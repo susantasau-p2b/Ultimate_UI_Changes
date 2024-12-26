@@ -1,0 +1,142 @@
+﻿@{
+    Layout = null;
+}
+@model Recruitment.RecruitEvaluationPara
+<style>
+    .radio_button_div_1, .horizontal_increpoly_row1 {
+        display: inline-block;
+    }
+
+    .increpoly_popup-content-label {
+        display: block;
+        float: left;
+        width: 123px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+
+    .increpoly_popup-content-textbox {
+        width: 120px;
+    }
+
+    .increpoly_row1 {
+        width: 424px;
+    }
+
+    .increpoly_icon-row {
+        position: relative;
+        left: 81px;
+        top: -150px;
+    }
+    .row3 {
+        width: 402px;
+    }
+</style>
+<script>
+	$(document).ready(function (e) {
+		var dt;
+		$('button').button();
+		$('#Name_Eval').ForceAmount().MaxLength(8);
+
+		$('#Lookup-SelectionPanel-RecruitEvaluationPara').on('click', function (event) {
+		    $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "RecruitEvaluationPara")', '', 'LookupDiv', 'Selection Panel Look Up Data', '#SelectionPanellist', 'SelectionPanellist', 5, 'SelectionPanellist', '#frmRecruitEvaluationPara', 'N', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-SelectionPanel-RecruitEvaluationPara', 'Lookup_table', 'PageNavPosition');
+		    event.preventDefault();
+		});
+
+	    $('<div></div>').P2BPartialCreateModalDialog();
+	    $('#Create-SelectionPanel-RecruitEvaluationPara').on("click", function (event) {
+	        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "SelectionPanel")', 'Create Selection Panel', 'open', '@Url.Action("Create", "SelectionPanel")', '#frmSelectionPanel', 'Message :', 'Request Falied :', '#JqGrid', 520, 600, '', '', '', '#frmRecruitEvaluationPara', '', function (data) {
+	            $('#SelectionPanellist').P2BLookUpEncapsulate('#SelectionPanellist', 'SelectionPanellist', data[0], data[1], 'SelectionPanellist', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-SelectionPanel-RecruitEvaluationPara', 'N');
+
+	        });
+	        event.preventDefault();
+	    });
+
+
+	    $('#Edit-SelectionPanel-RecruitEvaluationPara').button().on("click", function (event) {
+	        var a = [], b;
+	        a = $('#SelectionPanellist').P2BGetTableDataonSelectedRow('#SelectionPanellist', 0);
+	        b = a[0];
+	        //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+	        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "SelectionPanel")', '@Url.Action("Edit", "SelectionPanel")', b, '@Url.Action("Editsave", "SelectionPanel")', 'Edit Selection Panel data', '#frmSelectionPanel', b, 'Message :', 'Request Falied :', '#JqGrid', 520, 600, '#frmRecruitEvaluationPara', '#SelectionPanellist', 'SelectionPanellist', 'SelectionPanellist', 'N', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-SelectionPanel-RecruitEvaluationPara', function (data) {
+	            // setTimeout(function () {
+	            //to bind data according to selected id
+	            $.each(data[0], function (i, k) {
+	                $('#frmSelectionPanel').trigger("reset");
+	                $('#panelCategorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")",1064, k.PanelType_Id);
+	                $('#MaxPoints').val(k.MaxPoints);
+	                $('#SelectionCriteria').val(k.SelectionCriteria);
+	                $('#PanelName').val(k.PanelName);
+	            });
+	            //}, 3000);
+	            $.each(data[1], function (i, k) {
+	                $('#Employeelist').P2BLookUpEncapsulate('#Employeelist', 'Employeelist', k.RE_id, k.RE_val, 'Employeelist', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-RecruitEvaluationPara-RecruitEvaluationPara', 'N');
+	               
+	            });
+	            $.each(data[2], function (i, k) {
+	                $('#ExternalSelectorlist').P2BLookUpEncapsulate('#ExternalSelectorlist', 'ExternalSelectorlist', k.NS_id, k.NM_val, 'SelectionPanellist', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-SelectionPanel-RecruitEvaluationPara', 'N');
+
+	            });
+
+	        });
+	        event.preventDefault();
+	    });
+
+
+	    $('#Remove-SelectionPanel-RecruitEvaluationPara').button().on('click', function (event) {
+	        //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+	        //var a = [], b;
+	        //a = $('#SelectionPanellist').P2BGetTableDataonSelectedRow('#SelectionPanellist', 0);
+	        //b = a[0];
+			alert('hiii')
+			var selectedRows = [];
+            selectedRows = $('#SelectionPanellist').P2BGetTableDataonSelectedRow('#SelectionPanellist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SelectionPanellist', $('#SelectionPanellist').val(), 200, 200, '#frmRecruitEvaluationPara', '#SelectionPanellist', '#Edit-SelectionPanel-RecruitEvaluationPara,#Remove-SelectionPanel-RecruitEvaluationPara');
+	        event.preventDefault();
+	    });
+	    // Partial page edit
+
+		$('#Autho').makeDisable('#Create,#Edit,#Delete');
+		$('.popup_radio_button').controlgroup();
+		$('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+	    $('.drop').selectmenu().selectmenu('menuWidget');
+	    $('#CategorylistEvalpara').selectmenu().selectmenu("menuWidget");
+	    $('#CategorylistEvalpara').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 600, "");
+	});
+</script>
+<div id="Create_Dialog" title="Create JobAgency">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmRecruitEvaluationPara", name = "frmRecruitEvaluationPara" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        //<div class="increpoly_row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "increpoly_popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "increpoly_popup-content-textbox" }) </div>
+
+          <div class="row3 content_margine">@Html.LabelFor(m => m.Stage, "Stage :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Stage, new { @class = "popup-content-textbox must", @id = "Name_Eval" })</div>
+      
+
+         <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.RecruitEvalPara, "Recruit Eval Para Type :", new { @class = "popup-content-label must" })<select id="CategorylistEvalpara" name="CategorylistEvalpara" class="drop must" style="width:161px;"><option></option></select></div>
+        <div class="increpoly_row1 content_margine">
+            <div id="SelectionPanel_old"></div>
+            @Html.LabelFor(m => m.SelectionPanel, "Selection Panel:", new { @class = "increpoly_popup-content-label" })  <div class="popup-content-table">
+          <table class="lookuptableselected" id="SelectionPanellist">
+          <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+          </table>
+            </div>
+            <div class="increpoly_icon-row icon-row">
+                <button data-p2btooltip="LookUp SelectionPanel Details" class="popup-content-icon-lookup" id="Lookup-SelectionPanel-RecruitEvaluationPara"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Crate SelectionPanel Details" class="popup-content-icon-create" id="Create-SelectionPanel-RecruitEvaluationPara"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit SelectionPanel Details" class="popup-content-icon-edit" id="Edit-SelectionPanel-RecruitEvaluationPara"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove SelectionPanel Details" class="popup-content-icon-remove" id="Remove-SelectionPanel-RecruitEvaluationPara"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+
+
+    }
+</div>

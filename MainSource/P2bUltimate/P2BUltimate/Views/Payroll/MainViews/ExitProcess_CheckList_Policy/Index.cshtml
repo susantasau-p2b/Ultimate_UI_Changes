@@ -1,0 +1,271 @@
+﻿@model EMS.ExitProcess_CheckList_Policy
+@{
+    ViewBag.Title = "ExitProcess_CheckList_Policy";
+}
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 145px;
+            top: -145px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 190px;
+        }
+
+        .popup-content-labelT {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 120px;
+        }
+
+        .row3 {
+            width: 627px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .date-picker {
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" data-typeofbtn="process" id="View">View</button>
+                <button class="button" data-typeofbtn="release" id="Edit">Edit</button>
+                <button class="button" data-typeofbtn="delete" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmExitProcess_CheckList_Policy", name = "frmExitProcess_CheckList_Policy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+
+           <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ChecklistName, "Checklist Name  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ChecklistName, new { @class = "popup-content-textbox must" })
+            
+            </div>
+
+            <div class="row6 content_margine addons">
+                        <div id="LTCAdvanceClaimList_old"></div>
+                        @Html.LabelFor(m => m.ExitProcess_CheckList_Object, "ExitProcess_CheckList_Object:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ExitProcess_CheckList_ObjectList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup ExitProcess_CheckList_Object" class="button popup-content-icon-lookup" id="Lookup-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create ExitProcess_CheckList_Object" class="button popup-content-icon-create" id="Create-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit ExitProcess_CheckList_Object" class="button popup-content-icon-edit" id="Edit-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ExitProcess_CheckList_Object" class="button popup-content-icon-remove" id="Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+        }
+    </div>
+
+</body>
+</html>
+  
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        // $("#PayMonth").val($.datepicker.formatDate("mm/yy", new Date()));
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['ChecklistName', 'Id'];
+        ColNames = ['ChecklistName', 'Id'];
+        SortName = 'Id';
+        Caption = 'ExitProcess_CheckList_Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        @*$('#travelmodelist').on('selectmenuchange', function () {
+            $('#classoftravellist').P2BSelectMenuAppend('@Url.Action("ClassOffTravelList", "SeperationMaster")', $(this).val(), "", "0");
+        });*@
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmExitProcess_CheckList_Policy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create frmExitProcess_CheckList_Policy', 'open', '@Url.Action("Create")', '#frmExitProcess_CheckList_Policy', 'Message :', 'Request Falied :', '#JqGrid', 400, 580, '', '', function (data) { });
+            // $('[name="Default"]').button().button("refresh");
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            //alert('ok2');
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ExitProcess_CheckList_Policy Data", '#frmExitProcess_CheckList_Policy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 320, 550, '#AddressList,#ContactDetailsList', '', function (data) {
+                // setTimeout(function () {
+               // alert('ok1');
+                $.each(data[0], function (i, k) {
+                    $('#ChecklistName').val(k.ChecklistName);
+                    
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ExitProcess_CheckList_ObjectList').P2BLookUpEncapsulate('#ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', k.ExitProcessObj_Id, k.ExitProcessObj_FullDetails, 'ExitProcess_CheckList_ObjectList', '#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ExitProcess_CheckList_Policy Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 320, 550, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                  //  $('#Autho_Action').val(k.Action);
+                    $('#ChecklistName').val(k.ChecklistName);
+                });
+
+
+
+                //if ($("#Autho").hasClass('auto_active')) {
+                //    if (data[2] != null) {
+                //        $('#CheckListItemDesc').oldVal(data[2].CheckListItemDesc);
+                //        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                //        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                //        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                //    }
+                //}
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        // $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#PayProcessGroupList').selectmenu().selectmenu("menuWidget");
+        // $('#AmountList').selectmenu().selectmenu("menuWidget");
+        $('#ProcTypeList').selectmenu().selectmenu("menuWidget");
+    });
+
+
+
+    $('#Lookup-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy').on('click', function (event) {
+        $('.dialog').P2BLookUpModal('@Url.Action("GetExitProcessCheckListObjectDetails", "ExitProcess_CheckList_Object")', '', 'LookupDiv', 'Look Up Data', '#ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', 5, 'ExitProcess_CheckList_ObjectList', '#frmExitProcess_CheckList_Policy', 'A', '#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+    $('#Create-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy').button().on("click", function (event) {
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_ExitProcessCheckListObject", "ExitProcess_CheckList_Object")', 'ExitProcess_CheckList_Object List', 'open', '@Url.Action("Create", "ExitProcess_CheckList_Object")', '#frmExitProcess_CheckList_Object', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmExitProcess_CheckList_Object', '#Edit-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy,#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', function (data) {
+            $('#ExitProcess_CheckList_ObjectList').P2BLookUpEncapsulate('#ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', data[0], data[1], 'ExitProcess_CheckList_ObjectList', '#Edit-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy,#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', 'N');
+        });
+        event.preventDefault();
+    });
+
+    $('#Edit-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy').button().on("click", function (event) {
+        var a = [], b;
+        a = $('#ExitProcess_CheckList_ObjectList').P2BGetTableDataonSelectedRow('#ExitProcess_CheckList_ObjectList', 0);
+        b = a[0];
+        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_ExitProcessCheckListObject", "ExitProcess_CheckList_Object")', '@Url.Action("Edit", "ExitProcess_CheckList_Object")', b, '@Url.Action("EditSave", "ExitProcess_CheckList_Object")', 'ExitProcess_CheckList_Object Details', '#frmExitProcess_CheckList_Policy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmExitProcess_CheckList_Policy', '#ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', 'N', '#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', function (data) {
+            $.each(data[0], function (i, k) {
+                $('#frmExitProcess_CheckList_Policy').trigger('reset');
+                $('#ChecklistName').val(k.ChecklistName)
+            });
+            $.each(data[1], function (i, k) {
+                $('#ExitProcess_CheckList_ObjectList').P2BLookUpEncapsulate('#ExitProcess_CheckList_ObjectList', 'ExitProcess_CheckList_ObjectList', k.ExitProcessObj_Id, k.ExitProcessObj_FullDetails, 'ExitProcess_CheckList_ObjectList', '#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy', 'A');
+            });
+        });
+        event.preventDefault();
+    });
+
+    $('#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy').button().on('click', function (event) {
+        //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        //var a = [], b;
+        //a = $('#ExitProcess_CheckList_ObjectList').P2BGetTableDataonSelectedRow('#ExitProcess_CheckList_ObjectList', 0);
+        //b = a[0];
+
+        var selectedRows = [];
+        selectedRows = $('#ExitProcess_CheckList_ObjectList').P2BGetTableDataonSelectedRow('#ExitProcess_CheckList_ObjectList', 0);
+        $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExitProcess_CheckList_ObjectList', $('#ExitProcess_CheckList_ObjectList').val(), 200, 200, '#frmExitProcess_CheckList_Policy', '#ExitProcess_CheckList_ObjectList', '#Remove-ExitProcess_CheckList_Object-ExitProcess_CheckList_Policy');
+        event.preventDefault();
+    });
+
+
+
+
+
+
+
+
+
+
+
+</script>

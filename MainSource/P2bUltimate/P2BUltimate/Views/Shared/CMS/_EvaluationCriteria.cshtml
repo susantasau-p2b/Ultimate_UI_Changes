@@ -1,0 +1,130 @@
+﻿@{
+    Layout = null;
+}
+<style>
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 150px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 200px;
+    }
+</style>
+<script>
+    function SomeDeleteRowFunction(o) {
+        var currentRow = $(o).closest("tr");
+
+        var col1 = currentRow.find("td:eq(2)").html();
+        var col2 = currentRow.find("td:eq(3)").html();
+
+      //  var data = col1 + "\n" + col2;
+       // alert(data);
+
+        //var p = o.parentNode.parentNode;
+        //var col1 = p.find("td:eq(0)").text();
+        //alert(col1);
+
+        $.ajax({
+            url: "@Url.Action("deletedata", "CompetencyEmployeeDataT")",
+            method: "POST",
+            cache: false,
+            contentType: 'application/json',
+            datatype: 'json',
+            data: JSON.stringify({
+                ModelObjType: col1, ModelObjSubType: col2
+            }),
+            success: function (data) {
+                currentRow.remove();
+            }
+        });
+ 
+    }
+
+
+    $('#save_data').on('click', function (e) {
+        var formjson = [];
+        formjson.push({
+            "Id": $('#sr_no').val(),
+            "ModelName": $('#ModelName').val(),
+            "ModelObjectType": $('#ModelObjectType').val(),
+            "ModelObjectSubtype": $('#ModelObjectSubtype').val(),
+            "Criteria": $('#Criteria').val(),
+            "Data1": $('#Data1').val(),
+            "Data2": $('#Data2').val(),
+        });
+
+        $.ajax({
+            url: "@Url.Action("savedata", "CompetencyEmployeeDataT")",
+            method: "POST",
+            cache: false,
+            contentType: 'application/json',
+            datatype: 'json',
+            data: JSON.stringify({
+                data: formjson
+            }),
+            success: function (data) {
+                var tr = "";
+                var index = 1;
+                var tempclass = "";
+                $('#FinalTable tr:gt(0)').remove();
+
+                $.each(data, function (i, k) {
+                    tempclass = "weeklyoffclass";
+                    tr += "<tr class='" + tempclass + "' Id='" + k.SNo + "'><td>" + index + "</td><td>" + k.ModelName + "</td><td>" + k.ModelObjectType + "</td><td>" + k.ModelObjectSubtype + "</td><td>" + k.Criteria + "</td><td>" + k.Data1 + "</td><td>" + k.Data2 + "</td><td><input type='button' value='Delete' onclick='SomeDeleteRowFunction(this)'></td></tr>";
+                    index++;
+                    tempclass = "";
+                });
+                $('#FinalTable tr:last').after(tr);
+            }
+        });
+
+        $('#Finaldv').show();
+        $('#process_data').show();
+        alert('Data Save Successfully');
+        $('#save_data').hide();
+        e.preventDefault();
+
+    });
+    $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+</script>
+
+<form id="frm_edit_form" name="frm_edit_form">
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Sr.No :</label>
+        <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+    </div>
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Model Name :</label>
+        <input type="text" id="ModelName" name="ModelName" class="popup-content-textbox" readonly />
+    </div>
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Model ObjectType :</label>
+        <input type="text" id="ModelObjectType" name="ModelObjectType" class="popup-content-textbox" readonly />
+    </div>
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Model Object SubType :</label>
+        <input type="text" id="ModelObjectSubtype" name="ModelObjectSubtype" class="popup-content-textbox" readonly />
+    </div>
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Criteria :</label>
+        <input type="text" id="Criteria" name="Criteria" class="popup-content-textbox" readonly />
+    </div>
+
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Data1 :</label>
+        <input type="text" id="Data1" name="Data1" class="popup-content-textbox" />
+
+    </div>
+    <div class="row1 content_margine">
+        <label class="popup-content-label">Data2 :</label>
+        <input type="text" id="Data2" name="Data2" class="popup-content-textbox" />
+
+    </div>
+    @*<button type="button" id="sub_form">Submit</button>*@
+    <div style="float:right">
+        <button id="save_data">Save</button>
+    </div>
+</form>

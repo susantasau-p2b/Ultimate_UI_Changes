@@ -1,0 +1,733 @@
+﻿﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/P2B_CSS")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @*<script src="~/Scripts/P2B_Scripts/PagesValidation.js"></script>*@
+    <script src="~/Scripts/jquery.dataTables.js" type="text/javascript"></script>
+    @*<script src="~/Scripts/tableTools.js" type="text/javascript"></script>*@
+    <script src="~/Scripts/jquery.jeditable.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.dataTables.editable.js" type="text/javascript"></script>
+    <script src="~/Scripts/dataTables.colReorder.js" type="text/javascript"></script>
+    <script src="~/Scripts/dataTables.colVis.js" type="text/javascript"></script>
+    <script src="~/Scripts/dataTables.responsive.js"></script>
+    <script src="~/Scripts/pdf.js" type="text/javascript"></script>
+    @*<script src="~/Scripts/pdf.worker.js" type="text/javascript"></script>*@
+
+    <link rel="stylesheet" href="~/Content/themes/base/jquery.dataTables.css" />
+    <link rel="stylesheet" href="~/Content/themes/base/jquery.dataTables_themeroller.css" />
+    <link rel="stylesheet" href="~/Content/themes/base/tableTools.css" />
+    <link href="~/Content/themes/base/dataTables.colReorder.css" rel="stylesheet" />
+    <link href="~/Content/themes/base/dataTables.colVis.css" rel="stylesheet" />
+    <link href="~/Content/themes/base/dataTables.responsive.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/P2B_Scripts")
+    <link href="~/Content/HomePage/HomePage.css" rel="stylesheet" />
+    <style>
+        .dropbtn {
+            border: none;
+            cursor: pointer;
+        }
+
+
+            .dropbtn:hover, .dropbtn:focus {
+            }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 151px;
+            overflow: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 999;
+            right: 0px;
+            top: 20px;
+        }
+
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+        .dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+
+        #modelname {
+            color: #00897B;
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            var htm2 = "";
+            var htm3 = "";
+            var htm4 = "";
+
+            if (window.location.pathname.split('/').length > 2) {
+                if ($.LocalStorageHelper('LinkLength') == null) {
+                    $.LocalStorageHelper('LinkLength', 3);
+                }
+            } else {
+                if ($.LocalStorageHelper('LinkLength') == null) {
+                    $.LocalStorageHelper('LinkLength', 2);
+                }
+            }
+            console.log($.LocalStorageHelper('LinkLength'));
+            var GenrateLink = function (str) {
+                var parm = "";
+                if (str.split('/').length > 2) {
+                    parm += "?parm=" + str.split('/')[2];
+                    var link = str.split('/');
+                    str = link[0] + "/" + link[1];
+                }
+                if (window.location.pathname.split('/').length > $.LocalStorageHelper('LinkLength')) {
+                    return "../" + str + parm + "";
+
+                } else {
+                    return "./" + str + parm + "";
+                }
+            };
+            var MenuCreation = function (data) {
+                //   console.log(data);
+                if (data.children) {
+                    for (var i = 0; i < data.children.length; i++) {
+                        var link;
+                        if (data.children[i].data.url.trim() != "#") {
+                            link = GenrateLink(data.children[i].data.url.trim());
+                        } else {
+                            link = "#";
+                        }
+                        $("#htm1").append('<li id=' + i + '><a id=' + i + ' href=' + link.toLowerCase() + '>' + data.children[i].text + '</a><li>');
+
+                        if (data.children[i]) {
+                            for (var j = 0; j < data.children[i].children.length; j++) {
+                                var link;
+                                ////debugger;
+                                if (data.children[i].children[j].data.url.trim() != "#") {
+                                    link = GenrateLink(data.children[i].children[j].data.url.trim());
+                                } else {
+                                    link = '#';
+                                }
+                                //console.log(link);
+                                htm2 += '<li id=' + i + j + '><a id=' + +i + j + ' href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].data.authority + ' >' + data.children[i].children[j].text + '</a></li>';
+
+                                if (j == data.children[i].children.length - 1) {
+                                    $("#htm1 li#" + i + "").append("<ul class='submenu'>" + htm2 + "</ul>");
+                                    htm2 = "";
+                                }
+                            }
+                        }
+                    }
+
+                    //for second level of menu
+                    for (var i = 0; i < data.children.length; i++) {
+                        if (data.children[i]) {
+                            for (var j = 0; j < data.children[i].children.length; j++) {
+                                if (data.children[i].children[j].children) {
+                                    for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+                                        var link;
+                                        // ////debugger;
+                                        if (data.children[i].children[j].children[l].data.url != undefined) {
+                                            if (data.children[i].children[j].children[l].data.url != "#") {
+                                                link = GenrateLink(data.children[i].children[j].children[l].data.url.trim());
+                                            } else {
+                                                link = '#';
+                                            }
+                                        } else {
+                                            link = '#';
+                                        }
+                                        //console.log(link);
+                                        htm3 += '<li id=' + i + j + l + '><a id=' + i + j + l + ' href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].data.authority + '>' + data.children[i].children[j].children[l].text + '</a></li>';
+                                        if (l == data.children[i].children[j].children.length - 1) {
+                                            $("#htm1>li>ul.submenu>li#" + i + j + "").append("<ul class='submenu_level_2'>" + htm3 + "</ul>");
+                                            htm3 = "";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //for third level of menu
+                    for (var i = 0; i < data.children.length; i++) {
+
+                        if (data.children[i]) {
+                            for (var j = 0; j < data.children[i].children.length; j++) {
+
+                                if (data.children[i].children[j].children) {
+                                    for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+
+                                        if (data.children[i].children[j].children[l].children) {
+                                            for (var m = 0; m < data.children[i].children[j].children[l].children.length; m++) {
+                                                var link;
+                                                if (data.children[i].children[j].children[l].children[m].data.url != undefined) {
+                                                    if (data.children[i].children[j].children[l].children[m].data.url != "#") {
+                                                        link = GenrateLink(data.children[i].children[j].children[l].children[m].data.url.trim());
+                                                    } else {
+                                                        link = "#";
+                                                    }
+                                                } else {
+                                                    link = "#";
+                                                }
+                                                htm4 += '<li id=' + i + j + l + m + '><a id=' + i + j + l + m + ' href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].children[m].data.authority + '>' + data.children[i].children[j].children[l].children[m].text + '</a></li>';
+
+                                                if (m == data.children[i].children[j].children[l].children.length - 1) {
+                                                    $("#htm1>li>ul.submenu>li>ul.submenu_level_2>li#" + i + j + l + "").append("<ul class='submenu_level_3'>" + htm4 + "</ul>");
+                                                    htm4 = "";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //for forth level of menu
+                    for (var i = 0; i < data.children.length; i++) {
+
+                        if (data.children[i]) {
+                            for (var j = 0; j < data.children[i].children.length; j++) {
+
+                                if (data.children[i].children[j].children) {
+                                    for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+
+                                        if (data.children[i].children[j].children[l].children) {
+                                            for (var m = 0; m < data.children[i].children[j].children[l].children.length; m++) {
+
+                                                if (data.children[i].children[j].children[l].children[m].children) {
+                                                    for (var n = 0; n < data.children[i].children[j].children[l].children[m].children.length; n++) {
+                                                        var link;
+                                                        if (data.children[i].children[j].children[l].children[m].children[n].data.url != undefined) {
+                                                            if (data.children[i].children[j].children[l].children[m].children[n].data.url != "#") {
+                                                                //console.log(data.children[i].children[j].children[l].children[m].children[n].data.url);
+                                                                link = GenrateLink(data.children[i].children[j].children[l].children[m].children[n].data.url.trim());
+
+                                                            } else {
+                                                                link = "#";
+                                                            }
+                                                        } else {
+                                                            link = "#";
+                                                        }
+                                                        htm4 += '<li><a id=' + i + j + l + m + n + ' href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].children[m].children[n].data.authority + '>' + data.children[i].children[j].children[l].children[m].children[n].text + '</a></li>';
+
+                                                        if (n == data.children[i].children[j].children[l].children[m].children.length - 1) {
+                                                            $("#htm1>li>ul.submenu>li>ul.submenu_level_2>li>ul.submenu_level_3>li#" + i + j + l + m + "").append("<ul class='submenu_level_4'>" + htm4 + "</ul>");
+                                                            htm4 = "";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                $.getJSON("@Url.Action("GetJsonEmpWise", "Menuconfig")", function (data) {
+                    if (data == null) {
+                        return false;
+                    }
+                    var authority_string;
+                    console.log(data);
+                    //var d = JSON.parse(data);
+                    $('#menu_div a').hide();
+                    $.each(data["urlauthority"], function (i, k) {
+                        var anchr = $('#menu_div a[href="' + './' + i + '"]');
+                        var a = anchr.parents('ul').toArray();
+                        anchr.show();
+                        var i = 0;
+                        while (i < a.length) {
+                            if ($(a[i]).attr('id') != "htm1") {
+                                $(a[i]).show();
+                                $(a[i]).prev().show();
+                            }
+                            i++;
+                        }
+                    });
+
+                    var link = window.location.pathname.split("/")[1];
+                    authority_string = data["urlauthority"][link];
+                    if (authority_string == undefined) {
+                        return false
+                    }
+                    var authority_set = [];
+                    for (var i = 0; i < authority_string.length; i++) {
+                        authority_set = authority_set.concat(authority_string[i]);
+                    }
+                    var all_btn = $('.Button_Container').find('button').toArray();
+                    //console.log(all_btn);
+                    //var create_btn = $('button:contains("Create")');
+                    //var edit_btn = $('button:contains("Edit")');
+                    //var delete_btn = $('button:contains("Delete")');
+                    //var delete_btn = $('button:contains("Delete")');
+                    var view_btn = $('button:contains("View")');
+                    var authorized_btn = $('button:contains("Authorized")');
+
+                    var btn_set = all_btn;
+
+                    var checkExitance = function (btn_name) {
+                        if (authority_set.indexOf($(btn_name).attr("id").toLowerCase()) > -1) {
+                            $(btn_name).button("enable");
+                        } else {
+                            $(btn_name).button("disable");
+                        }
+                    };
+                    if (authority_set.indexOf("meaker") > -1) {
+                        /*
+                        *  He is meaker
+                        */
+                        $(btn_set).each(function (i, k) {
+                            checkExitance(k);
+                        });
+                        authorized_btn.button("disable");
+                    } else {
+                        /*
+                            He Is Cheaker
+                        */
+                        $.each(btn_set, function (i, k) {
+                            k.button("disable");
+                        });
+                        authorized_btn.button("enable");
+                        view_btn.button("enable");
+                    }
+                });
+            };
+            var MenuGenration = function (url, ModuleType) {
+                ModuleType = ModuleType || null;
+                //console.log(ModuleType);
+                $.getJSON(url, function (data) {
+                    $('#htm1').empty();
+                    if (ModuleType != null && ModuleType != undefined) {
+                        $(data).each(function (i, k) {
+                            $(k.children).each(function (i, k) {
+                                if (k.text.toLowerCase() == ModuleType.toLowerCase()) {
+                                    MenuCreation(k);
+                                }
+                            });
+                        });
+                    } else {
+                        //$(data).each(function (i, k) {
+                        //    $(k.children).each(function (i, k) {
+                        //        if (k.text.toLowerCase() == "core".toLocaleLowerCase()) {
+                        //            MenuCreation(k);
+                        //        }
+                        //    });
+                        //});
+                    }
+                });
+            };
+            $('li.nav-item>a').on('click', function (e) {
+                var ancher_id = $(this).attr('id');
+                var menulink = $(this).attr('href');
+                $.post("@Url.Action("moduletype", "menuconfig")", { data: ancher_id }, function (data) {
+                    MenuGenration("@Url.Action("GetJson","MenuConfig")", ancher_id);
+                    window.location.href = menulink;
+                });
+                e.preventDefault();
+            });
+            MenuGenration("@Url.Action("GetJson","MenuConfig")", "@Request.RequestContext.HttpContext.Session["ModuleType"]");
+            $('#main_home').on('click', function () {
+                $.post("@Url.Action("moduletype", "menuconfig")", { data: null }, function (data) {
+                    MenuGenration("@Url.Action("GetJson","MenuConfig")", "@Request.RequestContext.HttpContext.Session["ModuleType"]");
+                    window.location.href = "@Url.Action("index","Dashboard")";
+                });
+            });
+            var a = 0;
+            function myFunction() {
+                document.getElementById("myDropdown").classList.toggle("show");
+            }
+            $('#myFunction').on('click', function (e) {
+                //  alert('hi');
+                myFunction();
+                e.preventDefault();
+            });
+            // Close the dropdown if the user clicks outside of it
+            window.onclick = function (event) {
+                if (!event.target.matches('.dropbtn')) {
+
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            }
+            $('#calendar').on('click', function (e) {
+                if (a == 0) {
+                    a = 1;
+                    $('#calendar_display').datepicker({
+                        showButtonPanel: true,
+                        numberOfMonths: 3
+                    }).stop(true, true).show('drop').draggable();
+                }
+                else {
+                    a = 0;
+                    $('#calendar_display').datepicker().hide('drop');
+                }
+            });
+            $(window).on("click", function (e) {
+                var width = $('#drawer').width();
+                if (e.target.id === "nav-trigger") {
+                    //  console.log(width);
+                    if (width > 0) {
+                        $('#drawer').css('width', '0px');
+                        $("#nav-trigger")[0].checked = false;
+                    } else {
+                        $('#drawer').css('width', '80px');
+                        $("#nav-trigger")[0].checked = true;
+                    }
+                } else {
+                    if ($("#nav-trigger")[0].checked == true) {
+                        $('#drawer').css('width', '0px');
+                        $("#nav-trigger")[0].checked = false;
+                    }
+                }
+            });
+            $.get("@Url.Action("GetFyLy", "IntialSelection")", function (data) {
+                $.each(data, function (i, k) {
+                    if (i == 'fy') {
+                        $('#fydate').append("Fy:" + k);
+                    } else {
+                        $('#lydate').append("Ly:" + k);
+                    }
+                    // console.log(i);
+                });
+            });
+            var todaydate = new Date();
+            $.get("@Url.Action("GetUserinfo", "Login")", function (data) {
+                $('#company-name,#employe-name,#header-company-title').empty();
+                if (data.success == true) {
+                    if (data.data != null) {
+                        if (data.data["GeoStruct_Company_Name"] != null) {
+                            $('#header-company-title').html(data.data["GeoStruct_Company_Name"]);
+                        } else {
+                            $('#header-company-title').html("<p></p>");
+                        }
+                        //design-name
+                        if (data.data["PayStruct_Grade_Name"] != null) {
+                            $('#design-name').html(data.data["PayStruct_Grade_Name"]);
+                        } else {
+                            $('#design-name').html("<p></p>");
+                        }
+                        if (data.data["EmpName"] != null) {
+                            $('#employe-name').html(data.data["EmpCode"] + " " + data.data["EmpName"]);
+                        } else {
+                            $('#employe-name').html("<p></p>");
+                        }
+                    }
+                } else {
+                    console.log(data);
+                }
+
+            });
+            $('#change_pass').on("click", function (e) {
+                $('<div></div>').P2BConfidentialModelDialog({
+                    passurl: "@Url.Action("PassCheck", "ChangePassword") ",
+                    htmlurl: "@Url.Action("partial", "ChangePassword")",
+                    submiturl: "@Url.Action("create", "ChangePassword")",
+                    form: '#frmResetPassword',
+                    height: "358",
+                    width: "458",
+                    title: "Change Password",
+                    returnfun: function (data) {
+                        window.location.href = "" + data + "";
+                    },
+                });
+                e.preventDefault();
+            });
+            $('#reset_pass').on("click", function (e) {
+                $('<div></div>').P2BConfidentialModelDialog({
+                    passurl: "@Url.Action("PassCheck", "ChangePassword") ",
+                    htmlurl: "@Url.Action("partial", "ResetPassword")",
+                    submiturl: "@Url.Action("create", "ResetPassword")",
+                    form: '#frmResetPassword1',
+                    height: "400",
+                    width: "500",
+                    title: "Reset Password",
+                    returnfun: function (data) {
+                        //   window.location.href = "" + data + "";
+                    },
+                });
+                e.preventDefault();
+            });
+
+
+            $.get("@Url.Action("GetRole","Login")", function (data) {
+                if (data.success == true) {
+                    $('#add_newuser').on("click", function (e) {
+                        $('<div></div>').P2BConfidentialModelDialog({
+                            passurl: "@Url.Action("PassCheck", "addnewuser") ",
+                            htmlurl: "@Url.Action("partial","addnewuser")",
+                            submiturl: "@Url.Action("AddOrRemove", "addnewuser")",
+                            form: '#frmaddnewuser',
+                            height: "358",
+                            width: "458",
+                            title: "Add New User",
+                            returnfun: function (data) {
+                                console.log(data);
+                            },
+                        });
+                        e.preventDefault();
+                    });
+                    $('#release_pass').on("click", function (e) {
+                        $('<div></div>').P2BConfidentialModelDialog({
+                            passurl: "@Url.Action("PassCheck", "ChangePassword") ",
+                            htmlurl: "@Url.Action("partial", "LockRelease")",
+                            submiturl: "@Url.Action("create", "LockRelease")",
+                            form: '#frmlockrelease',
+                            height: "358",
+                            width: "500",
+                            title: "Lock Release",
+                            returnfun: function (data) {
+                                //  window.location.href = "" + data + "";
+                            },
+                        });
+                        e.preventDefault();
+                    });
+                    $('#p_p').on("click", function (e) {
+                        $('<div></div>').CustomeDialog({
+                            htmlurl: "@Url.Action("Index","PasswordPolicy")",
+                            onloaddataurl: null,
+                            onloaddataid: null,
+                            submiturl: "@Url.Action("Create","PasswordPolicy")",
+                            editid: null,
+                            form: "#frmPasswordPolicy",
+                            title: "Create Password Policy",
+                            height: 473,
+                            width: 1104,
+                            onloadreturnfunction: null,
+                            forwarddata: null,
+                            onsubmitreturnfunction: function (data) {
+                                console.log(data);
+                            }
+                        });
+                        e.preventDefault();
+                    });
+                    $('#U_UserProfile').on("click", function (e) {
+                        $('<div></div>').P2BConfidentialModelDialog({
+                            passurl: "@Url.Action("PassCheck", "addnewuser") ",
+                            htmlurl: "@Url.Action("index", "Upload")",
+                            submiturl: "@Url.Action("UploadFiles", "Upload")",
+                            form: '#frmUpload',
+                            height: "358",
+                            type: "FILE",
+                            width: "458",
+                            title: "Upload User Data",
+                            returnfun: function (data) {
+                                console.log(data);
+                            },
+
+                        });
+                        e.preventDefault();
+                    });
+                    $('#menu_autho').on("click", function (e) {
+                        $('<div></div>').P2BConfidentialModelDialog({
+                            passurl: "@Url.Action("PassCheck", "addnewuser") ",
+                            htmlurl: "@Url.Action("partial", "MenuAuthority")",
+
+                            height: "358",
+                            width: "800",
+                            title: "Menu Authority User",
+                            returnfun: function (data) {
+                                console.log(data);
+                            },
+
+                        });
+                        e.preventDefault();
+                    });
+                }
+            });
+            var loadImage = function (url, id) {
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        if (data.status == true) {
+                            $(id).attr('src', "data:image/png;base64," + data.data + "");
+                        } else {
+                            console.log("Error while loading captcha image");
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            };
+
+            //var loadImage1 = function (url, id) {
+            //    $.ajax({
+            //        type: 'GET',
+            //        url: url,
+            //        dataType: "json",
+            //        cache: false,
+            //        data: { data: data },
+            //        success: function (data) {
+
+            //            if (data != null) {
+
+            //                $(id).attr('src', "data:image/png;base64," + data + "");
+            //            } else {
+            //                console.log("Error while loading captcha image");
+            //            }
+            //        },
+            //        error: function (data) {
+            //        }
+            //    });
+            //};
+
+            //LoadImg("@Url.Action("GetEmpProfileImage", "Login")", "#dashboard-emp-avatar");
+            $("#dashboard-emp-avatar").LoadImg("@Url.Action("GetEmpProfileImage", "Login")");
+
+            loadImage("@Url.Action("GetCompImage", "Login")", "#dashboard-Company-avatar");
+            $('#modelname').html("@Request.RequestContext.HttpContext.Session["ModuleType"]");
+
+            localStorage.setItem("idelCounter", 5);
+            function IdelCounterFun() {
+                var idelCounter = parseInt(localStorage.getItem("idelCounter"));
+                idelCounter--;
+                if (idelCounter == 0 && $('.ajax_loder').length == 0) {
+                    alert("System Lock..!");
+                    window.location = "@Url.Action("Logout", "Login")";
+                }
+            };
+            var Counter = setInterval(IdelCounterFun, 60000);
+            $(document).on('click keypress', function () {
+                localStorage.setItem("idelCounter", 5);
+            });
+
+        });
+    </script>
+
+</head>
+<body>
+    <div class="header-content row">
+        <div class="header">
+            <div class="header-title">
+                <a href="" class="img_comp_icon">
+                    <img alt="" src="" id="dashboard-Company-avatar" style="background-repeat: no-repeat; max-height: 100px; max-width: 100px; " />
+                </a>
+                <div class="header-title-text">
+                    <div class="header-company-name" id="header-company-title">
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-info">
+                @*<div class="header-section1">
+            <div></div>
+        </div>*@
+                <div id="emp-avatar">
+                    @*<img id="dashboard-emp-avatar" style="background-repeat: no-repeat;padding: 4px; border-radius: 20%; max-height: 70px; max-width: 54px; " src="~/Content/EmployeeAvatar.png" />*@
+                    @*<img id="dashboard-emp-avatar" src="~/Content/EmployeeAvatar.png"/>*@
+                    <img id="dashboard-emp-avatar" />
+                    @*<img id="emp-avatar-img" />*@
+                </div>
+                <div class="header-section2">
+                    <div id="employe-name" class="emp-details"></div>
+                    <div id="design-name" class="emp-details-desc"></div>
+                    <div id="todaydate" class="emp-details-desc"></div>
+                    <div id="fydate" class="emp-details-desc"></div>
+                    <div id="lydate" class="emp-details-desc"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="menu_content row">
+        <nav id="menu_div" class="col-md-9">
+            <ul id="htm1" class="menu"></ul>
+        </nav>
+        <nav class="col-md-3">
+            <ul id="menu_icon">
+                <li id="modelname"></li>
+
+                <li><a href="#" data-p2bheadertooltip="Home"><span id="main_home"><i class="fa fa-home menu-icon-size fa-fw menu-icon-size" style="color:#181818cc;" aria-hidden="true"></i></span></a></li>
+                <li><a href="@Url.Action("logout", "login")" data-p2bheadertooltip="LogOut"><span id="log_out"><i class="fa fa-fw fa-sign-out menu-icon-size" style="color:#181818cc;" aria-hidden="true"></i></span></a></li>
+                <li><a href="#" data-p2bheadertooltip="Calendar"><span id="calendar"><i class="fa fa-fw fa-calendar-check-o menu-icon-size" style="color:#181818cc;" aria-hidden="true"></i></span></a></li>
+                <li>
+                    <div class="dropdown">
+                        <span id="myFunction" class="dropbtn fa fa-caret-square-o-down menu-icon-size" style="color:#181818cc;" aria-hidden="true">
+                        </span>
+                        <div id="myDropdown" class="dropdown-content">
+                            <a href="#" id="U_UserProfile">Upload User Data</a>
+                            @*<a href="#" id="p_p">Password Policy</a>*@
+                            <a href="#" id="change_pass">Change Password</a>
+                            <a href="#" id="reset_pass">Reset Password</a>
+                            <a href="#" id="release_pass">Release Lock</a>
+                            <a href="#" id="add_newuser">User Accountability</a>
+                            <a href="#" id="menu_autho">Menu Authority</a>
+                            <a id="Site_map" href="@Url.Action("Index","SiteMap")">Site Map</a>
+                        </div>
+                    </div>
+                </li>
+                <li><a href="#" data-p2bheadertooltip="Help"><span><i class="fa fa-question menu-icon-size fa-fw" style="color:#181818cc;" aria-hidden="true"></i></span></a></li>
+            </ul>
+        </nav>
+
+    </div>
+
+    <div class="middle-content row">
+        <div>
+            <span id="calendar_display" class="ui-widget-content"></span>
+        </div>
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger"></label>
+        <div>
+            <nav>
+                <ul id="drawer">
+                    <li class="nav-item"><a id="CORE" title="Core" href="@Url.Action("Index", "CoreDashboard")"><span>CORE</span></a></li>
+                    <li class="nav-item" title="Expert Payroll Management System"><a id="EPMS" href="@Url.Action("Index", "EPMSDashBoard")"><span>EPMS</span></a></li>
+                    <li class="nav-item" title="Expert Leave Management System"><a id="ELMS" href="@Url.Action("index", "ELMSDashBoard")"><span>ELMS</span></a></li>
+                    <li class="nav-item" title="Expert Employee Information System"><a id="EEIS" href="@Url.Action("index", "EEISDashBoard")"><span>EEIS</span></a></li>
+                    <li class="nav-item" title="Expert Time Resources Management System"><a id="ETRM" href="@Url.Action("index", "ETRMDashBoard")"><span>ETRM</span></a></li>
+                    @*<li class="nav-item" title="Expert Pf Trust Management System"><a id="EPFT" href="@Url.Action("Index", "EPFTDashBoard")"><span>EPFT</span></a></li>*@
+                </ul>
+            </nav>
+        </div>
+        <div class="page_content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="footer-content">
+        <div class="sp"></div>
+        <div class="footer-content-menu-list">
+            <ul>
+                @*<li><a>About P2B Ultimate</a></li>*@
+                <li><a>About Ultimate</a></li>
+                <li><a>Support</a></li>
+                <li><a>Help</a></li>
+            </ul>
+        </div>
+        @*<div class="footer-content-copyright">
+                <a><strong>  Copyright</strong> &copy;<strong> - 2015 Developed By P2BAce Solutions Pvt Ltd.</strong></a>
+            </div>*@
+    </footer>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

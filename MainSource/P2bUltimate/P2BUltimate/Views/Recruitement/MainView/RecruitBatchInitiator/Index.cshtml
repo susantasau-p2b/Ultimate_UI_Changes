@@ -1,0 +1,994 @@
+﻿@{
+    ViewBag.Title = "Recruitment Batch Initiator";
+}
+@model Recruitment.RecruitBatchInitiator
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 75px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 120px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 424px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .regpoly_popup-content-label {
+            width: 208px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .popup_radio_button {
+            font-size: 9px;
+            margin: 0 0 2px 2px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="Create_Dialog" title="Create Recruit Batch Initiator">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmRecruitBatchInitiator", name = "frmfrmRecruitBatchInitiatorEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.BatchName, "Batch Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BatchName, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.JobReferenceNo, "JobReference No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.JobReferenceNo, new { @class = "popup-content-textbox must" })</div>
+            <div class="row5 content_margine">@Html.LabelFor(m => m.initiatedDate, "Initiated Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.initiatedDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">
+                <div id="PostDetails_old"></div>
+                @Html.LabelFor(m => m.PostDetails, "Post Details :", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PostDetailslist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup PostDetails" class="popup-content-icon-lookup" id="Lookup-PostDetails-RecruitBatchInitiator"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create PostDetails" class="popup-content-icon-create" id="Create-PostDetails-RecruitBatchInitiator"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit PostDetails" class="popup-content-icon-edit" id="Edit-PostDetails-RecruitBatchInitiator"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove PostDetails" class="popup-content-icon-remove" id="Remove-PostDetails-RecruitBatchInitiator"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            @*<div class="row3 content_margine">
+                    <div id="Geostruct_old"></div>
+                    @Html.LabelFor(m => m.Geostruct, "Geo struct :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="Geostructlist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Geostruct" class="popup-content-icon-lookup" id="Lookup-Geostruct-RecruitBatchInitiator"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Geostruct" class="popup-content-icon-create" id="Create-Geostruct-RecruitBatchInitiator"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Geostruct" class="popup-content-icon-edit" id="Edit-Geostruct-RecruitBatchInitiator"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Geostruct" class="popup-content-icon-remove" id="Remove-Geostruct-RecruitBatchInitiator"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+
+            @*<div class="row3 content_margine">
+                    <div id="JobSource_old"></div>@Html.LabelFor(m => m.JobSource, "Job Source Details :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="JobSourceDetailslist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Job Source Details" class="popup-content-icon-lookup" id="Lookup-JobSource-RecruitBatchInitiator"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Job Source Details" class="popup-content-icon-create" id="Create-JobSource-RecruitBatchInitiator"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Job Source Details" class="popup-content-icon-edit" id="Edit-JobSource-RecruitBatchInitiator"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Job Source Details" class="popup-content-icon-remove" id="Remove-JobSource-RecruitBatchInitiator"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+            <div class="row3 content_margine ">
+                <div id="JobAgencylist_old"></div>
+                @Html.LabelFor(m => m.JobAgency, "Job Agency :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobAgencylist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Job Agency Details" class="popup-content-icon-lookup" id="Lookup-JobAgency-JobSource"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Job Agency Details" class="popup-content-icon-create" id="Create-JobAgency-JobSource"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Job Agency Details" class="popup-content-icon-edit" id="Edit-JobAgency-JobSource"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Job Agency Details" class="popup-content-icon-remove" id="Remove-JobAgency-JobSource"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="JobInsideOrglist_old"></div>
+                @Html.LabelFor(m => m.JobInsideOrg, "Job Inside Org:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobInsideOrglist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Job Inside Org Details" class="popup-content-icon-lookup" id="Lookup-JobInsideOrg-JobSource"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Job Inside Org Details" class="popup-content-icon-create" id="Create-JobInsideOrg-JobSource"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Job Inside Org Details" class="popup-content-icon-edit" id="Edit-JobInsideOrg-JobSource"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Job Inside Org Details" class="popup-content-icon-remove" id="Remove-JobInsideOrg-JobSource"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="IncrJobNewsPaper_old"></div>
+                @Html.LabelFor(m => m.JobNewsPaper, "Job News Paper:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobNewsPaperlist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Job News Paper Details" class="popup-content-icon-lookup" id="Lookup-JobNewsPaper-JobSource"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Job News Paper Details" class="popup-content-icon-create" id="Create-JobNewsPaper-JobSource"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Job News Paper Details" class="popup-content-icon-edit" id="Edit-JobNewsPaper-JobSource"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Job News Paper Details" class="popup-content-icon-remove" id="Remove-JobNewsPaper-JobSource"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="JobPortal_old"></div>
+                @Html.LabelFor(m => m.JobPortal, "Job Portal:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobPortallist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Job Portal Details" class="popup-content-icon-lookup" id="Lookup-JobPortal-JobSource"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Job Portal Details" class="popup-content-icon-create" id="Create-JobPortal-JobSource"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Job Portal Details" class="popup-content-icon-edit" id="Edit-JobPortal-JobSource"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Job Portal Details" class="popup-content-icon-remove" id="Remove-JobPortal-JobSource"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="RecruitEvaluationProcess_old"></div>@Html.LabelFor(m => m.RecruitEvaluationProcess, "Recruitment Evaluation Process Details :", new { @class = "popup-content-label" })
+                <br />
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="RecruitEvaluationProcessDetailslist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Recruit Evaluation Process Details" class="popup-content-icon-lookup" id="Lookup-RecruitEvaluationProcess-RecruitBatchInitiator"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Recruit Evaluation Process Details" class="popup-content-icon-create" id="Create-RecruitEvaluationProcess-RecruitBatchInitiator"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Recruit Evaluation Process Details" class="popup-content-icon-edit" id="Edit-RecruitEvaluationProcess-RecruitBatchInitiator"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Recruit Evaluation Process Details" class="popup-content-icon-remove" id="Remove-RecruitEvaluationProcess-RecruitBatchInitiator"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.CandidateDocuments, "Document details :", new { @class = "popup-content-label add_label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="CandidateDocumentslist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Document Details" class=" popup-content-icon-lookup" id="Lookup-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Document Details" class=" popup-content-icon-create" id="Create-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Document Details" class=" popup-content-icon-edit" id="Edit-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete Document Details" class=" popup-content-icon-remove" id="Remove-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            @*<div class="row3 content_margine">
+                <div id="ResumeCollection_old"></div>@Html.LabelFor(m => m.ResumeCollection, "Resume Collection Details :", new { @class = "popup-content-label" })
+                <br />
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ResumeCollectionlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup ResumeCollection Details" class="popup-content-icon-lookup" id="Lookup-ResumeCollection-RecruitBatchInitiator"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create ResumeCollection Details" class="popup-content-icon-create" id="Create-ResumeCollection-RecruitBatchInitiator"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+            @*<button data-p2btooltip="Edit ResumeCollection Details" class="popup-content-icon-edit" id="Edit-ResumeCollection-RecruitBatchInitiator"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove ResumeCollection Details" class="popup-content-icon-remove" id="Remove-ResumeCollection-RecruitBatchInitiator"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+
+            @*<div class="row5 content_margine">@Html.LabelFor(m => m.PublishDate, "Publish Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PublishDate, new { @class = "popup-content-textbox must" })</div>*@
+
+            <div class="row3 content_margine">
+            </div>
+
+            @*<div class="row5 content_margine">@Html.LabelFor(m => m.BatchCloseDate, "Batch Close Date:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BatchCloseDate, new { @class = "popup-content-textbox " })</div>*@
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        //$('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        //$('#Code').MaxLength(10);
+        $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#initiatedDate').P2BDatePicker();
+        $('#PublishDate').P2BDatePicker();
+        $('#BatchCloseDate').P2BDatePicker();
+
+        //  $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator,#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator,#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator,#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator";
+        ColModel = ['BatchName', 'JobReferenceNo', 'InitiatedDate', 'Id'];
+        ColNames = ['BatchName', 'JobReferenceNo', 'InitiatedDate', 'Id'];
+        SortName = 'Id';
+        Caption = 'Recruitment Batch Initiator';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        var btndisablenameinview = "#Lookup-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator,#Lookup-JobAgency-JobSource,#Remove-JobAgency-JobSource,#Lookup-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource,#Lookup-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource,#Lookup-JobPortal-JobSource,#Remove-JobPortal-JobSource,#Lookup-RecruitEvaluationProcess-RecruitBatchInitiator,#Create-RecruitEvaluationProcess-RecruitBatchInitiator";
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $.OnCheckMakeTextboxDisable('BatchClose', '#BatchCloseDate');
+        $('.popup_radio_button').controlgroup();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmRecruitBatchInitiator').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Recruitment Batch Institute', 'open', '@Url.Action("Create")', '#frmRecruitBatchInitiator', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#PostDetailslist,#Geostructlist,#JobSourceDetailslist,#RecruitEvaluationProcessDetailslist,#ResumeCollectionlist', btndisablenames, function (data) { });
+            $('#initiatedDate').attr('readonly', true);
+            $('#PublishDate').attr('readonly', true);
+            $('#BatchCloseDate').attr('readonly', true);
+            // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Recruitment Batch Institute", '#frmRecruitBatchInitiator', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#PostDetailslist,#RecruitEvaluationProcessDetailslist,#JobAgencylist,#JobInsideOrglist,#JobNewsPaperlist,#JobPortallist', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $('#Name').attr('readonly', true);
+                $('#initiatedDate').attr('readonly', true);
+                $('#PublishDate').attr('readonly', true);
+                $('#BatchCloseDate').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+
+                    $('#BatchName').val(k.Batchname);
+                    $('#JobReferenceNo').val(k.ReferenceNo);
+                    $('#Narration').val(k.Narration);
+
+                    $('#initiatedDate').val(k.initiatedDate);
+                    if (k.initiatedDate != null) {
+                        $('#initiatedDate').val(DateConvert(k.initiatedDate));
+                    }
+                    $('#PublishDate').val(k.PublishDate);
+                    if (k.PublishDate != null) {
+                        $('#PublishDate').val(DateConvert(k.PublishDate));
+                    }
+
+                    $('#BatchCloseDate').val(k.BatchCloseDate);
+                    if (k.BatchCloseDate != null) {
+                        $('#BatchCloseDate').val(DateConvert(k.BatchCloseDate));
+                    }
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#PostDetailslist').P2BLookUpEncapsulate('#PostDetailslist', 'PostDetailslist', k.Add_Id, k.PostDetails_Full, 'PostDetailslist', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator', 'N');
+                    // $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.Cont_Id, k.FullGeostructDetails, 'Geostructlist', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator', 'N');
+                });
+                //$.each(data[2], function (i, k) {
+                //    ////debugger;
+                //    console.log(k);
+                //    $('#JobSourceDetailslist').P2BLookUpEncapsulate('#JobSourceDetailslist', 'JobSourceDetailslist', k.SA_id, k.SA_val, 'AddressList', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+
+                //});
+
+                $.each(data[3], function (i, k) {
+                    $('#RecruitEvaluationProcessDetailslist').P2BLookUpEncapsulate('#RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', k.SA_id, k.SA_val, 'RecruitEvaluationProcessDetailslist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'A');
+                });
+
+                $.each(data[4], function (i, k) {
+                    $('#JobAgencylist').P2BLookUpEncapsulate('#JobAgencylist', 'JobAgencylist', k.JOBAGENCY_ID[i], k.JOBAGENCY_VAL[i], 'JobAgencylist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'N');
+                    $('#JobInsideOrglist').P2BLookUpEncapsulate('#JobInsideOrglist', 'JobInsideOrglist', k.JOBINSIDEORG_ID[i], k.JOBINSIDEORG_VAL[i], 'JobInsideOrglist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'N');
+                    $('#JobNewsPaperlist').P2BLookUpEncapsulate('#JobNewsPaperlist', 'JobNewsPaperlist', k.JOBNEWPAPER_ID[i], k.JOBNEWSPAPER_VAL[i], 'JobNewsPaperlist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'N');
+                    $('#JobPortallist').P2BLookUpEncapsulate('#JobPortallist', 'JobPortallist', k.JOBPORTAL_ID[i], k.JOBPORTAL_val[i], 'JobPortallist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'N');
+                });
+                //$.each(data[4], function (i, k) {
+                //    $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.SA_id, k.SA_val, 'Geostructlist', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator', 'N');
+                //});
+                //$.each(data[7], function (i, k) {
+                //    $('#ResumeCollectionlist').P2BLookUpEncapsulate('#ResumeCollectionlist', 'ResumeCollectionlist', k.RC_id, k.RC_val, 'ResumeCollectionlist', '#Edit-ResumeCollectionlist-RecruitBatchInitiator,#Remove-ResumeCollectionlist-RecruitBatchInitiator', 'N');
+                //});
+                $.each(data[8], function (i, k) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', k.Can_Id, k.Can_Full, 'CandidateDocumentslist', '#Edit-CandidateDocuments-Candidate,#Remove-CandidateDocuments-Candidate', 'N');
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[5]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Recruitment Batch Institute', '#PostDetailslist,#RecruitEvaluationProcessDetailslist,#JobAgencylist,#JobInsideOrglist,#JobNewsPaperlist,#JobPortallist', btndisablenameinview, 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                //$('#Create_Dialog').P2BViewModalDialog('@@Url.Action("Edit")', dt.Id, '@@Url.Action("EditSave")', "Create Recruitment Batch Institute", '#frmRecruitBatchInitiator', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#PostDetailslist,#Geostructlist,#JobSourceDetailslist,#RecruitEvaluationProcessDetailslist,#ResumeCollectionlist', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $('#Name').attr('readonly', true);
+                $('#initiatedDate').attr('readonly', true);
+                $('#PublishDate').attr('readonly', true);
+                $('#BatchCloseDate').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+
+                    $('#BatchName').val(k.Batchname);
+                    $('#JobReferenceNo').val(k.ReferenceNo);
+                    $('#Narration').val(k.Narration);
+
+                    $('#initiatedDate').val(k.initiatedDate);
+                    if (k.initiatedDate != null) {
+                        $('#initiatedDate').val(DateConvert(k.initiatedDate));
+                    }
+                    $('#PublishDate').val(k.PublishDate);
+                    if (k.PublishDate != null) {
+                        $('#PublishDate').val(DateConvert(k.PublishDate));
+                    }
+
+                    $('#BatchCloseDate').val(k.BatchCloseDate);
+                    if (k.BatchCloseDate != null) {
+                        $('#BatchCloseDate').val(DateConvert(k.BatchCloseDate));
+                    }
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#PostDetailslist').P2BLookUpEncapsulate('#PostDetailslist', 'PostDetailslist', k.Add_Id, k.PostDetails_Full, 'PostDetailslist', 'view', 'N');
+                    // $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.Cont_Id, k.FullGeostructDetails, 'Geostructlist', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator', 'N');
+                });
+                //$.each(data[2], function (i, k) {
+                //    ////debugger;
+                //    console.log(k);
+                //    $('#JobSourceDetailslist').P2BLookUpEncapsulate('#JobSourceDetailslist', 'JobSourceDetailslist', k.SA_id, k.SA_val, 'AddressList', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+
+                //});
+
+                $.each(data[3], function (i, k) {
+                    $('#RecruitEvaluationProcessDetailslist').P2BLookUpEncapsulate('#RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', k.SA_id, k.SA_val, 'RecruitEvaluationProcessDetailslist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'A');
+                });
+
+                $.each(data[4], function (i, k) {
+                    $('#JobAgencylist').P2BLookUpEncapsulate('#JobAgencylist', 'JobAgencylist', k.JOBAGENCY_ID[i], k.JOBAGENCY_VAL[i], 'JobAgencylist', 'view', 'N');
+                    $('#JobInsideOrglist').P2BLookUpEncapsulate('#JobInsideOrglist', 'JobInsideOrglist', k.JOBINSIDEORG_ID[i], k.JOBINSIDEORG_VAL[i], 'JobInsideOrglist', 'view', 'N');
+                    $('#JobNewsPaperlist').P2BLookUpEncapsulate('#JobNewsPaperlist', 'JobNewsPaperlist', k.JOBNEWPAPER_ID[i], k.JOBNEWSPAPER_VAL[i], 'JobNewsPaperlist', 'view', 'N');
+                    $('#JobPortallist').P2BLookUpEncapsulate('#JobPortallist', 'JobPortallist', k.JOBPORTAL_ID[i], k.JOBPORTAL_val[i], 'JobPortallist', 'view', 'N');
+                });
+                //$.each(data[4], function (i, k) {
+                //    $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.SA_id, k.SA_val, 'Geostructlist', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator', 'N');
+                //});
+                //$.each(data[7], function (i, k) {
+                //    $('#ResumeCollectionlist').P2BLookUpEncapsulate('#ResumeCollectionlist', 'ResumeCollectionlist', k.RC_id, k.RC_val, 'ResumeCollectionlist', '#Edit-ResumeCollectionlist-RecruitBatchInitiator,#Remove-ResumeCollectionlist-RecruitBatchInitiator', 'N');
+                //});
+                $.each(data[8], function (i, k) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', k.Can_Id, k.Can_Full, 'CandidateDocumentslist', 'view', 'N');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[5]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-JobSource-RecruitBatchInitiator').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "RecruitBatchInitiator")', '', 'LookupDiv', 'Address Look Up Data', '#JobSourceDetailslist', 'JobSourceDetailslist', 5, 'JobSourceDetailslist', '#frmRecruitBatchInitiator', 'N', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JobSource-RecruitBatchInitiator').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "JobSource")', 'Create Job Source', 'open', '@Url.Action("Create", "JobSource")', '#frmJobSource', 'Message :', 'Request Falied :', '#JqGrid', 517, 600, '', '', '', '#frmRecruitBatchInitiator', '', function (data) {
+                // to show data which is created in partial page
+                $('#JobSourceDetailslist').P2BLookUpEncapsulate('#JobSourceDetailslist', 'JobSourceDetailslist', data[0], data[1], 'JobSourceDetailslist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-JobAgency-JobSource').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "JobSource")', '', 'LookupDiv', 'Job Source Look Up Data', '#JobAgencylist', 'JobAgencylist', 5, 'JobAgencylist', '#frmRecruitBatchInitiator', 'N', '#Remove-JobAgency-JobSource', 'LookupDiv', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        // $('<div></div>').P2BPartialCreateModalDialog();
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JobAgency-JobSource').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "JobAgency")', 'Create Job Agency', 'open', '@Url.Action("Create", "JobAgency")', '#frmJobAgency', 'Message :', 'Request Falied :', '#JqGrid', 400, 600, '', '', '', '#frmJobSource', '', function (data) {
+                $('#JobAgencylist').P2BLookUpEncapsulate('#JobAgencylist', 'JobAgencylist', data[0], data[1], 'JobAgencylist', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JobAgency-JobSource').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JobAgencylist').P2BGetTableDataonSelectedRow('#JobAgencylist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "JobAgency")', '@Url.Action("Edit", "JobAgency")', b, '@Url.Action("Editsave", "JobAgency")', 'Edit Job Agency', '#frmJobAgency', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobSource', '#JobAgencylist', 'JobAgencylist', 'JobAgencylist', 'N', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJobAgency').trigger("reset");
+                    $('#Name_JobAgency').val(k.Name);
+                    $('#PANNo').val(k.PANNo);
+                    $('#GSTNo').val(k.GSTNo);
+                });
+                //}, 3000);
+                $.each(data[1], function (i, k) {
+                    $('#AgencyAddressList').P2BLookUpEncapsulate('#AgencyAddressList', 'AgencyAddressList', k.Add_Id, k.Address_FullAddress, 'AgencyAddressList', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource', 'N');
+                    $('#ContactDetailslistJA').P2BLookUpEncapsulate('#ContactDetailslistJA', 'ContactDetailslistJA', k.Cont_Id, k.FullContactDetails, 'ContactDetailslistJA', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource', 'N');
+                    $('#ContactPersonlistJA').P2BLookUpEncapsulate('#ContactPersonlistJA', 'ContactPersonlistJA', k.ContPer_Id, k.FullContactPersonDetail, 'ContactPersonlistJA', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource', 'N');
+                });
+
+
+            });
+            event.preventDefault();
+        });
+
+        //$('#Remove-JobAgency-JobSource').button().on('click', function (event) {
+
+        //    //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        //    var a = [], b;
+        //    a = $('#JobAgencylist').P2BGetTableDataonSelectedRow('#JobAgencylist', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobAgencylist', $('#JobAgencylist').val(), 200, 200, '#frmJobSource', '#JobAgencylist', '#Edit-JobAgency-JobSource,#Remove-JobAgency-JobSource');
+        //    event.preventDefault();
+        //});
+
+
+        $('#Lookup-JobInsideOrg-JobSource').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupJobInsideDetails", "JobSource")', '', 'LookupDiv', 'Job Inside Org Look Up Data', '#JobInsideOrglist', 'JobInsideOrglist', 5, 'JobInsideOrglist', '#frmRecruitBatchInitiator', 'N', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JobInsideOrg-JobSource').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "JobInsideOrg")', 'Create Job Inside Org', 'open', '@Url.Action("Create", "JobInsideOrg")', '#frmJobInsideOrg', 'Message :', 'Request Falied :', '#JqGrid', 500, 611, '', '', '', '#frmJobSource', '', function (data) {
+                $('#JobInsideOrglist').P2BLookUpEncapsulate('#JobInsideOrglist', 'JobInsideOrglist', data[0], data[1], 'JobInsideOrglist', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JobInsideOrg-JobSource').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JobInsideOrglist').P2BGetTableDataonSelectedRow('#JobInsideOrglist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "JobInsideOrg")', '@Url.Action("edit", "JobInsideOrg")', b, '@Url.Action("Editsave", "JobInsideOrg")', 'Edit Job Inside Org', '#frmJobInsideOrg', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobSource', '#JobInsideOrglist', 'JobInsideOrglist', 'JobInsideOrglist', 'N', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJobInsideOrg').trigger("reset");
+                    $('#Name_JobInsideOrg').val(k.Name);
+                    $('#GSTNo').val(k.GSTNo);
+                    $('#PANNo').val(k.PANNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#PortalAddressList').P2BLookUpEncapsulate('#PortalAddressList', 'PortalAddressList', k.Add_Id, k.Portal_FullAddress, 'PortalAddressList', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', 'N');
+                    $('#ContactDetailslistJI').P2BLookUpEncapsulate('#ContactDetailslistJI', 'ContactDetailslistJI', k.Cont_Id, k.FullContactDetails, 'ContactDetailslistJI', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', 'N');
+                    $('#ContactPersonlistJI').P2BLookUpEncapsulate('#ContactPersonlistJI', 'ContactPersonlistJI', k.ContPer_Id, k.FullContactPersonDetail, 'ContactPersonlistJI', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-JobInsideOrg-JobSource').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#JobInsideOrglist').P2BGetTableDataonSelectedRow('#JobInsideOrglist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobInsideOrglist').P2BGetTableDataonSelectedRow('#JobInsideOrglist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobInsideOrglist', $('#JobInsideOrglist').val(), 200, 200, '#frmRecruitBatchInitiator', '#JobInsideOrglist', '#Edit-JobInsideOrg-JobSource,#Remove-JobInsideOrg-JobSource');
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Lookup-JobNewsPaper-JobSource').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupJobNewsPaperDetails", "JobSource")', '', 'LookupDiv', 'Job News Paper Look Up Data', '#JobNewsPaperlist', 'JobNewsPaperlist', 5, 'JobNewsPaperlist', '#frmRecruitBatchInitiator', 'N', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JobNewsPaper-JobSource').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "JobNewsPaper")', 'Create Job News Paper', 'open', '@Url.Action("Create", "JobNewsPaper")', '#frmJobNewsPaper', 'Message :', 'Request Falied :', '#JqGrid', 500, 611, '', '', '', '#frmJobSource', '', function (data) {
+                $('#JobNewsPaperlist').P2BLookUpEncapsulate('#JobNewsPaperlist', 'JobNewsPaperlist', data[0], data[1], 'JobNewsPaperlist', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JobNewsPaper-JobSource').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JobNewsPaperlist').P2BGetTableDataonSelectedRow('#JobNewsPaperlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "JobNewsPaper")', '@Url.Action("edit", "JobNewsPaper")', b, '@Url.Action("Editsave", "JobNewsPaper")', 'Edit Job News Paper', '#frmJobNewsPaper', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobSource', '#JobNewsPaperlist', 'JobNewsPaperlist', 'JobNewsPaperlist', 'N', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJobNewsPaper').trigger("reset");
+                    $('#Name_JobNewsPaper').val(k.Name);
+                    $('#GSTNo').val(k.GSTNo);
+                    $('#PANNo').val(k.PANNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#NewPaperAddressList').P2BLookUpEncapsulate('#NewPaperAddressList', 'NewPaperAddressList', k.Add_Id, k.NewsP_FullAddress, 'NewPaperAddressList', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', 'N');
+                    $('#ContactDetailslistJN').P2BLookUpEncapsulate('#ContactDetailslistJN', 'ContactDetailslistJN', k.Cont_Id, k.FullContactDetails, 'ContactDetailslistJN', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', 'N');
+                    $('#ContactPersonlistJN').P2BLookUpEncapsulate('#ContactPersonlistJN', 'ContactPersonlistJN', k.ContPer_Id, k.FullContactPersonDetail, 'ContactPersonlistJN', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-JobNewsPaper-JobSource').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JobNewsPaperlist').P2BGetTableDataonSelectedRow('#JobNewsPaperlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobNewsPaperlist').P2BGetTableDataonSelectedRow('#JobNewsPaperlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobNewsPaperlist', $('#JobNewsPaperlist').val(), 200, 200, '#frmRecruitBatchInitiator', '#JobNewsPaperlist', '#Edit-JobNewsPaper-JobSource,#Remove-JobNewsPaper-JobSource');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-JobPortal-JobSource').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupJobPortalDetails", "JobSource")', '', 'LookupDiv', 'Job Portal Look Up Data', '#JobPortallist', 'JobPortallist', 5, 'JobPortallist', '#frmRecruitBatchInitiator', 'N', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-JobPortal-JobSource').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "JobPortal")', 'Create Job Portal', 'open', '@Url.Action("Create", "JobPortal")', '#frmJobPortal', 'Message :', 'Request Falied :', '#JqGrid', 500, 611, '', '', '', '#frmJobSource', '', function (data) {
+                $('#JobPortallist').P2BLookUpEncapsulate('#JobPortallist', 'JobPortallist', data[0], data[1], 'JobPortallist', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JobPortal-JobSource').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JobPortallist').P2BGetTableDataonSelectedRow('#JobPortallist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "JobPortal")', '@Url.Action("edit", "JobPortal")', b, '@Url.Action("Editsave", "JobPortal")', 'Edit Job Portal', '#frmJobPortal', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobSource', '#JobPortallist', 'JobPortallist', 'JobPortallist', 'N', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJobPortal').trigger("reset");
+                    $('#Name_JobPortal').val(k.Name);
+                    $('#GSTNo').val(k.GSTNo);
+                    $('#PANNo').val(k.PANNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#PortalAddressList').P2BLookUpEncapsulate('#PortalAddressList', 'PortalAddressList', k.Add_Id, k.Portal_FullAddress, 'PortalAddressList', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', 'N');
+                    $('#ContactDetailslistJP').P2BLookUpEncapsulate('#ContactDetailslistJP', 'ContactDetailslistJP', k.Cont_Id, k.FullContactDetails, 'ContactDetailslistJP', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', 'N');
+                    $('#ContactPersonlistJP').P2BLookUpEncapsulate('#ContactPersonlistJP', 'ContactPersonlistJP', k.ContPer_Id, k.FullContactPersonDetail, 'ContactPersonlistJP', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-JobPortal-JobSource').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#JobPortallist').P2BGetTableDataonSelectedRow('#JobPortallist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobPortallist').P2BGetTableDataonSelectedRow('#JobPortallist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobPortallist', $('#JobPortallist').val(), 200, 200, '#frmRecruitBatchInitiator', '#JobPortallist', '#Edit-JobPortal-JobSource,#Remove-JobPortal-JobSource');
+            event.preventDefault();
+        });
+
+        // Partial page edit
+        $('#Edit-JobSource-RecruitBatchInitiator').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JobSourceDetailslist').P2BGetTableDataonSelectedRow('#JobSourceDetailslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "JobSource")', '@Url.Action("edit", "JobSource")', b, '@Url.Action("Editsave", "JobSource")', 'Edit Address', '#frmJobSource', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmRecruitBatchInitiator', '#JobSourceDetailslist', 'JobSourceDetailslist', 'JobSourceDetailslist', 'N', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJobSource').trigger("reset");
+                    $('#JobAgencylist').P2BLookUpEncapsulate('#JobAgencylist', 'JobAgencylist', k.JA_id[i], k.JA_val[i], 'AddressList', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#JobInsideOrglist').P2BLookUpEncapsulate('#JobInsideOrglist', 'JobInsideOrglist', k.JI_id, k.JI_val, 'JobInsideOrglist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#JobNewsPaperlist').P2BLookUpEncapsulate('#JobNewsPaperlist', 'JobNewsPaperlist', k.JN_id, k.JN_val, 'JobNewsPaperlist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+
+                });
+
+                $.each(data[3], function (i, k) {
+                    $('#JobPortallist').P2BLookUpEncapsulate('#JobPortallist', 'JobPortallist', k.JP_id, k.JP_val, 'JobPortallist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'N');
+
+                });
+
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-JobSource-RecruitBatchInitiator').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JobSourceDetailslist').P2BGetTableDataonSelectedRow('#JobSourceDetailslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobSourceDetailslist').P2BGetTableDataonSelectedRow('#JobSourceDetailslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobSourceDetailslist', $('#JobSourceDetailslist').val(), 200, 200, '#frmRecruitBatchInitiator', '#JobSourceDetailslist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator');
+            event.preventDefault();
+        });
+
+
+
+
+
+        /* ContactDetails button click*/
+
+        $('#Lookup-PostDetails-RecruitBatchInitiator').button().on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPostDetails", "RecruitBatchInitiator")', '', 'LookupDiv', 'PostDetails Look Up Data', '#PostDetailslist', 'PostDetailslist', 5, 'PostDetailslist', '#frmRecruitBatchInitiator', 'N', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator', 'Lookup_table', 'PageNavPosition');
+            // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 10, 'ContactDetailsList', '#frmCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PostDetails-RecruitBatchInitiator').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "PostDetails")', 'Create PostDetails', 'open', '@Url.Action("Create", "PostDetails")', '#frmPostDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmRecruitBatchInitiator', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator', function (data) {
+                $('#PostDetailslist').P2BLookUpEncapsulate('#PostDetailslist', 'PostDetailslist', data[0], data[1], 'PostDetailslist', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator', 'N');
+            });
+            event.preventDefault();
+        });*@
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PostDetails-RecruitBatchInitiator').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "PostDetails")', 'Create PostDetails', 'open', '@Url.Action("Create", "PostDetails")', '#frmPostDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmRecruitBatchInitiator', '', function (data) {
+                // to show data which is created in partial page
+                $('#PostDetailslist').P2BLookUpEncapsulate('#PostDetailslist', 'PostDetailslist', data[0], data[1], 'PostDetailslist', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+
+
+
+
+        $('#Edit-PostDetails-RecruitBatchInitiator').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PostDetailslist').P2BGetTableDataonSelectedRow('#PostDetailslist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "PostDetails")', '@Url.Action("Edit", "PostDetails")', b, '@Url.Action("EditSave", "PostDetails")', 'Edit Contact Details', '#frmPostDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmRecruitBatchInitiator', '#PostDetailslist', 'PostDetailslist', 'PostDetailslist', 'N', '#Remove-PostDetails-RecruitBatchInitiator,#Edit-PostDetails-RecruitBatchInitiator', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmPostDetails').trigger('reset');
+                    $('#NoOfVacancies').val(k.Vaccancy);
+                    $('#NoOfVacancies').attr('readonly', 'readonly');
+                    $('#ExpYearFrom').val(k.ExpYearFrom);
+                    $('#ExpYearTo').val(k.ExpYearTo);
+                    $('#AgeFrom').val(k.AgeFrom);
+                    $('#AgeTo').val(k.AgeTo);
+                    $('#Narration').val(k.Narration);
+
+                    $('#RangeFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1058, k.RangeFilter_Id);
+                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1059, k.MaritalStatus_Id);
+                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1060, k.Gender_Id);
+                    $('#ExpFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1061, k.ExpFilter_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#JobPositionMlist').P2BLookUpEncapsulate('#JobPositionMlist', 'JobPositionMlist', k.JobPos_Id, k.JobPos_FullAddress, 'JobPositionMlist', '#Edit-JobPosition-PostDetails,#Remove-JobPosition-PostDetails', 'N');
+
+                });
+                $.each(data[2], function (i, k) {
+                    $('#QualificationlistM').P2BLookUpEncapsulate('#QualificationlistM', 'QualificationlistM', k.QualificationDetails_Id, k.QualificationDetails_val, 'QualificationlistM', '#Edit-Qualification-PostDetails,#Remove-Qualification-PostDetails', 'A');
+                    $('#SkillList').P2BLookUpEncapsulate('#SkillList', 'SkillList', k.SkillDetails_Id, k.SkillDetails_val, 'SkillList', '#Edit-Skill-PostDetails,#Remove-Skill-PostDetails', 'A');
+                    $('#CategoryPostlist').P2BLookUpEncapsulate('#CategoryPostlist', 'CategoryPostlist', k.CategoryDetails_Id, k.CategoryDetails_val, 'CategoryPostlist', '#Edit-Category-PostDetails,#Remove-Category-PostDetails', 'A');
+                    $('#CategorySplPostlist').P2BLookUpEncapsulate('#CategorySplPostlist', 'CategorySplPostlist', k.CategorySplDetails_Id, k.CategorySplDetails_val, 'CategorySplPostlist', '#Edit-CategorySpl-PostDetails,#Remove-CategorySpl-PostDetails', 'A');
+
+                });
+                $('#Autho_Allow').val(data[3]);
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PostDetails-RecruitBatchInitiator').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PostDetailslist').P2BGetTableDataonSelectedRow('#PostDetailslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PostDetailslist').P2BGetTableDataonSelectedRow('#PostDetailslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "PostDetails")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PostDetailslist', $('#PostDetailslist').val(), 200, 200, '#frmRecruitBatchInitiator', '#PostDetailslist', '#Edit-PostDetails-RecruitBatchInitiator,#Remove-PostDetails-RecruitBatchInitiator');
+            event.preventDefault();
+        });
+
+        $('#Remove-JobAgency-JobSource').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JobAgencylist').P2BGetTableDataonSelectedRow('#JobAgencylist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobAgencylist').P2BGetTableDataonSelectedRow('#JobAgencylist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "PostDetails")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobAgencylist', $('#JobAgencylist').val(), 200, 200, '#frmRecruitBatchInitiator', '#JobAgencylist', '#Remove-JobAgency-JobSource');
+            event.preventDefault();
+        });
+
+        $('#Remove-Geostruct-RecruitBatchInitiator').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#Geostructlist').P2BGetTableDataonSelectedRow('#Geostructlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Geostructlist').P2BGetTableDataonSelectedRow('#Geostructlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteGeo", "RecruitBatchInitiator")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Geostructlist', $('#Geostructlist').val(), 200, 200, '#frmRecruitBatchInitiator', '#Geostructlist', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator');
+            event.preventDefault();
+        });
+
+        $('#Lookup-RecruitEvaluationProcess-RecruitBatchInitiator').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupRecruitEvalProcess", "RecruitBatchInitiator")', '', 'LookupDiv', 'Recruit Evaluation Process Look Up Data', '#RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', 5, 'RecruitEvaluationProcessDetailslist', '#frmRecruitBatchInitiator', 'A', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-RecruitEvaluationProcess-RecruitBatchInitiator').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "RecruitEvaluationProcess")', 'Create Recruit Evaluation Process', 'open', '@Url.Action("Create", "RecruitEvaluationProcess")', '#frmRecruitEvaluationProcess', 'Message :', 'Request Falied :', '#JqGrid', 450, 625, '', '', '', '#frmRecruitBatchInitiator', '', function (data) {
+                // to show data which is created in partial page
+                $('#RecruitEvaluationProcessDetailslist').P2BLookUpEncapsulate('#RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', data[0], data[1], 'RecruitEvaluationProcessDetailslist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        // Partial page edit
+        $('#Edit-RecruitEvaluationProcess-RecruitBatchInitiator').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RecruitEvaluationProcessDetailslist').P2BGetTableDataonSelectedRow('#RecruitEvaluationProcessDetailslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "RecruitEvaluationProcess")', '@Url.Action("edit", "RecruitEvaluationProcess")', b, '@Url.Action("Editsave", "RecruitEvaluationProcess")', 'Edit Recruit Evaluation Process Data', '#frmRecruitEvaluationProcess', b, 'Message :', 'Request Falied :', '#JqGrid', 450, 625, '#frmRecruitBatchInitiator', '#RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', 'RecruitEvaluationProcessDetailslist', 'N', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                console.log("-----------");
+                console.log(data[3]);
+                $.each(data[0], function (i, k) {
+                    $('#frmRecruitEvaluationProcess').trigger("reset");
+                    $('#Name_Recruit').val(k.Name);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#RecruitEvaluationParalist').P2BLookUpEncapsulate('#RecruitEvaluationParalist', 'RecruitEvaluationParalist', k.RE_id, k.RE_val, 'RecruitEvaluationParalist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'A');
+
+                });
+                $.each(data[2], function (i, k) {
+                    $('#RecruitJoiningParalist').P2BLookUpEncapsulate('#RecruitJoiningParalist', 'RecruitJoiningParalist', k.RJ_id, k.RJ_val, 'RecruitJoiningParalist', '#Edit-JobSource-RecruitBatchInitiator,#Remove-JobSource-RecruitBatchInitiator', 'A');
+
+                });
+                $.each(data[3], function (i, k) {
+                    $('#RecruitShortlistingParalist').P2BLookUpEncapsulate('#RecruitShortlistingParalist', 'RecruitShortlistingParalist', k.Sh_id, k.Sh_val, 'RecruitShortlistingParalist', '#Edit-ShortlistingCriteria-RecruitEvaluationProcessr,#Remove-ShortlistingCriteria-RecruitEvaluationProcess', 'A');
+
+                });
+
+
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-RecruitEvaluationProcess-RecruitBatchInitiator').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#RecruitEvaluationProcessDetailslist').P2BGetTableDataonSelectedRow('#RecruitEvaluationProcessDetailslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#RecruitEvaluationProcessDetailslist').P2BGetTableDataonSelectedRow('#RecruitEvaluationProcessDetailslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RecruitEvaluationProcessDetailslist', $('#RecruitEvaluationProcessDetailslist').val(), 200, 200, '#frmRecruitBatchInitiator', '#RecruitEvaluationProcessDetailslist', '#Edit-RecruitEvaluationProcess-RecruitBatchInitiator,#Remove-RecruitEvaluationProcess-RecruitBatchInitiator');
+            event.preventDefault();
+        });
+
+        $('#Lookup-Geostruct-RecruitBatchInitiator').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_location", "RecruitBatchInitiator")', '', 'LookupDiv', 'Address Look Up Data', '#Geostructlist', 'Geostructlist', 5, 'Geostructlist', '#frmRecruitBatchInitiator', 'N', '#Edit-Geostruct-RecruitBatchInitiator,#Remove-Geostruct-RecruitBatchInitiator', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        /////new
+        $('#Lookup-ResumeCollection-RecruitBatchInitiator').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_ResumeCollection", "RecruitBatchInitiator")', '', 'LookupDiv', 'ResumeCollection Look Up Data', '#ResumeCollectionlist', 'ResumeCollectionlist', 5, 'ResumeCollectionlist', '#frmRecruitBatchInitiator', 'N', '#Edit-ResumeCollection-RecruitBatchInitiator,#Remove-ResumeCollection-RecruitBatchInitiator', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-ResumeCollection-RecruitBatchInitiator').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#ResumeCollectionlist').P2BGetTableDataonSelectedRow('#ResumeCollectionlist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ResumeCollectionlist').P2BGetTableDataonSelectedRow('#ResumeCollectionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ResumeCollectionlist', $('#ResumeCollectionlist').val(), 200, 200, '#frmRecruitBatchInitiator', '#ResumeCollectionlist', '#Edit-ResumeCollectionlist-RecruitBatchInitiator,#Remove-ResumeCollectionlist-RecruitBatchInitiator');
+            event.preventDefault();
+        });
+
+
+        //----------Candidate Document Details-end----
+
+        $('#Lookup-CandidateDocuments-Candidate').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCandDocsLKDetails", "ResumeCollection")', '', 'LookupDiv', 'Candidate Look Up Data', '#CandidateDocumentslist', 'CandidateDocumentslist', 5, 'CandidateDocumentslist', '#frmRecruitBatchInitiator', 'N', '#Remove-CandidateDocuments-Candidate', 'CandidateDocumentslist_table', 'PageNavPosition');
+            e.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-CandidateDocuments-Candidate').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "CandidateDocuments")', 'Create Candidate Documents', 'open', '@Url.Action("Create","CandidateDocuments")', '#frmCandidateDocs', 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '', '', '', '#frmRecruitBatchInitiator', '', function (data) {
+                $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data[0], data[1], 'CandidateDocumentslist', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-CandidateDocuments-Candidate').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "CandidateDocuments")', '@Url.Action("edit", "CandidateDocuments")', b, '@Url.Action("Editsave", "CandidateDocuments")', 'Edit Candidate Documents', '#frmCandidateDocuments', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmRecruitBatchInitiator', '#CandidateDocumentslist', 'CandidateDocumentslist', 'CandidateDocumentslist', 'N', '#Edit-CandidateDocuments-Candidate,#Remove-CandidateDocuments-Candidate', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmCandidateDocuments').trigger("reset");
+                    $('#DocTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1070, k.DocTypeList);
+                    $('#SubDocList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1071, k.SubDocList);
+                    if (k.txtUploadDate != null) {
+                        $('#txtUploadDate').val(DateConvert(k.txtUploadDate));
+                    }
+                    $('#txtDocPath').val(k.txtDocPath);
+                    $('[name="IsApproved"]').val([k.IsApproved]).button().button("refresh");
+
+                    if (k.txtApprovedDate != null) {
+                        $('#txtApprovedDate').val(DateConvert(k.txtApprovedDate));
+                    }
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-CandidateDocuments-Candidate').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#frmRecruitBatchInitiator', '#CandidateDocumentslist', '#Remove-CandidateDocuments-Candidate');
+            event.preventDefault();
+        });
+
+
+        //----------Candidate Document Details-end----
+
+
+        $('#Gender_drop').selectmenu().selectmenu("menuWidget");
+        $('#MaritalStatus_drop').selectmenu().selectmenu("menuWidget");
+        $('#RangeFilterlist').selectmenu().selectmenu("menuWidget");
+        $('#ExpFilterlist').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        //$('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

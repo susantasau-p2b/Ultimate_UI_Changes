@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "Negative Salary";
+}
+@model Payroll.NegSalAct
+
+
+<style>
+    .popup-content-label {
+        width: 123px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        min-width: 120px;
+        margin: 0px 0px 1px 1px;
+    }
+
+    .row1 {
+        width: 290px;
+    }
+
+    .horizontal_row1, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .popup-content-label {
+        width: 123px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        min-width: 120px;
+        margin: 0px 0px 1px 1px;
+    }
+
+    .row1 {
+        width: 290px;
+    }
+
+    .horizontal_row1, .radio_button_div_1 {
+        display: inline-block;
+    }
+</style>
+
+<html>
+<body>
+
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Negative Salary Act">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmNegativeSal", name = "frmNegativeSal" }))
+        {
+            <div class="row1 content_margine">@Html.LabelFor(m => m.EffectiveDate, "Effective:", new { @class = "popup-content-label must" })    @Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.NegSalActname, "Act Name :", new { @class = "popup-content-label must" })    @Html.TextBoxFor(m => m.NegSalActname, new { @class = "popup-content-textbox must" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MinAmount, "Min Amount :", new { @class = "popup-content-label must" })    @Html.TextBoxFor(m => m.MinAmount, new { @class = "popup-content-textbox must" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.SalPercentage, "SalPercentage :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SalPercentage, new { @class = "popup-content-textbox must" })</div>
+
+        }
+    </div>
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['NegSalActname', 'MinAmount', 'SalPercentage', 'Id'];
+        ColNames = ['NegSalActname', 'MinAmount', 'SalPercentage', 'Id'];
+        SortName = 'CalenderCode';
+        Caption = 'Negative Salary';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+
+
+        $('#NegSalActname').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#MinAmount').ForceOnlyNumeric().MaxLength(8);
+        $('#SalPercentage').ForceOnlyNumeric().MaxLength(5);
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('.popup_radio_button').controlgroup();
+        $('#Create_Dialog').P2BCreateDialog();
+        //$('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+
+        $('#Create').button().on("click", function () {
+            $('#frmNegativeSal').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Negative Salary', 'open', '@Url.Action("Create")', '#frmNegativeSal', 'Message :', 'Request Falied :', '#JqGrid', 300, 320, '', btndisablenames, function (data) { });
+
+            $('#EffectiveDate').attr('readonly', true);
+            event.preventDefault();
+        });
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#EffectiveDate').P2BDatePicker();
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Negative Salary", '#frmNegativeSal', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 300, 320, '', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                   if (k.EffectiveDate != null)
+                       $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                   else
+                       $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    $('#NegSalActname').val(k.NegSalActname);
+                    $('#MinAmount').val(k.MinAmount);
+                    $('#SalPercentage').val(k.SalPercentage);
+                });
+
+                // }, 2000);
+            });
+        });
+
+
+     
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Negative Salary', '', '', 300, 320, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                        $('#NegSalActname').val(k.NegSalActname);
+                        $('#MinAmount').val(k.MinAmount);
+                        $('#SalPercentage').val(k.SalPercentage);
+                    });
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[2] != null) {
+                            $('#Name').oldVal(data[2].Name);
+                            $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                            $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                        }
+                    }
+                });
+            });
+
+
+
+
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+
+    });
+</script>

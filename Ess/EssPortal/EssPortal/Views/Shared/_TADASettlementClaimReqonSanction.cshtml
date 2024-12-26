@@ -1,0 +1,1039 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.TADASettlementClaim
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+
+    .hide_textbox {
+        display: none;
+    }
+
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 70%;
+        position: relative;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+    /**/
+    #monthTable1 {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 70%;
+        position: relative;
+    }
+
+        #monthTable1 td, #monthTable1 th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable1-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable1 tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable1 th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    /***/
+    #monthTable2 {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 70%;
+        position: relative;
+    }
+
+        #monthTable2 td, #monthTable2 th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable2-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable2 tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable2 th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+    /****/
+    #monthTable3 {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 70%;
+        position: relative;
+    }
+
+        #monthTable3 td, #monthTable3 th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable3-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable3 tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable3 th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    #misexpensesettleamt {
+        margin-right: 200px;
+    }
+
+    #MisExpenseSettleAmt {
+        margin-left: 130px;
+    }
+
+    #journeyobj {
+        margin-left: 900px;
+    }
+
+    #MisExpense {
+        margin-left: 900px;
+    }
+
+    #HotelObject {
+        margin-left: 900px;
+    }
+
+    #DAobject {
+        margin-left: 900px;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+
+        $(document).ready(function (e) {
+
+            $('button').button();
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "MySelf".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+            }
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Sanction".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').hide();
+                $('#Sanction-div').show();
+            }
+
+
+            var DropTest = $.LocalStorageHelper.Get("Whois").toUpperCase() == "Approval".toUpperCase();
+            console.log("DropTest: " + DropTest);
+
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Approval".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').show();
+                $('#Sanction-div').hide();
+
+            }
+            $('#DateOfAppl').attr('readonly', 'readonly');
+            $('#DateOfAppl').TodayDate();
+            //$('#TADATypelist').selectmenu().selectmenu("menuWidget");
+            $('#TADATypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "Lookup")', 3005, "");
+
+            $('#create-ContactNo-ContDetails').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '', '', '', '#frmLvNewReq', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0], data[1], 'ContactNos_List', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', 'N');
+                });
+                event.preventDefault();
+            });
+            $('#lookup-ContactNo-ContDetails').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'lookupdiv', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#frmLvNewReq', 'A', '#remove-ContactNo-ContDetails', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#edit-ContactNo-ContDetails').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                b = a[0];
+                event.preventDefault();
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '#frmLvNewReq', '#ContactNos_List', 'ContactNos_List', 'ContactNos_List', 'N', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+
+                    $.each(data, function (i, k) {
+                        $('#frmContactNo').trigger('reset');
+                        $('#MobileNo').val(k.MobileNo);
+                        $('#LandlineNo').val(k.LandlineNo);
+                        $('#STDCode').val(k.STD);
+                    });
+                });
+
+            });
+
+            $('#remove-ContactNo-ContDetails').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#frmLvNewReq', '#ContactNos_List', '#remove-ContactNo-ContDetails');
+                event.preventDefault();
+            });
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('#lookup-JourneyDetails-TADASettlementClaim').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupJourneyDetails", "TADASettlementClaim")', '', 'lookupdiv', ' Look Up Data', '#JourneyDetailsList', 'JourneyDetailsList', 5, 'JourneyDetailsList', '#frmTADASettlementClaim', 'N', '#remove-JourneyDetails-TADASettlementClaim', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+            });
+
+            /******************************** Journey Details Lookup Create Button *********************************/
+            $('#create-JourneyDetails-TADASettlementClaim').on("click", function (event) {
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]"; // $('#employee-table').P2BGetTableDataonSelectedRow('#employee-table', 1);
+                if (a.val == "" || a.length == 0) {
+                    alert("Please select Employee");
+                    return false;
+                }
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_JourneyDetails", "LTCSettlementClaim")', 'Create JourneyDetails Master', 'open', '@Url.Action("Create", "JourneyDetails")?EmpId :' + a, '#frmJourneyDetailsPartial', 'Message :', 'Request Falied :', '#jqgrid', 600, 600, '', '', '#edit-JourneyObject1-JourneyDetails,#edit-JourneyObject-JourneyDetails,#edit-FamilyDetails-JourneyDetails,#remove-FamilyDetails-JourneyDetails', '#frmTADASettlementClaim', '', function (data) {
+                    $('#JourneyDetailsList').P2BLookUpEncapsulate('#JourneyDetailsList', 'JourneyDetailsList', data[0], data[1], 'JourneyDetailsList', '#remove-JourneyDetails-LTCSettlementClaim', 'N');
+
+                    $('#TravelModeEligibilityPolicylist').P2BSelectMenuAppend("@Url.Action("TravelModeEligibilityPolicylistd", "LTCSettlementClaim")", a.toString(), "");
+                });
+                event.preventDefault();
+
+            });
+            /******/
+
+            /******************************** Journey Details Lookup Delete Button *********************************/
+            $('#remove-JourneyDetails-TADASettlementClaim').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+                b = a[0];
+                //$('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmTADASettlementClaim', '#JourneyDetailsList');
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmTADASettlementClaim', '#JourneyDetailsList', '#edit-JourneyDetails-TADASettlementClaim,#remove-JourneyDetails-TADASettlementClaim');
+                event.preventDefault();
+            });
+            /******/
+
+            $('#lookup-Travel_Hotel_Booking-TADASettlementClaim').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetTravel_Hotel_Booking", "TADASettlementClaim")', '', 'lookupdiv', ' Look Up Data', '#Travel_Hotel_BookingList', 'Travel_Hotel_BookingList', 5, 'Travel_Hotel_BookingList', '#frmTADASettlementClaim', 'N', '#remove-Travel_Hotel_Booking-TADASettlementClaim', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+            });
+
+            /******************************** Hotel Booking Lookup Create Button *********************************/
+            $('#create-Travel_Hotel_Booking-TADASettlementClaim').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_TravelHotelBooking", "LTCSettlementClaim")', 'Create HotelBookingDetails Master', 'open', '@Url.Action("Create", "TravelHotelBooking")', '#frmTravelHotelBookingDetails', 'Message :', 'Request Falied :', '#jqgrid', 600, 600, '', '', '#edit-HotelBookingDetails-LTCSettlementClaim', '#frmTADASettlementClaim', '', function (data) {
+                    $('#HotelBookingDetailsList').P2BLookUpEncapsulate('#HotelBookingDetailsList', 'HotelBookingDetailsList', data[0], data[1], 'HotelBookingDetailsList', '#remove-HotelBookingDetails-LTCSettlementClaim', 'N');
+                });
+                event.preventDefault();
+            });
+            /******/
+
+            /******************************** Hotel Booking Lookup Delete Button *********************************/
+            $('#remove-Travel_Hotel_Booking-TADASettlementClaim').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#Travel_Hotel_BookingList').P2BGetTableDataonSelectedRow('#Travel_Hotel_BookingList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Travel_Hotel_BookingList', $('#Travel_Hotel_BookingList').val(), 200, 200, '#frmTADASettlementClaim', '#Travel_Hotel_BookingList', '#edit-Travel_Hotel_Booking-TADASettlementClaim,#remove-Travel_Hotel_Booking-TADASettlementClaim');
+                //$('<div></div>').P2BPartialDeleteModalDialog('', b, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Travel_Hotel_BookingList', $('#Travel_Hotel_BookingList').val(), 200, 200, '#frmTADASettlementClaim', '#Travel_Hotel_BookingList');
+                event.preventDefault();
+            });
+            /******/
+
+
+
+            $('#remove-JourneyDetails-LTCSettlementClaim').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmLTCSettlmentClaim', '#JourneyDetailsList', '#remove-CandidateDocuments-Candidate');
+                event.preventDefault();
+            });
+            /******/
+
+            $('#lookup-TADAAdvanceClaim-TADASettlementClaim').on('click', function (event) {
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+                if (a.val == "" || a.length == 0) {
+                    alert("Please select Employee");
+                    return false;
+                }
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTadaAdv", "TADASettlementClaim")?Empid=' + a, '', 'lookupdiv', 'TADA ADV Look Up Data', '#TADAAdvanceClaimList', 'TADAAdvanceClaimList', 5, 'TADAAdvanceClaimList', '#frmTADASettlementClaim', 'A', '#edit-TADAAdvanceClaim-TADASettlementClaim,#remove-TADAAdvanceClaim-TADASettlementClaim', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+
+                $('.dialog').P2BLookUpModal('@Url.Action("GetTADAAdvanceClaim", "TADASettlementClaim")', '', 'lookupdiv', ' Look Up Data', '#TADAAdvanceClaimList', 'TADAAdvanceClaimList', 5, 'TADAAdvanceClaimList', '#frmTADASettlementClaim', 'N', '#remove-TADAAdvanceClaim-TADASettlementClaim', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+            });
+
+
+            $('.popup_radio_button').buttonset();
+            //$('#LTCTypelist').selectmenu().selectmenu("menuWidget");
+            //$('#LvReqList').selectmenu().selectmenu("menuWidget");
+            //$('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').ForceAmount();
+            //$('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').val("0");
+            $('#DateOfAppl').P2BDatePicker();
+
+
+            $('#Sanlookup_Incharge').on('click', function (e) {
+                var emp = $('#Employee').text().split(" ");
+
+                $('.dialog').AddDataToTextbox({
+                    appendTo: "#SantxtIncharge",
+                    appendToId: "#SanIncharge_id",
+                    lookupurl: "@Url.Action("GetLookupIncharge", "ELMS")?data=" + emp[0],
+                    NoOfRecordToShow: "10",
+                    setnameofthelookupbyppage: "txtIncharge_FName-lookup",
+                    lookupdiv: "lookupdiv",
+                    lookuppagename: "lookup",
+                    pagename: "pageNavPosition",
+                    readonly: true,
+                    height: 200,
+                });
+                e.preventDefault();
+            });
+
+
+
+            $('#remove-CandidateDocuments-Candidate').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#frmHotelBookingReq', '#CandidateDocumentslist', '#remove-CandidateDocuments-Candidate');
+                event.preventDefault();
+            });
+
+            $('#sub_form').on('click', function (e) {
+                var table_sr_no = $('#sr_no').val();
+                var target = $('#monthTable tr#' + table_sr_no).children();
+                var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+                target.each(function (i, k) {
+                    if (i == 0) {
+                        $(k).text($('#sr_no').val());
+                    }
+                    if (i == 1) {
+                        $(k).text($('#FromDate').val());
+                    }
+                    if (i == 2) {
+                        $(k).text($('#ToDate').val());
+                    }
+                    if (i == 3) {
+                        $(k).text($('#PlaceFrom').val());
+                    }
+                    if (i == 4) {
+                        $(k).text($('#PlaceTo').val());
+                    }
+                    if (i == 5) {
+                        $(k).text($('#ClaimAmt').val());
+                    }
+                    if (i == 6) {
+                        $(k).text($('#SettleAmt').val());
+                    }
+                    if (i == 7) {
+                        $(k).text($('#Id').val());
+                        
+                    }
+                });
+            });
+
+            var JoyobjId = "";
+            var JoySettelmentAmt = "";
+            $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+                var target = $(e.target).parent('tr');
+                target.toggleClass('monthTable-selected');
+                $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+                $('#sr_no').focus();
+                var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+                target.children().each(function (i, k) {
+                    var childs = $(k).children().toArray();
+                    if (i == 0) {
+                        $('#sr_no').val($(k).text());
+                    }
+                    if (i == 1) {
+                        $('#FromDate').val($(k).text());
+                    }
+                    if (i == 2) {
+                        $('#ToDate').val($(k).text());
+                    }
+                    if (i == 3) {
+                        $('#PlaceFrom').val($(k).text());
+                    }
+                    if (i == 4) {
+                        $('#PlaceTo').val($(k).text());
+                    }
+                    if (i == 5) {
+                        $('#ClaimAmt').val($(k).text());
+                    }
+                    if (i == 6) {
+                        $('#SettleAmt').val($(k).text());
+                        JoySettelmentAmt = ($(k).text())
+                    }
+                    if (i == 7) {
+                        $('#Id').val($(k).text());
+                        JoyobjId = ($(k).text());
+                        
+                    }
+                });
+                e.preventDefault();
+            });
+           
+
+            $('#create-data').on('click', function (e) {
+                e.preventDefault();
+                var formjson = [];
+                var tr = [];
+                tr = $('#monthTable tr:gt(0)').toArray();
+                if (tr.length == 0) {
+                    tr = $('#monthTable tr:gt(0)').toArray();
+                }               
+                $.ajax({
+                    url: "@Url.Action("createJourneyObj", "TADASettlementClaim")?JoyobjId=" + JoyobjId + "&JoySettelmentAmt=" + JoySettelmentAmt,
+                    method: "POST",
+                    contentType: 'application/json',
+                    datatype: 'json',                  
+                    success: function (data) {
+                        if (data.status = true) {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        }
+
+                    }
+                });
+            });
+
+            $('#sub_form1').on('click', function (e) {
+                var table_sr_no = $('#sr_no1').val();
+                var target = $('#monthTable1 tr#' + table_sr_no).children();
+                var input = $('#frm_edit_form1 input[type="text"],#frm_edit_form1 select').toArray();
+                target.each(function (i, k) {
+                    if (i == 0) {
+                        $(k).text($('#sr_no1').val());
+                    }
+                    if (i == 1) {
+                        $(k).text($('#MisExpenseDate').val());
+                    }
+                    if (i == 2) {
+                        $(k).text($('#MisExpenseClaimAmt').val());
+                    }
+                    if (i == 3) {
+                        $(k).text($('#MisExpenseSettleAmt').val());
+                    }
+                    if (i == 4) {
+                        $(k).text($('#Id1').val());
+                    }
+                });
+            });
+
+            var MisobjId = "";
+            var MisExpenseSettleAmt = "";
+            $('#monthTable1').on('click', 'tr:gt(0)', function (e) {
+                var target = $(e.target).parent('tr');
+                target.toggleClass('monthTable1-selected');
+                $('#monthTable1 tr:gt(0)').not(target).removeClass('monthTable1-selected');
+                $('#sr_no1').focus();
+                var input = $('#frm_edit_form1 input[type="text"],#frm_edit_form1 select').toArray();
+                target.children().each(function (i, k) {
+
+                    if (i == 0) {
+                        $('#sr_no1').val($(k).text());
+                    }
+                    if (i == 1) {
+                        $('#MisExpenseDate').val($(k).text());
+                    }
+                    if (i == 2) {
+                        $('#MisExpenseClaimAmt').val($(k).text());
+                    }
+                    if (i == 3) {
+                        $('#MisExpenseSettleAmt').val($(k).text());
+                        MisExpenseSettleAmt = ($(k).text())
+                    }
+                    if (i == 4) {
+                        $('#Id1').val($(k).text());
+                        MisobjId = ($(k).text());
+                    }
+                });
+                e.preventDefault();
+            });
+
+
+            $('#create-data1').on('click', function (e) {
+                e.preventDefault();
+                var formjson1 = [];
+                var tr = [];
+                tr = $('#monthTable1 tr:gt(0)').toArray();
+                if (tr.length == 0) {
+                    tr = $('#monthTable1 tr:gt(0)').toArray();
+                }              
+                $.ajax({
+                    url: "@Url.Action("CreateMisExpenseObj", "TADASettlementClaim")?MisobjId=" + MisobjId + "&MisExpenseSettleAmt=" + MisExpenseSettleAmt,
+                    method: "POST",
+                    contentType: 'application/json',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        data: formjson1
+                    }),
+                    success: function (data) {
+                        if (data.status = true) {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        }
+
+                    }
+                });
+
+
+            });
+
+            $('#sub_form2').on('click', function (e) {
+                var table_sr_no = $('#sr_no2').val();
+                var target = $('#monthTable2 tr#' + table_sr_no).children();
+                var input = $('#frm_edit_form2 input[type="text"],#frm_edit_form2 select').toArray();
+                target.each(function (i, k) {
+                    if (i == 0) {
+                        $(k).text($('#sr_no2').val());
+                    }
+                    if (i == 1) {
+                        $(k).text($('#HotelDate').val());
+                    }
+                    if (i == 2) {
+                        $(k).text($('#HotelClaimAmt').val());
+                    }
+                    if (i == 3) {
+                        $(k).text($('#HotelSettleAmt').val());
+                    }
+                    if (i == 4) {
+                        $(k).text($('#Id2').val());
+                    }
+                });
+            });
+            var HotelbjId = "";
+            var HotelseSettleAmt = "";
+            $('#monthTable2').on('click', 'tr:gt(0)', function (e) {
+                var target = $(e.target).parent('tr');
+                target.toggleClass('monthTable2-selected');
+                $('#monthTable2 tr:gt(0)').not(target).removeClass('monthTable2-selected');
+                $('#sr_no2').focus();
+                var input = $('#frm_edit_form2 input[type="text"],#frm_edit_form2 select').toArray();
+                target.children().each(function (i, k) {
+
+                    if (i == 0) {
+                        $('#sr_no2').val($(k).text());
+                    }
+                    if (i == 1) {
+                        $('#HotelDate').val($(k).text());
+                    }
+                    if (i == 2) {
+                        $('#HotelClaimAmt').val($(k).text());
+                        
+                    }
+                    if (i == 3) {
+                        $('#HotelSettleAmt').val($(k).text());
+
+                        HotelseSettleAmt = ($(k).text())
+                    }
+                    if (i == 4) {
+                        $('#Id2').val($(k).text());
+                        HotelbjId = ($(k).text())
+                    }
+                });
+                e.preventDefault();
+            });
+
+
+            $('#create-data2').on('click', function (e) {
+                e.preventDefault();
+                var formjson2 = [];
+                var tr = [];
+                tr = $('#monthTable2 tr:gt(0)').toArray();
+                if (tr.length == 0) {
+                    tr = $('#monthTable2 tr:gt(0)').toArray();
+                }
+               
+                $.ajax({
+                    url: "@Url.Action("CreateHotelBooking", "TADASettlementClaim")?HotelbjId=" + HotelbjId + "&HotelseSettleAmt=" + HotelseSettleAmt,
+                    method: "POST",
+                    contentType: 'application/json',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        data: formjson2
+                    }),
+                    success: function (data) {
+                        if (data.status = true) {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        }
+
+                    }
+                });
+
+
+            });
+
+
+            $('#sub_form3').on('click', function (e) {
+                var table_sr_no = $('#sr_no3').val();
+                var target = $('#monthTable3 tr#' + table_sr_no).children();
+                var input = $('#frm_edit_form3 input[type="text"],#frm_edit_form3 select').toArray();
+                target.each(function (i, k) {
+                    if (i == 0) {
+                        $(k).text($('#sr_no3').val());
+                    }
+                    if (i == 1) {
+                        $(k).text($('#DADate').val());
+                    }
+                    if (i == 2) {
+                        $(k).text($('#DAClaimAmt').val());
+                    }
+                    if (i == 3) {
+                        $(k).text($('#DASettleAmt').val());
+                    }
+                    if (i == 4) {
+                        $(k).text($('#Id3').val());
+                    }
+                });
+            });
+            var DAbjId = "";
+            var DAseSettleAmt = "";
+            $('#monthTable3').on('click', 'tr:gt(0)', function (e) {
+                var target = $(e.target).parent('tr');
+                target.toggleClass('monthTable3-selected');
+                $('#monthTable3 tr:gt(0)').not(target).removeClass('monthTable3-selected');
+                $('#sr_no3').focus();
+                var input = $('#frm_edit_form3 input[type="text"],#frm_edit_form3 select').toArray();
+                target.children().each(function (i, k) {
+
+                    if (i == 0) {
+                        $('#sr_no3').val($(k).text());
+                    }
+                    if (i == 1) {
+                        $('#DADate').val($(k).text());
+                    }
+                    if (i == 2) {
+                        $('#DAClaimAmt').val($(k).text());
+                    }
+                    if (i == 3) {
+                        $('#DASettleAmt').val($(k).text());
+                        DAseSettleAmt = ($(k).text())
+                    }
+                    if (i == 4) {
+                        $('#Id3').val($(k).text());
+                        DAbjId = ($(k).text())
+                    }
+                });
+                e.preventDefault();
+            });
+
+
+            $('#create-data3').on('click', function (e) {
+                e.preventDefault();
+                var formjson3 = [];
+                var tr = [];
+                tr = $('#monthTable3 tr:gt(0)').toArray();
+                if (tr.length == 0) {
+                    tr = $('#monthTable3 tr:gt(0)').toArray();
+                }
+               
+                $.ajax({
+                    url: "@Url.Action("CreateDAobj", "TADASettlementClaim")?DAbjId=" + DAbjId + "&DAseSettleAmt=" + DAseSettleAmt,
+                    method: "POST",
+                    contentType: 'application/json',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        data: formjson3
+                    }),
+                    success: function (data) {
+                        if (data.status = true) {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        }
+
+                    }
+                });
+
+
+            });
+
+
+            function ajaxloaderv2(cameform) {
+                $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+            };
+            $('#Finalprocesssanction').on("click", function (event) {
+
+                $.ajax({
+                    url: '@Url.Action("GetTADAAmount", "TADASettlementClaim")',
+                    method: "POST",
+
+                    data: $('#frmTadaSettlementClaimReqonSanction').serialize(),
+                    beforeSend: function () {
+                        ajaxloaderv2('body');
+                    },
+                    success: function (data) {
+                        $.each(data, function (i, k) {
+
+                            $("#AdvAmt").val(k.AdvanceAmt);
+                            $("#TA_Claim_Amt").val(k.TAClaim);
+                            $("#TA_Eligible_Amt").val(k.TAElgmamt);
+                            $("#TA_SanctionAmt").val(k.TASanctionAmt);
+                            $("#DA_Eligible_Amt").val(k.DAElgmamt);
+                            $("#DA_Claim_Amt").val(k.DAClaim);
+                            $("#DA_SanctionAmt").val(k.DASanctionAmt);
+                            $("#Hotel_Eligible_Amt").val(k.HotelElgmamt);
+                            $("#Hotel_Claim_Amt").val(k.HotelClaim);
+                            $("#Hotel_SanctionAmt").val(k.HotelSanctionAmt);
+                            $("#MisExpense_Eligible_Amt").val(k.MisexpElgmamt);
+                            $("#MisExpense_Claim_Amt").val(k.MisexpClaim);
+                            $("#MisExpense_SanctionAmt").val(k.MisexpSanctionAmt);
+                            $("#NoOfDays").val(k.Noofdays);
+                            $("#SettlementAmt").val(k.SettlementAmt);
+
+                        });
+
+                    },
+                    complete: function () {
+                        $('.ajax_loder').remove();
+                    }
+                });
+                event.preventDefault();
+
+            });
+            $('.p2bdisabled').attr('readonly', 'readonly');
+            $('.p2bdisabled').css('background-color', 'rgb(231, 231, 231)');
+            $('#DaelglblId,#HotelglblId,#MiselglblId,#TaelglblId').hide();
+            $('#DA_Eligible_Amt,#Hotel_Eligible_Amt,#MisExpense_Eligible_Amt,#TA_Eligible_Amt').hide();
+            $('#DA_Eligible_Amt,#Hotel_Eligible_Amt,#MisExpense_Eligible_Amt,#TA_Eligible_Amt').val("0");
+            $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').ForceAmount();
+            $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').val("0");
+            $('#AdvAmt,#TA_Eligible_Amt,#TA_Claim_Amt,#TA_SanctionAmt,#EncashmentAmount,#SettlementAmt,#DA_Eligible_Amt,#DA_Claim_Amt,#DA_SanctionAmt,#Hotel_Eligible_Amt,#Hotel_Claim_Amt,#Hotel_SanctionAmt,#MisExpense_Eligible_Amt,#MisExpense_Claim_Amt,#MisExpense_SanctionAmt').ForceAmount();
+            $('#AdvAmt,#EncashmentAmount,#SettlementAmt').val("0");
+
+        });
+    </script>
+
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTadaSettlementClaimReqonSanction", name = "frmTadaSettlementClaimReqonSanction" }))
+    {
+        <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+        <input type="hidden" name="Lvnewreqid_User" id="Lvnewreqid_User" value="" />
+        <input type="hidden" name="Lvnewreqid_User_Empcode" id="Lvnewreqid_User_Empcode" value="" />
+        <input type="text" class="hide_textbox" name="authority" id="authority" />
+        <input type="text" class="hide_textbox" name="isClose" id="isClose" />
+        <input type="text" class="hide_textbox" name="TrClosed" id="TrClosed" />
+        <input type="text" class="hide_textbox" name="LvId" id="LvId" />
+        <input id="autho_action" type="hidden" name="autho_action" />
+        <input id="autho_allow" type="hidden" name="autho_allow" />
+
+        <div class=" " style="width: 506px;">
+            <div class=" " style="width: 506px;">
+
+
+                <table id="monthTable">
+                    <tr><th>Sr</th><th>FromDate</th><th>ToDate</th><th>PlaceFrom</th><th>PlaceTo</th><th>ClaimAmt</th><th>SettleAmt</th><th>Id</th></tr>
+                </table>
+                <div class="section2_Leave" id="journeyobj">
+                    <form id="frm_edit_form" name="frm_edit_form">
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Sr.No :</label>
+                            <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">FromDate :</label>
+                            <input type="text" id="FromDate" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">ToDate :</label>
+                            <input type="text" id="ToDate" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">PlaceFrom :</label>
+                            <input type="text" id="PlaceFrom" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">PlaceTo :</label>
+                            <input type="text" id="PlaceTo" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">ClaimAmt :</label>
+                            <input type="text" id="ClaimAmt" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">SettleAmt :</label>
+                            <input type="text" id="SettleAmt" class="popup-content-textbox" />
+                        </div>
+                        <div class="row1 content_margine">
+                            <label class="popup-content-label">Id :</label>
+                            <input type="text" id="Id" class="popup-content-textbox" readonly />
+                        </div>
+                        <button type="button" id="sub_form">JourneyobjModify</button>
+                        <div style="float:right">
+                            <button id="create-data">JourneyobjCreate</button>
+                        </div>
+                    </form>
+                </div>
+
+                <table id="monthTable1">
+                    <tr><th>Sr</th><th>MisExpenseDate</th><th>MisExpenseClaimAmt</th><th>MisExpenseSettleAmt</th><th>Id</th></tr>
+                </table>
+
+                <div class="section2_Leave" id="MisExpense">
+                    <form id="frm_edit_form1" name="frm_edit_form1">
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Sr.No :</label>
+                            <input type="text" id="sr_no1" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">MisExpenseDate :</label>
+                            <input type="text" id="MisExpenseDate" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">MisExpenseClaimAmt :</label>
+                            <input type="text" id="MisExpenseClaimAmt" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label" id="misexpensesettleamt">MisExpenseSettleAmt :</label>
+                            <input type="text" id="MisExpenseSettleAmt" class="popup-content-textbox" />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Id :</label>
+                            <input type="text" id="Id1" class="popup-content-textbox" readonly />
+                        </div>
+                        <button type="button" id="sub_form1">MisExpenseobjModify</button>
+                        <div style="float:right">
+                            <button id="create-data1">MisExpenseobjCreate</button>
+                        </div>
+                    </form>
+                </div>
+                <table id="monthTable2">
+                    <tr><th>Sr</th><th>HotelDate</th><th>HotelClaimAmt</th><th>HotelSettleAmt</th><th>Id</th></tr>
+                </table>
+                <div class="section2_Leave" id="HotelObject">
+                    <form id="frm_edit_form2" name="frm_edit_form2">
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Sr.No :</label>
+                            <input type="text" id="sr_no2" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">HotelDate :</label>
+                            <input type="text" id="HotelDate" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">HotelClaimAmt :</label>
+                            <input type="text" id="HotelClaimAmt" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">HotelSettleAmt :</label>
+                            <input type="text" id="HotelSettleAmt" class="popup-content-textbox" />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Id :</label>
+                            <input type="text" id="Id2" class="popup-content-textbox" readonly />
+                        </div>
+                        <button type="button" id="sub_form2">HotelBookingModify</button>
+                        <div style="float:right">
+                            <button id="create-data2">HotelBookingCreate</button>
+                        </div>
+                    </form>
+                </div>
+
+                <table id="monthTable3">
+                    <tr><th>Sr</th><th>DADate</th><th>DAClaimAmt</th><th>DASettleAmt</th><th>Id</th></tr>
+                </table>
+                <div class="section2_Leave" id="DAobject">
+                    <form id="frm_edit_form3" name="frm_edit_form3">
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Sr.No :</label>
+                            <input type="text" id="sr_no3" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">DADate :</label>
+                            <input type="text" id="DADate" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">DAClaimAmt :</label>
+                            <input type="text" id="DAClaimAmt" class="popup-content-textbox" readonly />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">DASettleAmt :</label>
+                            <input type="text" id="DASettleAmt" class="popup-content-textbox" />
+                        </div>
+                        <div class="row2 content_margine">
+                            <label class="popup-content-label">Id :</label>
+                            <input type="text" id="Id3" class="popup-content-textbox" readonly />
+                        </div>
+                        <button type="button" id="sub_form3">DAModify</button>
+                        <div style="float:right">
+                            <button id="create-data3">DACreate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="Sanction-div">
+                <div class="heading">Sanction Authority Views</div>
+                <div class="row3 content_margine " id="yes_no_div">
+                    <label class="popup-content-label">
+                        Sanction Status:
+                    </label>
+                    <span class="popup_radio_button">
+                        <span><input type="radio" id="radio1" name="Sanction" value="true" /> <label for="radio1">Yes</label></span>
+                        <span><input type="radio" id="radio2" name="Sanction" value="false" /> <label for="radio2">No</label></span>
+                    </span>
+                </div>
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label must">
+                        Reason:
+                    </label>
+                    <input type="text" name="ReasonSanction" id="ReasonSanction" class="popup-content-textbox" />
+                </div>
+            </div>
+
+            <div class="section_Method hide-div" id="Approval-div">
+                <div id="ApprovalDiv" class="row1 content_margine">
+                    <div class="heading">Approval Authority View</div>
+                    <label class="popup-content-label">
+                        Approval Status:
+                    </label>
+                    <div class="popup_radio_button">
+                        <input type="radio" name="Approval" value="true" id="rdo3" /><label for="rdo3">Yes</label>
+                        <input type="radio" name="Approval" id="rdo4" value="false" /><label for="rdo4">No</label>
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label must">Reason :</label>
+                        <input type="text" name="ReasonApproval" id="ReasonApproval" class="popup-content-textbox" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+</body>
+</html>

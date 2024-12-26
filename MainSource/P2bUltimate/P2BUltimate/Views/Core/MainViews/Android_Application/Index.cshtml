@@ -1,0 +1,229 @@
+﻿@{
+    ViewBag.Title = "Android User Creation";
+}
+@model P2b.Global.Android_Application
+<html>
+<head>
+
+    <title>Android User Creation</title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 207px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container"> 
+                <button class="button" id="btn-add">Add</button> 
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th> 
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th> 
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    var paramdataload = "";
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#btn-add').on('click', function (e) {
+
+            $('<div></div>').PartialCreateDialog({
+                height: '600',
+                width: '1300',
+                form: '#frmAndroidAppCreate',
+                title: 'Android Application',
+                htmlurl: '@Url.Action("PARTIAL","Android_Application")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#MyTable').DataTable({
+                        "ajax": {
+                            "url": "@Url.Action("Emp_Grid", "Android_Application")",
+                            "type": "post",
+                            "data": forwarddata,
+                        }
+                    }).load();
+                },
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "Android_Application")",
+
+            htmurl: "@Url.Action("partial", "Android_Application")",
+
+            columnname: ["Code", "Name", "Id"],
+            childheader: ["PhoneNo", "IMEINo", "ActiveUser", "IsGeoFencingApp", "Id"],
+            childurl: "@Url.Action("Get_AppData", "Android_Application")",
+                tableheader: "Android Application User Data",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                var chhassa = $(parent_element).find('td:eq(6)').html();
+                console.log(chhassa);
+                var dt = $('#MyTable').DataTable();
+
+
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frm-YearlyPaymentT-partial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: editurl,
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data.data, function (i, k) {
+                                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                                $('#yearlypayment-Narration').val(k.NarrationP);
+                            });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                 $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-AndroidApp",
+                    htmlurl: "@Url.Action("GridPartial", "Android_Application")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "Android_Application")",
+                    submiturl: "@Url.Action("GridEditSave", "Android_Application")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) { 
+                            $('[name="IsActive"]').val([k.ActiveUser]).button().button("refresh");
+                            $('[name="IsGeoFenceApp"]').val([k.IsGeoFencingApp]).button().button("refresh");
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                forwarddata: id,
+                submitfun: function (data) {
+                    var row = dt.row(papartialrent_element);
+                    if (row.child.isShown()) {
+                        parent_element.removeClass('details');
+                        row.child.hide();
+                    }
+                }
+            });
+        }
+    };
+
+    });
+</script>

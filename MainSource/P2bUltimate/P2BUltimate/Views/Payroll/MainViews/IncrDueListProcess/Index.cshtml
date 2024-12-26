@@ -1,0 +1,141 @@
+﻿@{
+    ViewBag.Title = "IncrDueList";
+}
+<style>
+    .btn_row {
+        position: absolute;
+        top: 6px;
+        left: 241px;
+    }
+
+
+    .emplist_row {
+        margin: 0px;
+        padding-top: 6px;
+        padding-left: 10px;
+    }
+</style>
+<script>
+    $(function () {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        @*ColModel = ['Id', 'EmpCode', 'EmpName'];
+        ColNames = ['Id', 'EmpCode', 'EmpName'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = "Employee List",
+		width = 700;
+        height = 200*@;
+
+        ColDisplayNames = ['EmpCode', 'EmpName', 'Id'];
+        ColDisplayModel = ['EmpCode', 'EmpName', 'Id'];
+        @*url = '@Url.Action("P2BGrid")';*@
+        width = 1000;
+        height = 150;
+        Caption_one = "increment",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 700;
+        heightD = 200;
+        //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#pager2');
+        $('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+
+        @*$('#display_emp').button().on("click", function (event) {
+		    var month = $("#month").val();
+		    alert(month);
+		    $.get("@Url.Action("Create")", { data: month }, function (data) {
+		        console.log(data);
+		    });
+		    event.preventDefault();
+		});*@
+
+        $('#display_emp').on('click', function (e) {
+            $('#display_emp').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcess", "IncrDueListProcess")",
+                submiturl: "@Url.Action("Create", "IncrDueListProcess")",
+                cancelurl: "@Url.Action("LoadbyDefault", "IncrDueListProcess")",
+                month: "#txtPayMonth",
+                gridid: "#JqGridNew",
+                msg: "InCrementDueListProcess Already Done,Do You Want To Reprocess...?",
+            });
+            e.preventDefault();
+        });
+
+        $('#relase_incr').on('click', function (e) {
+             @*$('#relase_incr').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcess", "IncrDueListProcess")",
+                submiturl: "@Url.Action("Create", "IncrDueListProcess")",
+                month: "#month",
+                msg: "Relase InCrementDueListProcess,Please Confirm ..?",
+                cancelurl: "@Url.Action("LoadbyDefault", "IncrDueListProcess")",
+                gridid: "#JqGridNew",
+                status: function (data) {
+                   // alert(data.responseText);
+                    //console.log(data);
+                    //if (data == true) {
+                    //    alert("Data Saved Succesfully..!");
+                    //}
+                }
+            });*@
+            e.preventDefault();
+        });
+        $('#Create').button().on("click", function (event) {
+            $('#frmEmpList').trigger('reset');
+            // To bind dropdown on page load
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create Dialog",
+                submiturl: "@Url.Action("create")",
+                form: "#frmEmpList",
+                height: 475,
+                width: 800,
+                state: "open",
+                gridname: "#JqGridNew",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            event.preventDefault();
+        });
+        $.fn.MonthAndYear = function () {
+            $(this).datepicker({
+                changeMonth: true,
+                changeYear: true,
+                stepMonths: true,
+                dateFormat: 'mm/yy',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    //$(this).val($.datepicker.formatDate('mm yy', new Date(year, month, 1)));
+                }
+            });
+        };
+        $('#txtPayMonth').MonthAndYear();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>
+<div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="emplist_row">
+                <label for="payscaleagreement_drop" class="emplist_label must">Month :</label>
+                <input type="text" id="txtPayMonth" name="txtPayMonth" class="emplist_textbox must" />
+                <div class="btn_row">
+                    <button id="display_emp" data-typeofbtn="display">DueList Display</button>
+                    <button id="relase_incr" data-typeofbtn="process">Release Increment</button>
+                </div>
+            </div>
+
+            <div class="emplist_row">
+                <div id="Grid_Form2">
+                    <div>
+                        <table id="JqGridNew"></table>
+                        <div id="pager22"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

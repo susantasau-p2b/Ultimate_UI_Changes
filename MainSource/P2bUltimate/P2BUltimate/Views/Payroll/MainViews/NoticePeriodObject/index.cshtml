@@ -1,0 +1,326 @@
+﻿@{
+    ViewBag.Title = "NoticePeriodObject";
+}
+@model EMS.NoticePeriod_Object
+<script>
+    $(document).ready(function () {
+        $('#PolicyName').ForceOnlyAlphaNumeric();
+        $('#PolicyName').MaxLength(100);
+        $('#NoticePeriod').MaxLength(15);
+        $('#NoticePeriod').ForceOnlyNumeric();
+    });
+
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['PolicyName', 'NoticePeriod', 'Id'];
+        ColNames = ['PolicyName', 'NoticePeriod', 'Id'];
+        SortName = 'Id';
+        Caption = 'NoticePeriodObject';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#Create').on("click", function (event) {
+            $('#frmNoticePeriodObject').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create NoticePeriodObject Policy', 'open', '@Url.Action("Create")', '#frmNoticePeriodObject', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '#Travel_Mode_Eligibility_PolicyList,#PTWagesMasterlist,#Stateslist', '#Edit-TravelModeEligibilityPolicy, #Edit-Wages', function (data) { });
+            event.preventDefault();
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit NoticePeriodObject Policy Data", '#frmNoticePeriodObject', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 463, 600, '#Travel_Mode_Eligibility_PolicyList,#Wageslist,#ServiceRangeList', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#NoticePeriod').val(k.NoticePeriod);
+                    $('#Wageslist').P2BLookUpEncapsulate('#Wageslist', 'Wageslist', k.wagesid, k.wagesfulldetails, 'Wageslist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                    $('#ServiceRangeList').P2BLookUpEncapsulate('#ServiceRangeList', 'ServiceRangeList', k.ServiceranngeId, k.ServicerangeFulldetails, 'ServiceRangeList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+
+
+                });
+
+                //partial page bind
+                //$.each(data[1], function (i, k) {
+                //    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                //    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                //});
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+        @*$('#Lookup-TravelModeEligibilityPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTravelModeEligibilitydata", "NoticePeriodObject")', '', 'LookupDiv', 'TravelModeEligibilityPolicy Look Up Data', '#Travel_Mode_Eligibility_PolicyList', 'Travel_Mode_Eligibility_PolicyList', 5, 'Travel_Mode_Eligibility_PolicyList', '#frmNoticePeriodObject', 'N', '#Edit-TravelModeEligibilityPolicy,#Remove-TravelModeEligibilityPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('#Lookup-Wages').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTA_TMRC_Eligibility_Wages", "NoticePeriodObject")', '', 'LookupDiv', 'Wages Look Up Data', '#Wageslist', 'Wageslist', 5, 'Wageslist', '#frmNoticePeriodObject', 'N', '#Edit-Wages,#Remove-wages', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-ServiceRange').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetServiceRange", "NoticePeriodObject")', '', 'LookupDiv', 'ServiceRange Look Up Data', '#ServiceRangeList', 'ServiceRangeList', 5, 'ServiceRangeList', '#frmNoticePeriodObject', 'N', '#Edit-ServiceRangeList,#Remove-ServiceRangeList', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Wages').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create wages', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmNoticePeriodObject', '', function (data) {
+                // to show data which is created in partial page
+                $('#Wageslist').P2BLookUpEncapsulate('#Wageslist', 'Wageslist', data[0], data[1], 'Wageslist', '#Remove-Wages', 'N');
+
+            });
+            event.preventDefault();
+
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_Wages", "NoticePeriodObject")', 'Create Wages', 'open', '@Url.Action("CreateSave", "TravelModeRateCeiingPolicy")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 350, 600, '', '', '', '#NoticePeriodObject', '', function (data) {
+                $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', data[0], data[1], 'WagesList', '#Remove-DistanceRange', 'A');
+
+            });
+
+            event.preventDefault();*@
+        });
+
+        $('#Edit-TravelModeEligibilityPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Travel_Mode_Eligibility_PolicyList').P2BGetTableDataonSelectedRow('#Travel_Mode_Eligibility_PolicyList', 0);
+            b = a[0];
+
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_TravelModeEligibilityPolicy", "NoticePeriodObject")', '@Url.Action("EditTravelModeEligibilityPolicy_partial", "NoticePeriodObject")', b, '@Url.Action("EditSave", "TravelModeEligibilityPolicy")', 'Edit TravelModeEligibilityPolicy Details', '#frmPartialTravelEligibiltyPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmNoticePeriodObject', '#Travel_Mode_Eligibility_PolicyList', 'Travel_Mode_Eligibility_PolicyList', 'Travel_Mode_Eligibility_PolicyList', 'N', '#Remove-TravelModeEligibilityPolicy,#View-TravelModeEligibilityPolicy-SalHeadFormula', function (data) {
+                // $.each(data[0], function (i, k) {
+                $('#frmPartialTravelModeEligibiltyPolicy').trigger('reset');
+                $('#TA_TM_Elligibilty_Code').val(data.TA_TM_Elligibilty_Code);
+                $('#TA_TM_Elligibilty_Code').val(data.TA_TM_Elligibilty_Code);
+                $('#travelmodelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3001, data.TravelMode_Id);
+                $('#classoftravellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3002, data.ClassTravel_id);
+                //$('#travelmodelist').val(data.TravelMode);
+                //$('#classoftravellist').val(data.ClassOfTravel);
+                //});
+
+            });
+            event.preventDefault();
+
+        });
+        $('#Delete').button().click(function (event) {
+            AssignData();
+            $('#NoticePeriodObject').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Remove-TravelModeEligibilityPolicy').button().on('click', function (event) {
+            a = $('#Travel_Mode_Eligibility_PolicyList').P2BGetTableDataonSelectedRow('#Travel_Mode_Eligibility_PolicyList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Travel_Mode_Eligibility_PolicyList', $('#Travel_Mode_Eligibility_PolicyList').val(), 200, 200, '#frmNoticePeriodObject', '#Travel_Mode_Eligibility_PolicyList');
+            event.preventDefault();
+        });
+
+        $('#Create-ServiceRange').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_ServiceRange", "NoticePeriodObject")', 'Create ServiceRange', 'open', '@Url.Action("CreateSave", "ServiceRange")', '#frmserviceRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 400, '', '', '', '#frmNoticePeriodObject', '', function (data) {
+                //alert(data[0]);
+                $('#ServiceRangeList').P2BLookUpEncapsulate('#ServiceRangeList', 'ServiceRangeList', data[0], data[1], 'ServiceRangeList', '#Remove-ServiceRangelist', 'A');
+            });
+
+            event.preventDefault();
+        });
+        $('#Edit-Wages').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Wageslist').P2BGetTableDataonSelectedRow('#Wageslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit Wages Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmNoticePeriodObject', '#Wageslist', 'Wageslist', 'Wageslist', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+        $('#Remove-Wages').button().on('click', function (event) {
+
+            //a = $('#Wageslist').P2BGetTableDataonSelectedRow('#Wageslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Wageslist').P2BGetTableDataonSelectedRow('#Wageslist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Wageslist', $('#Wageslist').val(), 200, 200, '#frmNoticePeriodObject', '#Wageslist');
+            event.preventDefault();
+        });
+        $('#Remove-ServiceRange').button().on('click', function (event) {
+            //a = $('#ServiceRangeList').P2BGetTableDataonSelectedRow('#ServiceRangeList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ServiceRangeList').P2BGetTableDataonSelectedRow('#ServiceRangeList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ServiceRangeList', $('#ServiceRangeList').val(), 200, 200, '#frmNoticePeriodObject', '#ServiceRangeList');
+            event.preventDefault();
+        });
+
+        $('#Edit-ServiceRange').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ServiceRangeList').P2BGetTableDataonSelectedRow('#ServiceRangeList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_ServiceRange", "NoticePeriodObject")', '@Url.Action("Edit", "ServiceRange")', b, '@Url.Action("EditSave", "ServiceRange")', 'Edit ServiceRange Details', '#frmserviceRange', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmNoticePeriodObject', '#ServiceRangeList', 'ServiceRangeList', 'ServiceRangeList', 'A', '#Edit-ServiceRange,#Remove-ServiceRange', function (data) {
+                $('#frmserviceRange').trigger('reset');
+                    $('#ServiceFrom').val(data.Servicefrom);
+                    $('#ServiceTo').val(data.ServiceTo);
+                    $('#WagesFrom').val(data.RangeFrom);
+                    $('#WagesTo').val(data.RangeTo);
+                    $('#Amount').val(data.Amount);
+                    $('#CeilingMin').val(data.CeilingMin);
+                    $('#CeilingMax').val(data.CeilingMax);
+                    $('#Percentage').val(data.Percentage);
+               
+            });
+            event.preventDefault();
+        });
+
+        
+
+        $('selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        //$('.popup_rdio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#EffectiveDate').P2BDatePicker();
+
+    });
+</script>
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 140px;
+            top: -149px;
+        }
+
+        .row1 {
+            width: 600px;
+        }
+
+        .popup-content-textbox {
+            min-width: 122px;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 180px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmNoticePeriodObject", name = "frmNoticePeriodObject" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1  content_margine ">
+                @Html.LabelFor(m => m.PolicyName, "PolicyName :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PolicyName, new { @class = "popup-content-textbox-short must", @readonly = true })
+            </div>
+    <div class="row1 content_margine">@Html.LabelFor(m => m.NoticePeriod, "Notice Period in Month :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.NoticePeriod, new { @class = "contact_popup-content-textbox" })</div>
+            
+            @*<div class="row1  content_margine ">
+                    @Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(e => e.EndDate, new { @class = "popup-content-textbox date must", @readonly = true })
+                </div>*@
+            <div class="row1 content_margine">
+                @*@Html.LabelFor(m => m.TravelModeEligibilityPolicy, "TravelModeEligibilityPolicy:", new { @class = "popup-content-label must" })*@
+                @*<div class="popup-content-table">
+                    <div id="TravelModeEligibilityPolicylist_old"></div>
+                    <table class="lookuptableselected" id="Travel_Mode_Eligibility_PolicyList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select TravelModeEligibilityPolicy Details" class="popup-content-icon-lookup" id="Lookup-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create TravelModeEligibilityPolicy Details" class="popup-content-icon-create" id="Create-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit TravelModeEligibilityPolicy Details" class="popup-content-icon-edit" id="Edit-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove TravelModeEligibilityPolicy Details" class="popup-content-icon-remove" id="Remove-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>*@
+                <div class="row1 content_margine">
+                    @Html.LabelFor(m => m.Wages, "Wages(notice period recovery Salary):", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <div id="PTWagesMasterlist_old"></div>
+                        <table class="lookuptableselected" id="Wageslist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select Wages Details" class="popup-content-icon-lookup" id="Lookup-Wages"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Wages Details" class="popup-content-icon-create" id="Create-Wages"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Wages Details" class="popup-content-icon-edit" id="Edit-Wages"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Wages Details" class="popup-content-icon-remove" id="Remove-Wages"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row1 content_margine">
+                    @Html.LabelFor(m => m.ServiceRange, "ServiceRange:", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <div id="StatutoryEffectiveMonthslist_old"></div>
+                        <table class="lookuptableselected" id="ServiceRangeList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select ServiceRange Details" class="popup-content-icon-lookup" id="Lookup-ServiceRange"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ServiceRange Details" class="popup-content-icon-create" id="Create-ServiceRange"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit ServiceRange Details" class="popup-content-icon-edit" id="Edit-ServiceRange"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove ServiceRange Details" class="popup-content-icon-remove" id="Remove-ServiceRange"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,287 @@
+﻿@{
+    ViewBag.Title = "UnitId Assignment";
+}
+@model Attendance.UnitIdAssignment
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 180px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 500px;
+        }
+
+        .row4 {
+            padding: 0px 0 5px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .tblmargin {
+            margin-left: 177px;
+            margin-top: 6px;
+        }
+
+        .xdsoft_datetimepicker .xdsoft_timepicker {
+            width: 83px;
+            float: left;
+            text-align: center;
+            margin-left: 8px;
+            margin-top: 0;
+        }
+
+        .xdsoft_prev {
+            margin-left: 25px;
+        }
+
+        .custome_ul {
+            padding: 0 0 0 15px;
+        }
+
+        .custome_li {
+            list-style: disc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+               
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>UnitId</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                    
+                    </table>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create UnitId Assignment">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmUnitIdAssign", name = "frmUnitIdAssign" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.UnitId, "Unit Id :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.UnitId, new { @class = "popup-content-textbox must" }) 
+            </div>
+    <div class="row3 content_margine">
+        @Html.LabelFor(m => m.GeoStruct, "Select GeoStruct :", new { @class = "popup-content-label must" })
+        <div id="NewGeoT-div">
+            <div class="newstruct-div">
+                <div class="transactiondiv without-btn">
+                    <div><label>Search : </label><input type="text" id="NewGeoT-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewGeoT-table">
+                        <tr><th><input type="checkbox" id="case-NewGeoT" /></th><th>New Geostruct</th></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        
+
+     
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmUnitIdAssign').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create UnitId Assignment', 'open', '@Url.Action("Create")', '#frmUnitIdAssign', 'Message :', 'Request Falied :', '#JqGrid', 400, 600, '', '', function (data) { }, {});
+            $('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("GetNewGeoStructDetails")', "0");
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            //  AssignData();
+            //$.LoadEmpByDefault();
+            $('#frmUnitIdAssign').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            //data('datatable_selectedrow');
+            ////debugger;
+            console.log(a.Id);
+            $('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("GetNewGeoStructDetails")', a.Id);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit UnitId Assignment Data", '#frmUnitIdAssign', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                
+
+                $.each(data[0], function (i, k) {
+                    $('#UnitId').val(k.UnitId);
+                    $('#UnitId').attr('readonly', 'readonly');
+                }); 
+                
+            }, { datatablename: "#MyTable" });
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "UnitIdAssignment")",
+            editurl: " ",
+            htmurl: " ",
+            submiturl: "",
+            columnname: ["UnitId", "Id"],
+            childheader: ["Geostruct", "Id"],
+            childurl: "@Url.Action("Get_Details", "UnitIdAssignment")",
+            tableheader: "UnitIdAssignment",
+            childurlColumnNo: "2"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            var chhassa = $(parent_element).find('td:eq(2)').html();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-LTCAdvanceClaim",
+                    htmlurl: "",
+                    state: "open",
+                    mode: "View",
+                    editurl: "",
+                    submiturl: "",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-ProposedPlace').val(k.ProposedPlace);
+                            $('#Edit-LTCEligibleAmount').val(k.EligibleAmount);
+                            $('#Edit-LTCAdvanceAmount').val(k.AdvanceAmount);
+                            $('#Edit-Remark').val(k.Remark);
+
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#EditGridForm",
+                    htmlurl: "",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "",
+                    submiturl: "",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-ProposedPlace').val(k.ProposedPlace);
+                            $('#Edit-LTCEligibleAmount').val(k.EligibleAmount);
+                            $('#Edit-LTCAdvanceAmount').val(k.AdvanceAmount);
+                            $('#Edit-Remark').val(k.Remark);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                // alert(chhassa);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    editdata: chhassa,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+    });
+</script>

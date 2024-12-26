@@ -1,0 +1,682 @@
+﻿@{
+    ViewBag.Title = "ITSection10Payment";
+}
+@model Payroll.ITSection10Payment
+
+<html>
+<head>
+
+
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+
+            $('#ActualInvestment').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#DeclaredInvestment').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#Narration').MaxLength(30);
+            $('#InvestmentDate').attr('readonly', 'readonly');
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+                htmurl: "@Url.Action("partial", "ITSection10Payment")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["InvestmentDate", "ActualInvestment", "DeclaredInvestment", "Narration", "Id"],
+                childurl: "@Url.Action("Get_ITSection10Payment", "ITSection10Payment")",
+                tableheader: "IT Section 10 Payment",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                // console.log($(init).parents('tr:eq(0)'));
+                var parent_element = $(init).parents('td:last').parent().prev();
+                //var element = $(init).parents('tr:eq(0)');
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                //   console.log(element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frm-ITSection10-partial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("EditGridDetails", "ITSection10Payment")",
+                        submiturl: "@Url.Action("GridEditSave", "ITSection10Payment")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+
+                            $.each(data.data, function (i, k) {
+                                $('#ITSection10-InvestmentDate').val(DateConvert(k.InvestmentDate));
+                                // $('#ITSection10-InvestmentDate').val(k.InvestmentDate);
+                                $('#ITSection10-ActualInvestment').val(k.ActualInvestment);
+                                $('#ITSection10-DeclaredInvestment').val(k.DeclaredInvestment);
+                                $('#ITSection10-Narration').val(k.Narration);
+                            });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frm-ITSection10-partial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("EditGridDetails", "ITSection10Payment")",
+                        submiturl: "@Url.Action("GridEditSave", "ITSection10Payment")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $('#ITSection10-InvestmentDate').attr('readonly', 'readonly');
+                            // $('ITSection10-ActualInvestment').ForceOnlyNumeric();
+                            // $('ITSection10-DeclaredInvestment').ForceOnlyNumeric().MaxLength(8);
+                            $.each(data.data, function (i, k) {
+                                $('#ITSection10-InvestmentDate').val(DateConvert(k.InvestmentDate));
+                                //$('#ITSection10-InvestmentDate').val(k.InvestmentDate);
+                                $('#ITSection10-ActualInvestment').val(k.ActualInvestment);
+                                $('#ITSection10-DeclaredInvestment').val(k.DeclaredInvestment);
+                                $('#ITSection10-Narration').val(k.Narration);
+
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete", "ITSection10Payment")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            $('#InvestmentDate').P2BDatePicker();
+            $('#Create_Dialog').P2BCreateDialog();
+            //$.LoadEmpByDefault();
+            $.LoadEmpByDefaultWOGeoId(true, "");
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#pay_id').val(data.PayStruct);
+                        //$('#fun_id').val(data.FunStruct);
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $('#frmITSection10Payment').trigger("reset");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create IT Section 10 Payment', 'open', '@Url.Action("Create")', '#frmITSection10Payment', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+                $('#InvestmentDate').attr('readonly', 'readonly');
+                $('#dispcalender').attr('readonly', 'readonly');
+                $('#InvestmentDate').TodayDate();
+                $.get("@Url.Action("GetITSectionByDefault")", function (data) {
+                    $('#ITSectionListL').P2BLookUpEncapsulate('#ITSectionListL', 'ITSectionList', data.Id, data.FullDetails, 'ITSectionList', '', 'N');
+                });
+                $.get("@Url.Action("getCalendar", "ITInvestmentPayment80CCCTo80CCF")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+
+                    $('#dispcalender_id').val(data.Id);
+                    console.log(data);
+                });
+                event.preventDefault();
+            });
+
+            // Main page edit
+            $('#Edit').on('click', function () {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit IT Investment Payment Data", '#frmITInvestmentPayment', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#ITInvestmentlist,#ITSectionListL,#ITSubInvestmentPaymentlist,#LoanAdvanceHeadlist', btndisablenames, function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        $('#ActualInvestment').val(k.ActualInvestment);
+                        $('#InvestmentDate').attr('readonly', 'readonly');
+                        if (k.InvestmentDate != null) { $('#InvestmentDate').val(DateConvert(k.InvestmentDate)); }
+                        $('#DeclaredInvestment').val(k.DeclaredInvestment);
+
+                        $('#Narration').val(k.Narration);
+                    });
+
+                    //partial page bind
+                    $.each(data[1], function (i, k) {
+                        $('#ITInvestmentlist').P2BLookUpEncapsulate('#ITInvestmentlist', 'ITInvestmentlist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentlist', '#Remove-ITInvestment-ITInvestmentPayment', 'N');
+                        $('#ITSectionListL').P2BLookUpEncapsulate('#ITSectionListL', 'ITSectionlist', k.ITSection_Id, k.ITSection_Val, 'ITSectionlist', '#Remove-ITSection-ITInvestmentPayment', 'N');
+                        $('#ITSubInvestmentPaymentlist').P2BLookUpEncapsulate('#ITSubInvestmentPaymentlist', 'ITSubInvestmentPaymentlist', k.ITSubInvestmentPayment_Id, k.ITSubInvestmentPayment_Val, 'ITSubInvestmentPaymentlist', '#Remove-ITSubInvestmentPayment-ITInvestmentPayment', 'A');
+                        $('#LoanAdvanceHeadlist').P2BLookUpEncapsulate('#LoanAdvanceHeadlist', 'LoanAdvanceHeadlist', k.LoanAdvHead_Id, k.LoanAdvHead_Val, 'LoanAdvanceHeadlist', '#Remove-LoanAdvanceHead-ITInvestmentPayment', 'N');
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                    // }, 2000);
+                }, { datatablename: "#MyTable" });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Corporate Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#ActualInvestment').val(k.ActualInvestment);
+                        $('#InvestmentDate').attr('readonly', 'readonly');
+                        $('#DeclaredInvestment').val(k.DeclaredInvestment);
+                        if (k.InvestmentDate != null) { $('#InvestmentDate').val(DateConvert(k.InvestmentDate)); }
+                        $('#Narration').val(k.Narration);
+                    });
+
+                    //partial page bind
+                    $.each(data[1], function (i, k) {
+                        $('#ITInvestmentlist').P2BLookUpEncapsulate('#ITInvestmentlist', 'ITInvestmentlist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentlist', '', 'N');
+                        $('#ITSectionListL').P2BLookUpEncapsulate('#ITSectionListL', 'ITSectionlist', k.ITSection_Id, k.ITSection_Val, 'ITSectionlist', '', 'N');
+                        $('#ITSubInvestmentPaymentlist').P2BLookUpEncapsulate('#ITSubInvestmentPaymentlist', 'ITSubInvestmentPaymentlist', k.ITSubInvestmentPayment_Id, k.ITSubInvestmentPayment_Val, 'ITSubInvestmentPaymentlist', '', 'A');
+                        $('#LoanAdvanceHeadlist').P2BLookUpEncapsulate('#LoanAdvanceHeadlist', 'LoanAdvanceHeadlist', k.LoanAdvHead_Id, k.LoanAdvHead_Val, 'LoanAdvanceHeadlist', '', 'N');
+                    });
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[2] != null) {
+                            $('#ActualInvestment').oldVal(data[2].ActualInvestment);
+                            $('#DeclaredInvestment').oldVal(data[2].DeclaredInvestment);
+                            $('#InvestmentDate').oldVal(data[2].InvestmentDate);
+                            $('#Narration').oldVal(data[2].Narration);
+                            $('#ITSectionlist_old').oldLookupVal(data[2].ITInvestment_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[2].ITSection_Val);
+                            $('#LoanAdvanceHeadlist_old').oldLookupVal(data[2].LoanAdvHead_Val);
+                        }
+                    }
+                    //}, 2000);
+                });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+            $('#Lookup_FinancialYear').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "ITProjection")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmITSection10Payment', 'N', '#remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            @*$('#Lookup_ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITSectionLKDetails", "ITInvestmentPayment")', '', 'LookupDiv', ' Look Up Data', '#ITSectionListL', 'ITSectionList', 5, 'ITSectionList', '#frmITInvestmentPayment', 'N', '#remove_ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+
+            $('#Lookup_ITSection').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetITSectionLKDetails", "ITSection10Payment")', '', 'LookupDiv', 'ITSection Look Up Data', '#ITSectionListL', 'ITSectionList', 5, 'ITSectionList', '#frmITSection10Payment', 'N', '#remove_ITSection', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+            $('#remove_ITSection').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ITSectionListL').P2BGetTableDataonSelectedRow('#ITSectionListL', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ITSectionListL').P2BGetTableDataonSelectedRow('#ITSectionListL', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSectionListL', $('#ITSectionListL').val(), 200, 200, '#frmITSection10Payment', '#ITSectionListL', '');
+                event.preventDefault();
+            });
+            $('#remove_FinancialYear').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#FinancialYearList').P2BGetTableDataonSelectedRow('#FinancialYearList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#FinancialYearList').P2BGetTableDataonSelectedRow('#FinancialYearList', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#FinancialYearList', $('#FinancialYearList').val(), 200, 200, '#frmITSection10Payment', '#FinancialYearList', '');
+                event.preventDefault();
+            });
+            //To get data in Lookup
+            $('#Lookup-Address-Corporate').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-Address-Corporate').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCorporate', '', function (data) {
+                    // to show data which is created in partial page
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                });
+                event.preventDefault();
+            });
+
+            //To get data in Lookup
+            $('#Lookup-ITSection-ITInvestmentPayment').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetITSectionLKDetails", "ITSection10Payment")', '', 'LookupDiv', 'ITSection Look Up Data', '#ITSectionListL', 'ITSectionlist', 5, 'ITSectionlist', '#frmITInvestmentPayment', 'N', '#Remove-ITSection-ITInvestmentPayment', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Lookup-ITSection10-ITSection10Payment').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetITSection10LKDetails", "ITSection10Payment")', '', 'LookupDiv', 'ITSection10 Look Up Data', '#ITSection10list', 'ITSection10list', 5, 'ITSection10list', '#frmITSection10Payment', 'N', '#Remove-ITSection10-ITSection10Payment', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Edit-ITSection10-ITSection10Payment').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ITSection10list').P2BGetTableDataonSelectedRow('#ITSection10list', 0);
+                b = a[0];
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial_ITSection10", "ITSection10Payment")', '@Url.Action("Edit", "ITSection10")', b, '@Url.Action("EditSave", "ITSection10")', 'Edit IT Section 10', '#frmitsection10', b, 'Message :', 'Request Falied :', '#JqGrid', 310, 520, '#frmITSection10Payment', '#ITSection10list', 'ITSection10list', 'ITSection10list', 'N', '', function (data) {
+                    $('#ExemptionCode').attr('readonly', 'readonly');
+                    $.each(data[0], function (i, k) {
+                        $('#ExemptionCode').val(k.ExemptionCode);
+                        $('#MaxAmount').val(k.MaxAmount);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#Itsection10salheadlist').P2BLookUpEncapsulate('#Itsection10salheadlist', 'Itsection10salheadlist', k.ITSection10SalHead_Id, k.ITSection10SalHead_FullDetails, 'Itsection10salheadlist', '#Remove-ITSection10SalHead-ITSection10', 'A');
+                    });
+                });
+                event.preventDefault();
+            });
+
+            $('#Lookup-ITSubInvestmentPayment-ITInvestmentPayment').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetSubInvPayLKDetails", "ITInvestmentPayment80C")', '', 'LookupDiv', 'ITSub Investment Payment Look Up Data', '#ITSubInvestmentPaymentlist', 'ITSubInvestmentPaymentlist', 5, 'ITSubInvestmentPaymentlist', '#frmITInvestmentPayment', 'N', '#Remove-ITSubInvestmentPayment-ITInvestmentPayment', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Lookup-LoanAdvanceHead-ITInvestmentPayment').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLoanAdvHeadLKDetails", "ITInvestmentPayment80C")', '', 'LookupDiv', 'Loan Advance Head Look Up Data', '#LoanAdvanceHeadlist', 'LoanAdvanceHeadlist', 5, 'LoanAdvanceHeadlist', '#frmITInvestmentPayment', 'N', '#Remove-LoanAdvanceHead-ITInvestmentPayment', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-ITSubInvestmentPayment-ITInvestmentPayment').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateITSubInvPay_partial", "ITSubInvestmentPayment")', 'Create ITSub Investment Payment', 'open', '@Url.Action("Create", "ITSubInvestmentPayment")', '#frmITSubInvestmentPayment', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmITInvestmentPayment', '', function (data) {
+                    $('#ITSubInvestmentPaymentlist').P2BLookUpEncapsulate('#ITSubInvestmentPaymentlist', 'ITSubInvestmentPaymentlist', data[0], data[1], 'ITSubInvestmentPaymentlist', '#Remove-ITSubInvestmentPayment-ITInvestmentPayment', 'A');
+                });
+                event.preventDefault();
+            });
+
+
+            //partial page delete
+            $('#Remove-ITSection10-ITSection10Payment').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ITSection10list').P2BGetTableDataonSelectedRow('#ITSection10list', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ITSection10list').P2BGetTableDataonSelectedRow('#ITSection10list', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSection10list', $('#ITSection10list').val(), 200, 200, '#frmITSection10Payment', '#ITSection10list', '#Remove-ITSection10-ITSection10Payment');
+                event.preventDefault();
+            });
+
+
+            $('#Remove-ITSection-ITInvestmentPayment').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ITSectionListL').P2BGetTableDataonSelectedRow('#ITSectionListL', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ITSectionListL').P2BGetTableDataonSelectedRow('#ITSectionListL', 0);
+
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSectionListL', $('#ITSectionListL').val(), 200, 200, '#frmITInvestmentPayment', '#ITSectionListL', '#Remove-ITSection-ITInvestmentPayment');
+                event.preventDefault();
+            });
+            $('#Remove-ITSubInvestmentPayment-ITInvestmentPayment').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ITSubInvestmentPaymentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentPaymentlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ITSubInvestmentPaymentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentPaymentlist', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSubInvestmentPaymentlist', $('#ITSubInvestmentPaymentlist').val(), 200, 200, '#frmITInvestmentPayment', '#ITSubInvestmentPaymentlist', '#Remove-ITSubInvestmentPayment-ITInvestmentPayment');
+                event.preventDefault();
+            });
+
+
+            $('#Remove-LoanAdvanceHead-ITInvestmentPayment').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#LoanAdvanceHeadlist').P2BGetTableDataonSelectedRow('#LoanAdvanceHeadlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#LoanAdvanceHeadlist').P2BGetTableDataonSelectedRow('#LoanAdvanceHeadlist', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LoanAdvanceHeadlist', $('#LoanAdvanceHeadlist').val(), 200, 200, '#frmITInvestmentPayment', '#LoanAdvanceHeadlist', '#Remove-LoanAdvanceHead-ITInvestmentPayment');
+                event.preventDefault();
+            });
+
+            $('#Btn-Upload-Data').on('click', function (e) {
+                ////debugger;
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        });
+
+    </script>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 108px;
+            top: -150px;
+        }
+
+        .popup-content-labelM {
+            display: block;
+            float: left;
+            width: 153px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 568px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 688px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 688px;
+            width: 610px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Add</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                @*<button class="button" id="View">View</button>
+                    <button class="button" id="Edit">Edit</button>
+                    <button class="button" id="Delete">Delete</button>
+                    <button class="button" id="Autho">Authorised</button>*@
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div id="Container" class="container">
+        <div id="Demo">
+            <table id="MyTable" class="datatable-inline" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>DD</th>
+                        <th>EmployeeCode</th>
+                        <th>EmployeeName</th>
+                        <th>ID</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>DD</th>
+                        <th>EmployeeCode</th>
+                        <th>EmployeeName</th>
+                        <th>ID</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create ITInvestmentPayment">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmITSection10Payment", name = "frmITSection10Payment" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                        @*<span class="btn-span1" aria-hidden="true">
+                                <button id="load_emp" class="loan-btn">Load Employee</button>
+                            </span>*@
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+
+            <div class="section2_Leave">
+                <div class="row3 content_margine">
+
+                    <div id="FinancialYearList_old"></div>
+                    @Html.LabelFor(m => m.FinancialYear, "Financial year:", new { @class = "popup-content-labelM" })
+                    <input type="text" hidden id="dispcalender_id" name="FinancialYearList" />
+                    <input type="text" readonly id="dispcalender" name="" style="width:250px" />
+                    @*<div class="popup-content-table">
+                            <table class="lookuptableselected" id="FinancialYearList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                            <button data-p2btooltip="Remove FinancialYear Details" class="button popup-content-icon-remove" id="remove_FinancialYear"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>*@
+
+                </div>
+
+                <div class="row3 content_margine">
+
+                    <div id="ItsectionList_old"></div>
+                    @Html.LabelFor(m => m.ITSection, "IT Section :", new { @class = "popup-content-labelM" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ITSectionListL">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup ITSection Details" class="button popup-content-icon-lookup" id="Lookup_ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                        @* <button data-p2btooltip="Remove ITSection Details" class="button popup-content-icon-remove" id="remove_ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>*@
+                    </div>
+
+                </div>
+
+                <div class="row3 content_margine">
+                    <div id="ITSection10list_old"></div>
+                    @Html.LabelFor(m => m.ITSection10, "IT Section 10 :", new { @class = "popup-content-labelM" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ITSection10list">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup ITSection10" class="popup-content-icon-lookup" id="Lookup-ITSection10-ITSection10Payment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-Address-Corporate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Edit ITSection10" class="popup-content-icon-edit" id="Edit-ITSection10-ITSection10Payment"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove ITSection10" class="popup-content-icon-remove" id="Remove-ITSection10-ITSection10Payment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.InvestmentDate, "Investment Date :", new { @class = "popup-content-labelM must" })@Html.TextBoxFor(m => m.InvestmentDate, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ActualInvestment, "Actual Investment :", new { @class = "popup-content-labelM must" })@Html.TextBoxFor(m => m.ActualInvestment, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.DeclaredInvestment, "Declared Investment :", new { @class = "popup-content-labelM must" })@Html.TextBoxFor(m => m.DeclaredInvestment, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-labelM" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox" })</div>
+
+            </div>
+        }
+    </div>
+
+</body>
+</html>

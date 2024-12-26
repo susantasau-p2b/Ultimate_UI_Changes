@@ -1,0 +1,98 @@
+﻿@model  Payroll.HRATransT
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        //$('#Date-edit,#DateOfCloser-edit,#DateOfMaturity-edit').P2BDatePicker();
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#Financialyear-edit').attr('readonly', 'readonly');
+        $('#City-edit').attr('readonly', 'readonly');
+
+
+    });
+    $('<div></div>').P2BPartialCreateModalDialog();
+    //partial page delete
+
+    $('#Lookup-Rent-HRATransTPartial').on('click', function (event) {
+        $('.dialog').P2BLookUpModal('@Url.Action("GetLookupRent", "HRATransT")', '', 'LookupDiv', 'Rent Look Up Data', '#Rent_ListPartial-edit', 'Rent_ListPartial-edit', 5, 'Rent_ListPartial-edit', '#frmHRATransTGridPartial', 'A', '#Remove-Rent-HRATransTPartial', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+
+    $('<div></div>').P2BPartialCreateModalDialog();
+
+    $('#Create-Rent-HRATransTPartial').on("click", function (event) {
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "HRATransT")', 'Create Rent', 'open', '@Url.Action("CreateSave", "Rent")', '#frmRent', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmHRATransTGridPartial', '', function (data) {
+            // to show data which is created in partial page
+            $('#Rent_ListPartial-edit').P2BLookUpEncapsulate('#Rent_ListPartial-edit', 'Rent_ListPartial-edit', data[0], data[1], 'Rent_ListPartial-edit', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', 'A');
+        });
+        event.preventDefault();
+    });
+
+    $('#Edit-Rent-HRATransTPartial').button().on("click", function (event) {
+        var a = [], b;
+        a = $('#Rent_ListPartial-edit').P2BGetTableDataonSelectedRow('#Rent_ListPartial-edit', 0);
+        b = a[0];
+        console.log(b);
+        event.preventDefault();
+        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HRATransT")', '@Url.Action("Edit", "Rent")', b, '@Url.Action("EditSave", "Rent")', 'Edit Rent Numbers', '#frmRent', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmHRATransTGridPartial', '#Rent_ListPartial-edit', 'Rent_ListPartial-edit', 'Rent_ListPartial-edit', 'A', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', function (data) {
+
+            $.each(data, function (i, k) {
+                $('#frmRent').trigger('reset');
+                $('#RentFromDate').val(k.RentFromDate);
+                $('#RentToDate').val(k.RentToDate);
+                $('#RentAmt').val(k.RentAmount);
+            });
+        });
+
+    });
+
+    $('#Remove-Rent-HRATransTPartial').button().on('click', function (event) {
+        var a = [], b;
+        a = $('#Rent_ListPartial-edit').P2BGetTableDataonSelectedRow('#Rent_ListPartial-edit', 0);
+        b = a[0];
+        $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Rent_ListPartial-edit', $('#Rent_ListPartial-edit').val(), 200, 200, '#frmHRATransTGridPartial', '#Rent_ListPartial-edit', '#Remove-Rent-HRATransTPartial');
+        event.preventDefault();
+    });
+
+</script>
+<style>
+    .row2 {
+        width: 400px;
+    }
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        width: 275px;
+    }
+
+</style>
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmHRATransTGridPartial", Name = "frmHRATransTGridPartial" }))
+    {
+        <div class="heading">HRA Exemption Details Edit</div>
+
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Financialyear, "Financial Year :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Financialyear, new { @class = "popup-content-textbox must", @id = "Financialyear-edit" })</div>
+
+
+        <div class="row1 content_margine">@Html.LabelFor(m => m.City, "City :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.City, new { @class = "popup-content-textbox", @id = "City-edit" })</div>
+       
+         <div class="row3 content_margine">
+            @Html.LabelFor(m => m.HRAMonthRent, "Rent :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="Rent_ListPartial-edit">
+                    <tr>
+                        <th>ID</th>
+                        <th>LookUp Selected Description</th>
+                    </tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select Rent Details" class="popup-content-icon-lookup" id="Lookup-Rent-HRATransTPartial"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Rent Details" class="popup-content-icon-create" id="Create-Rent-HRATransTPartial"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Rent Details" class="popup-content-icon-edit" id="Edit-Rent-HRATransTPartial"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Delete Rent Details" class="popup-content-icon-remove" id="Remove-Rent-HRATransTPartial"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+</div>

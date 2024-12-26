@@ -1,0 +1,628 @@
+﻿@{
+    ViewBag.Title = "EmpTimingRoasterData";
+}
+@model Attendance.EmpTimingRoasterData
+
+<style>
+    #lvdata {
+        float: right;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 112px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        /*! width: 600px; */
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 250px;
+        display: inline-block;
+        /*! margin-left: -89px; */
+        position: absolute;
+        left: 191px;
+        top: 137px;
+    }
+
+    .loader {
+        width: 299px;
+        /*! display: inline-flex; */
+        /*! margin-left: -89px; */
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 29px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        /*! margin: 0 auto; */
+        width: 379px;
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*! width: 507px; */
+        border-radius: 5px;
+        height: 100%;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: left;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        /*! width: 511px; */
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 502px;
+        width: 437px;
+        /*! margin: 5px 4px; */
+        position: absolute;
+        left: 401px;
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        /*! height: 502px; */
+        width: 329px;
+        /*! margin: 5px 4px; */
+        /*! position: absolute; */
+        /*! left: 842px; */
+        /*! top: 91px; */
+        float: right;
+    }
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    .weeklyoffclass {
+        background-color: #e8fefa;
+    }
+
+    .holidayclass {
+        background-color: #e8f3f1;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmEmpTimingMonthlyRoaster').trigger("reset");
+            $('#monthTable tr:gt(0)').remove();
+            $.LoadEmpByDefault(true);
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create EmpTimingMonthlyRoaster', 'open', '@Url.Action("Create","EmpTimingRoasterTiming")', '#frmEmpTimingMonthlyRoaster', 'Message :', 'Request Falied :', '#JqGrid', 500, 1200, '#TimingMonthlyRoasterlist', "", function (data) { });
+            //     $('#DayTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 203, ""); // To bind dropdown on page load
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            event.preventDefault();
+        });
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                },
+            renderat: "#FormFilter", hierarchy: true,
+            });
+        //console.log($('#FormFilter')[0]);
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "EmpTimingRoasterTiming")",
+            htmurl: "@Url.Action("GridPartial", "EmpTimingRoasterTiming")",
+            columnname: ["Code", "Name", "Id" ],
+            childheader: [ "DayType", "InTime", "RoasterDate", "Id" ],
+            childurl: "@Url.Action("Get_EmpTimingRostData", "EmpTimingRoasterTiming")",
+            tableheader: "Emp Timing Monthly Roaster Data",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "EmpTimingRoasterTiming")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            $('#Grid-ReqDate').val(k.ReqDate);
+                            $('#Grid-FromDate').val(k.FromDate);
+                            $('#Grid-ToDate').val(k.ToDate);
+                            $('#Grid-TotalDays').val(k.TotalDays);
+                            $('#Grid-Reason').val(k.Reason);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                //  return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "EmpTimingRoasterTiming")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "EmpTimingRoasterTiming")",
+                    submiturl: "@Url.Action("GridEditsave", "EmpTimingRoasterTiming")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            //console.log(k.MonthlyInstallmentAmount);
+                            $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                            //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                //    return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+
+        $('#InTime').P2BTimePicker();
+        //$('.popup_radio_button').controlgroup();
+        $('.defult-time').P2BTimePicker();
+        $('.date').MonthYearPicker();
+        $('#DayTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                $('#Emp_id').val($(this).val());
+                $('#monthTable tr:gt(0)').remove();
+            } else {
+                $('#Emp_id').val("");
+
+            }
+        });
+        $('#btnLoad').on('click', function () {
+            $.ajax({
+                url: "@Url.Action("EmpTimingRoasterDates", "EmpTimingRoasterTiming")",
+                data: { employeeids: $('#Emp_id').val(), paymonth: $('#month').val() },
+                success: function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "";
+                    $('#monthTable tr:gt(0)').remove();
+                    var intimeval = $('#default_time').val();
+                    $.each(data, function (i, k) {
+                        $.each(k, function (l, j) {
+                            if (j == "weeklyoff") {
+                                tempclass = "weeklyoffclass";
+                            } else if (j == "Holiday") {
+                                tempclass = "holidayclass";
+                            }
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + l + "</td><td>" + j + "</td><td>" + intimeval + "</td></tr>";
+                            index++;
+                            tempclass = "";
+                        });
+                    });
+                    $('#monthTable tr:last').after(tr);
+                }
+            });
+        });
+
+        $('#month').on('change', function () {
+            $.ajax({
+                url: "@Url.Action("EmpTimingRoasterDatesprv", "EmpTimingRoasterTiming")",
+                data: { employeeids: $('#Emp_id').val(), paymonth: $('#month').val() },
+            success: function (data) {
+                var tr = "";
+                var index = 1;
+                var tempclass = "";
+                $('#monthTable tr:gt(0)').remove();
+                //var intimeval = $('#default_time').val();
+                $.each(data, function (i, k) {
+                    $.each(k, function (l, j) {
+                        if (j == "weeklyoff") {
+                            tempclass = "weeklyoffclass";
+                        } else if (j == "Holiday") {
+                            tempclass = "holidayclass";
+                        }
+                        tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + j._dater + "</td><td>" + j._Remark + "</td><td>" + j._Pcode + "</td></tr>";
+                        index++;
+                        tempclass = "";
+                    });
+                });
+                $('#monthTable tr:last').after(tr);
+            }
+        });
+        });
+
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+            //  var sno = target.attr('id');
+            $('#sr_no').focus();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.children().each(function (i, k) {
+                if (input[i].type == "select-one") {
+                    $(input[i]).val($(k).text()).selectmenu().selectmenu("refresh");
+                } else {
+                    $(input[i]).val($(k).text());
+                }
+            });
+            e.preventDefault();
+        });
+        $('#sub_form').on('click', function (e) {
+            var table_sr_no = $('#sr_no').val();
+            var target = $('#monthTable tr#' + table_sr_no).children();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.each(function (i, k) {
+                $(k).text($(input[i]).val());
+            });
+        });
+        $('#create_roaster').on('click', function (e) {
+            var formjson = [];
+            var tr = [];
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+            console.log(tr);
+            $.each(tr, function (i, k) {
+                var childs = $(k).children().toArray();
+                formjson.push({
+                    "SNo": $(childs[0]).text(),
+                    "Date": $(childs[1]).text(),
+                    "Type": $(childs[2]).text(),
+                    "Time": $(childs[3]).text(),
+                });
+            });
+            $.ajax({
+                url: "@Url.Action("CreateRoaster", "EmpTimingRoasterTiming")",
+                method: "POST",
+                cache: false,
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({ data: formjson, EmpId: $('#Emp_id').val() }),
+                success: function (data) {
+                    var k = data;
+                    if (k.status == 1) {
+                        if (confirm("Do you want to override Roaster..?")) {
+                            $.ajax({
+                                url: "@Url.Action("CreateRoaster", "EmpTimingRoasterTiming")",
+                                method: "POST",
+                                cache: false,
+                                contentType: 'application/json',
+                                datatype: 'json',
+                                data: JSON.stringify({ data: formjson, EmpId: $('#Emp_id').val(), overide: true }),
+                                success: function (data) {
+                                    alert(data.MSG);
+                                }
+                            });
+                        }
+                    } else {
+                        alert(data.MSG);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Employee Timing Monthly Roaster">
+        <div class="section_Method">
+            <div class="heading">Filter View</div>
+
+            <div class="filter-div">
+                <label class="advance_filter_label">
+                    Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                    </span>
+                </label>
+                <div id="FormFilter"></div>
+            </div>
+        </div>
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpTimingMonthlyRoaster", name = "frmEmpTimingMonthlyRoasterEdit" }))
+            {
+
+
+
+
+                <input id="Autho_Action" type="hidden" name="Autho_Action" />
+                <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+                <input id="geo_id" class="filter_structure_id" name="geo_id" />
+                <input id="pay_id" class="filter_structure_id" name="pay_id" />
+                <input id="fun_id" class="filter_structure_id" name="fun_id" />
+                <input id="Emp_id" class="filter_structure_id" name="fun_id" />
+                <div class="section1_Leave">
+                    <div class="heading">Employee List</div>
+                    <div class="employeeselectiondiv">
+                        <div class="transactiondivnew dynamic addons" style="float:left">
+                            <div>
+                                <label>Search:</label>
+                                <input type="text" id="Employee-Search" style="width: 317px;" />
+                            </div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                                <tr>
+                                    <th><input type="checkbox" id="Case-Employee" /></th>
+                                    <th>Employee</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="section2_Leave">
+                    <div class="dropdown_row1 row3 content_margine">
+                        <label class="dropdown_row1 row3 content_margine">
+                            PayMonth :
+                        </label>
+                        <input type="text" id="month" class="date" style="width:70px" />
+                        <label class="dropdown_row1 row3 content_margine">
+                            Default Time :
+                        </label>
+                        <input type="text" id="default_time" class="defult-time" style="width:40px;" />
+                        <button id="btnLoad">Load</button>
+                    </div>
+                    <div>
+                        <label class="heading">Month Data</label>
+                        <table id="monthTable">
+                            <tr><th>Sr.No</th><th>Date</th><th>Type</th><th>Time</th></tr>
+                        </table>
+                    </div>
+                </div>
+            }
+            <div class="section3_Leave">
+                <form id="frm_edit_form" name="frm_edit_form">
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Sr.No :</label>
+                        <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">RoasterDate :</label>
+                        <input type="text" name="RoasterDate" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="dropdown_row1 row3 content_margine">
+                        <div class="popup-content-label">DayType</div>
+                        <select id="DayTypelist" name="DayTypelist" style="width:100px;">
+                            <option value="HO">HO</option>
+                            <option value="WO">WO</option>
+                            <option value="Working">Working</option>
+                        </select>
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">InTime :</label>
+                        <input type="text" id="InTime" class="popup-content-textbox" />
+                    </div>
+                    <button type="button" id="sub_form">Submit</button>
+                    <div style="float:right">
+                        <button id="create_roaster">Create Roaster</button>
+                    </div>
+                </form>
+            </div>
+            <div id="delete_dialoage">
+
+            </div>
+
+        </div>
+</body>

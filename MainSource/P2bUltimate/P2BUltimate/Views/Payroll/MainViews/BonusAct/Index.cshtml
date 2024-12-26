@@ -1,0 +1,461 @@
+﻿@model Payroll.BonusAct
+@{
+    ViewBag.Title = "BonusAct";
+}
+
+
+<html>
+<head>
+    <title></title>
+
+
+    <script>
+
+
+
+        $(document).ready(function (e) {
+            $('button').button();
+
+
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablenames = "#Edit-PayScaleArea-BonusAct,Remove-PayScaleArea-BonusAct";
+
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = [ 'BonusName', 'MaximumBonus', 'Id'];
+            ColNames = [ 'BonusName', 'MaximumBonus', 'Id'];
+            SortName = 'Id';
+            Caption = 'Bonus Act';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmBonusAct').trigger('reset');
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create BonusAct ', 'open', '@Url.Action("create") ', '#frmBonusAct', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '#BonusWageslist,#BonusCalendarlist', "", function (data) { });
+                $('#MinimumBonusV').val("0");
+                $('#MaximumBonusV').val("0");
+                $('#MinPercentageV').val("0");
+                $('#MaxPercentageV').val("0");
+                $('#QualiAmount').val("0");
+                $('#MinimumWorkingDays').val("0");
+                $('#MaximumBonusV').on('focusout', function (e) {
+                    if (!$('#MinimumBonusV').val()) {
+                        alert('Enter MinimumBonus value...!');
+                        $('#RangeTo').val('');
+                        return false;
+                    }
+                    if (parseFloat($("#MaximumBonusV").val()) < parseFloat($("#MinimumBonusV").val())) {
+                        alert(" MaximumBonus  Should Be Grater Than MinimumBonus ...!");
+                        $('#MaximumBonusV').val('');
+                    }
+                });
+
+                $('#MaxPercentageV').on('focusout', function (e) {
+                    if (!$('#MinPercentageV').val()) {
+                        alert('Enter MinPercentage value...!');
+                        $('#RangeTo').val('');
+                        return false;
+                    }
+                    if (parseFloat($("#MaxPercentageV").val()) < parseFloat($("#MinPercentageV").val())) {
+                        alert(" MaxPercentage Should Be Grater Than MinPercentage...!");
+                        $('#MaxPercentageV').val('');
+                    }
+                });
+
+
+                e.preventDefault();
+            });
+
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+
+            $('#Edit').on('click', function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmBonusAct', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 750, '#BonusWageslist,#BonusCalendarlist', '', function (data) {
+                    $.each(data[1], function (i, k) {
+
+                    });
+                    $.each(data[0], function (i, k) {
+                        $('#frmBonusAct').trigger('reset');
+                        $('[name="WantToGiveExgratia"]').val([k.WantToGiveExgratia]).button().button("refresh");
+                        $('[name="ApplicationForBonus"]').val([k.ApplicationForBonus]).button().button("refresh");
+
+                        $('#BonusName').val(k.BonusName);
+                        $('#MinimumBonusV').val(k.MinimumBonusAmount);
+                        $('#MaximumBonusV').val(k.MaximumBonus);
+                        $('#MinPercentageV').val(k.MinPercentage);
+                        $('#MaxPercentageV').val(k.MaxPercentage);
+                        $('#MinimumWorkingDays').val(k.MinimumWorkingDays);
+                        $('#QualiAmount').val(k.QualiAmount);
+                        $('#BonusWageslist').P2BLookUpEncapsulate('#BonusWageslist', 'BonusWageslist', k.BonusWages_Id, k.BonusWages_FullDetails, 'BonusWageslist', '#Remove-BonusWages-BonusAct', 'N');
+                        $('#BonusCalendarlist').P2BLookUpEncapsulate('#BonusCalendarlist', 'BonusCalendarlist', k.BonusCalendar_Id, k.BonusCalendar_FullDetails, 'BonusCalendarlist', '#Remove-BonusCalendar-BonusAct', 'N');
+
+                        $('#MaximumBonusV').on('focusout', function (e) {
+                            if (!$('#MinimumBonusV').val()) {
+                                alert('Enter MinimumBonus value...!');
+                                $('#RangeTo').val('');
+                                return false;
+                            }
+                            if (parseFloat($("#MaximumBonusV").val()) < parseFloat($("#MinimumBonusV").val())) {
+                                alert(" MaximumBonus  Should Be Grater Than MinimumBonus ...!");
+                                $('#MaximumBonusV').val('');
+                            }
+                        });
+
+                        $('#MaxPercentageV').on('focusout', function (e) {
+                            if (!$('#MinPercentageV').val()) {
+                                alert('Enter MinPercentage value...!');
+                                $('#RangeTo').val('');
+                                return false;
+                            }
+                            if (parseFloat($("#MaxPercentageV").val()) < parseFloat($("#MinPercentageV").val())) {
+                                alert(" MaxPercentage Should Be Grater Than MinPercentage...!");
+                                $('#MaxPercentageV').val('');
+                            }
+                        });
+
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BonusWageslist,#BonusCalendarlist', '', 500, 750, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#frmBonusAct').trigger('reset');
+                        $('#BonusName').val(k.BonusName);
+                        $('#MinimumBonusV').val(k.MinimumBonusAmount);
+                        $('#MaximumBonusV').val(k.MaximumBonus);
+                        $('#MinPercentageV').val(k.MinPercentage);
+                        $('#MaxPercentageV').val(k.MaxPercentage);
+                        $('#MinimumWorkingDays').val(k.MinimumWorkingDays);
+                        $('#QualiAmount').val(k.QualiAmount);
+                        $('[name="WantToGiveExgratia"]').val([k.WantToGiveExgratia]).button().button("refresh");
+                        $('[name="ApplicationForBonus"]').val([k.ApplicationForBonus]).button().button("refresh");
+                        $('#BonusWageslist').P2BLookUpEncapsulate('#BonusWageslist', 'BonusWageslist', k.BonusWages_Id, k.BonusWages_FullDetails, 'BonusWageslist', 'view', 'N');
+                        $('#BonusCalendarlist').P2BLookUpEncapsulate('#BonusCalendarlist', 'BonusCalendarlist', k.BonusCalendar_Id, k.BonusCalendar_FullDetails, 'BonusCalendarlist', 'view', 'N');
+                    });
+
+
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        $('[name="BasicScaleAppl"]').StickNote([data[2].BasicScaleAppl]);
+                        $('[name="CPIAppl"]').StickNote([data[2].CPIAppl]);
+                        $('#PayScaleTypeList').StickNote(data[2].PayScaleType_Val);
+                        $('#BonusWageslist_old').StickNote(data[2].PayScaleDetails_Val);
+                    }
+                });
+            });
+
+
+            $('#Lookup-BonusWages-BonusAct').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "Wages")', '', 'LookupDiv', 'Look Up Data', '#BonusWageslist', 'BonusWageslist', 10, 'BonusWageslist', '#frmBonusAct', 'N', '#Payscale_Edit,#Payscale_remove', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });
+
+            $('#Lookup-BonusCalendar-BonusAct').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "BonusAct")', '', 'LookupDiv', 'Look Up Data', '#BonusCalendarlist', 'BonusCalendarlist', 10, 'BonusCalendarlist', '#frmBonusAct', 'N', '#Payscale_Edit,#Payscale_remove', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });
+
+            $('#Create-BonusWages-BonusAct').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Wages")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmBonusAct', '#Create-BonusWages-BonusAct,#Remove-BonusWages-BonusAct', function (data) {
+                    $('#BonusWageslist').P2BLookUpEncapsulate('#BonusWageslist', 'BonusWageslist', data[0], data[1], 'BonusWageslist', '#Edit-BonusWages-BonusAct,#Remove-BonusWages-BonusAct', 'N');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-BonusWages-BonusAct').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#BonusWageslist').P2BGetTableDataonSelectedRow('#BonusWageslist', 0);
+                b = a[0];
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', '@Url.Action("edit", "Wages")', b, '@Url.Action("Editsave", "Wages")', 'Edit Wages', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmBonusAct', '#BonusWageslist', 'BonusWageslist', 'BonusWageslist', 'A', '', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmWages').trigger("reset");
+                        $('#WagesName').val(k.WagesName);
+                        $('#Percentage').val(k.Percentage);
+                        $('#WagesCeilingMin').val(k.CeilingMin);
+                        $('#WagesCeilingMax').val(k.CeilingMax);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages', 'A');
+                    });
+ });
+                event.preventDefault();
+            });
+
+            $('#Remove-BonusWages-BonusAct').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                //var a = [], b;
+                //a = $('#BonusWageslist').P2BGetTableDataonSelectedRow('#BonusWageslist', 0);
+                //b = a[0];
+                //console.log(b);
+          
+                var selectedRows = [];
+                selectedRows = $('#BonusWageslist').P2BGetTableDataonSelectedRow('#BonusWageslist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#BonusWageslist', $('#BonusWageslist').val(), 200, 200, '#frmBonusAct', '#BonusWageslist');
+                event.preventDefault();
+            });
+
+            $('#Remove-BonusCalendar-BonusAct').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                //var a = [], b;
+                //a = $('#BonusCalendarlist').P2BGetTableDataonSelectedRow('#BonusCalendarlist', 0);
+                //b = a[0];
+                //console.log(b);
+              
+                var selectedRows = [];
+                selectedRows = $('#BonusCalendarlist').P2BGetTableDataonSelectedRow('#BonusCalendarlist', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#BonusCalendarlist', $('#BonusCalendarlist').val(), 200, 200, '#frmBonusAct', '#BonusCalendarlist');
+                event.preventDefault();
+            });
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+
+            $('#BonusName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            $('#MinimumBonusV').ForceOnlyNumeric().MaxLength(10);
+            $('#MaximumBonusV').ForceOnlyNumeric().MaxLength(10);
+            $('#MinPercentageV').ForceOnlyNumeric().MaxLength(10);
+            $('#MaxPercentageV').ForcePercent().MaxLength(5);
+            $('#MinimumWorkingDays').ForceOnlyNumeric().MaxLength(3);
+            $('#MinPercentageV').ForcePercent().MaxLength(5);
+            $('#QualiAmount').ForceOnlyNumeric().MaxLength(7);
+
+        });
+    </script>
+
+
+</head>
+<body>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 112px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            width: 750px;
+            display: inline-flex;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .section1 {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 318px;
+            width: 432px;
+            margin: 4px auto;
+            position: absolute;
+            left: 4px;
+            top: -2px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .namepush {
+            margin-right: 30px;
+        }
+
+        .lblwidth {
+            width: 110px;
+        }
+
+        .Clblwidth {
+            width: 111px;
+        }
+
+        .Cnamepush {
+            margin-right: 127px;
+        }
+    </style>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create BonusAct">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmBonusAct", name = "frmBonusAct" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+
+                @Html.LabelFor(m => m.BonusCalendar, "Bonus Calendar:", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <div id="BonusCalendarlist_old"></div>
+                    <table class="lookuptableselected" id="BonusCalendarlist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp BonusCalendar" class="popup-content-icon-lookup" id="Lookup-BonusCalendar-BonusAct"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" id="Create-PayScaleArea-BonusAct"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    @*<button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-PayScaleArea-BonusAct"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove BonusCalendar" class="popup-content-icon-remove" id="Remove-BonusCalendar-BonusAct"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.BonusName, "Bonus Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.BonusName, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MinimumBonusAmount, "Minimum Bonus :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.MinimumBonusAmount, new { @class = "popup-content-textbox", id = "MinimumBonusV" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MaximumBonus, "Maximum Bonus :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MaximumBonus, new { @class = "popup-content-textbox must", id = "MaximumBonusV" })
+
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MinPercentage, "Min Percentage :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.MinPercentage, new { @class = "popup-content-textbox", id = "MinPercentageV" })
+
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MaxPercentage, "Max Percentage :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.MaxPercentage, new { @class = "popup-content-textbox", id = "MaxPercentageV" })
+
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MinimumWorkingDays, "Minimum Working Days :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MinimumWorkingDays, new { @class = "popup-content-textbox must" })
+
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.QualiAmount, "Quali Amount :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.QualiAmount, new { @class = "popup-content-textbox" })
+
+            </div>
+            <div class="row3 content_margine">
+
+                @Html.LabelFor(m => m.BonusWages, "Bonus Wages:", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <div id="BonusWageslist_old"></div>
+                    <table class="lookuptableselected" id="BonusWageslist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Bonus Act" class="popup-content-icon-lookup" id="Lookup-BonusWages-BonusAct"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Crate Bonus Act" class="popup-content-icon-create" id="Create-BonusWages-BonusAct"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Bonus Act" class="popup-content-icon-edit" id="Edit-BonusWages-BonusAct"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Bonus Act" class="popup-content-icon-remove" id="Remove-BonusWages-BonusAct"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.WantToGiveExgratia, "Want To Give Exgratia:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="WantToGiveExgratia" value="true" /><label for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="WantToGiveExgratia" value="false" checked="checked" /><label for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ApplicationForBonus, "Application For Bonus:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button ">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="ApplicationForBonus" value="true" /><label for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="ApplicationForBonus" value="false" checked="checked" /><label for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+
+
+</html>

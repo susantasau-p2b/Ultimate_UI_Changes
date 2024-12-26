@@ -1,0 +1,227 @@
+﻿@{
+    ViewBag.Title = "User Creation";
+}
+@model P2b.Global.Login
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 470px;
+        width: 480px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 250px;
+        width: 780px;
+        margin-top: 12px;
+        position: absolute;
+        margin-left: 46em;
+        /* margin-inline-end: 25em;*/
+        /* justify-content:flex-end;*/
+        /*left: 401px;*/
+    }
+
+    .popup-content-label {
+        display: block;
+        /* float: left;*/
+        /*   margin-right:50px;*/
+        width: 145px;
+        padding-top: 2px;
+    }
+
+    .content_margine {
+        /*   margin-right: 20px;*/
+        /**/ font-size: 12px;
+        padding-top: 2px;
+        /*  width: 650px;*/
+        justify-content: center;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 400px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 470px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+   .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+      }
+
+  .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 110px;
+          }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+     .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+     .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 110%;
+        }
+
+     .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('#Mydiv').hide();
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'EmpCode', 'EmpName', 'MobileNumber', 'IsUltimateHOAppl', 'IsESSAppl', 'IsMobileAppl', 'IsMobileGeoFenceAttendAAppl'];
+        ColNames = ['Id', 'EmpCode', 'EmpName', 'MobileNumber', 'IsUltimateHOAppl', 'IsESSAppl', 'IsMobileAppl', 'IsMobileGeoFenceAttendAAppl']
+        SortName = 'Id';
+        Caption = 'User Creation';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        };
+
+        $('#Create_Dialog').P2BGridDialog();
+        $('#Create').on("click", function (event) {
+            $('#Mydiv').hide();
+            $('#Empl_list_h').show();
+            $('#frmUserCreation').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create User Creation', 'open', '@Url.Action("Create")', '#frmUserCreation', 'Message :', 'Request Falied :', '#JqGrid', 590, 1300, '', '', function (data) {  
+            $.LoadEmpByDefaultLogin(false, "");
+            });
+            event.preventDefault();          
+        });
+
+        $('#Edit').on('click', function () {
+            $('#Empl_list_h').hide();
+            $('#Mydiv').show();
+            $('#frmUserCreation').trigger("reset");
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit User Creation->" + JSON.stringify(dt) + "", '#frmUserCreation', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 590, 1300, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('[name="IsUltimateHOAppl"]').val([k.IsUltimateHOAppl]).button().button("refresh");
+                    $('[name="IsMobileGeoFenceAttendAAppl"]').val([k.IsMobileGeoFenceAttendAAppl]).button().button("refresh");
+                    $('#MobileNumberList').P2BSelectMenuAppend('@Url.Action("LoginContactNumbers", "UserCreation")?Empids=' + dt.Id, '', "");
+                });
+            });
+        });
+        $('#MobileNumberList').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+    });
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="Edit">Edit</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmUserCreation", name = "frmUserCreation" }))
+    {
+        <div class="section1_Leave" id="Empl_list_h">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 380px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+
+                </div>
+                <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+            </div>
+        </div>
+        <div id="Mydiv">
+            <div class="section2_Leave">
+
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.MobileNumber, "MobileNumber :", new { @class = "popup-content-label" })
+                    <select class="drop" style="width:120px;" name="MobileNumberList" id="MobileNumberList">
+                        <option></option>
+                    </select>
+                </div>
+
+                <div class=" content_margine">
+                    @Html.LabelFor(m => m.IsMobileGeoFenceAttendAAppl, "IsGeoFenceingAppl :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio1" name="IsMobileGeoFenceAttendAAppl" value="true" /><label for="radio1">Yes</label>
+                            <input type="radio" id="radio2" name="IsMobileGeoFenceAttendAAppl" value="false" checked="checked" /><label for="radio2">No</label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class=" content_margine">
+                    @Html.LabelFor(m => m.IsUltimateHOAppl, "IsUltimateAppl :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio3" name="IsUltimateHOAppl" value="true" /><label for="radio3">Yes</label>
+                            <input type="radio" id="radio4" name="IsUltimateHOAppl" value="false" checked="checked" /><label for="radio4">No</label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

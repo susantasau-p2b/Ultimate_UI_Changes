@@ -1,0 +1,249 @@
+﻿@model P2b.Global.Unit
+@{
+    Layout = null;
+}
+<style>
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmunit", name = "frmunit" }))
+    {
+
+        <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.Type, "Type :", new { @class = "popup-content-label must" })<select class="must" id="Type" name="Type_drop" style="width:120px;"><option value="0">-select-</option></select></div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "UnitCode", @maxlength = "10" })</div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", @id = "UnitName", @maxlength = "50" })</div>
+        <div class="row3 content_margine">
+            <div id="Inchargelist_old"></div>
+            @Html.LabelFor(m => m.Incharge, "Incharge :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="Inchargelist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Address" class="  popup-content-icon-lookup" id="Lookup-Incharge-Unit"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-Incharge-Unit"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-Incharge-Unit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="Remove-Incharge-Unit"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <div id="ContactDetailsList_Old"></div>@Html.LabelFor(m => m.ContactDetails, "Contact Details :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="ContactDetailsList">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Contact Details" class="  popup-content-icon-lookup" id="Lookup-ContactDetails-Unit"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Contact Details" class="  popup-content-icon-create" id="Create-ContactDetails-Unit"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Contact Details" class="  popup-content-icon-edit" id="Edit-ContactDetails-Unit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" id="Remove-ContactDetails-Unit"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+        <div class="row3 content_margine">
+            <div id="InchargeContactNoslist_old"></div>@Html.LabelFor(m => m.InchargeContactNos, "InchargeNos Details :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="InchargeContactNoslist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Contact Details" class="  popup-content-icon-lookup" id="Lookup-InchargeContactNos-Unit"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Contact Details" class="  popup-content-icon-create" id="Create-InchargeContactNos-Unit"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Contact Details" class="  popup-content-icon-edit" id="Edit-InchargeContactNos-Unit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" id="Remove-InchargeContactNos-Unit"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+
+</div>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#UnitCode').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#UnitName').MaxLength(50);
+
+        $('#Code').ValidateTextBox({ maxlength: 50, name: true });
+
+
+            //To get data in Lookup
+            $('#Lookup-Incharge-Unit').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupIncharge", "Unit")', '', 'LookupDiv', 'Incharge Look Up Data', '#Inchargelist', 'Inchargelist', 5, 'Inchargelist', '#frmunit', 'N', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-Incharge-Unit').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateIncharge_partial", "Unit")', 'Create Incharge', 'open', '@Url.Action("CreateSave", "NameDetails")', '#frmNameDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmunit', '', function (data) {
+                    // to show data which is created in partial page
+                    $('#Inchargelist').P2BLookUpEncapsulate('#Inchargelist', 'Inchargelist', data[0], data[1], 'Inchargelist', '', 'N');
+                });
+                event.preventDefault();
+            });
+
+            // Partial page edit
+            $('#Edit-Address-Corporate').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+                b = a[0];
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCorporate', '#AddressList', 'AddressList', 'AddressList', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', function (data) {
+                    // setTimeout(function () {
+                    //to bind data according to selected id
+                    $.each(data[0], function (i, k) {
+                        $('#FormAddress').trigger("reset");
+                        $('#Address1').val(k.Address1);
+                        $('#Address2').val(k.Address2);
+                        $('#Address3').val(k.Address3);
+                        $('#Landmark').val(k.Landmark);
+                        $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                        $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                        $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                        $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                        $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                        $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                        $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                    });
+                    //}, 3000);
+
+
+                });
+                event.preventDefault();
+            });
+
+            //partial page delete
+            $('#Remove-Address-Corporate').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmCorporate', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+
+            /* ContactDetails button click*/
+
+            $('#Lookup-ContactDetails-Unit').button().on('click', function (event) {
+
+                $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Unit")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmunit', 'N', '', 'Lookup_table', 'PageNavPosition');
+
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-ContactDetails-Unit').button().on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Unit")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-ContactDetails-Unit').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Unit")', '@Url.Action("Editcontactdetails_partial", "Unit")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmunit', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmContactDetails').trigger('reset');
+                        $('#EmailId').val(k.EmailId);
+                        $('#Website').val(k.Website);
+                        $('#FaxNo').val(k.FaxNo);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                    });
+                });
+                event.preventDefault();
+            });
+
+            $('#Remove-ContactDetails-Corporate').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailsList', $('#ContactDetailsList').val(), 200, 200, '#frmCorporate', '#ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate');
+                event.preventDefault();
+            });
+
+            $('#Lookup-InchargeContactNos-Unit').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactDetailsLookupvalue", "ContactDetails")', '', 'LookupDiv', 'Incharge Look Up Data', '#InchargeContactNoslist', 'InchargeContactNoslist', 5, 'InchargeContactNoslist', '#frmunit', 'N', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Edit-InchargeContactNos-Unit').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#InchargeContactNoslist').P2BGetTableDataonSelectedRow('#InchargeContactNoslist', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave", "ContactNumbers")', 'Edit  Details', '#frmContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmunit', '#InchargeContactNoslist', 'InchargeContactNoslist', 'InchargeContactNoslist', 'N', '', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmContactDetails').trigger('reset');
+                        $('#EmailId').val(k.EmailId);
+                        $('#Website').val(k.Website);
+                        $('#FaxNo').val(k.FaxNo);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                    });
+                });
+                event.preventDefault();
+            });
+
+            $('#Create-InchargeContactNos-Unit').button().on("click", function (event) {
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Contact No:', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmunit', '', function (data) {
+                    $('#InchargeContactNoslist').P2BLookUpEncapsulate('#InchargeContactNoslist', 'InchargeContactNoslist', data[0], data[1], 'InchargeContactNoslist', '', 'N');
+                });
+                event.preventDefault();
+            });
+
+            $('.popup_radio_button').controlgroup();
+            $('#Type').selectmenu().selectmenu("menuWidget");
+
+            $('button').button();
+    });
+
+</script>

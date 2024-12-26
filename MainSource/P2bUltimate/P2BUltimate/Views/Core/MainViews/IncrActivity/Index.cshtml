@@ -1,0 +1,356 @@
+﻿@{
+    ViewBag.Title = "IncrActivity";
+}
+@model P2b.Global.IncrActivity
+@*<link href="~/Content/incractivity/incractivity.css" rel="stylesheet" />*@
+<style>
+    .overflow {
+        height: auto;
+    }
+    .popup-content-label {
+			display: block;
+			margin: 1px;
+			float: left;
+			width: 107px;
+		}
+
+    .icon-row {
+        position: relative;
+        left: 68px;
+        top: -150px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dt;
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-StagIncrPolicy_IncrActivity,#Remove-StagIncrPolicy_IncrActivity";
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Increment Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#Name').MaxLength(50);
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Payscaleagreementdetailslist').val() });
+        });
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        @*$('#Create').button().on("click", function () {
+            $('#frmIncrActivity').trigger("reset");
+            $('#Category').selectmenu().selectmenu("menuWidget");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Increment Activity', 'open', '@Url.Action("Create", "IncrActivity")', '#frmIncrActivity', 'Message :', 'Request Falied :', '#JqGrid', 320, 520, '', '',
+                function (data) {
+                    $('#Category').P2BSelectMenuAppend('@Url.Action("PopulateLookupDropDownList", "IncrActivity")', 0);
+                });
+        });*@
+        $('#Payscaleagreementdetailslist').selectmenu().selectmenu("menuWidget");
+        $('#Payscaleagreementdetailslist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+        $('#Create').on("click", function (event) {
+
+            $('#frmIncrActivity').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Increment Policy', 'open', '@Url.Action("Create")', '#frmIncrActivity', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#StagIncrPolicyList,#IncrPolicyList', '', function (data) {
+                @*// $('#Category').P2BSelectMenuAppend('@Url.Action("PopulateLookupDropDownList", "IncrActivity")', 0);*@
+                $('#Category').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 307, "");
+                $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_StagIncrPolicy_IncrActivity').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "StagIncrPolicy")', 'Create  StagIncrPolicy', 'open', '@Url.Action("Create", "StagIncrPolicy")', '#frmStagIncrPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmIncrActivity', '', function (data) {
+                //1$('#Address_List').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList');
+                $('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', data[0], data[1], 'StagIncrPolicyList', '#Remove_StagIncrPolicy_IncrActivity', 'N');
+            });
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+        $('#Lookup_StagIncrPolicy_IncrActivity').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_StagIncrPolicy", "StagIncrPolicy")', '', 'LookupDiv', 'Look Up Data', '#StagIncrPolicyList', 'StagIncrPolicyList', 5, 'StagIncrPolicyList', '#frmIncrActivity', 'N', '#Edit_StagIncrPolicy_IncrActivity,#Remove_StagIncrPolicy_IncrActivity', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Edit_StagIncrPolicy_IncrActivity').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#StagIncrPolicyList').P2BGetTableDataonSelectedRow('#StagIncrPolicyList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "StagIncrPolicy")', '@Url.Action("Edit", "StagIncrPolicy")', b, '@Url.Action("EditSave", "StagIncrPolicy")', 'Edit StagIncrPolicy Details', '#frmStagIncrPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmIncrActivity', '#StagIncrPolicyList', 'StagIncrPolicyList', 'StagIncrPolicyList', 'N', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmStagIncrPolicy').trigger('reset');
+                    $('[name="IsLastIncr"]').val([k.IsLastIncr]).button().button("refresh");
+                    $('[name="IsFixAmount"]').val([k.IsFixAmount]).button().button("refresh");
+                    $('#stag_name').val(k.Name);
+                    $('#SpanYears').val(k.SpanYears);
+                    $('#MaxStagIncr').val(k.MaxStagIncr);
+                    $('#IncrAmount').val(k.IncrAmount);
+                });
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove_StagIncrPolicy_IncrActivity').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#StagIncrPolicyList').P2BGetTableDataonSelectedRow('#StagIncrPolicyList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#StagIncrPolicyList').P2BGetTableDataonSelectedRow('#StagIncrPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StagIncrPolicyList', $('#StagIncrPolicyList').val(), 200, 200, '#frmIncrActivity', '#StagIncrPolicyList', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-Incrpolicy-IncrActivity').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_IncrPolicy", "IncrPolicy")', '', 'LookupDiv', 'Incr Policy Look Up Data', '#IncrPolicyList', 'IncrPolicyList', 5, 'IncrPolicyList', '#frmIncrActivity', 'N', '#Edit-Incrpolicy-IncrActivity,#Remove-Incrpolicy-IncrActivity', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Incrpolicy-IncrActivity').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "IncrPolicy")', 'Create Increment Policy', 'open', '@Url.Action("Create", "IncrPolicy")', '#frmIncrPolicy', 'Message :', 'Request Falied :', '#JqGrid', 600,800, '', '', '', '#frmIncrActivity', '', function (data) {
+                // to show data which is created in partial page
+                $('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', data[0], data[1], 'IncrPolicyList', '#Remove-Incrpolicy-IncrActivity', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-Incrpolicy-IncrActivity').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#IncrPolicyList').P2BGetTableDataonSelectedRow('#IncrPolicyList', 0);
+            b = a[0];
+            console.log(b);
+           
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "IncrPolicy")', '@Url.Action("Edit", "IncrPolicy")', b, '@Url.Action("EditSave", "IncrPolicy")', 'Edit Incr Policy Details', '#frmIncrPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 600, 800, '#frmIncrActivity', '#IncrPolicyList', 'IncrPolicyList', 'IncrPolicyList', 'N', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy,#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy,#Edit-IncrPolicyDetails-IncrPolicy,#Remove-IncrPolicyDetails-IncrPolicy', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmIncrPolicy').trigger('reset');
+                    $('#IncrPolicy_Name').val(k.Name);
+                    // $('#IsRegularIncr').val(k.IsRegularIncr);
+                    $('[name="IsRegularIncr"]').val([k.IsRegularIncr]).button().button("refresh");
+                    $('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldetails, 'RegIncrPolicylist', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy', 'N');
+                    $('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldetails, 'NonRegIncrPolicylist', '#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy', 'N');
+                    $('#IncrPolicyDetailslist').P2BLookUpEncapsulate('#IncrPolicyDetailslist', 'IncrPolicyDetailslist', k.IncrPromoPolicyDetails_Id, k.IncrPromoPolicy_FullDetails, 'IncrPolicyDetailslist', '#Edit-IncrPolicyDetails-IncrPolicy,#Remove-IncrPolicyDetails-IncrPolicy', 'N');
+                });
+                //$.each(data[1], function (i, k) {
+                //    $('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldetails, 'RegIncrPolicylist', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy', 'N');
+                //    $('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldetails, 'NonRegIncrPolicylist', '#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy', 'N');
+                //});
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-Incrpolicy-IncrActivity').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#IncrPolicyList').P2BGetTableDataonSelectedRow('#IncrPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#IncrPolicyList').P2BGetTableDataonSelectedRow('#IncrPolicyList', 0);
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#IncrPolicyList', $('#IncrPolicyList').val(), 200, 200, '#frmIncrActivity', '#IncrPolicyList', '');
+            event.preventDefault();
+        });
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Increment Policy", '#frmIncrActivity', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#StagIncrPolicyList,#IncrPolicyList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Name);
+                    $('#Name').val(k.Name);
+                    $('#Category').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 307, k.IncrList_id); // Dropdown bind
+                    $('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', k.StagIncrPolicy_Id, k.StagIncrPolicy_FullDetails, 'StagIncrPolicyList', '#Edit_StagIncrPolicy_IncrActivity,#Remove_StagIncrPolicy_IncrActivity', 'N');
+                    $('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', k.IncrPolicy_Id, k.IncrPolicy_FullDetails, 'IncrPolicyList', '#Edit-Incrpolicy-IncrActivity,#Remove-Incrpolicy-IncrActivity', 'N');
+
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    //$('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', k.StagIncrPolicy_Id, k.StagIncrPolicy_FullDetails, 'StagIncrPolicyList', '#Edit_StagIncrPolicy_IncrActivity,#Remove_StagIncrPolicy_IncrActivity', 'N');
+                    //$('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', k.IncrPolicy_Id, k.IncrPolicy_FullDetails, 'IncrPolicyList', '#Edit-Incrpolicy-IncrActivity,#Remove-Incrpolicy-IncrActivity', 'N');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //$('.popup_radio_button').buttonset({});
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            //alert('ass');
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Increment Policy', '#StagIncrPolicyList,#IncrPolicyList', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data)
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {*@ {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action); 
+                    $('#Name').val(k.Name);
+                    $('#Category').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 307, k.IncrList_id);
+                    $('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', k.StagIncrPolicy_Id, k.StagIncrPolicy_FullDetails, 'StagIncrPolicyList', 'view', 'N');
+                    $('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', k.IncrPolicy_Id, k.IncrPolicy_FullDetails, 'IncrPolicyList', 'view', 'N');
+                    // alert('0');
+                });
+
+                $.each(data[1], function (i, k) {
+                    //alert('1');
+                    //$('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', k.StagIncrPolicy_Id, k.StagIncrPolicy_FullDetails, 'StagIncrPolicyList', '', 'N');
+                    //$('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', k.IncrPolicy_Id, k.IncrPolicy_FullDetails, 'IncrPolicyList', '', 'N');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    //alert('2');
+                    // alert(data[2].Name, data[2].IncrList_val)
+                    $('#Name').oldVal(data[2].Name);
+                    $('#Category').oldDropval(data[2].IncrList_val);
+                    $('#StagIncr_old').oldLookupVal(data[2].IncrPolicy_val);
+
+                    @*$.each(data[2], function (i, k) {
+                        // $('#Code').Oldval(k.Code);
+                        alert(k.Name)
+                        $('#Name').oldVal(k.Name);
+                        $('#Categorylist').oldDropval(k.BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(k.Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(k.Contact_Val);
+                        //$('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                    });*@
+                }
+                //}, 2000);
+            });
+        });
+
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        //$('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#PayscaleagreementdetailsCreatelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left">
+                @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
+                <label id="lblPayMonth" class="popup-content-label">Agreement:</label>
+                <select id="Payscaleagreementdetailslist" name="Payscaleagreementdetailslist" style="width:120px;"><option></option></select>
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog" title="Create Increment Activity">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmIncrActivity", name = "frmIncrActivity" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <label id="lblPayMonth" class="popup-content-label">Agreement:</label>
+        <select id="PayscaleagreementdetailsCreatelist" name="PayscaleagreementdetailsCreatelist" style="width:120px;"><option></option></select>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })
+        </div>
+
+        <div class="dropdown_row1 row3 content_margine">
+            @Html.LabelFor(m => m.IncrList, "Incr List Type :", new { @class = "popup-content-label must" })
+            <select name="Category" class="drop must" id="Category" style="width:120px;"><option></option></select>
+        </div>
+
+
+        <div class="row1 content_margine">
+            <div id="StagIncr_old"></div>
+            @Html.LabelFor(m => m.StagIncrPolicy, "Stagnancy Increment Policy :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="StagIncrPolicyList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select StagIncrPolicy" class="popup-content-icon-lookup" id="Lookup_StagIncrPolicy_IncrActivity"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create StagIncrPolicy" class="popup-content-icon-create" id="Create_StagIncrPolicy_IncrActivity"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+               <button data-p2btooltip="Edit StagIncrPolicy" class="popup-content-icon-edit" id="Edit_StagIncrPolicy_IncrActivity"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove StagIncrPolicy" class="popup-content-icon-remove" id="Remove_StagIncrPolicy_IncrActivity"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+        <div class="row1 content_margine">
+            <div id="Incrpolicylist_old"></div>
+            @Html.LabelFor(m => m.IncrPolicy, "Increment Policy :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="IncrPolicyList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select IncrPolicy" class="popup-content-icon-lookup" id="Lookup-Incrpolicy-IncrActivity"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create IncrPolicy" class="popup-content-icon-create" id="Create-Incrpolicy-IncrActivity"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit IncrPolicy" class="popup-content-icon-edit" id="Edit-Incrpolicy-IncrActivity"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove IncrPolicy" class="popup-content-icon-remove" id="Remove-Incrpolicy-IncrActivity"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+
+        </div>
+
+
+    }
+</div>

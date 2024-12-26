@@ -1,0 +1,318 @@
+@{
+    ViewBag.Title = "ServiceModel";
+}
+@model CMS_SPS.ServiceModel
+<html>
+<head>
+    <title></title>
+    <style>
+        .popup-content-label {
+            width: 170px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row3, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 477px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+
+        .popup-content-table {
+            right: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="30" width="1000">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ModelCode</th>
+                                <th>ModelName</th>
+                                <th>ModelDescription</th>
+                                <th>CreatedDate</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmServiceModel", name = "frmServiceModel" }))
+        {
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Code, "Model Code :", new { @class = "popup-content-label must", @maxlength = "10" })
+                @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelName, "Model Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelName, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelDescription, "Model Description :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelDescription, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.CreatedDate, "Created Date :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.CreatedDate, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ServiceModelObject, "Service Object :", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ServiceModelObjectList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup ServiceModelObject" class=" popup-content-icon-lookup" id="Lookup-ServiceModelObject"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create ServiceModelObject " class=" popup-content-icon-create" id="Create-ServiceModelObject"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit  ServiceModelObject" class=" popup-content-icon-edit" id="Edit-ServiceModelObject"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Delete ServiceModelObject" class=" popup-content-icon-remove" id="Remove-ServiceModelObject"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Code').ValidateTextBox({ maxlength: 10 });
+        $('#ModelName').ValidateTextBox({ maxlength: 25 });
+        $('#ModelDescription').ValidateTextBox({ maxlength: 50 });
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("ServiceModel_Grid")",
+            columnname: ["Code", "ModelName", "ModelDescription", "CreatedDate", "Id", ],
+            childheader: ["ServiceModel", "EvaluationModel", "Id"],
+            childurl: "@Url.Action("A_ServiceModel_Grid", "ServiceModel")",
+            tableheader: "Service Model",
+            childurlColumnNo: "5"
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };*@
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmServiceModel');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Appraisal Service Model Object', 'open', '@Url.Action("Create")', '#frmServiceModel', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#CreatedDate').TodayDate();
+            $('#CreatedDate').attr("readonly", "readonly");
+            event.preventDefault();
+        });
+        $('#Create-ServiceModelObject').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("ServiceModelPartial", "ServiceModel")', 'Create Service Model Object', 'open', '@Url.Action("Create", "ServiceModelObject")', '#frmServiceModelObject', 'Message :', 'Request Falied :', '#JqGrid', 300, 550, '', '', '', '#frmServiceModel', '', function (data) {
+                @*$('#ServiceModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, "");*@
+                $('#ServiceModellist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "ServiceModelObject")', '', "");
+                $('#ServiceModelObjectList').P2BLookUpEncapsulate('#ServiceModelObjectList', 'ServiceModelObjectList', data[0], data[1], 'ServiceModelObjectList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+
+         $('#Edit').on('click', function () {
+             $('#frmServiceModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Appraisal Service Model Object", '#frmServiceModel', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmServiceModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ServiceModelObjectList').P2BLookUpEncapsulate('#ServiceModelObjectList', 'ServiceModelObjectList', k.ServiceModelObject_Id, k.ServiceModelObject_FullDetails, 'ServiceModelObjectList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+        $('#Lookup-ServiceModelObject').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupServiceModelObject", "ServiceModel")', '', 'LookupDiv', ' Service Model Object Look Up Data', '#ServiceModelObjectList', 'ServiceModelObjectList', 5, 'ServiceModelObjectList', '#frmServiceModel', 'A', '#Remove-Witness-Witness', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Edit-ServiceModelObject').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ServiceModelList').P2BGetTableDataonSelectedRow('#ServiceModelObjectList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("ServiceModelPartial", "ServiceModel")', '@Url.Action("Edit", "ServiceModelObject")', b, '@Url.Action("Editsave", "ServiceModelObject")', 'Edit Service Model Object', '#frmServiceModelObject', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmServiceModel', '#ServiceModelObjectList', 'ServiceModelObjectList', 'ServiceModelObjectList', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    @*$('#ServiceModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, k.ServiceModel_Id);*@
+                    $('#ServiceModellist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "ServiceModelObject")", "", k.ServiceModelObject_Id, '');
+                    $('#CompetencyEvaluationModelList').P2BLookUpEncapsulate('#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', k.CompetencyEvaluationModel_Id, k.CompetencyEvaluationModelDetails, 'CompetencyEvaluationModelList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+        $('#View').on('click', function () {
+            $('#frmServiceModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Appraisal Service Model Object', '#QualificationModelObjectList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmServiceModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ServiceModelObjectList').P2BLookUpEncapsulate('#ServiceModelObjectList', 'ServiceModelObjectList', k.ServiceModelObject_Id, k.ServiceModelObject_FullDetails, 'ServiceModelObjectList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmServiceModel');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+        $('#Remove-ServiceModelObject').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#ServiceModelObjectList').P2BGetTableDataonSelectedRow('#ServiceModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ServiceModelObjectList').P2BGetTableDataonSelectedRow('#ServiceModelObjectList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ServiceModelList', $('#ServiceModelObjectList').val(), 200, 200, '#frmServiceModel', '#ServiceModelObjectList');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+
+
+

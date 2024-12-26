@@ -1,0 +1,91 @@
+﻿@model P2b.Global.Calendar
+
+@{
+    Layout = null;
+}
+<style>
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+<div id="Create_Dialog" title="Create Calendar">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCalendarP", name = "frmCalendarP" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Calendar Name :", new { @class = "popup-content-label" })
+            <select id="Name_drop" name="Name_drop" class="drop"></select>
+    </div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.FromDate, "From Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox", @id = "FromDate" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.ToDate, "To Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox", @id = "ToDate" })</div>
+        <div class="look_value_row1 horizontal_row1 content_margine ">
+            @Html.LabelFor(m => m.Default, "Default Year :", new { @class = "popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <div id="radioset">
+                    <span><input type="radio" id="radio1" name="Default" value="true" /> <label for="radio1">Yes</label></span>
+                    <span><input type="radio" id="radio2" name="Default" value="false" /> <label for="radio2">No</label></span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function (e) {
+        var dia;
+        $('#FromDate,#ToDate').P2BDatePicker();
+        $('button').button();
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+       
+        $("#Name").ForceOnlyAlpha();
+        $("#IssuePlace").ForceOnlyAlpha();
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Lookup")", 500, "", '#Name_drop');
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>

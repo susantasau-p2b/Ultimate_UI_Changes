@@ -1,0 +1,406 @@
+﻿@{
+	ViewBag.Title = "IncrPolicy";
+}
+@model P2b.Global.IncrPolicy
+<style>
+	.radio_button_div_1, .horizontal_increpoly_row1 {
+		display: inline-block;
+	}
+
+	.increpoly_popup-content-label {
+		display: block;
+		float: left;
+		width: 123px;
+	}
+
+	.increpoly_popup-content-textbox {
+		width: 120px;
+	}
+
+	.increpoly_row1 {
+		width: 424px;
+	}
+
+	.increpoly_icon-row {
+		position: relative;
+		left: 81px;
+		top: -150px;
+	}
+</style>
+<script>
+    $(document).ready(function (e) {
+        var dt;
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var btndisablename = "#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy,#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy";
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name', 'IncrAmount Amount'];
+        ColNames = ['Id', 'Name', 'IncrAmount Amount'];
+        SortName = 'Name';
+        Caption = 'IncrPolicy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        //create
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').button().on("click", function (e) {
+            //alert(0)
+            $('#frmIncrPolicy').trigger('reset');
+            $('#frmIncrPolicy').P2BCreateDialog('', '', '', '', 'Increment Policy ', 'open', '@Url.Action("create")', '#frmIncrPolicy', 'Message :', 'Request Falied :', '#JqGrid', 515, 600, '#RegIncrPolicylist,#NonRegIncrPolicylist', btndisablename, function (data) { });
+            e.preventDefault();
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            //alert('delete')
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //alert(dt.Id)
+            $('#frmIncrPolicy').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            //alert(dt.Name)
+            $('#frmIncrPolicy').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmIncrPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#RegIncrPolicylist,#NonRegIncrPolicylist', btndisablename, function (data) {
+                // setTimeout(function () {
+                //alert(data[0])
+                $.each(data[0], function (i, k) {
+                    console.log(k.Name);
+
+                    //alert(data[0])
+                    $('#IncrPolicy_Name').val(k.Name);
+                    $('[name="IsRegularIncr"]').val([k.IsRegularIncr]).button().button("refresh");
+                    $('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldetails, 'RegIncrPolicylist', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy', 'N');
+                    $('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldetails, 'NonRegIncrPolicylist', '#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy', 'N');
+
+                    $('#IncrPolicyDetailslist').P2BLookUpEncapsulate('#IncrPolicyDetailslist', 'IncrPolicyDetailslist', k.IncrPromoPolicyDetails_Id, k.IncrPromoPolicy_FullDetails, 'IncrPolicyDetailslist', '#Remove-IncrPolicyDetails-IncrPolicy,#Remove-IncrPolicyDetails-IncrPolicy', 'N');
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    //$('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldtl, 'RegIncrPolicylist', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy', 'N');
+                    //$('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldtl, 'NonRegIncrPolicylist', '#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy', 'N');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+               
+            });
+        });
+
+
+
+        $('#Create-RegIncrPolicy-IncrPolicy').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "RegIncrPolicy")', 'Create RegIncrPolicy', 'open', '@Url.Action("Create", "RegIncrPolicy")', '#frmRegularIncrementPolicy', 'Message :', 'Request Falied :', '#JqGrid', 450, 650, '', '', '', '#frmIncrPolicy', '', function (data) {
+                //alert (22)
+                $('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', data[0], data[1], 'RegIncrPolicylist', btndisablename, 'N');
+            });
+            e.preventDefault();
+        });
+
+
+        $('#Create-NonRegIncrPolicy-IncrPolicy').on('click', function (e) {
+            //alert(21)
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "NonRegIncrPolicy")', 'Create nonRegIncrPolicy', 'open', '@Url.Action("Create", "NonRegIncrPolicy")', '#frmNonRegularIncrementPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmIncrPolicy', '', function (data) {
+                //alert(24)
+                $('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', data[0], data[1], 'NonRegIncrPolicylist', btndisablename, 'N');
+            });
+            e.preventDefault();
+        });
+        $('#Create-IncrPromoPolicyDetails-IncrPolicy').on('click', function (e) {
+            //alert(21)
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "IncrPromoPolicyDetails")', 'Create IncrPromoPolicyDetails', 'open', '@Url.Action("Create", "IncrPromoPolicyDetails")', '#frmIncrPromoPolicyDetails', 'Message :', 'Request Falied :', '#JqGrid', 250, 470, '', '', '', '#frmIncrPolicy', '', function (data) {
+                //alert(24)
+                $('#IncrPromoPolicyDetailslist').P2BLookUpEncapsulate('#IncrPromoPolicyDetails', 'IncrPromoPolicyDetails', data[0], data[1], 'IncrPromoPolicyDetails', btndisablename, 'N');
+            });
+            e.preventDefault();
+        });
+
+        //To get data in Lookup RegIncrPolicy
+        $('#Lookup-RegIncrPolicy-IncrPolicy').on('click', function (event) {
+            //alert('regpol')
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_RegIncrPolicy", "RegIncrPolicy")', '', 'LookupDiv', 'Look Up Data', '#RegIncrPolicylist', 'RegIncrPolicylist', 5, 'RegIncrPolicylist', '#frmIncrPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+        //To get data in Lookup nonRegIncrPolicy
+        $('#Lookup-NonRegIncrPolicy-IncrPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_NonRegIncrPolicy", "NonRegIncrPolicy")', '', 'LookupDiv', 'Look Up Data', '#NonRegIncrPolicylist', 'NonRegIncrPolicylist', 5, 'NonRegIncrPolicylist', '#frmIncrPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Edit-RegIncrPolicy-IncrPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RegIncrPolicylist').P2BGetTableDataonSelectedRow('#RegIncrPolicylist', 0);
+            b = a[0];
+            @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCorporate', '#AddressList', 'AddressList', 'AddressList', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', function (data) {*@
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "RegIncrPolicy")', '@Url.Action("Edit", "RegIncrPolicy")', b, '@Url.Action("editsave", "RegIncrPolicy")', 'Edit RegularIncrementPolicy', '#frmRegularIncrementPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 650, '#frmIncrPolicy', '#RegIncrPolicylist', 'RegIncrPolicylist', 'RegIncrPolicylist', 'N', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmRegularIncrementPolicy').trigger("reset");
+                    $('[name="CurrQuarterStart"]').val([k.CurrQuarterStart]).button().button("refresh");
+                    $('[name="IsConfirmDate"]').val([k.IsConfirmDate]).button().button("refresh");
+                    $('[name="IsFixMonth"]').val([k.IsFixMonth]).button().button("refresh");
+                    $('[name="IsJoiningDate"]').val([k.IsJoiningDate]).button().button("refresh");
+                    $('[name="IsLWPEffectDateAsIncrDate"]').val([k.IsLWPEffectDateAsIncrDate]).button().button("refresh");
+                    $('[name="IsLWPIncl"]').val([k.IsLWPIncl]).button().button("refresh");
+                    $('[name="IsMidMonthEffect"]').val([k.IsMidMonthEffect]).button().button("refresh");
+                    $('[name="IsMidQuarterEffect"]').val([k.IsMidQuarterEffect]).button().button("refresh");
+                    $('[name="NextQuarterStart"]').val([k.NextQuarterStart]).button().button("refresh");
+                    $('#LWPMinCeiling').val(k.LWPMinCeiling);
+                    $('#MidMonthLockDay').val(k.MidMonthLockDay);
+                    $('#LWPMinCeiling').val(k.LWPMinCeiling);
+                    $('#NextMonStartDay').val(k.NextMonStartDay);
+                    $('#CurMonStartDay').val(k.CurMonStartDay);
+                    $('#IncrMonth').val(k.IncrMonth);
+
+                });
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-NonRegIncrPolicy-IncrPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#NonRegIncrPolicylist').P2BGetTableDataonSelectedRow('#NonRegIncrPolicylist', 0);
+            //b = a[a.length - 1];
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "NonRegIncrPolicy")', '@Url.Action("Edit", "NonRegIncrPolicy")', b, '@Url.Action("editsave", "NonRegIncrPolicy")', 'Edit NonRegularIncrementPolicy', '#frmNonRegularIncrementPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmIncrPolicy', '#NonRegIncrPolicylist', 'NonRegIncrPolicylist', 'NonRegIncrPolicylist', 'N', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmNonRegularIncrementPolicy').trigger('reset');
+                    $('#MaxIncrInService').val(k.MaxIncrInService);
+                    $('#MinService').val(k.MinService);
+                    $('#MaxService').val(k.MaxService);
+                    $('[name="MaxSerLockAppl"]').val([k.MaxSerLockAppl]).button().button("refresh");
+                    $('[name="MinSerAppl"]').val([k.MinSerAppl]).button().button("refresh");
+                    @*$('#salhead').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList","salhead")', '', k.salhead_id);*@
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-RegIncrPolicy-IncrPolicy').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#RegIncrPolicylist').P2BGetTableDataonSelectedRow('#RegIncrPolicylist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RegIncrPolicylist', $('#RegIncrPolicylist').val(), 200, 200, '#frmIncrPolicy', '#RegIncrPolicylist');
+            event.preventDefault();
+        });
+
+        $('#Remove-NonRegIncrPolicy-IncrPolicy').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#NonRegIncrPolicylist').P2BGetTableDataonSelectedRow('#NonRegIncrPolicylist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NonRegIncrPolicylist', $('#NonRegIncrPolicylist').val(), 200, 200, '#frmIncrPolicy', '#NonRegIncrPolicylist');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-IncrPolicyDetails-IncrPolicy').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#IncrPolicyDetailslist').P2BGetTableDataonSelectedRow('#IncrPolicyDetailslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#IncrPolicyDetailslist', $('#IncrPolicyDetailslist').val(), 200, 200, '#frmIncrPolicy', '#IncrPolicyDetailslist');
+            event.preventDefault();
+        });
+
+        $('#Lookup-IncrPolicyDetails-IncrPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupIncrPolicyDetails", "IncrPolicyDetails")', '', 'LookupDiv', 'Look Up Data', '#IncrPolicyDetailslist', 'IncrPolicyDetailslist', 5, 'IncrPolicyDetailslist', '#frmIncrPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+		    event.preventDefault();
+		});
+
+
+		$('#Edit-IncrPolicyDetails-IncrPolicy').button().on("click", function (event) {
+			var a = [], b;
+			a = $('#IncrPolicyDetailslist').P2BGetTableDataonSelectedRow('#IncrPolicyDetailslist', 0);
+			//b = a[a.length - 1];
+			b = a[0];
+			$('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "IncrPolicyDetails")', '@Url.Action("Edit", "IncrPolicyDetails")', b, '@Url.Action("editsave", "IncrPolicyDetails")', 'Edit IncrPolicyDetails', '#frmIncrPromoPolicyDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmIncrPolicy', '#IncrPolicyDetailslist', 'IncrPolicyDetailslist', 'IncrPolicyDetailslist', 'N', '', function (data) {
+				$.each(data[0], function (i, k) {
+				    $('#frmIncrPromoPolicyDetails').trigger('reset');
+				    $('#IncrPercent').val(k.IncrPercent);
+					$('#IncrSteps').val(k.IncrSteps);
+					$('#IncrAmount').val(k.IncrAmount);
+					$('[name="IsIncrAmount"]').val([k.IsIncrAmount]).button().button("refresh");
+					$('[name="IsIncrPercent"]').val([k.IsIncrPercent]).button().button("refresh");
+					$('[name="IsIncrSteps"]').val([k.IsIncrSteps]).button().button("refresh");
+					@*$('#salhead').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList","salhead")', '', k.salhead_id);*@
+				});
+			});
+			event.preventDefault();
+		});
+
+
+		$('#Create-IncrPolicyDetails-IncrPolicy').on('click', function (e) {
+			//alert(21)
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "IncrPolicyDetails")', 'Create IncrPolicyDetails', 'open', '@Url.Action("Create", "IncrPolicyDetails")', '#frmIncrPromoPolicyDetails', 'Message :', 'Request Falied :', '#JqGrid', 300, 500, '', '', '', '#frmIncrPolicy', '', function (data) {
+                //alert(24)
+                $('#IncrPolicyDetailslist').P2BLookUpEncapsulate('#IncrPolicyDetailslist', 'IncrPolicyDetailslist', data[0], data[1], 'IncrPolicyDetailslist', '', 'N');
+            });
+            e.preventDefault();
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            //alert('ass');
+            $('#frmIncrPolicy').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#RegIncrPolicylist,#NonRegIncrPolicylist', btndisablename, 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#IncrPolicy_Name').val(k.Name);
+                    $('[name="IsRegularIncr"]').val([k.IsRegularIncr]).button().button("refresh");
+                    $('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldetails, 'RegIncrPolicylist', '#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy', 'N');
+                    $('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldetails, 'NonRegIncrPolicylist', '#Edit-NonRegIncrPolicy-IncrPolicy,#Remove-NonRegIncrPolicy-IncrPolicy', 'N');
+
+                    $('#IncrPolicyDetailslist').P2BLookUpEncapsulate('#IncrPolicyDetailslist', 'IncrPolicyDetailslist', k.IncrPromoPolicyDetails_Id, k.IncrPromoPolicy_FullDetails, 'IncrPolicyDetailslist', '#Remove-IncrPolicyDetails-IncrPolicy,#Remove-IncrPolicyDetails-IncrPolicy', 'N');
+
+                    // alert('0');
+                });
+                $.each(data[1], function (i, k) {
+                    //alert('1');
+                    //$('#RegIncrPolicylist').P2BLookUpEncapsulate('#RegIncrPolicylist', 'RegIncrPolicylist', k.RegIncrPolicyId, k.RegIncrFulldtl, 'RegIncrPolicylist', '', 'N');
+                    //$('#NonRegIncrPolicylist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldtl, 'NonRegIncrPolicylist', '', 'N');
+                    //$('#IncrPromoPolicyDetailslist').P2BLookUpEncapsulate('#NonRegIncrPolicylist', 'NonRegIncrPolicylist', k.NonRegIncrPolicyId, k.NonRegIncrFulldtl, 'NonRegIncrPolicylist', '', 'N');
+
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    //alert('2');
+                    // alert(data[2].Name, data[2].IncrList_val)
+                    $('#Name').oldVal(data[2].Name);
+                    $('#IncrAmount').oldVal(data[2].IncrAmount);
+                    $('#IncrPercent').oldVal(data[2].IncrPercent);
+                    $('#IncrSteps').oldVal(data[2].IncrSteps);
+                    $('#IsRegularIncr').oldVal(data[2].IsRegularIncr);
+                    $('#IsIncrSteps').oldVal(data[2].IsIncrSteps);
+                    $('#IsIncrAmount').oldVal(data[2].IsIncrAmount);
+                    $('#IsIncrPercent').oldVal(data[2].IsIncrPercent);
+                    $('#RegIncrPolicy_old').oldLookupVal(data[2].RegIncrPolicy_Val);
+                    $('#NonRegIncrPolicy_old').oldLookupVal(data[2].NonRegIncrPolicy_Val);
+                }
+            });
+
+        });
+
+
+
+        $('#IncrAmount').ForceOnlyNumeric();
+        $('#IncrPercent').ForceOnlyNumeric();
+        $('#IncrSteps').ForceOnlyNumeric();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>
+<div class="Form_Bg">
+	<div class="Form_Input">
+		<div class="Button_Container">
+			<button class="button" id="Create">Create</button>
+			<button class="button" id="View">View</button>
+			<button class="button" id="Edit">Edit</button>
+			<button class="button" id="Delete">Delete</button>
+			<button class="button" id="Autho">Authorised</button>
+			<div id="Grid_Form">
+				<div>
+					<table id="JqGrid"></table>
+					<div id="pager2"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog" title="Create Increment Activity">
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmIncrPolicy", name = "frmIncrPolicy" }))
+	{
+		<input id="Autho_Action" type="hidden" name="Autho_Action" />
+		<input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+		//<div class="increpoly_row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "increpoly_popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "increpoly_popup-content-textbox" }) </div>
+		<div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "increpoly_popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", id = "IncrPolicy_Name" })</div>
+
+
+		<div class="increpoly_row1 horizontal_increpoly_row1">
+			@Html.LabelFor(m => m.IsRegularIncr, " Regular increment :", new { @class = "increpoly_popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="IncrPolicy_radio1" name="IsRegularIncr" value="true" /><label for="IncrPolicy_radio1">Yes</label>
+				<input type="radio" id="IncrPolicy_radio2" name="IsRegularIncr" value="false" checked="checked" /><label for="IncrPolicy_radio2">No</label>
+
+			</div>
+		</div>
+		<div class="increpoly_row1 content_margine ">
+			<div id="RegIncrPolicy_old"></div>
+			@Html.LabelFor(m => m.RegIncrPolicy, "Reg Incr Policy :", new { @class = "increpoly_popup-content-label" })  <div class="popup-content-table">
+				<table class="lookuptableselected" id="RegIncrPolicylist">
+					<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+				</table>
+			</div>
+			<div class="increpoly_icon-row icon-row">
+				<button data-p2btooltip="LookUp RegIncrPolicy Details" class="popup-content-icon-lookup" id="Lookup-RegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Crate RegIncrPolicy Details" class="popup-content-icon-create" id="Create-RegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Edit RegIncrPolicy Details" class="popup-content-icon-edit" id="Edit-RegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Remove RegIncrPolicy Details" class="popup-content-icon-remove" id="Remove-RegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+			</div>
+		</div>
+		<div class="increpoly_row1 content_margine">
+			<div id="NonRegIncrPolicy_old"></div>
+			@Html.LabelFor(m => m.NonRegIncrPolicy, "Non Reg Incr Policy:", new { @class = "increpoly_popup-content-label" })  <div class="popup-content-table">
+				<table class="lookuptableselected" id="NonRegIncrPolicylist">
+					<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+				</table>
+			</div>
+			<div class="increpoly_icon-row icon-row">
+				<button data-p2btooltip="LookUp NonRegIncrPolicy Details" class="popup-content-icon-lookup" id="Lookup-NonRegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Crate NonRegIncrPolicy Details" class="popup-content-icon-create" id="Create-NonRegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Edit NonRegIncrPolicy Details" class="popup-content-icon-edit" id="Edit-NonRegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Remove NonRegIncrPolicy Details" class="popup-content-icon-remove" id="Remove-NonRegIncrPolicy-IncrPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+			</div>
+		</div>
+		<div class="increpoly_row1 content_margine">
+			<div id="IncrPromoPolicyDetails_old"></div>
+			@Html.LabelFor(m => m.IncrPolicyDetails, "IncrPolicyDetails:", new { @class = "increpoly_popup-content-label" })
+			<div class="popup-content-table">
+				<table class="lookuptableselected" id="IncrPolicyDetailslist">
+					<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+				</table>
+			</div>
+			<div class="increpoly_icon-row icon-row">
+				<button data-p2btooltip="LookUp NonRegIncrPolicy Details" class="popup-content-icon-lookup" id="Lookup-IncrPolicyDetails-IncrPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Crate NonRegIncrPolicy Details" class="popup-content-icon-create" id="Create-IncrPolicyDetails-IncrPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Edit NonRegIncrPolicy Details" class="popup-content-icon-edit" id="Edit-IncrPolicyDetails-IncrPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Remove NonRegIncrPolicy Details" class="popup-content-icon-remove" id="Remove-IncrPolicyDetails-IncrPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+			</div>
+		</div>
+	}
+</div>
+
+
+

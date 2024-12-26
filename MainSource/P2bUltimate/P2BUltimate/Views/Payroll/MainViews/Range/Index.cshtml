@@ -1,0 +1,188 @@
+﻿@{
+    ViewBag.Title = "Range";
+}
+@model Payroll.Range
+<style>
+    .popup-content-label {
+        width: 140px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        min-width: 120px;
+    }
+
+    .row1 {
+        width: 317px;
+    }
+
+    .horizontal_row1, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .search {
+        padding-left: 5px;
+    }
+
+    .dem {
+        position: relative;
+        left: 285px;
+        top: -19px;
+        height: 15px;
+        width: 15px;
+    }
+</style>
+
+
+<div class="Form_Bg">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+</div>
+<body>
+    <div id="Create_Dialog" title="Create Range">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmRange" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.RangeFrom, "Range From :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.RangeFrom, new { @class = "popup-content-textbox", id = "FromDate" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.RangeTo, "Range To :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.RangeTo, new { @class = "popup-content-textbox", id = "ToDate" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.EmpShareAmount, " Emp Amount :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EmpShareAmount, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.EmpSharePercentage, " Emp Percentage :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EmpSharePercentage, new { @class = "popup-content-textbox" })<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" /></div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.CompShareAmount, "Comp Share Amount :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.CompShareAmount, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.CompSharePercentage, "Comp Percentage :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.CompSharePercentage, new { @class = "popup-content-textbox" })<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" /></div>
+        }
+    </div>
+</body>
+<script>
+    $(document).ready(function (e) {
+        var dia;
+
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        //"#EmpShareAmount","#EmpSharePercentage",  "#CompShareAmount"
+        ColModel = ['Id', 'RangeFrom', 'RangeTo', 'EmpShareAmount', 'EmpSharePercentage', 'CompShareAmount'];
+        ColNames = ['Id', 'RangeFrom', 'RangeTo', 'EmpShareAmount', 'EmpSharePercentage', 'CompShareAmount'];
+        SortName = 'Code';
+        Caption = 'Range';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmRange').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Range', 'open', '@Url.Action("Create")', '#frmRange', 'Message :', 'Request Falied :', '#JqGrid', 300, 595, '', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+        $('#Create_Dialog').P2BCreateDialog();
+       
+        $('.popup-content-textbox').ForceOnlyNumeric();
+        $('.popup-content-textbox').MaxLength(10);
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmRange', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 340, 595, '', btndisablenames, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#RangeFrom').val(k.RangeFrom);
+                    $('#RangeFrom').attr('readonly', 'readonly');
+                    $('#RangeTo').val(k.RangeTo);
+                    $('#EmpShareAmount').val(k.EmpShareAmount);
+                    $('#EmpSharePercentage').val(k.EmpSharePercentage);
+                    $('#CompShareAmount').val(k.CompShareAmount);
+                    $('#CompSharePercentage').val(k.CompSharePercentage);
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 370, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#RangeFrom').val(k.RangeFrom);
+                    $('#RangeTo').val(k.RangeTo);
+                    $('#EmpShareAmount').val(k.EmpShareAmount);
+                    $('#EmpSharePercentage').val(k.EmpSharePercentage);
+                    $('#CompShareAmount').val(k.CompShareAmount);
+                    $('#CompSharePercentage').val(k.CompSharePercentage);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#RangeFrom').oldVal(data[2].RangeFrom);
+                    $('#RangeTo').oldVal(data[2].RangeTo);
+                    $('#EmpShareAmount').oldVal(data[2].EmpShareAmount);
+                    $('#EmpSharePercentage').oldVal(data[2].EmpSharePercentage);
+                    $('#CompShareAmount').oldVal(data[2].CompShareAmount);
+                    $('#CompSharePercentage').oldVal(data[2].CompSharePercentage);
+
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $("#RangeFrom").ForceOnlyAlphaNumeric();
+        $("#RangeTo").ForceOnlyAlphaNumeric();
+        $("#EmpShareAmount").ForceOnlyAlphaNumeric();
+        $("#EmpSharePercentage").ForceOnlyAlphaNumeric();
+        $("#CompShareAmount").ForceOnlyAlphaNumeric();
+        $("#CompSharePercentage").ForceOnlyAlphaNumeric();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>

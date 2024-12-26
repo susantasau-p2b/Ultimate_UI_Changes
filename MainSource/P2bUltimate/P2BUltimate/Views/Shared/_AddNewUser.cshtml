@@ -1,0 +1,103 @@
+﻿@{
+    ViewBag.title = "Add New User";
+}
+@{
+    Layout = null;
+}
+<!Doctype html>
+<html>
+<head>
+    <title>
+
+    </title>
+    <style>
+        .row1 {
+            width: 354px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 124px;
+        }
+
+
+        #username {
+            width: 186px;
+        }
+
+        .hide-div {
+            display: none;
+        }
+        .form_content, .action_content {
+            padding:2px;
+        }
+    </style>
+</head>
+<body>
+    <form id="frmaddnewuser" name="frmaddnewuser">
+        <div class="action_content">
+            <input type="radio" name="action" id="add_user" value="add"/><label for="add_user">Add</label>
+            <input type="radio" name="action" id="del_user" value="del"/><label for="del_user">Delete</label>
+        </div>
+        <div class="form_content">
+            <div id="add_newuser-div" class="hide-div">
+                <div class="row1 content_margine">
+                    <label for="Group" class="popup-content-label">Select Group :</label>
+                    <select id="Group" name="Group" class="drop" style="width: 200px;">
+                        <option value="0">-Select-</option>
+                        <option value="1">Auditor</option>
+                        <option value="2">Checker</option>
+                        <option value="3">Maker</option>
+                    </select>
+                </div>
+                <div class="row1 content_margine">
+                    <label for="employee" class="popup-content-label">Assign Employee :</label>
+                    <select id="employee" class="drop" name="employee" style="width:200px">
+                        <option>-Select-</option>
+                    </select>
+                </div>
+                <div class="row1 content_margine">
+                    <label for="username" class="popup-content-label">Enter User Name :</label>
+                    <input type="text" id="username" name="username" />
+                </div>
+            </div>
+            <div id="del_newuser" class="hide-div">
+                <label class="popup-content-label">Select Employee To Remove Rights :</label><select id="Emp_drop" name="Emp_drop" class="" style="width: 200px;"></select>
+            </div>
+        </div>
+    </form>
+
+
+</body>
+</html>
+<script>
+    $(function () {
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#employee').P2BSelectMenuAppend("@Url.Action("GetEmp", "AddNewUser")", "", "");
+        $('#employee').on('selectmenuchange', function () {
+            $('#username').val($(this).val() != 0 ? $(this).val() : "");
+        });
+        $('#Emp_drop').P2BSelectMenuMuliSelectAppend("@Url.Action("EmployeeDrop", "AddNewUser")", "", "");
+        $('[name="action"]').on('change', function () {
+            var id = $(this).attr('id');
+            //console.log(id);
+            if (id == "add_user") {
+                $('#add_newuser-div').show();
+                $('#del_newuser').hide();
+            }
+            if (id == "del_user") {
+                $('#del_newuser').show();
+                $('#add_newuser-div').hide();
+
+            }
+        });
+        $.fn.doval = function () {
+            //if ($('#employee').val() == 0) {
+            //    return false;
+            //}
+            return true;
+
+        };
+    });
+</script>

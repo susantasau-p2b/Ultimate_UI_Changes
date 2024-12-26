@@ -1,0 +1,277 @@
+﻿@{
+    ViewBag.Title = "Seniority Policy";
+}
+@model P2b.Global.Senioritypolicy
+<html>
+<head>
+    <title></title>
+    <style>
+        .popup-content-label {
+            width: 170px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row3, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 477px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+
+        .popup-content-table {
+            right: 120px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Name</th>                                
+                                <th>ID</th>
+                            </tr>
+                        </thead>                       
+                    </table>
+                </div>
+            </div>
+            <table id="JqGrid"></table>
+            <div id="pager2"></div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmsenioritypolicy", name = "frmsenioritypolicy" }))
+        {
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label " })
+                @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox " })
+            </div>            
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.JobStatus, "JobStatus :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobStatusList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup JobStatusList " class=" popup-content-icon-lookup" id="Lookup-JobStatusList"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>                   
+                    <button data-p2btooltip="Delete JobStatusList " class=" popup-content-icon-remove" id="Remove-JobStatusList"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+       
+        $('button').button();      
+        //$('#Code').ValidateTextBox({ maxlength: 10 });
+        //$('#ModelName').ValidateTextBox({ maxlength: 25});
+        //$('#ModelDescription').ValidateTextBox({ maxlength: 50 });
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("SeniorityPolicy_Grid")",
+            columnname: ["Name", "Id"],
+            childheader: ["JobStatus", "Id"],
+            childurl: "@Url.Action("A_Senioritypolicy_Grid", "Senioritypolicy")",
+            tableheader: "Seniority policy",
+            childurlColumnNo: "2"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+           @* if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }*@
+             if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: [id, parentid],
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+        
+        $('#Create_Dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmsenioritypolicy');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Seniorit Policy', 'open', '@Url.Action("Create")', '#frmsenioritypolicy', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" });
+            //$('#CreatedDate').TodayDate();
+            //$('#CreatedDate').attr("readonly", "readonly");
+            event.preventDefault();
+        });
+
+        $('#Lookup-JobStatusList').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("JobStatusDetails", "Senioritypolicy")', '', 'LookupDiv', ' JobStatus Look Up Data', '#JobStatusList', 'JobStatusList', 15, 'JobStatusList', '#frmsenioritypolicy', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-JobStatusList').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#AppraisalAttributeModelObjectList').P2BGetTableDataonSelectedRow('#AppraisalAttributeModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobStatusList').P2BGetTableDataonSelectedRow('#JobStatusList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobStatusList', $('#JobStatusList').val(), 200, 200, '#frmsenioritypolicy', '#JobStatusList');
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            $('#frmsenioritypolicy').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Seniority Policy", '#frmsenioritypolicy', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmsenioritypolicy').trigger("reset");
+                    $('#Name').val(k.Name);
+                    //$('#CreatedDate').val(k.CreatedDate);
+                    //$('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#JobStatusList').P2BLookUpEncapsulate('#JobStatusList', 'JobStatusList', k.Id, k.JobStatus, 'JobStatusList', '', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        $('#View').on('click', function () {
+            $('#frmsenioritypolicy').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Appraisal Attribute Model Object', '#AppraisalAttributeModelObjectList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmsenioritypolicy').trigger("reset");
+                    $('#Name').val(k.Name);
+                    //$('#CreatedDate').val(k.CreatedDate);
+                    //$('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#JobStatusList').P2BLookUpEncapsulate('#JobStatusList', 'JobStatusList', k.Id, k.JobStatus, 'JobStatusList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        @*$('#Delete').button().click(function (event) {
+            $.FormReset('#frmsenioritypolicy');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#frmsenioritypolicy').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });*@       
+    });
+</script>

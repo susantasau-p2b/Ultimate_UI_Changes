@@ -1,0 +1,211 @@
+﻿@model P2b.Global.LoginDetails
+@{
+    ViewBag.Title = "Verify";
+
+}
+<script>
+    var td = @TempData["Skey"]
+    $(function () {
+        var dia = $('#createdialog').dialog({
+            autoOpen: false,
+            height: 400,
+            width: 425,
+            modal: true,
+            beforeClose: function () { true; },
+            closeOnEscape: false,
+            title: "Verify",
+            buttons: {
+                Submit: function (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("create", "SecurityQOTP")?seqid="+td,
+                        data: $('#frmSecqOTP').serialize() + '&capcha_text=' + $("#captcha_code").val(),
+                        success: function (data) {
+                            if (data.success == true) {
+                                window.location.href = "@Url.Action("index","dashboard")";
+                            } else {
+                                //debugger;
+                                alert(data.responseText);
+                                dia.dialog('close');
+
+                                window.location.href = "@Url.Action("logout", "login")";
+
+                            }
+                        },
+                    });
+
+
+
+                },
+                //Cancel: function (e) {
+                //    $(this).dialog("close");
+                //}
+            }
+        });
+        dia.dialog("open");
+        $('.ui-dialog-titlebar-close').hide();
+            $('#secq').hide();
+            $('#secA').hide();
+            $('#OTP').hide();
+        var tt = @TempData["Skey"]
+console.log(tt);
+       
+        if (tt == 1) {
+           
+            $('#secq').show();
+            $('#secA').show();
+            $('#OTP').show();
+        }
+        
+        if (tt == 2) {
+            $('#secq').show();
+            $('#secA').show();
+            $('#OTP').hide();
+        }
+        if (tt == 3) {
+            $('#OTP').show();
+            $('#secq').hide();
+            $('#secA').hide();
+        }
+        //else
+        //{
+        //    $('#secq').hide();
+        //    $('#secA').hide();
+        //    $('#OTP').hide();
+           
+        //}
+        //if (tt == 3) {
+        //    $('#OTP').show();
+
+        //}
+        //else
+        //{
+        //    $('#secq').hide();
+        //    $('#secA').hide();
+        //    $('#OTP').hide();
+        //}
+      
+
+        @*$('#Employee_Id').val('@Request.RequestContext.HttpContext.Session["EmpId"]');*@
+        @*$('#SecurityQuestion').val('@Url.Action("GetQuestion", "SecurityQOTP")', '@Request.RequestContext.HttpContext.Session["EmpId"]');*@
+
+        $.get("@Url.Action("GetQuestion", "SecurityQOTP")", function (data) {
+            $('#SecQ').val(data);
+
+        });
+
+        $('button').button();
+        var FormValidation = { ValidationField: {} };
+        if (typeof (Storage) !== "undefined") {
+            console.log("webstorage Avaliable");
+            localStorage.clear();
+
+            $.get('@Url.Action("GetPasswordPolicy", "PasswordPolicy")', function (data) {
+
+                if (localStorage.getItem("SecurityQuestion") === "false") {
+                    $('#SecurityQuestion,#SecurityAnswer').parent().hide();
+                } else {
+                    $('#SecurityQuestion,#SecurityAnswer').parent().show();
+                }
+
+
+            });
+        }
+        else {
+            alert("Webstorage is Not Avaliable");
+        }
+
+
+        
+        $('#EmailId').ForceEmail();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#SecQ').attr('readonly', 'readonly');
+
+    });
+</script>
+<div id="createdialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmSecqOTP" }))
+    {
+        <div class="parent_div">
+            @*<div class="child-div">
+                    @Html.LabelFor(e => e.Company.Code, "Company Code :", new { @class = "content-label" })<select id="comp_drop" name="comp_drop" class="drop" style="width:100px;"><option></option></select>
+                </div>*@
+
+            @*<div class="child-div">
+                    @Html.LabelFor(e => e.Employee.Id, "Employee Code :", new { @class = "content-label must" })@Html.TextBoxFor(e => e.Employee.Id, new { @class = "must" })
+                </div>*@
+            @*<div class="child-div">
+                    @Html.LabelFor(e => e.OldPassword, "Old Password :", new { @class = "content-label must" })@Html.TextBoxFor(e => e.OldPassword, new { @type = "password", @class = "must" })
+                </div>
+                <div class="child-div">
+                    @Html.LabelFor(e => e.NewPassword, "New Password :", new { @class = "content-label must" })@Html.TextBoxFor(e => e.NewPassword, new { @type = "password", @class = "must" })
+                </div>*@
+            @*<div class="child-div">
+                    <label class="content-label">Confirm Password</label><input type="password" id="Confrm_password" />
+                </div>*@
+            @*<div class="child-div">
+
+                    <label class="content-label">Security Question:</label>
+                    <select id="iSecQQ" name="iSecQQ" style="width:160px;"><option value="0">-Select-</option></select>
+
+                </div>*@
+
+            <div id="secq" class="child-div">
+                @Html.LabelFor(e => e.SecQ, "Security Question :", new { @class = "content-label" })@Html.TextBoxFor(e => e.SecQ)
+            </div>
+            <div id="secA" class="child-div">
+                @Html.LabelFor(e => e.SecAns, "Security Answer :", new { @class = "content-label" })@Html.TextBoxFor(e => e.SecAns)
+            </div>
+            <div id="OTP" class="child-div">
+                <input type="text" class="capcha_text" id="OTP_code" title="Write OTP Code" placeholder="Enter OTP Here" />
+            </div>
+
+            @*<div class="child-div">
+                    @Html.LabelFor(e => e.EmailId, "Email Id :", new { @class = "content-label" })@Html.TextBoxFor(e => e.EmailId)
+                </div>*@
+            @*<div class="child-div">
+                    <label style="float:left;display:block;">Captcha Image :</label>
+                    <div style="" class="capcha_content">
+                        <img id="capcha_img" title="Refresh Captcha Image" style="width:163px; height: 50px;" />
+                    </div>
+                </div>*@
+            @*<div class="child-div">
+                    <input type="text" class="capcha_text" id="captcha_code" title="Write Captcha Code" placeholder="Enter Captcha Text Here" />
+                </div>*@
+        </div>
+    }
+</div>
+<style>
+    .parent_div {
+        float: left;
+        width: 368px;
+    }
+
+    .content-label {
+        float: left;
+        width: 130px;
+    }
+
+    .child-div {
+        display: inline-block;
+        margin: 1px;
+        width: 400px;
+    }
+
+    .button-div {
+        padding-top: 2px;
+    }
+
+    .capcha_content {
+        width: 163px;
+        height: 50px;
+        border-color: grey;
+        border-style: solid;
+        border-width: thin;
+        margin-left: 130px;
+    }
+
+    .capcha_text {
+        margin-left: 129px;
+    }
+</style>

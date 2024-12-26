@@ -1,0 +1,121 @@
+﻿@{
+    Layout = null;
+}
+
+@model P2b.Global.VisaDetails
+
+<html>
+<head>
+    <title></title>
+
+    <style>
+        .qual_popup-content-textbox {
+            min-width: 200px;
+            margin: 0px 0px 1px 3px;
+        }
+
+        .qual_popup-content-label {
+            display: block;
+            float: left;
+            width: 165px;
+        }
+
+        .content_margine_quali {
+            margin: 2.5px;
+            padding: 0.5px;
+        }
+
+        .qual_row3 {
+            width: 473px;
+        }
+
+        .qual_icon_row3 {
+            left: 118px;
+            top: -150px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="lookup_Increment">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="create_dialog" title="Create Visa Detail">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmVisa", name = "frmVisa" }))
+        {
+            <input id="auth_action" type="hidden" name="auth_action" />
+            <input id="Add" type="hidden" name="Add" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <input id="isauth" type="hidden" name="isauth" />
+            <input id="id" type="hidden" name="auth_id" />
+
+            <div class="row1 content_margine_quali">
+                @Html.LabelFor(m => m.VisaType, "Visa Type :", new { @class = "qual_popup-content-label must" })
+                <select class="drop  must" style="width:120px;" name="VisaTypelist" id="VisaTypelist"><option value="0">-Select-</option></select>
+            </div>
+            <div class="row1 content_margine_quali">
+                @Html.LabelFor(m => m.Country, "Country :", new { @class = "qual_popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="CountryList" id="CountryList"><option value="0">-Select-</option></select>
+            </div>
+            <div class="row1 content_margine_quali">
+                @Html.LabelFor(m => m.IssueDate, "Issue Date :", new { @class = "qual_popup-content-label must" })@Html.TextBoxFor(m => m.IssueDate, new { @class = "qual_popup-content-textbox must" })
+            </div>
+            <div class="row1 content_margine_quali">@Html.LabelFor(m => m.ValidDate, "Expiry Date :", new { @class = "qual_popup-content-label must" })@Html.TextBoxFor(m => m.ValidDate, new { @class = "qual_popup-content-textbox must" })</div>
+            <div class="row1 content_margine_quali">@Html.LabelFor(m => m.IssueAt, "Issue At :", new { @class = "qual_popup-content-label must" })@Html.TextBoxFor(m => m.IssueAt, new { @class = "qual_popup-content-textbox must" })</div>
+
+        }
+    </div>
+
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function (e) {
+        $("#IssueAt").ForceOnlyAlphaNumeric();
+
+        $('#IssueDate,#ValidDate').P2BDatePicker();
+        $('#FromDate,#ToDate').P2BDatePicker();
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        $('#CountryList').empty();
+        $('#CountryList').off("selectmenuopen").on("selectmenuopen", function () {
+            $('#CountryList').empty().append("<option value=0 >-Select-</option>").selectmenu("refresh");
+            $.post("@Url.Action("PopulateDropDownList", "VisaDetails")", {
+                data: "",
+                data2: ""
+            }, function (data) {
+                $.each(data, function (i, k) {
+                    $('#CountryList').append($("<option>", {
+                        value: k.Value,
+                        text: k.Text,
+                        selcted: k.Selected
+                    }));
+                });
+                jQuery('#CountryList').selectmenu('refresh').selectmenu("menuWidget").css({ "height": "120px" });
+            });
+        });
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+        }
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#VisaTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 316, "");
+
+
+    });
+</script>

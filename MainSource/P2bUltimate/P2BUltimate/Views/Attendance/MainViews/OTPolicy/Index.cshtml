@@ -1,0 +1,279 @@
+﻿@{
+    ViewBag.Title = "Over Time Policy";
+}
+
+@model Attendance.OTPolicy
+@*<link href="~/Content/popup_form.css" rel="stylesheet" />
+<link href="~/Content/OTPolicy/OTPolicy.css" rel="stylesheet" />*@
+<style>
+ .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+<script>
+    $(document).ready(function (e) {
+        var dia;
+       // $('#COffOTHours,#compulsoryStay').P2BDatePicker();
+            
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['OTPoilicyName', 'BreakTime ', 'compulsoryStay', 'COffOTHours', 'CompensatoryOff', 'Id'];
+        ColNames = ['OTPoilicyName', 'BreakTime', 'compulsoryStay', 'COffOTHours', 'CompensatoryOff', 'Id'];
+        SortName = 'Code';
+        Caption = 'OT Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#BreakTime').P2BTimePicker();
+        $('#OTPoilicyName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#COffOTHours').P2BTimePicker();
+        $('#compulsoryStay').P2BTimePicker();
+
+        function DateConvert(JsonDate) {
+            var time = new Date(parseInt(JsonDate.substr(6)));
+           // var time = new Date();
+
+            time = time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+            return time;
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmOTPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create OT Policy', 'open', '@Url.Action("Create")', '#frmOTPolicy', 'Message :', 'Request Falied :', '#JqGrid', 300,485, '', btndisablenames, function (data) { });
+            $('#compulsoryStay').attr('readonly', 'readonly');
+            $('#BreakTime').attr('readonly', 'readonly');
+            $('#COffOTHours').attr('readonly', 'readonly');
+            event.preventDefault();
+        });
+
+        //$('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();           
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit OT Policy Data", '#frmOTPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 300, 485, '', btndisablenames, function (data) {              
+                $('#compulsoryStay').attr('readonly', 'readonly');
+                $('#BreakTime').attr('readonly', 'readonly');
+                $('#COffOTHours').attr('readonly', 'readonly');
+                $('#OTPoilicyName').attr('readonly', 'readonly');
+                $.each(data[0], function (i, k) {
+                    $('#frmOTPolicy').trigger("reset");
+
+                     $('#OTPoilicyName').val(k.OTPoilicyName);
+
+                     $('#compulsoryStay').val(k.compulsoryStay);
+                     if (k.compulsoryStay != null) {
+                         $('#compulsoryStay').val(DateConvert(k.compulsoryStay));
+                     }
+                     $('#BreakTime').val(k.BreakTime);
+                     if (k.BreakTime != null) {
+                         $('#BreakTime').val(DateConvert(k.BreakTime));
+                     }
+
+                    //  $('#compulsoryStay').val(k.compulsoryStay);  
+                     $('#COffOTHours').val(k.COffOTHours);
+                     if (k.COffOTHours != null) {
+                         $('#COffOTHours').val(DateConvert(k.COffOTHours));
+                     }
+
+                 //   $('#BreakTime').val(k.BreakTime);
+                  //  $('#COffOTHours').val(k.COffOTHours);
+                    $('[name="CompensatoryOff"]').val([k.CompensatoryOff]).button().button("refresh");
+                });
+              
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View OT Policy Data', '', '', 300, 485, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmOTPolicy').trigger("reset");
+                   // alert(k.CompensatoryOff);
+                    $('#Autho_Action').val(k.Action);
+                    //$('#Name').val(k.Name);
+                  //  $('#Name').attr('readonly', 'readonly');
+                    $('#OTPoilicyName').val(k.OTPoilicyName);
+                    $('#compulsoryStay').val(k.compulsoryStay);
+                    if (k.compulsoryStay != null) {
+                        $('#compulsoryStay').val(DateConvert(k.compulsoryStay));
+                    }
+                    $('#BreakTime').val(k.BreakTime);
+                    if (k.BreakTime != null) {
+                        $('#BreakTime').val(DateConvert(k.BreakTime));
+                    }
+
+                    //  $('#compulsoryStay').val(k.compulsoryStay);  
+                    $('#COffOTHours').val(k.COffOTHours);
+                    if (k.COffOTHours != null) {
+                        $('#COffOTHours').val(DateConvert(k.COffOTHours));
+                    }
+                    $('[name="CompensatoryOff"]').val([k.CompensatoryOff]).button().button("refresh");
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').oldVal(data[2].Name);
+                    $('#Name').attr('readonly', 'readonly');
+                    $('#compulsoryStay').oldVal(data[2].compulsoryStay);
+                    //"#RemarkDesc","#RemarkId",  "#SelectedRemark"
+                    $('#BreakTime').oldVal(data[2].BreakTime);
+                    $('#COffOTHours').oldVal(data[2].COffOTHours);
+                    $('[name="CompensatoryOff"]').oldVal(data[2].CompensatoryOff).button().button("refresh");
+
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $("#Name").ForceOnlyAlpha();
+        $("#compulsoryStay").ForceOnlyAlphaNumeric();
+        $("#BreakTime").ForceOnlyAlphaNumeric();
+        $("#COffOTHours").ForceOnlyAlphaNumeric();
+        //$('#COffOTHours').P2BDatePicker();
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();     
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>
+
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create OT Policy">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmOTPolicy", name = "frmOTPolicyEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+  <div class="row3 content_margine">
+    @Html.LabelFor(m => m.OTPoilicyName, "OT Poilicy Name  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OTPoilicyName, new { @class = "popup-content-textbox must" })
+</div>
+             <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BreakTime, "Break Time :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BreakTime, new { @class = "popup-content-textbox must" })
+                </div>
+             <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.COffOTHours, "COffOT Hours :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.COffOTHours, new { @class = "popup-content-textbox must" })
+                </div>
+             <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.compulsoryStay, "compulsory Stay :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.compulsoryStay, new { @class = "popup-content-textbox must" })
+                </div>
+
+            @*<div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox", @maxlength = "10" })</div>*@            
+          //  <div class="row1 content_margine">@Html.LabelFor(m => m.BreakTime, "Break Time :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.BreakTime, new { @class = "popup-content-textbox", @id = "BreakTime" })</div>
+           // <div class="row1 content_margine">@Html.LabelFor(m => m.COffOTHours, "COff OT Hours :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.COffOTHours, new { @class = "popup-content-textbox", @id = "COffOTHours" })</div>
+           // <div class="row1 content_margine">@Html.LabelFor(m => m.compulsoryStay, "Compulsory Stay:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.compulsoryStay, new { @class = "popup-content-textbox", @id = "compulsoryStay" })</div>
+            @*<div class="row3 content_margine horizontal_row2 content_margine">
+            @Html.LabelFor(m => m.CompensatoryOff, "Compensatory Off :", new { @class = "popup-content-label" })          
+            <div class="popup_radio_button radio_button_div_1">
+                <div id="radioset">
+                    <span><input type="radio" id="radio1" name="CompensatoryOff" value="true" /> <label for="radio1">Yes</label></span>
+                    <span><input type="radio" id="radio2" name="CompensatoryOff" value="false" /> <label for="radio2">No</label></span>
+                </div>
+            </div>
+        </div>*@
+            
+               <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.CompensatoryOff, "Compensatory Off :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button  ">
+                        @Html.RadioButtonFor(m => m.CompensatoryOff, "true", new { type = "radio", @id = "radio15" })
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio15" })
+                        @Html.RadioButtonFor(m => m.CompensatoryOff, "false", new { type = "radio", @id = "radio16" })
+                        @Html.Label("No", new { @class="ui-corner-right", @for = "radio16" })
+                    </div>
+                </div>
+        }
+    </div>
+        
+</body>
+</html>

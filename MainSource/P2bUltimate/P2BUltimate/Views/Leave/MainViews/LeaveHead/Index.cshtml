@@ -1,0 +1,337 @@
+﻿@{
+    ViewBag.Title = "Leave Head";
+}
+
+@model Leave.LvHead
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<script>
+    $(document).ready(function (e) {
+        var btndisablenames = "#Edit-LvHeadObj-LeaveHead,#Remove-LvHeadObj-LeaveHead,#Edit-PayScaleAgreement-LeaveHead,#Remove-PayScaleAgreement-LeaveHead";
+        $('button').button();
+        //$('.popup_radio_button').buttonset({})
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'LvCode', 'LvName', 'LvHeadOprationType','HFPay', 'LTAAppl'];
+        ColNames = ['Id', 'LvCode', 'LvName', 'LvHeadOprationType','HFPay', 'LTAAppl'];
+        SortName = 'Id';
+        Caption = 'Leave Head';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmLeavehead').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Head', 'open', '@Url.Action("Create")', '#frmLeavehead', 'Message :', 'Request Falied :', '#JqGrid', 350, 520, '#LvHeadObjlist,#PayScaleAgreementlist', btndisablenames, function (data) { });         
+            $('#ToStatlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 447, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+
+        $('#Edit').on('click', function (event) {
+            alert('e');
+            AssignData();
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Other Salary Head Master", '#frmOtherSalHead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmLeavehead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#LvHeadObjlist,#PayScaleAgreementlist', '', function (data) {
+                $.each(data[1], function (i, k) {
+                    alert('dt');
+                    $('#LvHeadObjlist').P2BLookUpEncapsulate('#LvHeadObjlist', 'LvHeadObjlist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'LvHeadObjlist', '#Edit-LvHeadObj-LeaveHead,#Remove-LvHeadObj-LeaveHead', 'N');
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgreement_Id, k.PayScaleAgreement_FullDetails, 'PayScaleAgreementlist', '#Edit-PayScaleAgreement-LeaveHead,#Remove-PayScaleAgreement-LeaveHead', 'N');
+                });
+                $.each(data[0], function (i, k) {
+                    $('#frmLeaveHead').trigger('reset');
+                    //'HFPay', 'LTAAppl', 'ApplAtt', 'EncashRegular', 'EncashRetirement'
+                    $('[name="HFPay"]').val([k.HFPay]).button().button("refresh");
+                    $('[name="LTAAppl"]').val([k.LTAAppl]).button().button("refresh");
+                    $('[name="ApplAtt"]').val([k.ApplAtt]).button().button("refresh");
+                    $('[name="EncashRegular"]').val([k.EncashRegular]).button().button("refresh");
+                    $('[name="EncashRetirement"]').val([k.EncashRetirement]).button().button("refresh");
+                    $('[name="ESS"]').val([k.ESS]).button().button("refresh");                    
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#LvHeadObjlist,#PayScaleAgreementlist', '#Lookup-LvHeadObj-LeaveHead,#Create-LvHeadObj-LeaveHead,#Edit-LvHeadObj-LeaveHead,#Remove-LvHeadObj-LeaveHead,#Lookup-PayScaleAgreement-LeaveHead,#Create-PayScaleAgreement-LeaveHead,#Edit-PayScaleAgreement-LeaveHead,#Remove-PayScaleAgreement-LeaveHead', 700, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Id').val(k.Id);
+                    $('[name="HFPay"]').val([k.HFPay]).button().button("refresh");
+                    $('[name="LTAAppl"]').val([k.LTAAppl]).button().button("refresh");
+                    $('[name="ApplAtt"]').val([k.ApplAtt]).button().button("refresh");
+                    $('[name="EncashRegular"]').val([k.EncashRegular]).button().button("refresh");
+                    $('[name="EncashRetirement"]').val([k.EncashRetirement]).button().button("refresh");
+                    $('[name="ESS"]').val([k.ESS]).button().button("refresh");
+                });
+
+                $.each(data[1], function (i, k) {                   
+                    $('#LvHeadObjlist').P2BLookUpEncapsulate('#LvHeadObjlist', 'LvHeadObjlist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'LvHeadObjlist', '', 'N');
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgreement_Id, k.PayScaleAgreement_FullDetails, 'PayScaleAgreementlist', '', 'N');
+                });
+
+                ////To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {                   
+                    $('#radio4').StickNote([data[2].HFPay]);
+                    $('#radio6').StickNote([data[2].LTAAppl]);
+                    $('#radio8').StickNote([data[2].ApplAtt]);
+                    $('#radio10').StickNote([data[2].EncashRegular]);
+                    $('#radio12').StickNote([data[2].EncashRetirement]);
+                    $('#radio14').StickNote([data[2].ESS]);
+                    $('#PayScaleAgreementlist').StickNote([data[2].PayScaleAgreement_Val]);
+                    $('#LvHeadObjlist').StickNote([data[2].LvHeadObj_Val])
+                }
+            });
+            });
+
+
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('frmLeaveHead').P2BDeleteModalDialog('@Url.Action("Delete", "LeaveHead")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            });
+
+
+
+
+            $('#Lookup-LvHeadObj-LeaveHead').button().on('click', function (event) {
+                alert('e');
+                $('.dialog1').P2BLookUpModal('@Url.Action("GetLvHeadObjLKDetails", "LeaveHead")', '', 'lookupdiv1', 'Look LvHeadObj Details', '#LvHeadObjlist', 'LvHeadObjlist', 5, 'LvHeadObjlist', 'frmLeaveHead', 'N', btndisablenames, '#Lookup_table', 'pageNavPosition1');
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-LvHeadObj-LeaveHead').button().on("click", function (event)
+            {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateLvHeadObj_partial", "LeaveHead")', 'Create LvHeadObj Details', 'open', '@Url.Action("Create", "LvHeadObj")', '#frmLvHeadObj', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmLeaveHead', '', function (data) {
+                    $('#LvHeadObjlist').P2BLookUpEncapsulate('#LvHeadObjlist', 'LvHeadObjlist', data[0], data[1], 'LvHeadObjlist', '#Edit-LvHeadObj-LeaveHead,#Remove-LvHeadObj-LeaveHead', 'A');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-LvHeadObj-LeaveHead').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#LvHeadObjlist').P2BGetTableDataonSelectedRow('#LvHeadObjlist', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateLvHeadObj_partial", "LeaveHead")', '@Url.Action("EditContactDetails_partial", "LvHeadObj")', b, '@Url.Action("EditSave", "LeaveHead")', 'Edit Contact Details', '#frmLvHeadObj', b, 'Message :', 'Request Falied :', '#JqGrid', 300, 400, 'frmLeaveHead', btndisablenames, '#LvHeadObjlist', 'LvHeadObjlist', 'LvHeadObjlist', function (data) {
+                    setTimeout(function () {
+                        $.each(data, function (i, k) {
+                            $('#frmLvHeadObj').trigger('reset');
+                            $('#EmailId').val(k.EmailId);
+                            $('#Website').val(k.Website);
+                            $('#FaxNo').val(k.FaxNo);
+                        });
+                    }, 3000);
+                });
+                event.preventDefault();
+            });
+
+            $('#Remove-LvHeadObj-LeaveHead').button().on('click', function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                var a = [], b;
+                a = $('#LvHeadObjlist').P2BGetTableDataonSelectedRow('#LvHeadObjlist', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "LvHeadObj")', b, dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#LvHeadObjlist').val(), 200, 200, '#frmLeaveHead', '#LvHeadObjlist');
+                event.preventDefault();
+            });
+
+           
+
+        $('#Lookup-PayScaleAgreement-LeaveHead').button().on('click', function (event) {
+            alert('e');
+            $('.dialog1').P2BLookUpModal('@Url.Action("GetPayScaleAgreementLKDetails", "LeaveHead")', '', 'lookupdiv1', 'Look PayScaleAgreement Details', '#PayScaleAgreementlist', 'PayScaleAgreementlist', 5, 'PayScaleAgreementlist', 'frmLeaveHead', 'N', btndisablenames, '#Lookup_table', 'pageNavPosition1');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayScaleAgreement-LeaveHead').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PayScaleAgreement_partial", "LeaveHead")', 'Create PayScaleAgreement Details', 'open', '@Url.Action("Create", "PayScaleAgreement")', '#frmPayScaleAgreement', 'Message :', 'Request Falied :', '#JqGrid', 400, 450, '', '', '', 'frmLeaveHead', '', function (data) {
+                $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', data[0], data[1], 'PayScaleAgreementlist', '#Edit-PayScaleAgreement-LeaveHead,#Remove-PayScaleAgreement-LeaveHead', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-PayScaleAgreement-LeaveHead').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PayScaleAgreement_partial", "LeaveHead")', '@Url.Action("EditContactDetails_partial", "PayScaleAgreement")', b, '@Url.Action("EditSave", "LeaveHead")', 'Edit Contact Details', '#frmPayScaleAgreement', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 450, 'frmLeaveHead', btndisablenames, '#PayScaleAgreementlist', 'PayScaleAgreementlist', 'PayScaleAgreementlist', function (data) {
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        $('#frmPayScaleAgreement').trigger('reset');
+                        $('#EmailId').val(k.EmailId);
+                        $('#Website').val(k.Website);
+                        $('#FaxNo').val(k.FaxNo);
+                    });
+                }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PayScaleAgreement-LeaveHead').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "PayScaleAgreement")', b, dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#PayScaleAgreementlist').val(), 200, 200, '#frmLeaveHead', '#PayScaleAgreementlist');
+            event.preventDefault();
+        });
+
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+
+<style>
+    .popup-content-label {
+        width: 130px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        width: 150px;
+    }
+
+    .row1 {
+        width: 350px;
+    }
+
+    .icon-row {
+        left: -10px;
+        position: relative;
+        top: -151px;
+    }
+    .horizontal_row1, .popup_radio_button {
+        display: inline-block;
+    }
+    
+</style>
+<html>
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog1">
+        <div title="LookUp Data">
+            <div class="lookupdiv1"></div>
+        </div>
+        <div id="pageNavPosition1">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Leave Head">
+
+
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmLeavehead", name = "frmLeavehead" }))
+        {
+            //<div class="row1 content_margine">@Html.LabelFor(m => m., " Leave Name :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox" })</div>
+
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine horizontal_row1">
+            @Html.LabelFor(m => m.HFPay, " Hfpay Applicable:", new { @class = "popup-content-label" })
+            <span class="popup_radio_button">
+                    <span><input type="radio" id="radio3" name="HFPay" value="true" /> <label for="radio3">Yes</label></span>
+                    <span><input type="radio" id="radio4" name="HFPay" value="false" /> <label for="radio4">No</label></span>
+                </span>
+            </div>
+
+            <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.LTAAppl, "Lta Applicable:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button ">
+                   
+                        <span><input type="radio" id="radio5" name="LTAAppl" value="true" /> <label for="radio5">Yes</label></span>
+                        <span><input type="radio" id="radio6" name="LTAAppl" value="false" /> <label for="radio6">No</label></span>
+                </div>
+            </div>
+            <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.ApplAtt, "Att Applicable:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button ">
+                       <input type="radio" id="radio7" name="ApplAtt" value="true" /> <label for="radio7">Yes</label>
+                        <input type="radio" id="radio8" name="ApplAtt" value="false" /> <label for="radio8">No</label>
+                </div>
+            </div>
+            <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.EncashRegular, " Encash Regular:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                        <span><input type="radio" id="radio9" name="EncashRegular" value="true" /> <label for="radio9">Yes</label></span>
+                        <span><input type="radio" id="radio10" name="EncashRegular" value="false" /> <label for="radio10">No</label></span>
+                </div>
+            </div>
+
+            <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.EncashRetirement, "Encash Retirement:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                        <span><input type="radio" id="radio11" name="EncashRetirement" value="true" /> <label for="radio11">Yes</label></span>
+                        <span><input type="radio" id="radio12" name="EncashRetirement" value="false" /> <label for="radio12">No</label></span>
+                </div>
+            </div>
+
+            
+            
+            
+            <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.ESS, "Encash Retirement:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                        <span><input type="radio" id="radio13" name="ESS" value="true" /> <label for="radio13">Yes</label></span>
+                        <span><input type="radio" id="radio14" name="ESS" value="false" /> <label for="radio14">No</label></span>
+                </div>
+            </div>
+
+          
+
+        }
+
+
+    </div>
+</body>
+</html>

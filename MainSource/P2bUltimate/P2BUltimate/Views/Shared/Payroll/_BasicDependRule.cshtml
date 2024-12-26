@@ -1,0 +1,140 @@
+﻿@model Payroll.BASICDependRule
+@{
+    Layout = null;
+}
+<div>
+
+    <div class="ser_row1">
+        @Html.LabelFor(m => m.BasicScale, new { @class = "ser_popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="BasicRuleList">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+        <div class="ser_icon-row icon-row">
+            <button data-p2btooltip="Select BasicScale" class="popup-content-icon-lookup" id="Lookup-BASICRule-SalHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create BasicScale" class="popup-content-icon-create" id="Create-BASICRule-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit BasicScale" class="popup-content-icon-edit" id="Edit-BASICRule-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Remove BasicScale" class="popup-content-icon-remove" id="Remove-BASICRule-SalHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            <button data-p2btooltip="View BasicScale" class="popup-content-icon-view" id="view-BASICRule-SalHeadFormula"><span class="ui-icon ui-icon-extlink popup-content-iconmark"></span></button>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog_BasicRule">
+    <div title="LookUp Data">
+        <div class="lookupdiv_BasicRule"></div>
+    </div>
+    <div id="pageNavPosition_BasicRule">
+
+    </div>
+</div>
+<style>
+    .ser_popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .ser_icon-row {
+        position: relative;
+        left: 58px;
+        top: -150px;
+    }
+
+    .ser_row1 {
+        width: 400px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        /*ServiceRange CRUD Start*/
+        $('button').button();
+
+
+        $('#Lookup-BASICRule-SalHeadFormula').button().on('click', function (event) {
+            $('.dialog_BasicRule').P2BLookUpModal('@Url.Action("GetBasicRuleLKDetails", "BASICScale")', '', 'lookupdiv_BasicRule', 'BasicRule Look Up Data', '#BasicRuleList', 'BasicRuleList', 5, 'BasicRuleList', '#frmBASICDependRule', 'A', '', 'Lookup_table_BASAICRule', 'pageNavPosition_BASICRule');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-BASICRule-SalHeadFormula').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateBASICRule_partial", "SalHeadFormula")', 'Create BASICRule', 'open', '@Url.Action("Create", "BASICScale")', '#frmBasciScaleP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmBASICDependRule', '', function (data) {
+
+                $('#BasicRuleList').P2BLookUpEncapsulate('#BasicRuleList', 'BasicRuleList', data[0], data[1], 'BasicRuleList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Edit-BASICRule-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#BasicRuleList').P2BGetTableDataonSelectedRow('#BasicRuleList', 0);
+            b = a[0];
+            console.log(b);
+
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateBASICRule_partial", "SalHeadFormula")', '@Url.Action("Edit", "BASICScale")', b, '@Url.Action("EditSave", "BASICScale")', 'Edit BASICScale', '#frmBasicScaleP', b, 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#frmBASICDependRule', '', '#BasicRuleList', 'BasicRuleList', 'BasicRuleList', 'A', function (data) {
+                //setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmBasicScaleP').trigger('reset');
+                    $('#ScaleName').val(k.ScaleName);
+
+                });
+                $.each(data[1], function (i, k) {
+
+                    $('#BSCALEDETAILS_List').P2BLookUpEncapsulate('#BSCALEDETAILS_List', 'BSCALEDETAILS_List', k.BSDL_Id, k.BSDL_FullDetails, 'BSCALEDETAILS_List', '', 'A');
+                });
+                //}, 3000);
+
+
+            });
+        });
+
+        $('#View-BASICRule-SalHeadFormula').on('click', function (e) {
+            var a = [], b;
+            a = $('#BasicRuleList').P2BGetTableDataonSelectedRow('#BasicRuleList', 0);
+            b = a[0];
+            $('<div></div>').P2bViewPartialDialog({
+                htmurl: '@Url.Action("CreateBASICRule_partial", "SalHeadFormula")',
+                btnid: '#View-BASICRule-SalHeadFormula',
+                editurl: "@Url.Action("Edit", "BASICScale")",
+                height: 'auto',
+                width: 'auto',
+                returndatafunction: function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmBasicScaleP').trigger('reset');
+                        $('#ScaleName').val(k.ScaleName);
+
+                    });
+                    $.each(data[1], function (i, k) {
+
+                        $('#BSCALEDETAILS_List').P2BLookUpEncapsulate('#BSCALEDETAILS_List', 'BSCALEDETAILS_List', k.BSDL_Id, k.BSDL_FullDetails, 'BSCALEDETAILS_List', '', 'A');
+                    });
+
+                },
+                editdata: b,
+            });
+            e.preventDefault();
+        });
+        $('#Remove-BASICRule-SalHeadFormula').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#BasicRuleList').P2BGetTableDataonSelectedRow('#BasicRuleList', 0);
+            //b = a[0];
+            //console.log(b);
+
+            var selectedRows = [];
+            selectedRows = $('#BasicRuleList').P2BGetTableDataonSelectedRow('#BasicRuleList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#BasicRuleList', $('#BasicRuleList').val(), 200, 200, '#FormSalHeadFormula', '#BasicRuleList');
+            event.preventDefault();
+        });
+        /*ServiceRange CRUD End*/
+    });
+</script>

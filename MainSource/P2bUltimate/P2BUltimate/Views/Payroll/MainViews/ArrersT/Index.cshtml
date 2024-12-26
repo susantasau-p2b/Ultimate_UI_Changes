@@ -1,0 +1,226 @@
+﻿@{
+	ViewBag.Title = "Salaray Arrear T";
+}
+
+@model Payroll.SalaryArrearT
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+	.icon-row {
+		position: relative;
+		left: 60px;
+		top: -150px;
+	}
+
+	.emplist_row {
+		width: 303px;
+		margin: 2px;
+	}
+
+	.emplist_label {
+		display: block;
+		float: left;
+		width: 100px;
+	}
+
+	.section {
+		float: right;
+		width: 464px;
+	}
+</style>
+
+<script>
+
+
+	$(document).ready(function (e) {
+		$('button').button();
+
+		var ColNames = [];
+		var ColModel = [];
+		var SortName, Caption, url, width, height;
+		var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+		ColModel = ['Id', 'Arrearstype', 'TotalDays'];
+		ColNames = ['Id', 'Arrearstype', 'TotalDays'];
+		url = '@Url.Action("P2BGrid")';
+		width = 1000;
+		height = 150;
+		Caption = "SalaryArrearT"
+		$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+		function AssignData() {
+			dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+		}
+		$('#list-employee').P2BGridDialog();
+		$('#edit_model_dialog').P2BGridDialog();
+		$('#Create').button().on("click", function (event) {
+			$('#frmEmpList').trigger('reset');
+			$('#paymentmonth_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue")', "", "");
+			$('#arrears_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 425, "");
+			@*$('#payscaleagreement_drop').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "EmpSalStruct")', "", ""); // To bind dropdown on page load*@
+			$('#list-employee').P2BGridDialog({
+				title: "Create Dialog",
+				submiturl: "@Url.Action("create")",
+				form: "#frmEmpList",
+				height: 475,
+				width: 800,
+				state: "open",
+				gridname: "#JqGridNew",
+				gridfunction: "GetGridSelctedvalue",
+			});
+			$.AdvanceFilterFunction();
+			event.preventDefault();
+		});
+
+
+
+
+		$('#Edit').on('click', function (e) {
+			AssignData();
+
+			$('#edit_model_dialog').P2BGridDialog({
+				title: "Edit Dialog",
+				submiturl: "@Url.Action("process")",
+				form: "#frmeditinlinegrid",
+				height: 400,
+				width: 900,
+				gridname: "#JqGrid",
+				state: "open",
+				editurl: "@Url.Action("P2BInlineGrid")",
+				editdata: dt.Id,
+				returnToGrid: "#inline_JqGrid",
+
+			});
+		});
+
+
+		$('#View').on('click', function (e) {
+			AssignData();
+
+			$('#edit_model_dialog').P2BGridDialog({
+				title: "Edit Dialog",
+				submiturl: "@Url.Action("process")",
+				form: "#frmeditinlinegrid",
+				height: 400,
+				width: 900,
+				gridname: "#JqGrid",
+				state: "open",
+				editurl: "@Url.Action("P2BInlineGrid")",
+				editdata: dt.Id,
+				returnToGrid: "#inline_JqGrid",
+			});
+
+		});
+		$('button').button();
+		$('.drop').selectmenu().selectmenu('menuWidget');
+	});
+
+
+
+</script>
+
+<div class="Form_Bg">
+	<div class="Form_Input">
+		<div class="Button_Container">
+			<button class="button" id="Create">Create</button>
+			<button class="button" id="View">View</button>
+			<button class="button" id="Edit">Edit</button>
+			<button class="button" id="Delete">Delete</button>
+			<button class="button" id="Autho">Authorised</button>
+			<div id="Grid_Form">
+				<div>
+					<table id="JqGrid"></table>
+					<div id="pager2"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dialog">
+	<div title="LookUp Data">
+		<div class="LookupDiv"></div>
+	</div>
+	<div id="PageNavPosition">
+
+	</div>
+</div>
+<div id="list-employee">
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+	{
+		<fieldset style="border: 0.1px; border-color: #d1d1d1b3; border-style: solid;width:100%;">
+			<legend id="first">
+				<a data-p2bheadertooltip="Collapse">
+					<i class="fa fa-angle-double-right fa-fw " style="cursor:pointer" aria-hidden="true"></i>&nbsp;Filter&nbsp;
+				</a>
+				<input type="checkbox" id="apply_geo_filter" disabled />
+			</legend>
+			<div id="filter_stick_div"></div>
+		</fieldset>
+		<div class="emplist_row">
+			<label for="paymentmonth_drop" class="emplist_label">Payment Month :</label>
+			<select id="paymentmonth_drop" name="paymentmonth_drop" class="drop" style="width:200px;"><option value="0">-Select-</option></select>
+		</div>
+		<div class="emplist_row">
+			<label for="arrears_drop" class="emplist_label">Arrears Type :</label>
+            <select id="arrears_drop" name="arrears_drop" class="drop must" style="width:200px;"><option value="0">-Select-</option></select>
+		</div>
+		<div class="emplist_row">
+			<label for="arrears_drop" class="emplist_label">Employee List :</label>
+			<div class="transactiondiv dynamic" style="float:left">
+				<div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+				<table cellspacing="0" cellpadding="1" class="transactiontable" id="Employee-Table">
+					<tr><th><input type="checkbox" id="case-department" /></th><th>Employee</th></tr>
+				</table>
+				<span class="btn-span1" aria-hidden="true">
+					<button id="load_emp" class="loan-btn">Load Employee</button>
+				</span>
+			</div>
+			<input name="geo_id" id="geo_id" style="display:none" />
+			<input name="pay_id" id="pay_id" style="display:none" />
+			<input name="fun_id" id="fun_id" style="display:none" />
+		</div>
+		<div class="section">
+			<div class="emplist_row">
+				<label for="arrears_drop" class="emplist_label">From Date :</label>
+				<input type="text" />
+			</div>
+			<div class="emplist_row">
+				<label for="arrears_drop" class="emplist_label">To Date :</label>
+				<input type="text" />
+			</div>
+			<div class="emplist_row">
+				<label for="arrears_drop" class="emplist_label">Total Days :</label>
+				<input type="text" />
+			</div>
+		</div>
+
+		<div class="emplist_row">
+			<div id="Grid_Form2">
+				<div>
+					<table id="JqGridNew"></table>
+					<div id="pager22"></div>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+<div id="edit_model_dialog">
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+	{
+		<div class="emplist_row">
+			<label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+			<input type="text" style="display:none" id="payscaleagreement_id" name="payscaleagreement_id" />
+			<input type="text" id="payscaleagreement" name="payscaleagreement" />
+		</div>
+		<div class="emplist_row">
+			<label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date" />
+		</div>
+		<div>
+			<table id="inline_JqGrid"></table>
+			<div id="inline_pager"></div>
+		</div>
+	}
+</div>

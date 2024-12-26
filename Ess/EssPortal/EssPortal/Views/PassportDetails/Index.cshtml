@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "Passport Details";
+}
+@model P2b.Global.PassportDetails
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form_bg">
+        <div class="form_input">
+            <div class="button_container">
+                <button class="button" id="create">Create</button>
+                <button class="button" id="view">View</button>
+                <button class="button" id="edit">Edit</button>
+                <button class="button" id="delete">Delete</button>
+                <button class="button" id="autho">Authorised</button>
+                <div id="grid_form">
+                    <div>
+                        <table id="jqgrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="create_dialog" title="Create Hobby">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPassportDetails", name = "frmPassportDetails" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+    <div id="create_dialog">
+        <div class="row1 content_margine ">@Html.LabelFor(m => m.PassportNo, "Passport No. :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PassportNo, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+        <div class="row1 content_margine ">@Html.LabelFor(m => m.IssuePlace, "Place Of Issue :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.IssuePlace, new { @class = "popup-content-textbox must", @maxlength = "50" })</div>
+        <div class="row1 content_margine ">@Html.LabelFor(m => m.IssueDate, "Date of Issue :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.IssueDate, new { @class = "popup-content-textbox", @id = "IssueDate" })</div>
+        <div class="row1 content_margine ">@Html.LabelFor(m => m.ExpiryDate, "Date of Expiry :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.ExpiryDate, new { @class = "popup-content-textbox", @id = "ExpiryDate" })</div>
+    </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(function (e) {
+        $('button').button();
+        $('#IssueDate,#ExpiryDate').P2BDatePicker();
+        $('#IssueDate,#ExpiryDate').attr('readonly', 'readonly');
+
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColNames = ['Id'];
+        ColModel = ['Id'];
+        SortName = 'Id';
+        Caption = 'Hobby';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        $('#create_dialog').P2BCreateDialog();
+        $('#create').on("click", function (event) {
+            $('#frmPassportDetails').trigger("reset");
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create Passport Details', 'open', '@Url.Action("Create")', '#frmPassportDetails', 'Message :', 'Request Falied :', '#jqgrid', 500, 620, '', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+
+        $('#delete').button().click(function (event) {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            $('#create_dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#jqgrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#edit').on("click", function () {
+            AssignData();
+            $('#create_dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmPassportDetails', dt.Id, 'Message : ', 'Request Falied :', '#jqgrid', 500, 620, '', btndisablenames, function (data) {
+                alert('test');
+                $.each(data[0], function (i, k) {
+               
+                    $('#frmPassportDetails').trigger("reset");
+                    alert(k.PassportNo);
+                    $('#PassportNo').val(k.PassportNo);
+                    $('#IssuePlace').val(k.IssuePlace);
+                    $('#IssueDate').val(DateConvert(k.IssueDate));
+                    $('#ExpiryDate').val(DateConvert(k.ExpiryDate));
+                });
+                $('#autho_allow').val(data[1]);
+            });
+        });
+
+
+
+
+
+
+    });
+
+
+
+</script>
+

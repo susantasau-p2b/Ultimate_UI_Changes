@@ -1,0 +1,785 @@
+﻿@{
+    ViewBag.Title = "Timing Policy";
+}
+@model Attendance.TimingPolicy
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 180px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 500px;
+        }
+
+        .row4 {
+            padding: 0px 0 5px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .tblmargin {
+            margin-left: 177px;
+            margin-top: 6px;
+        }
+
+        .xdsoft_datetimepicker .xdsoft_timepicker {
+            width: 83px;
+            float: left;
+            text-align: center;
+            margin-left: 8px;
+            margin-top: 0;
+        }
+
+        .xdsoft_prev {
+            margin-left: 25px;
+        }
+
+        .custome_ul {
+            padding: 0 0 0 15px;
+        }
+
+        .custome_li {
+            list-style: disc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create TimingPolicy">
+        
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTimingPolicy", name = "frmTimingPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TimingCode, "Timing Code :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.TimingCode, new { @class = "popup-content-textbox must", @id = "TimingCode", @maxlength = "10" })
+                <label style="float:left;color:#339389;" class="content_margine">
+                    Note : For Global policy Creation ,Put "_Global" in timing code
+                    Exp : For Employee In Time 8 ,Then timing code for there policy will be "08:00_Global"
+                </label>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TimingPolicyDesc, "Policy Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.TimingPolicyDesc, new { @class = "popup-content-textbox must", @id = "PolicyName", @maxlength = "50" })
+            </div>
+            <div class="section1">
+                <div class="heading">In Time Policy</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.InTime, "In Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.InTime, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.InTimeSpan, "In Time Span :", new { @class = "popup-content-label must" })
+                    <input  class="popup-content-textbox defult-time" id="InTimeSpan" name="InTimeSpan" />
+                    @*@Html.TextBoxFor(m => m.InTimeSpan, new { @class = "popup-content-textbox" ,@type = "time" })*@
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.InTimeStart, "In Time Start :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.InTimeStart, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceNoAction, "Grace No Action :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceNoAction, new { @class = "popup-content-textbox defult-time" })
+
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLateAction, "Grace IN Late Action :", new { @class = "popup-content-label" })
+                    @Html.TextBoxFor(m => m.GraceLateAction, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LateCount, "Late Count :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.LateCount, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LateAction, "Late Action:", new { @class = "popup-content-label " })
+                    <select id="LateActionlist" name="LateActionlist" style="width:120px;"></select>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsLateCountInit, "Is Late Count Initialize :", new { @class = "popup-content-label must " })
+                    <div class="popup_radio_button ">
+                        @Html.RadioButtonFor(m => m.IsLateCountInit, "true", new { type = "radio", @id = "radio9" })
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio9" })
+                        @Html.RadioButtonFor(m => m.IsLateCountInit, "false", new { type = "radio", @id = "radio10" })
+                        @Html.Label("No", new { @class = "ui-corner-right", @for = "radio10" })
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="section2">
+                <div class="heading">Out Time Policy</div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.OutTime, "Out Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.OutTime, new { @class = "popup-content-textbox defult-time", @type = "text" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.OutTimeSpanTime, "Out Time Span Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.OutTimeSpanTime, new { @class = "popup-content-textbox defult-time" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceEarlyAction, "Grace Out Early Action :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceEarlyAction, new { @class = "popup-content-textbox defult-time" })
+                </div>
+           
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.EarlyCount, "Early Count :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.EarlyCount, new { @class = "popup-content-textbox must" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.EarlyAction, "Early Action :", new { @class = "popup-content-label " })
+                    <select id="EarlyAction-drop" name="EarlyActionList" style="width:120px;"></select>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsEarlyCountInit, "Is Early Count Initialize :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button ">
+                        @Html.RadioButtonFor(m => m.IsEarlyCountInit, "true", new { type = "radio", @id = "radio13" })
+
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio13" })
+                        @Html.RadioButtonFor(m => m.IsEarlyCountInit, "false", new { type = "radio", @id = "radio14" })
+                        @Html.Label("No", new { @class = "ui-corner-right", @for = "radio14" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="section3">
+                <div class="heading">Lunch Policy</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LunchStartTime, "Lunch Start Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.LunchStartTime, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LunchEndTime, "Lunch End Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.LunchEndTime, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLunchEarly, "Grace Lunch Early Time :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceLunchEarly, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLunchEarlyCount, "Grace Lunch EarlyCount :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceLunchEarlyCount, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LunchEarlyAction, "Lunch Early Action :", new { @class = "popup-content-label" })
+                    <select id="LunchEarlyActionList" name="LunchEarlyActionList" style="width:120px;"></select>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLunchLateAction, "Grace Lunch Late Action :", new { @class = "popup-content-label" })
+                    <select id="GraceLunchLateActionList" name="GraceLunchLateActionList" style="width:120px;"></select>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLunchLate, "Grace Lunch Late :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceLunchLate, new { @class = "popup-content-textbox defult-time" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.GraceLunchLateCount, "Grace Lunch Late Count :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.GraceLunchLateCount, new { @class = "popup-content-textbox must" })
+                </div>
+            </div>
+            <div class="section3">
+                <div class="heading">Missing Policy</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.MissingEntryMarker, "Missing Entry Marker :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.MissingEntryMarker, new { @class = "popup-content-textbox defult-time" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TimingType, "Timing Type :", new { @class = "popup-content-label" })
+                    <select id="TimingTypeList" name="TimingTypeList" style="width:120px;"></select>
+                </div>
+            </div>
+            <div class="section3">
+
+                <div class="heading">Working Hours</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.WorkingHrs, "Working Hours :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.WorkingHrs, new { @class = "popup-content-textbox defult-time" })
+                </div>
+            </div>
+            <div class="section3">
+                <div class="heading">Flexible Policy</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FlexiDailyTiming, "Flexi Daily Timing :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button  ">
+                        @Html.RadioButtonFor(m => m.FlexiDailyTiming, "true", new { type = "radio", @id = "radio15" })
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio15" })
+                        @Html.RadioButtonFor(m => m.FlexiDailyTiming, "false", new { type = "radio", @id = "radio16" })
+                        @Html.Label("No", new { @class = "ui-corner-right", @for = "radio16" })
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FlexiWeeklyTiming, "Flexi Weekly Timing :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button">
+                        @Html.RadioButtonFor(m => m.FlexiWeeklyTiming, "true", new { type = "radio", @id = "radio17" })
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio17" })
+                        @Html.RadioButtonFor(m => m.FlexiWeeklyTiming, "false", new { type = "radio", @id = "radio18" })
+                        @Html.Label("No", new { @class = "ui-corner-right", @for = "radio18" })
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FlexiDailyHours, "Flexi Daily Hours :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.FlexiDailyHours, new { @class = "popup-content-textbox must" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FlexiWeeklyHours, "Flexi Weekly Hours :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.FlexiWeeklyHours, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FlexiAction, "Flexi Action :", new { @class = "popup-content-label" })
+                    <select id="FlexiActionList" name="FlexiActionList" style="width:120px;"></select>
+                </div>
+            </div>
+            <div class="section3">
+
+                <div class="heading">Employee Timing Policy </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsEmpTiming, "Employee Time Applicable :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button ">
+                        @Html.RadioButtonFor(m => m.IsEmpTiming, "true", new { type = "radio", @id = "radio19" })
+                        @Html.Label("Yes", new { @class = "ui-corner-left", @for = "radio19" })
+                        @Html.RadioButtonFor(m => m.IsEmpTiming, "false", new { type = "radio", @id = "radio20" })
+                        @Html.Label("No", new { @class = "ui-corner-right", @for = "radio20" })
+                    </div>
+                </div>
+                @*<div class="row3 content_margine">
+                    <div id="TimingGrouplist_old"></div>
+                    @Html.LabelFor(m => m.TimingGroup, "Timing Group :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected tblmargin" id="TimingGrouplist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup TimingGroup-TimingPolicy" class="  popup-content-icon-lookup" id="Lookup-TimingGroup-TimingPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create TimingGroup-TimingPolicy" class="  popup-content-icon-create" id="Create-TimingGroup-TimingPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit TimingGroup-TimingPolicy" class="  popup-content-icon-edit" id="Edit-TimingGroup-TimingPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove TimingGroup-TimingPolicy" class="  popup-content-icon-remove" id="Remove-TimingGroup-TimingPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('#TimingCode').MaxLength(10);
+        $('#PolicyName').MaxLength(50);
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Code', 'Name', 'InTime', 'OutTime', 'Id'];
+        ColNames = [ 'Code', 'Name', 'InTime', 'OutTime', 'Id'];
+        SortName = 'Id';
+        Caption = 'Timing Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        //$("#InTime").datepicker({
+        //    altFormat: "yy-mm-dd"
+        //});
+        //  $('#InTime').P2BTimePicker();
+        //  $('#InTime').P2BTimePicker();
+        //$('#InTimeSpan').P2BTimePicker();
+        //$('#InTimeStart').P2BTimePicker();
+        //$('#LunchEndTime').P2BTimePicker();
+        //$('#LunchStartTime').P2BTimePicker();
+        //$('#WorkingHrs').P2BTimePicker();
+        //$('#MissingEntryMarker').P2BTimePicker();
+        //$('#OutTime').P2BTimePicker();
+        //$('#OutTimeSpanTime').P2BTimePicker();
+        ////  $('#WorkingHrs').P2BTimePicker();
+        //$('#GraceEarlyAction').P2BTimePicker();
+        //$('#GraceLateAction').P2BTimePicker();
+        //$('#GraceLunchEarly').P2BTimePicker();
+        //$('#GraceLunchEarlyCount').P2BTimePicker();
+        //$('#GraceLunchLate').P2BTimePicker();
+        //$('#GraceLunchLateCount').P2BTimePicker();
+        //$('#GraceNoAction').P2BTimePicker();
+
+
+        $('#LateCount').ForceAmount().MaxLength(8);
+        $('#EarlyCount').ForceAmount().MaxLength(8);
+        $('#FlexiDailyHours').ForceAmount().MaxLength(8);
+        $('#FlexiWeeklyHours').ForceAmount().MaxLength(8);
+
+        $('#TimingCode').ValidateTextBox({ maxlength: 12 });
+
+        $('#TimingPolicyDesc').ValidateTextBox({ maxlength: 50 });
+
+        //function DateConvert(JsonDate) {
+        //    var date = new Date(parseInt(JsonDate.substr(6)));
+        //    var displayDate = $.datetimepicker.formatDate("hh:mm", date);
+        //    return displayDate;
+        //};
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+
+
+            time = date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+            // var displayDate = $.datetimepicker.formatDate("hh:mm", time);
+            return time;
+
+
+
+        };
+        $('.defult-time').P2BTimePicker();
+        $('#OutTime').focusout(function () {
+            var x = document.getElementById("InTime").value;
+            var y = document.getElementById("OutTime").value;
+            console.log(x);
+            if ($('#InTime').val()) {
+                $.ajax({
+                    url: "@Url.Action("DiffBitDate")",
+                    data: { Start_Date: x, End_Date: y },
+                    success: function (data) {
+                        console.log(data);
+                        $('#WorkingHrs').val(data);
+                    }
+                });
+                // var a = new Date($('#InTime').val()).getHours();
+                //console.log(a);
+            }
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmTimingPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Timing Policy', 'open', '@Url.Action("Create")', '#frmTimingPolicy', 'Message :', 'Request Falied :', '#JqGrid', 500, 660, '', "", function (data) { });
+            $('.defult-time').val("00:00");
+
+            $('#LateCount').val("0");
+            $('#EarlyCount').val("0");
+            $('#GraceLunchEarlyCount').val("0");
+            $('#GraceLunchLateCount').val("0");
+            $('#FlexiDailyHours').val("0");
+            $('#FlexiWeeklyHours').val("0");
+            //$('#InTime').attr('readonly', 'readonly');
+            //$('#InTimeSpan').attr('readonly', 'readonly');
+            //$('#InTimeStart').attr('readonly', 'readonly');
+            //$('#LunchEndTime').attr('readonly', 'readonly');
+            //$('#LunchStartTime').attr('readonly', 'readonly');
+            //$('#WorkingHrs').attr('readonly', 'readonly');
+            //$('#MissingEntryMarker').attr('readonly', 'readonly');
+            //$('#OutTime').attr('readonly', 'readonly');
+            //$('#OutTimeSpanTime').attr('readonly', 'readonly');
+            ////  $('#WorkingHrs').attr('readonly', 'readonly');
+            //$('#GraceEarlyAction').attr('readonly', 'readonly');
+            //$('#GraceLateAction').attr('readonly', 'readonly');
+            //$('#GraceLunchEarly').attr('readonly', 'readonly');
+            //$('#GraceLunchEarlyCount').attr('readonly', 'readonly');
+            //$('#GraceLunchLate').attr('readonly', 'readonly');
+            //$('#GraceLunchLateCount').attr('readonly', 'readonly');
+            //$('#GraceNoAction').attr('readonly', 'readonly');
+
+            $('#EarlyAction-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, ""); // To bind dropdown on page load
+            $('#LunchEarlyActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, ""); // To bind dropdown on page load
+            $('#LateActionlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, "");
+            $('#FlexiActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, "");
+            $('#TimingTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1003, "");
+            $('#GraceLunchLateActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, "");
+
+
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit TimingPolicy Data", '#frmTimingPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 660, '', btndisablenames, function (data) {
+                // setTimeout(function () {
+
+                //$('#InTime').attr('readonly', 'readonly');
+                //$('#InTimeSpan').attr('readonly', 'readonly');
+                //$('#InTimeStart').attr('readonly', 'readonly');
+                //$('#LunchEndTime').attr('readonly', 'readonly');
+                //$('#LunchStartTime').attr('readonly', 'readonly');
+                //$('#WorkingHrs').attr('readonly', 'readonly');
+                //$('#MissingEntryMarker').attr('readonly', 'readonly');
+                //$('#OutTime').attr('readonly', 'readonly');
+                //$('#OutTimeSpanTime').attr('readonly', 'readonly');
+                ////  $('#WorkingHrs').attr('readonly', 'readonly');
+                //$('#GraceEarlyAction').attr('readonly', 'readonly');
+                //$('#GraceLateAction').attr('readonly', 'readonly');
+                //$('#GraceLunchEarly').attr('readonly', 'readonly');
+                //$('#GraceLunchEarlyCount').attr('readonly', 'readonly');
+                //$('#GraceLunchLate').attr('readonly', 'readonly');
+                //$('#GraceLunchLateCount').attr('readonly', 'readonly');
+                //$('#GraceNoAction').attr('readonly', 'readonly');
+
+                //  $.each(data[0], function (i, k) {
+                var k = data[0];
+                $('#frmTimingPolicy').trigger('reset');
+                $('#TimingPolicyDesc').val(k.TimingPolicyDesc);
+                $('#TimingCode').val(k.TimingCode);
+                $('#TimingCode').attr('readonly', 'readonly');
+                if (k.InTimeSpan != null) {
+                    $('#InTimeSpan').val(k.InTimeSpan);
+                }
+
+                //    $('#InTimeSpan').val(k.InTimeSpan);
+                if (k.InTimeStart != null) {
+                    $('#InTimeStart').val(k.InTimeStart);
+                }
+                //    $('#InTimeStart').val( k.InTimeStart);
+                //$('#InTime').val(k.InTime);
+
+                if (k.InTime != null) {
+                    $('#InTime').val(k.InTime);
+                }
+                if (k.GraceNoAction != null) {
+                    $('#GraceNoAction').val(k.GraceNoAction);
+                }
+                if (k.OutTime != null) {
+                    $('#OutTime').val(k.OutTime);
+                }
+                if (k.OutTimeSpanTime != null) {
+                    $('#OutTimeSpanTime').val(k.OutTimeSpanTime);
+                }
+                if (k.GraceEarlyAction != null) {
+                    $('#GraceEarlyAction').val(k.GraceEarlyAction);
+                }
+                if (k.LunchStartTime != null) {
+                    // $('#LunchStartTime').val( k.LunchStartTime);
+                    $('#LunchStartTime').val(k.LunchStartTime);
+                }
+                if (k.WorkingHrs != null) {
+                    $('#WorkingHrs').val(k.WorkingHrs);
+                }
+                if (k.GraceLunchEarlyCount != null) {
+                    $('#GraceLunchEarlyCount').val(k.GraceLunchEarlyCount);
+                }
+
+                if (k.LunchEndTime != null) {
+                    $('#LunchEndTime').val(k.LunchEndTime);
+                }
+                if (k.GraceLunchEarly != null) {
+                    $('#GraceLunchEarly').val(k.GraceLunchEarly);
+                }
+                if (k.GraceLunchLate != null) {
+                    $('#GraceLunchLate').val(k.GraceLunchLate);
+                }
+                if (k.GraceLunchLateCount != null) {
+                    $('#GraceLunchLateCount').val(k.GraceLunchLateCount);
+                }
+                if (k.GraceLateAction != null) {
+                    $('#GraceLateAction').val(k.GraceLateAction);
+                }
+                if (k.MissingEntryMarker != null) {
+                    $('#MissingEntryMarker').val(k.MissingEntryMarker);
+                }
+                $('#LateCount').val(k.LateCount);
+                $('#EarlyCount').val(k.EarlyCount);
+                $('#TimingType').val(k.TimingType);
+                $('#FlexiDailyHours').val(k.FlexiDailyHours);
+                $('#FlexiWeeklyHours').val(k.FlexiWeeklyHours);
+                //alert(k.FlexiDailyHours);
+
+                //    $('#MissingEntryMarker').val(k.MissingEntryMarker);
+                $('[name="IsLateCountInit"]').val([k.IsLateCountInit]).button().button("refresh");
+                $('[name="IsEarlyCountInit"]').val([k.IsEarlyCountInit]).button().button("refresh");
+                $('[name="IsEmpTiming"]').val([k.IsEmpTiming]).button().button("refresh");
+                $('[name="FlexiWeeklyTiming"]').val([k.FlexiWeeklyTiming]).button().button("refresh");
+                $('[name="FlexiDailyTiming"]').val([k.FlexiDailyTiming]).button().button("refresh");
+                $('#EarlyAction-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.EarlyAction_Id); // To bind dropdown on page load
+                $('#LunchEarlyActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.LunchEarlyAction_Id); // To bind dropdown on page load
+                $('#LateActionlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.LateAction_Id);
+                $('#FlexiActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.FlexiAction_Id);
+                //console.log(k.TimingType_Id);
+                $('#TimingTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1003, k.TimingType_Id);
+                $('#GraceLunchLateActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.GraceLunchLateAction_Id);
+
+                // });
+
+                //partial page bind
+                //$.each(data[1], function (i, k) {
+                //    $('#TimingGrouplist').P2BLookUpEncapsulate('#TimingGrouplist', 'TimingGrouplist', k.Group_Id, k.GropDetails, 'TimingGrouplist', '#Create-TimingGroup-TimingPolicy,#Remove-TimingGroup-TimingPolicy', 'A');
+
+                //});
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Timing Policy Data', '#TimingGrouplist', '#Lookup-TimingGroup-TimingPolicy,#Create-TimingGroup-TimingPolicy,#Edit-TimingGroup-TimingPolicy,#Remove-TimingGroup-TimingPolicy', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                // setTimeout(function () {
+
+                //$('#InTime').attr('readonly', 'readonly');
+                //$('#InTimeSpan').attr('readonly', 'readonly');
+                //$('#InTimeStart').attr('readonly', 'readonly');
+                //$('#LunchEndTime').attr('readonly', 'readonly');
+                //$('#LunchStartTime').attr('readonly', 'readonly');
+                //$('#WorkingHrs').attr('readonly', 'readonly');
+                //$('#MissingEntryMarker').attr('readonly', 'readonly');
+                //$('#OutTime').attr('readonly', 'readonly');
+                //$('#OutTimeSpanTime').attr('readonly', 'readonly');
+                ////  $('#WorkingHrs').attr('readonly', 'readonly');
+                //$('#GraceEarlyAction').attr('readonly', 'readonly');
+                //$('#GraceLateAction').attr('readonly', 'readonly');
+                //$('#GraceLunchEarly').attr('readonly', 'readonly');
+                //$('#GraceLunchEarlyCount').attr('readonly', 'readonly');
+                //$('#GraceLunchLate').attr('readonly', 'readonly');
+                //$('#GraceLunchLateCount').attr('readonly', 'readonly');
+                //$('#GraceNoAction').attr('readonly', 'readonly');
+
+                //  $.each(data[0], function (i, k) {
+                var k = data[0];
+                $('#frmTimingPolicy').trigger('reset');
+                $('#TimingPolicyDesc').val(k.TimingPolicyDesc);
+                $('#TimingCode').val(k.TimingCode);
+               
+                if (k.InTimeSpan != null) {
+                    $('#InTimeSpan').val(k.InTimeSpan);
+                }
+
+                //    $('#InTimeSpan').val(k.InTimeSpan);
+                if (k.InTimeStart != null) {
+                    $('#InTimeStart').val(k.InTimeStart);
+                }
+                //    $('#InTimeStart').val( k.InTimeStart);
+                //$('#InTime').val(k.InTime);
+
+                if (k.InTime != null) {
+                    $('#InTime').val(k.InTime);
+                }
+                if (k.GraceNoAction != null) {
+                    $('#GraceNoAction').val(k.GraceNoAction);
+                }
+                if (k.OutTime != null) {
+                    $('#OutTime').val(k.OutTime);
+                }
+                if (k.OutTimeSpanTime != null) {
+                    $('#OutTimeSpanTime').val(k.OutTimeSpanTime);
+                }
+                if (k.GraceEarlyAction != null) {
+                    $('#GraceEarlyAction').val(k.GraceEarlyAction);
+                }
+                if (k.LunchStartTime != null) {
+                    // $('#LunchStartTime').val( k.LunchStartTime);
+                    $('#LunchStartTime').val(k.LunchStartTime);
+                }
+                if (k.WorkingHrs != null) {
+                    $('#WorkingHrs').val(k.WorkingHrs);
+                }
+                if (k.GraceLunchEarlyCount != null) {
+                    $('#GraceLunchEarlyCount').val(k.GraceLunchEarlyCount);
+                }
+
+                if (k.LunchEndTime != null) {
+                    $('#LunchEndTime').val(k.LunchEndTime);
+                }
+                if (k.GraceLunchEarly != null) {
+                    $('#GraceLunchEarly').val(k.GraceLunchEarly);
+                }
+                if (k.GraceLunchLate != null) {
+                    $('#GraceLunchLate').val(k.GraceLunchLate);
+                }
+                if (k.GraceLunchLateCount != null) {
+                    $('#GraceLunchLateCount').val(k.GraceLunchLateCount);
+                }
+                if (k.GraceLateAction != null) {
+                    $('#GraceLateAction').val(k.GraceLateAction);
+                }
+                if (k.MissingEntryMarker != null) {
+                    $('#MissingEntryMarker').val(k.MissingEntryMarker);
+                }
+                $('#LateCount').val(k.LateCount);
+                $('#EarlyCount').val(k.EarlyCount);
+                $('#TimingType').val(k.TimingType);
+                $('#FlexiDailyHours').val(k.FlexiDailyHours);
+                $('#FlexiWeeklyHours').val(k.FlexiWeeklyHours);
+              //alert(k.FlexiDailyHours);
+
+                //    $('#MissingEntryMarker').val(k.MissingEntryMarker);
+                $('[name="IsLateCountInit"]').val([k.IsLateCountInit]).button().button("refresh");
+                $('[name="IsEarlyCountInit"]').val([k.IsEarlyCountInit]).button().button("refresh");
+                $('[name="IsEmpTiming"]').val([k.IsEmpTiming]).button().button("refresh");
+                $('[name="FlexiWeeklyTiming"]').val([k.FlexiWeeklyTiming]).button().button("refresh");
+                $('[name="FlexiDailyTiming"]').val([k.FlexiDailyTiming]).button().button("refresh");
+                $('#EarlyAction-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.EarlyAction_Id); // To bind dropdown on page load
+                $('#LunchEarlyActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.LunchEarlyAction_Id); // To bind dropdown on page load
+                $('#LateActionlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.LateAction_Id);
+                $('#FlexiActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.FlexiAction_Id);
+                //console.log(k.TimingType_Id);
+                $('#TimingTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1003, k.TimingType_Id);
+                $('#GraceLunchLateActionList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 612, k.GraceLunchLateAction_Id);
+
+                // });
+
+                //partial page bind
+                //$.each(data[1], function (i, k) {
+                //    $('#TimingGrouplist').P2BLookUpEncapsulate('#TimingGrouplist', 'TimingGrouplist', k.Group_Id, k.GropDetails, 'TimingGrouplist', 'view', 'A');
+
+                //});
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+        /* Address button click*/
+
+        //To get data in Lookup
+        $('#Lookup-TimingGroup-TimingPolicy').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingGrpDetails", "TimingPolicy")', '', 'LookupDiv', 'Look Timing Monthly Roaster', '#TimingGrouplist', 'TimingGrouplist', 5, 'TimingGrouplist', '#frmTimingPolicy', 'N', btndisablenames, '#Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingGroup-TimingPolicy').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TimingGroup")', 'Create Dialog', 'open', '@Url.Action("Create", "TimingGroup")', '#frmTimingGroup1', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTimingPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#TimingGrouplist').P2BLookUpEncapsulate('#TimingGrouplist', 'TimingGrouplist', data[0], data[1], 'TimingGrouplist', '#Edit-TimingGroup-TimingPolicy,#remove - TimingGroup - TimingPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-TimingGroup-TimingPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TimingGrouplist').P2BGetTableDataonSelectedRow('#TimingGrouplist', 0);
+            b = a[0];
+            console.log(b);
+
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TimingGroup")', '@Url.Action("edit", "TimingGroup")', b, '@Url.Action("EditSave", "TimingGroup")', 'Edit TimingGroup', '#frmTimingGroup1', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTimingPolicy', '#TimingGrouplist', 'TimingGrouplist', 'TimingGrouplist', 'N', '#Remove-TimingGroup-TimingPolicy,#Edit-TimingGroup-TimingPolicy', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#frmTimingGroup1').trigger('reset');
+                    $('#GroupName').val(k.GroupName);
+                    $('#GroupCode').val(k.GroupCode);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('[name="IsAutoShift"]').val([k.IsAutoShift]).button().button("refresh");
+                    $('[name="IsManualRotateShift"]').val([k.IsManualRotateShift]).button().button("refresh");
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    // $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                    //$('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', k.TimingGroup_Id, k.TimingGroup_FullDetails, 'TimingGroupList', '#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', 'N');
+                    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.TimingPolicy_Id, k.TimingPolicy_FullDetails, 'TimingPolicylist', '', 'N');
+                });
+
+            });
+            event.preventDefault();
+        });
+
+
+        //partial page delete
+        $('#Remove-TimingGroup-TimingPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TimingGrouplist').P2BGetTableDataonSelectedRow('#TimingGrouplist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#TimingGrouplist').P2BGetTableDataonSelectedRow('#TimingGrouplist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingGrouplist', $('#TimingGrouplist').val(), 200, 200, '#frmTimingPolicy', '#TimingGrouplist', '#Edit-TimingGroup-TimingPolicy,#Remove-TimingGroup-TimingPolicy');
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#EarlyAction-drop').selectmenu().selectmenu("menuWidget");
+        $('#LateActionlist').selectmenu().selectmenu("menuWidget");
+        $('#FlexiActionList').selectmenu().selectmenu("menuWidget");
+        $('#TimingTypeList').selectmenu().selectmenu("menuWidget");
+        $('#GraceLunchLateActionList').selectmenu().selectmenu("menuWidget");
+
+        $('#LunchEarlyActionList').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

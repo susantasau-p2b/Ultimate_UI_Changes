@@ -1,0 +1,563 @@
+﻿@{
+    Layout = null;
+}
+@model Attendance.EmpTimingRoasterData
+
+<style>
+    #lvdata {
+        float: right;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 122px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        /*! width: 600px; */
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 250px;
+        display: inline-block;
+        /*! margin-left: -89px; */
+        position: absolute;
+        left: 191px;
+        top: 137px;
+    }
+
+    .loader {
+        width: 299px;
+        /*! display: inline-flex; */
+        /*! margin-left: -89px; */
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 29px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        /*! margin: 0 auto; */
+        width: 379px;
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*! width: 507px; */
+        border-radius: 5px;
+        height: 100%;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: left;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        /*! width: 511px; */
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 502px;
+        width: 42.5%;
+        /*! margin: 5px 4px; */
+        position: absolute;
+        left: 401px;
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        /*! height: 502px; */
+        width: 292px;
+        /*! margin: 5px 4px; */
+        /*! position: absolute; */
+        /*! left: 842px; */
+        /*! top: 91px; */
+        float: right;
+    }
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 100%;
+        font-size:10PX;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    .weeklyoffclass {
+        background-color: #e8fefa;
+    }
+
+    .holidayclass {
+        background-color: #e8f3f1;
+    }
+
+    #case-employee{
+        pointer-events:none;
+    }
+    
+    
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        
+       
+        $('#Comments').selectmenu().selectmenu('menuWidget');
+        $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', 'Appraisal/Get_Employelist?geo_id=', "", "");
+        
+        // $('#create_dialog1').P2BCreateDialog();
+        @*$('#create').on("click", function (event) {
+            $('#frmEmpTimingMonthlyRoaster').trigger("reset");
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create EmpTimingMonthlyRoaster', 'open', '@Url.Action("Create","EmpTimingRoasterTiming")', '#frmEmpTimingMonthlyRoaster', 'Message :', 'Request Falied :', '#jqgrid', 500, 1200, '#TimingMonthlyRoasterlist', "", function (data) { });
+            //     $('#DayTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 203, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });*@
+        $('#InTime').P2BTimePicker();
+        $('.popup_radio_button').buttonset();
+        $('.defult-time').P2BTimePicker();
+        $('.date').MonthYearPicker();
+        $('#DayTypelist').selectmenu().selectmenu("menuWidget");
+        $('#employee-table').on('click', 'input:checkbox:gt(0)', function (e) {
+           
+            $('input:checkbox').not(this).prop('checked', false);
+            if (this.checked) {
+                $('#Emp_id').val($(this).val());
+            } else {
+                $('#Emp_id').val("");
+
+            }
+            
+        });
+        var id; var getdropdownval = "";
+        $('#employee-table').on('click', 'input:checkbox:gt(0)', function (e) {
+            getdropdownval = "";
+            if (this.checked) {
+                 id = $(this).val();
+                
+                $.ajax({
+                    url: "@Url.Action("EmployeeAppraisal", "Appraisal")",
+                    data: { employeeids: id, paymonth: $('#month').val() },
+                    success: function (data) {
+                        var tr = "";
+                        var index = 1;
+                        var tempclass = "";
+                        $('#monthTable tr:gt(0)').remove();
+                        var intimeval = $('#default_time').val();
+                        console.log(data.data);
+                        console.log("Employeeappraisal");
+                        $.each(data.data, function (i, k) {
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + k.Id + "</td><td>" + k.Category + "</td><td>" + k.Subcategory + "</td><td>" + k.MaxPoint + "</td><td>" + k.RatingPoint + "</td><td>" + k.Comment + "</td></tr>";
+                            index++;
+                            tempclass = "";
+                        });
+                        $('#monthTable tr:last').after(tr);
+                    }
+                });
+            }
+            
+        });
+
+
+
+        var SelectId = "";
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+
+            //  var sno = target.attr('id');
+            $('#sr_no').focus();
+
+
+            if (target.hasClass('monthTable-selected')) {
+
+                $.each(target, function (p, q) {
+                    var childs = $(q).children().toArray();
+                    SelectId = ($(childs[1]).text());
+                    //alert("HI :: " + SelectId);
+                    console.log(SelectId);
+                    $('#Comments').P2BSelectMenuAppend('@Url.Action("GetObjectiveWordings", "Appraisal")?AppAssignId=' + SelectId, '', id);
+
+                });
+            }
+
+
+            var abc;
+            $('#Comments').on('selectmenuchange', function () {
+                $.ajax({
+                    url: "@Url.Action("GetObjectiveWordings", "Appraisal")?AppAssignId=" + SelectId,
+                    method: "GET",
+                data: abc,
+                success: function (data) {
+                    console.log("length :: "+data.length);
+                    var aaa = JSON.stringify(data);
+                    var sel = $("#Comments option:selected").text();
+                    //console.log("string len: "+sel.charAt(15));
+                    var ratePnts = sel.charAt(15);
+                    $('#RatingPoint').val(ratePnts);
+                }
+
+            });
+                
+        });
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.children().each(function (i, k) {
+                if (input[i].type == "select-one") {
+                    $(input[i]).val($(k).text()).selectmenu("refresh");
+                } else {
+                    $(input[i]).val($(k).text());
+                }
+            });
+            e.preventDefault();
+        });
+
+        var aaa;
+        var dropVal = "";
+        var table_sr_no = "";
+        //var getdropdownval;
+
+        $('#sub_form').on('click', function (e) {
+
+            // debugger;
+            $('#create_roaster').css("pointer-events", "all");
+            //$('#create_roaster').css("opacity", "1");
+            table_sr_no = $('#sr_no').val();
+            var target = $('#monthTable tr#' + table_sr_no).children();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.each(function (i, k) {
+                $(k).text($(input[i]).val());
+
+            });
+
+
+            var formjson = [];
+            var tr = [];
+            var col2 = "";
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+            console.log("tr -------- " + tr);
+            var srindex = table_sr_no - 1;
+            $.each(tr, function (i, k) {
+                if (i == srindex) {
+                    // alert("Hi"+i);
+
+                    dropVal = $("#Comments option:selected").text();
+                    var childs = $(k).children().toArray();
+                    //console.log("childs : " + childs);
+                    formjson.push({
+                        "SRNo": $(childs[0]).text(),
+                        "Id": $(childs[1]).text(),
+                        "CatName": $(childs[2]).text(),
+                        "SubCatName": $(childs[3]).text(),
+                        "MaxPoint": $(childs[4]).text(),
+                        "RatingPoints": $(childs[5]).text(),
+                        "Comments": $(childs[6]).text(dropVal),
+                    });
+                }
+
+            });
+
+
+            var dataform = JSON.stringify(formjson);
+            var newCommentValue = '"' + dropVal + '"';
+            aaa = dataform.replace('{"0":{},"context":{},"length":1}', newCommentValue)
+            //console.log("data : " + aaa);
+            //console.log("FormDATA : " +dataform);
+            //$.LocalStorageHelper.Set('FormTrainingNeedData', aaa);
+            
+            //getdropdownval = $('#get_dropVal').append(aaa).text(); // coded on: 02/02/2024, found bug on: 16/04/2024
+            
+            //Bug fixed code
+            if (aaa != null && aaa != "") {
+                getdropdownval = getdropdownval + aaa;
+            }
+            
+            //console.log("getdropdownval : " + getdropdownval);
+
+
+        });
+
+
+
+        $('#create_roaster').on('click', function (event) {
+            var formjsonN = [];
+            var NewArray = [];
+            var tr = [];
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+            console.log(tr);
+            var SRRindex = table_sr_no - 1;
+            $.each(tr, function (i, k) {
+               // for (var m = 0; m < tr.length; m++) {
+                    if (i == SRRindex) {
+                        var childs = $(k).children().toArray();
+                        dropVal = $("#Comments option:selected").text();
+                        formjsonN.push({
+                            "SRNo": $(childs[0]).text(),
+                            "Id": $(childs[1]).text(),
+                            "CatName": $(childs[2]).text(),
+                            "SubCatName": $(childs[3]).text(),
+                            "MaxPoint": $(childs[4]).text(),
+                            "RatingPoints": $(childs[5]).text(),
+                            "Comments": $(childs[6]).text(dropVal),
+
+                        });
+                        //NewArray.concat(formjsonN);
+                        //alert(NewArray);
+                    }
+               // }
+                
+            });
+            
+            $.ajax({
+                url: "@Url.Action("CreateRoaster", "Appraisal")",
+                method: "POST",
+                cache: false,
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({ data: getdropdownval, EmpId: $('#Emp_id').val(), SRno: table_sr_no, cmnt: getdropdownval }),
+                success: function (data) {
+                    debugger;
+                    if (data.status == true) {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Data Saved Successfully");
+                        //$('#sub_form').remove();
+                        //$('#create_roaster').remove();
+                        return false;
+                    }
+                    else {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-alert', " Appraisal for this employee already done. ");
+                        //$('#create_dialog1').remove();
+                       // $('#create_roaster').remove();
+                        return false;
+                    }
+                }
+            });
+            event.preventDefault();
+        });
+        $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        $('.popup_radio_button').buttonset();
+    });
+</script>
+
+<body>
+    <div id="create_dialog1" title="Create Employee Appraisal">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpTimingMonthlyRoaster", name = "frmEmpTimingMonthlyRoasterEdit" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <input id="get_dropVal" type="hidden" name="get_dropVal" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="Emp_id" class="filter_structure_id" name="fun_id" />
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="employee-search" style="width: 317px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table">
+                            <tr>
+                                <th><input type="checkbox" id="case-employee" /></th>
+                                <th>Employee</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="section2_Leave">
+                @*<div class="dropdown_row1 row3 content_margine">
+                        <label class="dropdown_row1 row3 content_margine">
+                            PayMonth :
+                        </label>
+                        <input type="text" id="month" class="date" style="width:70px" />
+                        <label class="dropdown_row1 row3 content_margine">
+                            Default Time :
+                        </label>
+                        <input type="text" id="default_time" class="defult-time" style="width:40px;" />
+                        <button id="btnLoad">Load</button>
+                    </div>*@
+                <div>
+                    <label class="heading">Appraisal Rating</label>
+                    <table id="monthTable">
+                        <tr><th>Sr No</th><th>Id</th><th>Category</th><th>Subcategory</th><th>MaxPoint</th><th>RatingPoint</th><th>Comment</th></tr>
+                    </table>
+                </div>
+            </div>
+        }
+        <div class="section3_Leave">
+            <form id="frm_edit_form" name="frm_edit_form">
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Sr.No :</label>
+                    <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Id:</label>
+                    <input type="text" id="App_id" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Category Name :</label>
+                    <input type="text" name="Category_name" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">SubCategory Name :</label>
+                    <input type="text" name="SubcategoryName" class="popup-content-textbox" readonly />
+                </div>
+                @*<div class="dropdown_row1 row3 content_margine">
+                        <div class="popup-content-label">DayType</div>
+                        <select id="DayTypelist" name="DayTypelist" style="width:100px;">
+                            <option value="HO">HO</option>
+                            <option value="WO">WO</option>
+                            <option value="Working">Working</option>
+                        </select>
+                    </div>*@
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Max Point:</label>
+                    <input type="text" id="MaxPoint" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label must">Rating Point:</label>
+                    <input type="text" id="RatingPoint" class="popup-content-textbox must" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label must">Comment:</label>
+                    <select id="Comments" style="width:164px" name="Comments" class="drop must"><option value="0">-Select-</option></select>
+                    @*<input type="text" id="Comment" class="popup-content-textbox" />*@
+                </div>
+                <br>
+                <button type="button" id="sub_form">Modify</button>
+                <div style="float:right;pointer-events:none;">
+                    <button id="create_roaster">Create Appraisal</button>
+                </div>
+            </form>
+        </div>
+        <div id="delete_dialoage" style="position: relative; float: right; left: 308px; top: 28em; /*! display: inline-block; */ font-size: 10px; font-style: oblique;">
+            <span>Note: Please first click on Modify and then Create Appraisal.</span>
+        </div>
+
+    </div>
+</body>

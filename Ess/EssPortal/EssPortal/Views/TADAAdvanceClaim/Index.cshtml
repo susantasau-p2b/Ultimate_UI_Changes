@@ -1,0 +1,233 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.TADAAdvanceClaim
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+</style>
+
+<html>
+
+<head>
+    <title></title>
+    <script>
+    $(document).ready(function (e) {
+
+        $('button').button();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').buttonset();
+        $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+        $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#TADATypelist').selectmenu().selectmenu("menuWidget");
+        $('#TADATypelist').P2BSelectMenuAppend('@Url.Action("GetLookupPolicyname", "TADASettlementClaim")', 3005, "");
+        $('#LvReqList').selectmenu().selectmenu("menuWidget");
+        $('#DateOfAppl').attr('readonly', 'readonly');
+        $('#DateOfAppl').TodayDate();
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        var EMPID = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+        //alert("EMPID : " + EMPID);
+        if (EMPID != null || EMPID != "") {
+            // alert($(this).val());
+            //var id = $(this).val();
+            $.get("@Url.Action("GetEmpLTCBlock")", { data: EMPID }, function (data) {
+                $('#txtLTCBlock').val(data.Id);
+                $('#BlockId').val(data.Id);
+                $('#LvReqList').P2BSelectMenuAppend('@Url.Action("GetLVReqLKDetails", "TADAAdvanceClaim")', EMPID, data.Id); // To bind dropdown on page load
+                $('#txtLTCBlock').val(data.FullDetails).attr("readonly", "readonly");
+
+            });
+            $.get("@Url.Action("GetEmpSalStruct")", { data: EMPID }, function (data1) {
+
+                $('#EligibleAmt').val(data1).attr("readonly", "readonly");
+
+            });
+
+        }
+
+
+
+        $("#LTCAdvAmt").on('focusout', function () {
+            // alert('r');
+            var a = $("#LTC_Eligible_Amt").val();
+            var b = $("#LTCAdvAmt").val();
+
+            if (parseInt(b) > parseInt(a)) {
+                $("#LTCAdvAmt").val("");
+                alert("Advance amount should not be greater than Eligible amount");
+
+            }
+
+        });
+
+        $('#AdvAmtids').keyup(function () {
+            $.post('', { id: 0 }, function (data) {
+                if (data != null && data != "") {
+                    var elg = $('#EligibleAmtids').val();
+                    var clm = $('#AdvAmtids').val();
+                    var setl = $('#TASettleAmtoids').val();
+                    elg = parseFloat(elg);
+                    clm = parseFloat(clm);
+                    setl = parseFloat(setl);
+                    if (clm != null && clm != "") {
+
+                        $('#SanctionedAmtids').val(clm)
+                    }
+                    else {
+
+                        $('#SanctionedAmtids').val(clm)
+                    }
+                }
+                else {
+                    alert("Data Null");
+                }
+            });
+
+        });
+        $('.popup_radio_button').buttonset();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#EligibleAmtids').attr('readonly', 'readonly');
+        $('#AdvAmtids,#EligibleAmtids,#SanctionedAmtids').ForceAmount();
+        $('#AdvAmtids,#EligibleAmtids,#SanctionedAmtids').val("0");
+        $('#DateOfAppl,#TravelStartDate,#TravelEndDate').P2BDatePicker();
+
+    });
+
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTADAAdvClaim", name = "frmTADAAdvClaim" }))
+        {
+            
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+            <div class="section2_Leave">
+
+                <div class="row2 select_div content_margine">@Html.LabelFor(m => m.TADAType, "TADA Type :", new { @class = "popup-content-label must" })<select id="TADATypelist" name="TADATypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>
+
+                <div class="row2 content_margine">@Html.LabelFor(m => m.DateOfAppl, "Requisition Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DateOfAppl, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row2 content_margine">@Html.LabelFor(m => m.TravelStartDate, "Travel Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelStartDate, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row2 content_margine">@Html.LabelFor(m => m.TravelEndDate, "Travel End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelEndDate, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row2 content_margine">@Html.LabelFor(m => m.ProposedPlace, "Proposed Place :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProposedPlace, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row2 content_margine">@Html.LabelFor(m => m.EligibleAmt, "TADA Eligible Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EligibleAmt, new { @class = "popup-content-textbox must", @id = "EligibleAmtids" })</div>
+
+                <div class="row2 content_margine" id="TADAAdvAmt" style="float:left;">
+                    @Html.LabelFor(m => m.AdvAmt, "TADA Advance Amount :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.AdvAmt, new { @class = "popup-content-textbox must", @id = "AdvAmtids" })
+                </div>
+
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.SanctionedAmt, "TADA Sanctioned Amount :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.SanctionedAmt, new { @class = "popup-content-textbox must", @id = "SanctionedAmtids" })
+                </div>
+
+                <div class="row2 content_margine" id="TADARem" style="float:left;">
+                    @Html.LabelFor(m => m.Remark, "Remark :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must" })
+                </div>
+
+
+            </div>
+
+        }
+    </div>
+</body>
+</html>

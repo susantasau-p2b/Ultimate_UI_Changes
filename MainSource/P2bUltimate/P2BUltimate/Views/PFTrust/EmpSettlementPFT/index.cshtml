@@ -1,0 +1,721 @@
+﻿@{
+    ViewBag.Title = "EmpSettlementPFT";
+}
+@model P2B.PFTRUST.EmpSettlementPFT
+<html>
+
+<head>
+
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            var JsonDate;
+
+            ColModel = ['EmpCode', 'EmpName', 'TotalGross', 'Deductions', 'ActualFundGross','SettlementDate', 'IsPaymentLock', 'ChequeIssueDate', 'Id'];
+            ColNames = ['EmpCode', 'EmpName', 'TotalGross', 'Deductions', 'ActualFundGross', 'SettlementDate', 'IsPaymentLock', 'ChequeIssueDate', 'Id'];
+
+            SortName = 'Id';
+            Caption = 'EmpSettlementPFT';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            $('#Divintonint').hide();
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h_PFT?geo_id=' + forwarddata + '', "");
+                    }, hierarchy: true,
+                    renderat: "#FormFilter",
+                });
+            });
+
+            $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+
+                if (this.checked) {
+                    //alert("ok");
+                }
+            });
+
+            $("#Deductions").keyup(function () {
+
+                var v1 = $("#TotalGross").val();
+                var v2 = $("#Deductions").val();
+                var v3 = parseFloat(v1) - parseFloat(v2);
+                $("#ActualFundGross").val(v3)
+            });
+
+            $('#lblloader').hide();
+            $('#Process').button().on('click', function (event) {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                if (a.val == "" || a.length == 0) {
+                    alert("Please select Employee");
+                    return false;
+                }
+                var x = PerformValidations('#frmEmpSettlementPFT', 'OwnPfInterest');
+                if ($('#SettlementDate').val() == 0) {
+                    alert('Please enter Settlement Date..!');
+                    return false;
+                }
+
+                if (x == true) {
+                    var form = $("#frmEmpSettlementPFT").serialize();
+                    $('#lblloader').show();
+                    $.post({
+                        url: "@Url.Action("Process")",
+                        data: form,
+                        dataType: 'json',
+                        success: function (data,status,xhr) {
+                            ////debugger;
+                          
+                          //  alert(data);
+                           // alert(data);
+                            if (data.success == true) {
+                                alert(data.responseText);
+                            }
+                            
+                            //if (data.errorno > 0) {
+                            //    alert(data.ShowMessage);
+                                //}
+                            //if (xhr.status == 200)
+                            //{
+                              
+                            //}
+                            else {
+                                
+                                $('#OwnOpenBal').val(data.OwnOpenBal);
+                                $('#OwnerOpenBal').val(data.OwnerOpenBal);
+                                $('#PFOpenBal').val(data.PFOpenBal);
+                                $('#VPFOpenBal').val(data.VPFOpenBal);
+                                $('#OwnIntOpenBal').val(data.OwnIntOpenBal);
+                                $('#OwnerIntOpenBal').val(data.OwnerIntOpenBal);
+                                $('#PFIntOpenBal').val(data.PFIntOpenBal);
+                                $('#VPFIntOpenBal').val(data.VPFIntOpenBal);
+
+                                $('#OwnCloseBal').val(data.OwnCloseBal);
+                                $('#OwnerCloseBal').val(data.OwnerCloseBal);
+                                $('#PFCloseBal').val(data.PFCloseBal);
+                                $('#VPFCloseBal').val(data.VPFCloseBal);
+                                $('#OwnIntCloseBal').val(data.OwnIntCloseBal);
+                                $('#OwnerIntCloseBal').val(data.OwnerIntCloseBal);
+                                $('#PFIntCloseBal').val(data.PFIntCloseBal);
+                                $('#VPFIntCloseBal').val(data.VPFIntCloseBal);
+                                $('#OwnPfInterest').val(data.OwnPfInterest);
+                                $('#OwnerPfInterest').val(data.OwnerPfInterest);
+                                $('#VpfInt').val(data.VpfInt);
+                                $('#PfInterest').val(data.PfInterest);
+                                $('#OwnIntOnInt').val(data.OwnIntOnInt);
+                                $('#OwnerIntOnInt').val(data.OwnerIntOnInt);
+                                $('#VPFIntOnInt').val(data.VPFIntOnInt);
+                                $('#Actualtax').val(data.TaxableAccountInterest);
+
+                                $('#SeperationDate').val(DateConvert(data.SeperationDate));
+                                $('#ChequeIssueDate').val(DateConvert(data.ChequeIssueDate));
+                                $('#PaymentDate').val(DateConvert(data.PaymentDate));
+                                var OwnCloseBal = $('#OwnCloseBal').val();
+                                var OwnerCloseBal = $('#OwnerCloseBal').val();
+                                var VPFCloseBal = $('#VPFCloseBal').val();
+                                var OwnIntCloseBal = $('#OwnIntCloseBal').val();
+                                var OwnerIntCloseBal = $('#OwnerIntCloseBal').val();
+                                var VPFIntCloseBal = $('#VPFIntCloseBal').val();
+                                var totgross = parseFloat(OwnCloseBal) + parseFloat(OwnerCloseBal) + parseFloat(VPFCloseBal) + parseFloat(OwnIntCloseBal) + parseFloat(OwnerIntCloseBal) + parseFloat(VPFIntCloseBal);
+                                $('#TotalGross').val(totgross);
+                               
+                                var totActgross = parseFloat(OwnCloseBal) + parseFloat(OwnerCloseBal) + parseFloat(VPFCloseBal) + parseFloat(OwnIntCloseBal) + parseFloat(OwnerIntCloseBal) + parseFloat(VPFIntCloseBal) ;
+
+                                $('#ActualFundGross').val(totActgross);
+
+                            }
+
+
+
+
+
+
+                        },
+                        complete: function (data) {
+                            $('#lblloader').hide();
+                        }
+                    });
+
+                }
+
+            });
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').on("click", function (event) {
+                $('#frmEmpSettlementPFT').trigger("reset");
+
+                $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                    if (data == true) {
+                        $('#Divintonint').fadeIn();
+
+                    }
+
+                    else {
+
+                        $('#Divintonint').fadeOut();
+
+                    }
+                });
+
+
+                //$.LoadEmpByDefaultWOGeoId(true, "");
+                $.LoadEmpByDefaultPFTRUST(false, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create EmpSettlementPFT', 'open', '@Url.Action("EditSave")', '#frmEmpSettlementPFT', 'Message :', 'Request Falied :', '#JqGrid', 600, 1588, '', '', function (data) { }, { datatablename: "#MyTable" });
+                $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "EmpSettlementPFT")', '', "");
+                event.preventDefault();
+            });
+            $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+
+            $('#Edit').on('click', function () {
+                $('.hidden').hide();
+                AssignData();
+                $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                    if (data == true) {
+                        $('#Divintonint').fadeIn();
+
+                    }
+
+                    else {
+
+                        $('#Divintonint').fadeOut();
+
+                    }
+                });
+
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit EmpSettlementPFT" + JSON.stringify(dt) + " ", '#frmEmpSettlementPFT', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 1588, '', '', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmEmpSettlementPFT').trigger("reset");
+                        $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "EmpSettlementPFT")', '', k.PFTCalendar);
+                        // $('#PFTCalendar').val(k.PFTCalendar);
+                        $('#SeperationDate').val(k.SeperationDate);
+                        $('#SettlementDate').val(k.SettlementDate);
+                        $('#OwnIntCloseBal').val(k.OwnIntCloseBal);
+                        $('#OwnerIntCloseBal').val(k.OwnerIntCloseBal);
+                        $('#PFIntCloseBal').val(k.PFIntCloseBal);
+                        $('#DeductSurchar').val(k.DeductSurchar);
+                        $('#VPFCloseBal').val(k.VPFCloseBal);
+                        $('#PFCloseBal').val(k.PFCloseBal);
+                        $('#OwnCloseBal').val(k.OwnCloseBal);
+                        $('#OwnerCloseBal').val(k.OwnerCloseBal);
+                        $('#VPFIntCloseBal').val(k.VPFIntCloseBal);
+                        $('#Actualtax').val(k.Actualtax);
+                        $('#TaxableIncome').val(k.TaxableIncome);
+                        $('#Actualsurchar').val(k.Actualsurchar);
+                        $('#DeductTax').val(k.DeductTax);
+                        $('#TotalGross').val(k.TotalGross);
+                        $('#Deductions').val(k.Deductions);
+                        $('#PaymentDate').val(k.PaymentDate);
+                        $('#Cheque_no').val(k.Cheque_no);
+                        $('#BankBranch').val(k.BankBranch);
+                        $('#ChequeIssueDate').val(k.ChequeIssueDate);
+                        $('[name="IsPaymentLock"]').val([k.IsPaymentLock]).button().button("refresh");
+                        $('#OwnPfInterest').val(k.OwnPfInterest);
+                        $('#OwnerPfInterest').val(k.OwnerPfInterest);
+                        $('#VpfInt').val(k.VpfInt);
+                        $('#PfInterest').val(k.PfInterest);
+                        $('#OwnIntOnInt').val(k.OwnIntOnInt);
+                        $('#OwnerIntOnInt').val(k.OwnerIntOnInt);
+                        $('#VPFIntOnInt').val(k.VPFIntOnInt);
+                        $('#ActualFundGross').val(k.ActualFundGross);
+
+                        $('#OwnOpenBal').val(k.OwnOpenBal);
+                        $('#OwnerOpenBal').val(k.OwnerOpenBal);
+                        $('#PFOpenBal').val(k.PFOpenBal);
+                        $('#VPFOpenBal').val(k.VPFOpenBal);
+                        $('#OwnIntOpenBal').val(k.OwnIntOpenBal);
+                        $('#OwnerIntOpenBal').val(k.OwnerIntOpenBal);
+                        $('#PFIntOpenBal').val(k.PFIntOpenBal);
+                        $('#VPFIntOpenBal').val(k.VPFIntOpenBal);
+
+                    });
+                });
+            });
+
+            $('#View').button().click(function (event) {
+                $('.hidden').hide();
+                AssignData();
+                $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                    if (data == true) {
+                        $('#Divintonint').fadeIn();
+
+                    }
+
+                    else {
+
+                        $('#Divintonint').fadeOut();
+
+                    }
+                });
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View EmpSettlementPFT' + JSON.stringify(dt) + " ", '', '', 600, 1588, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmEmpSettlementPFT').trigger("reset");
+                        //$('#PFTCalendar').val(k.PFTCalendar);
+                        $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "EmpSettlementPFT")', '', k.PFTCalendar);
+                        $('#SeperationDate').val(k.SeperationDate);
+                        $('#SettlementDate').val(k.SettlementDate);
+                        $('#OwnIntCloseBal').val(k.OwnIntCloseBal);
+                        $('#OwnerIntCloseBal').val(k.OwnerIntCloseBal);
+                        $('#PFIntCloseBal').val(k.PFIntCloseBal);
+                        $('#DeductSurchar').val(k.DeductSurchar);
+                        $('#VPFCloseBal').val(k.VPFCloseBal);
+                        $('#PFCloseBal').val(k.PFCloseBal);
+                        $('#OwnCloseBal').val(k.OwnCloseBal);
+                        $('#OwnerCloseBal').val(k.OwnerCloseBal);
+                        $('#VPFIntCloseBal').val(k.VPFIntCloseBal);
+                        $('#Actualtax').val(k.Actualtax);
+                        $('#TaxableIncome').val(k.TaxableIncome);
+                        $('#Actualsurchar').val(k.Actualsurchar);
+                        $('#DeductTax').val(k.DeductTax);
+                        $('#TotalGross').val(k.TotalGross);
+                        $('#Deductions').val(k.Deductions);
+                        $('#PaymentDate').val(k.PaymentDate);
+                        $('#Cheque_no').val(k.Cheque_no);
+                        $('#BankBranch').val(k.BankBranch);
+                        $('#ChequeIssueDate').val(k.ChequeIssueDate);
+                        $('[name="IsPaymentLock"]').val([k.IsPaymentLock]).button().button("refresh");
+                        $('#OwnPfInterest').val(k.OwnPfInterest);
+                        $('#OwnerPfInterest').val(k.OwnerPfInterest);
+                        $('#VpfInt').val(k.VpfInt);
+                        $('#PfInterest').val(k.PfInterest);
+                        $('#OwnIntOnInt').val(k.OwnIntOnInt);
+                        $('#OwnerIntOnInt').val(k.OwnerIntOnInt);
+                        $('#VPFIntOnInt').val(k.VPFIntOnInt);
+                        $('#ActualFundGross').val(k.ActualFundGross);
+
+                        $('#OwnOpenBal').val(k.OwnOpenBal);
+                        $('#OwnerOpenBal').val(k.OwnerOpenBal);
+                        $('#PFOpenBal').val(k.PFOpenBal);
+                        $('#VPFOpenBal').val(k.VPFOpenBal);
+                        $('#OwnIntOpenBal').val(k.OwnIntOpenBal);
+                        $('#OwnerIntOpenBal').val(k.OwnerIntOpenBal);
+                        $('#PFIntOpenBal').val(k.PFIntOpenBal);
+                        $('#VPFIntOpenBal').val(k.VPFIntOpenBal);
+                    });
+                });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+
+            $('#SeperationDate').P2BDatePicker();
+            $('#SettlementDate').P2BDatePicker();
+            $('#PaymentDate').P2BDatePicker();
+            $('#ChequeIssueDate').P2BDatePicker();
+            $('.popup_radio_button').controlgroup();
+
+
+            $('#OwnIntCloseBal').attr("value", "0");
+            $('#OwnerIntCloseBal').attr("value", "0");
+            $('#PFIntCloseBal').attr("value", "0");
+            $('#DeductSurchar').attr("value", "0");
+            $('#VPFCloseBal').attr("value", "0");
+            $('#PFCloseBal').attr("value", "0");
+            $('#OwnCloseBal').attr("value", "0");
+            $('#OwnerCloseBal').attr("value", "0");
+            $('#VPFIntCloseBal').attr("value", "0");
+            $('#Actualtax').attr("value", "0");
+            $('#TaxableIncome').attr("value", "0");
+            $('#Actualsurchar').attr("value", "0");
+            $('#DeductTax').attr("value", "0");
+            $('#TotalGross').attr("value", "0");
+            $('#Deductions').attr("value", "0");
+            $('#OwnPfInterest').attr("value", "0");
+            $('#OwnerPfInterest').attr("value", "0");
+            $('#VpfInt').attr("value", "0");
+            $('#PfInterest').attr("value", "0");
+            $('#Cheque_no').attr("value", "0");
+            $('#OwnIntOnInt').attr("value", "0");
+            $('#OwnerIntOnInt').attr("value", "0");
+            $('#VPFIntOnInt').attr("value", "0");
+            
+            $('#ActualFundGross').attr("value", "0");
+
+            $('#OwnOpenBal').attr("value", "0");
+            $('#OwnerOpenBal').attr("value", "0");
+            $('#PFOpenBal').attr("value", "0");
+            $('#VPFOpenBal').attr("value", "0");
+            $('#OwnIntOpenBal').attr("value", "0");
+            $('#OwnerIntOpenBal').attr("value", "0");
+            $('#PFIntOpenBal').attr("value", "0");
+            $('#VPFIntOpenBal').attr("value", "0");
+
+        });
+    </script>
+    <style>
+        .icon-row {
+            position: absolute;
+            left: 39px;
+            top: 114px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 116px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            /*min-width: 150px;*/
+            width: 35%;
+        }
+
+        .row3 {
+            width: 238px;
+            display: inline-flex;
+        }
+
+        .row5 {
+            width: 280px;
+            display: inline-flex;
+            left: 200px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+        .section1_YearlyPT {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 539px;
+            width: 417px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 647px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 116px;
+            width: 488px;
+            /*margin: 47px 4px;*/
+            margin: 174px 4px;
+            position: absolute;
+            left: 549px;
+        }
+        .section7_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 116px;
+            width: 488px;
+            margin: 47px 4px;
+            position: absolute;
+            left: 546px;
+        }
+        .section3_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 244px;
+            width: 488px;
+            margin: 176px 4px;
+            position: absolute;
+            left: 1051px;
+        }
+
+        .section4_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 118px;
+            width: 220px;
+            margin: 47px 4px;
+            position: absolute;
+            left: 1049px;
+        }
+
+        .section6_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 118px;
+            width: 229px;
+            margin: 47px 4px;
+            position: absolute;
+            left: 1279px;
+        }
+
+        .section5_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 32px;
+            width: 425px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 552px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="EmpSettlementPFT">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpSettlementPFT", name = "frmEmpSettlementPFT" }))
+        {   <div class="hidden">
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <div class="section1_Leave">
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+           
+
+            <div class="section5_Leave">
+                
+
+                <div id="loading_img" class="loader content_margine">
+                    <label id="lblloader" style="color: red; display: block; position: absolute; left: 492px; top: 8px;">Processing...</label>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SettlementDate, "PF Settlement Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SettlementDate, new { @class = "popup-content-textbox must" })</div>
+                <div>
+                    <button class="button" id="Process" style="left: 281px; top: -30px;">Process</button>
+                </div>
+
+            </div>
+            <div class="section7_Leave">
+
+                <div>
+                    <label id="Contribution" style="margin-left:9em;"> Contribution Opening Balance</label>
+                    <label id="UptoSettleInt" style="margin-left:4em;"> Interest Opening Balance</label>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnOpenBal, "OwnPF:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnIntOpenBal, "OwnPfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnIntOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerOpenBal, "OwnerPF:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerIntOpenBal, "OwnerPfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerIntOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PFOpenBal, "PFAmt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PFOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PFIntOpenBal, "PfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PFIntOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.VPFOpenBal, "VPFAmt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFOpenBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.VPFIntOpenBal, "VpfInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFIntOpenBal, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+            <div class="section2_Leave">
+
+                <div>
+                    <label id="Contribution" style="margin-left:4em;"> Contribution Closing Balance</label>
+                    <label id="UptoSettleInt" style="margin-left:4em;"> Contribution Closing Balance</label>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnCloseBal, "OwnPF:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnIntCloseBal, "OwnPfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnIntCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerCloseBal, "OwnerPF:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerIntCloseBal, "OwnerPfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerIntCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PFCloseBal, "PFAmt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PFCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PFIntCloseBal, "PfInterest:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PFIntCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.VPFCloseBal, "VPFAmt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFCloseBal, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.VPFIntCloseBal, "VpfInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFIntCloseBal, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+            <div class="section4_Leave">
+                <div>
+                    <label id="Interim" style="margin-left:130px;"> Interim</label>
+
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnPfInterest, "OwnPfInterimInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnPfInterest, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerPfInterest, "OwnerPfInterimInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerPfInterest, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.VpfInt, "VPFInterimInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VpfInt, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PfInterest, "PfInterimInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PfInterest, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+            <div class="section6_Leave" id="Divintonint">
+                <div>
+                    <label id="InterimInterestonInterest" style="margin-left:6em;"> InterimInterestonInterest</label>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.OwnIntOnInt, "OwnIntOnInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnIntOnInt, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.OwnerIntOnInt, "OwnerIntOnInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerIntOnInt, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.VPFIntOnInt, "VPFIntOnInt:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFIntOnInt, new { @class = "popup-content-textbox must" })</div>
+
+                </div>
+            </div>
+            <div class="section3_Leave">
+                <div class="row3 content_margine">
+
+                    <label for="PFTACCalendar" class="popup-content-label "> PFTACCalendar</label>
+                    <select class="drop " style="width:321px; margin-left:10px" name="PFTACCalendar" id="PFTACCalendar">
+                        <option></option>
+                    </select>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SeperationDate, "Seperation Date:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.SeperationDate, new { @class = "popup-content-textbox " })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PaymentDate, "PaymentDate:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.PaymentDate, new { @class = "popup-content-textbox " })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.TaxableIncome, "TaxableIncome:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TaxableIncome, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Actualtax, "Actualtax:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Actualtax, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Actualsurchar, "Actualsurcharge:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Actualsurchar, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.DeductTax, "DeductTax:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DeductTax, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.DeductSurchar, "DeductSurcharge:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DeductSurchar, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.TotalGross, "TotalGross:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TotalGross, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Deductions, "Deductions:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Deductions, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ActualFundGross, "ActualFundGross:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ActualFundGross, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Cheque_no, "Cheque_no:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Cheque_no, new { @class = "popup-content-textbox " })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ChequeIssueDate, "ChequeIssue Date:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ChequeIssueDate, new { @class = "popup-content-textbox " })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.BankBranch, "BankBranch:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BankBranch, new { @class = "popup-content-textbox " })</div>
+
+                <div class="row3  content_margine">
+                    @Html.LabelFor(m => m.IsPaymentLock, "IsPaymentLock :", new { @class = "popup-content-label must" })
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio1" name="IsPaymentLock" value="true" /><label for="radio1">Yes</label>
+                        <input type="radio" id="radio2" name="IsPaymentLock" value="false" checked="checked" /><label for="radio2">No</label>
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

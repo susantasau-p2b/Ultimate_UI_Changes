@@ -1,0 +1,760 @@
+﻿@{
+    ViewBag.Title = "LTCFormula";
+}
+@model Payroll.LTCFormula
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        $('#PolicyName').ForceOnlyAlphaNumeric();
+        $('#PolicyName').MaxLength(10);
+        $('#EncashSpanYear').ForceOnlyNumeric(),
+        $('#FromServ').ForceOnlyNumeric(),
+        $('#ToServ').ForceOnlyNumeric(),
+        $('#MinBalance').ForceOnlyNumeric(),
+        $('#MinEncashment').ForceOnlyNumeric(),
+        $('#MinUtilized').ForceOnlyNumeric()
+    });
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#OpeningDate').P2BDatePicker();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name'];
+        ColNames = ['Id', 'Name'];
+        SortName = 'Id';
+        Caption = 'LTC Formula';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Formula_Grid", "LTCFormula")",
+            editurl: "@Url.Action("EditGridDetails", "LTCFormula")",
+            htmurl: "@Url.Action("partial", "LTCFormula")",
+            submiturl: "@Url.Action("GridEditSave", "LTCFormula")",
+            //columnname: ["Id", "Name", "CeilingMin", "CeilingMax", "DependRule"],
+            columnname: ["Name", "Id"],
+            childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+            childurl: "@Url.Action("Get_FormulaStructDetails", "LTCFormula")",
+            tableheader: "LTC Formula",
+            childurlColumnNo: "2"
+        });
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('input:checkbox').removeAttr('checked');
+            $('tr').removeClass('selectedtr');
+            $('#frmLTCFormula').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create LTC Formula', 'open', '@Url.Action("Create")', '#frmLTCFormula', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '', "", function (data) { }, { datatablename: "#MyTable" });
+
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+       
+
+        $('#Edit').on('click', function () {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit LTC Formula Data", '#frmLTCFormula', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#WagesList', '', function (data) {
+          
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+                if (selected == 1) {
+                    $('#load_div').trigger('reset');
+                    $('#HotelEligibilityPolicy1').prop('checked', 'checked');
+                    $('#HotelEligibilityPolicy1').prop('enable', 'enable');
+                    $('#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#HotelEligibilityPolicyList').P2BLookUpEncapsulate('#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', k.HotelEligibilityPolicy_Id, k.HotelEligibilityPolicy_Fulldetails, 'HotelEligibilityPolicyList', '#Remove-HotelEligibilityPolicy-LTCFormula', 'A');
+                    });
+
+                }
+
+                if (selected == 2) {
+                    $('#load_div').trigger('reset');
+                    $('#TravelEligibilityPolicy1').prop('checked', 'checked');
+                    $('#TravelEligibilityPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelEligibilityPolicyList').P2BLookUpEncapsulate('#TravelEligibilityPolicyList', 'TravelEligibilityPolicyList', k.TravelEligibilityPolicy_Id, k.TravelEligibilityPolicys_Fulldetails, 'TravelEligibilityPolicyList', '#Remove-TravelEligibilityPolicy-LTCFormula', 'A');
+                    });
+                }
+
+                if (selected == 3) {
+                    $('#load_div').trigger('reset');
+                    $('#TravelModeEligibilityPolicy1').prop('checked', 'checked');
+                    $('#TravelModeEligibilityPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelModeEligibilityPolicyList').P2BLookUpEncapsulate('#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', k.TravelModeEligibilityPolicy_Id, k.TravelModeEligibilityPolicy_Fulldetails, 'TravelModeEligibilityPolicyList', '#Remove-TravelModeEligibilityPolicy-LTCFormula', 'A');
+                    });
+                }
+
+                if (selected == 4) {
+                    $('#load_div').trigger('reset');
+                    $('#TravelModeRateCeilingPolicy1').prop('checked', 'checked');
+                    $('#TravelModeRateCeilingPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').fadeIn();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelModeRateCeilingPolicyList').P2BLookUpEncapsulate('#TravelModeRateCeilingPolicyList', 'TravelModeRateCeilingPolicyList', k.TravelModeRateCeilingPolicy_Id, k.TravelModeRateCeilingPolicy_Fulldetails, 'TravelModeRateCeilingPolicyList', '#Remove-TravelModeRateCeilingPolicy-LTCFormula', 'A');
+                    });
+                }
+                if (selected == 5) {
+                    $('#load_div').trigger('reset');
+                    $('#GlobalLTCBlockPolicy1').prop('checked', 'checked');
+                    $('#GlobalLTCBlockPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').fadeIn();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#GlobalLTCBlockPolicyList').P2BLookUpEncapsulate('#GlobalLTCBlockPolicyList', 'GlobalLTCBlockPolicyList', k.GlobalLTCBlockPolicy_Id, k.GlobalLTCBlockPolicy_Fulldetails, 'GlobalLTCBlockPolicyList', '#Remove-GlobalLTCBlockPolicy-LTCFormula', 'A');
+                    });
+                }
+
+                if (selected == 6) {
+                    $('#load_div').trigger('reset');
+                    $('#DAEligibilityPolicy1').prop('checked', 'checked');
+                    $('#DAEligibilityPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').fadeIn();
+                    $.each(data[1], function (i, k) {
+                        $('#DAEligibilityPolicyList').P2BLookUpEncapsulate('#DAEligibilityPolicyList', 'DAEligibilityPolicyList', k.DAEligibilityPolicy_Id, k.DAEligibilityPolicy_Fulldetails, 'DAEligibilityPolicyList', '#Remove-DAEligibilityPolicy-LTCFormula', 'A');
+                    });
+                }
+
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Leave Head Formula data', '#HotelEligibilityPolicyList', '#Remove-HotelEligibilityPolicy-LTCFormula', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#HotelEligibilityPolicy1').prop('checked', 'checked');
+                    $('#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#HotelEligibilityPolicyList').P2BLookUpEncapsulate('#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', k.HotelEligibilityPolicy_Id, k.HotelEligibilityPolicy_Fulldetails, 'HotelEligibilityPolicyList', 'view', 'N');
+                    });
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#TravelEligibilityPolicy1').prop('checked', 'checked');
+                    $('#HotelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelEligibilityPolicyList').P2BLookUpEncapsulate('#TravelEligibilityPolicyList', 'TravelEligibilityPolicyList', k.TravelEligibilityPolicy_Id, k.TravelEligibilityPolicys_Fulldetails, 'TravelEligibilityPolicyList', 'view', 'N');
+                    });
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#TravelModeEligibilityPolicy1').prop('checked', 'checked');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelModeEligibilityPolicyList').P2BLookUpEncapsulate('#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', k.TravelModeEligibilityPolicy_Id, k.TravelModeEligibilityPolicy_Fulldetails, 'TravelModeEligibilityPolicyList', 'view', 'A');
+                    });
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#TravelModeRateCeilingPolicy1').prop('checked', 'checked');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#GlobalLTCBlockPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').fadeIn();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#TravelModeRateCeilingPolicyList').P2BLookUpEncapsulate('#TravelModeRateCeilingPolicyList', 'TravelModeRateCeilingPolicyList', k.TravelModeRateCeilingPolicy_Id, k.TravelModeRateCeilingPolicy_Fulldetails, 'TravelModeRateCeilingPolicyList', 'view', 'A');
+                    });
+                }
+                if (selected == "5") {
+                    $('#load_div').trigger('reset');
+                    $('#GlobalLTCBlockPolicy1').prop('checked', 'checked');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#DAEligibilityPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#DApolicyId').hide();
+                    $('#LTCpolicyId').fadeIn();
+                    $.each(data[1], function (i, k) {
+                        $('#GlobalLTCBlockPolicyList').P2BLookUpEncapsulate('#GlobalLTCBlockPolicyList', 'GlobalLTCBlockPolicyList', k.GlobalLTCBlockPolicy_Id, k.GlobalLTCBlockPolicy_Fulldetails, 'GlobalLTCBlockPolicyList', 'view', 'N');
+                    });
+                }
+
+                if (selected == "6") {
+                    $('#load_div').trigger('reset');
+                    $('#DAEligibilityPolicy1').prop('checked', 'checked');
+                    $('#DAEligibilityPolicy1').prop('enable', 'enable');
+                    $('#HotelEligibilityPolicy1,#TravelEligibilityPolicy1,#TravelModeEligibilityPolicy1,#TravelModeRateCeilingPolicy1,#GlobalLTCBlockPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#LTCpolicyId').hide();
+                    $('#DApolicyId').fadeIn();
+                    $.each(data[1], function (i, k) {
+                        $('#DAEligibilityPolicyList').P2BLookUpEncapsulate('#DAEligibilityPolicyList', 'DAEligibilityPolicyList', k.DAEligibilityPolicy_Id, k.DAEligibilityPolicy_Fulldetails, 'DAEligibilityPolicyList', 'view', 'N');
+                    });
+                }
+
+            });
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmLTCFormula').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            @*$('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);*@
+            $('#frmLTCFormula').P2BDeleteModalDialog('@Url.Action("Delete", "LTCFormula")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+
+        $('#Lookup-TravelModeRateCeilingPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTravelModeRateCeilPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#TravelModeRateCeilingPolicyList', 'TravelModeRateCeilingPolicyList', 5, 'TravelModeRateCeilingPolicyList', '#frmLTCFormula', 'A', '#Remove-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-TravelModeEligibilityPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTravelModeEligPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', 5, 'TravelModeEligibilityPolicyList', '#frmLTCFormula', 'A', '#Remove-TravelModeEligibilityPolicy-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-TravelEligibilityPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTravelEligPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#TravelEligibilityPolicyList', 'TravelEligibilityPolicyList', 5, 'TravelEligibilityPolicyList', '#frmLTCFormula', 'A', '#Remove-TravelEligibilityPolicy-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-HotelEligibilityPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupHotelEligPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', 5, 'HotelEligibilityPolicyList', '#frmLTCFormula', 'A', '#Remove-HotelEligibilityPolicy-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-GlobalLTCBlockPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupGlobalLTCBlockPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#GlobalLTCBlockPolicyList', 'GlobalLTCBlockPolicyList', 5, 'GlobalLTCBlockPolicyList', '#frmLTCFormula', 'N', '#Remove-GlobalLTCBlockPolicy-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-DAEligibilityPolicy-LTCFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDAEligibilityPolicy", "LTCFormula")', '', 'LookupDiv', 'Look Up Data', '#DAEligibilityPolicyList', 'DAEligibilityPolicyList', 5, 'DAEligibilityPolicyList', '#frmLTCFormula', 'A', '#Remove-DAEligibilityPolicy-LTCFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-TravelModeRateCeilingPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TravelModeRateCeilingPolicyList').P2BGetTableDataonSelectedRow('#TravelModeRateCeilingPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TravelModeRateCeilingPolicyList').P2BGetTableDataonSelectedRow('#TravelModeRateCeilingPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TravelModeRateCeilingPolicyList', $('#TravelModeRateCeilingPolicyList').val(), 200, 200, '#frmLTCFormula', '#TravelModeRateCeilingPolicyList', '#Remove-TravelModeRateCeilingPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+        $('#Remove-TravelModeEligibilityPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TravelModeEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelModeEligibilityPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TravelModeEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelModeEligibilityPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TravelModeEligibilityPolicyList', $('#TravelModeEligibilityPolicyList').val(), 200, 200, '#frmLTCFormula', '#TravelModeEligibilityPolicyList', '#Remove-TravelModeEligibilityPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+        $('#Remove-TravelEligibilityPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TravelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelEligibilityPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TravelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelEligibilityPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TravelEligibilityPolicyList', $('#TravelEligibilityPolicyList').val(), 200, 200, '#frmLTCFormula', '#TravelEligibilityPolicyList', '#Remove-TravelEligibilityPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+        $('#Remove-HotelEligibilityPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#HotelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#HotelEligibilityPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#HotelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#HotelEligibilityPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HotelEligibilityPolicyList', $('#HotelEligibilityPolicyList').val(), 200, 200, '#frmLTCFormula', '#HotelEligibilityPolicyList', '#Remove-HotelEligibilityPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+        $('#Remove-GlobalLTCBlockPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#GlobalLTCBlockPolicyList').P2BGetTableDataonSelectedRow('#GlobalLTCBlockPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#GlobalLTCBlockPolicyList').P2BGetTableDataonSelectedRow('#GlobalLTCBlockPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#GlobalLTCBlockPolicyList', $('#GlobalLTCBlockPolicyList').val(), 200, 200, '#frmLTCFormula', '#GlobalLTCBlockPolicyList', '#Remove-GlobalLTCBlockPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+        $('#Remove-DAEligibilityPolicy-LTCFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#GlobalLTCBlockPolicyList').P2BGetTableDataonSelectedRow('#GlobalLTCBlockPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#DAEligibilityPolicyList').P2BGetTableDataonSelectedRow('#DAEligibilityPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DAEligibilityPolicyList', $('#DAEligibilityPolicyList').val(), 200, 200, '#frmLTCFormula', '#DAEligibilityPolicyList', '#Remove-DAEligibilityPolicy-LTCFormula');
+            event.preventDefault();
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+
+                    $('#fun_id').val(data.FunStruct);
+                    $('#pay_id').val(data.PayStruct);
+                    $('#geo_id').val(data.GeoStruct);
+                },
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+
+
+        $('#creditpolicyId').hide();
+        $('#debitPolicyId').hide();
+        $('#encashpolicyId').hide();
+        $('#BankpolicyId').hide();
+        $('#LTCpolicyId').hide();
+        $('#DApolicyId').hide();
+
+        $('.popup_radio_button').on('change', function () {
+            var selected = $(".popup_radio_button input[type='radio']:checked").val();
+            if (selected == "1") {
+                $('#creditpolicyId').fadeIn();
+                $('#debitPolicyId').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId').hide();
+                $('#LTCpolicyId').hide();
+                $('#DApolicyId').hide();
+            }
+            if (selected == "2") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId').fadeIn();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId').hide();
+                $('#LTCpolicyId').hide();
+                $('#DApolicyId').hide();
+            }
+            if (selected == "3") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId').hide();
+                $('#encashpolicyId').fadeIn();
+                $('#BankpolicyId').hide();
+                $('#LTCpolicyId').hide();
+                $('#DApolicyId').hide();
+            }
+            if (selected == "4") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId').fadeIn();
+                $('#LTCpolicyId').hide();
+                $('#DApolicyId').hide();
+            }
+            if (selected == "5") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId').hide();
+                $('#DApolicyId').hide();
+                $('#LTCpolicyId').fadeIn();
+            }
+            if (selected == "6") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId').hide();
+                $('#LTCpolicyId').hide();
+                $('#DApolicyId').fadeIn();
+            }
+        });
+
+
+    });
+</script>
+<style>
+    .icon-row {
+        left: 85px;
+        position: relative;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 128px;
+    }
+
+    .popup-content-label-short {
+        display: block;
+        float: left;
+        width: 87px;
+    }
+
+    .popup-content-textbox {
+        width: 87px;
+    }
+
+    .row1 {
+        width: 431px;
+        /*! margin: 0 auto; */
+    }
+
+    .row2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 500px;
+    }
+
+    .row2 {
+        width: 198px;
+    }
+
+    .popup-row {
+        width: 600px;
+        margin: 1px 0px 0px 127px;
+    }
+
+    .name {
+        width: 293px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+<html>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <div class="section_Method">
+            <div class="heading">Filter View</div>
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+        </div>
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmLTCFormula", name = "frmLTCFormula" }))
+        {
+
+
+            <input name="geo_id" id="geo_id" class="filter_structure_id" />
+            <input name="pay_id" id="pay_id" class="filter_structure_id" />
+            <input name="fun_id" id="fun_id" class="filter_structure_id" />
+
+
+            @*<div style="float:left;">*@
+            <div class="section_Method">
+                <div class="heading">LTCFormula Details</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox name must" })</div>
+
+
+                <div class="popup-row">
+                    <div class="popup_radio_button">
+                        <input type="radio" id="HotelEligibilityPolicy1" name="radio" value="1" /><label for="HotelEligibilityPolicy1">HotelEligibilityPolicy</label>
+                        <input type="radio" id="TravelEligibilityPolicy1" name="radio" value="2" /><label for="TravelEligibilityPolicy1">TravelEligibilityPolicy</label>
+                        <input type="radio" id="TravelModeEligibilityPolicy1" name="radio" value="3" /><label for="TravelModeEligibilityPolicy1">TravelModePolicy </label>
+                        <input type="radio" id="TravelModeRateCeilingPolicy1" name="radio" value="4" /><label for="TravelModeRateCeilingPolicy1">TravelModeRatePolicy</label>
+                        <input type="radio" id="GlobalLTCBlockPolicy1" name="radio" value="5" /><label for="GlobalLTCBlockPolicy1">GlobalLTCBlockPolicy</label>
+                        <input type="radio" id="DAEligibilityPolicy1" name="radio" value="6" /><label for="DAEligibilityPolicy1">DAEligibilityPolicy</label>
+
+
+                    </div>
+                </div>
+                <div id="load_div" style="display:none;"></div>
+
+                <div id="creditpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.HotelEligibilityPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="HotelEligibilityPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select HotelEligibilityPolicy" class="popup-content-icon-lookup" id="Lookup-HotelEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove HotelEligibilityPolicy" class="popup-content-icon-remove" id="Remove-HotelEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="debitPolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TravelEligibilityPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="TravelEligibilityPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select TravelEligibilityPolicy" class="popup-content-icon-lookup" id="Lookup-TravelEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove TravelEligibilityPolicy" class="popup-content-icon-remove" id="Remove-TravelEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="encashpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TravelModeEligibilityPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="TravelModeEligibilityPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select TravelModeEligibilityPolicy" class="popup-content-icon-lookup" id="Lookup-TravelModeEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove TravelModeEligibilityPolicy" class="popup-content-icon-remove" id="Remove-TravelModeEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="BankpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TravelModeRateCeilingPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="TravelModeRateCeilingPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select TravelModeRateCeilingPolicy" class="popup-content-icon-lookup" id="Lookup-TravelModeRateCeilingPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove TravelModeRateCeilingPolicy" class="popup-content-icon-remove" id="Remove-TravelModeRateCeilingPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="LTCpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.GlobalLTCBlock, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="GlobalLTCBlockPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select GlobalLTCBlockPolicy" class="popup-content-icon-lookup" id="Lookup-GlobalLTCBlockPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove GlobalLTCBlockPolicy" class="popup-content-icon-remove" id="Remove-GlobalLTCBlockPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="DApolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.DAEligibilityPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="DAEligibilityPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select DAEligibilityPolicy" class="popup-content-icon-lookup" id="Lookup-DAEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove DAEligibilityPolicy" class="popup-content-icon-remove" id="Remove-DAEligibilityPolicy-LTCFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            @*</div>*@
+
+        }
+    </div>
+</body>
+</html>

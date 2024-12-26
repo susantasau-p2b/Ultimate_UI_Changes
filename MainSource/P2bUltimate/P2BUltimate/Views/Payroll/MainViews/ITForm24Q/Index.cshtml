@@ -1,0 +1,691 @@
+﻿@{
+    ViewBag.Title = "ITForm24";
+}
+@model Payroll.ITForm16Data
+
+<script>
+    $(document).ready(function () {
+        var start = new Date();
+        start.setFullYear(start.getFullYear() - 70);
+        var end = new Date();
+        end.setFullYear(end.getFullYear() - 18);
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        // $("#PayMonth").val($.datepicker.formatDate("mm/yy", new Date()));
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['QuarterName', 'ReportDate', 'Id'];
+        ColNames = ['QuarterName', 'ReportDate', 'Id'];
+        SortName = 'Id';
+        Caption = 'IT Form24Q';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#pager2', { multiple: true, rowNum: 30, selectall: false });
+        var ColNamesP = [];
+        var ColModelP = [];
+        var SortNameP, CaptionP, urlP, widthP, heightP;
+
+
+        ColModelP = ['Code', 'HeaderCol', 'ActualAmount', 'QualifyAmount', 'DeductibleAmount', 'FinalAmount', 'Id'];
+        ColNamesP = ['Code', 'HeaderCol', 'ActualAmount', 'QualifyAmount', 'DeductibleAmount', 'FinalAmount', 'Id'];
+
+
+
+        SortNameP = 'Id';
+        CaptionP = 'IT Form16 Details';
+        urlP = '@Url.Action("ViewProjection")';
+        widthP = 1000;
+        heightP = 150;
+
+        function ajaxloaderv2(cameform) {
+            $('<div style="width: 100%;height: 100%;position: fixed;top: 0;left: 0;background-color: #0000;z-index:998;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999" aria-hidden="true"></i></div>').appendTo(cameform);
+        };
+        var ajaxLoderRemove = function (init) {
+            if (!init) {
+                $('.ajax_loder').parents('div').remove();
+            } else {
+                $(init).find("div .ajax_loder").remove();
+            }
+            $(window).off('beforeunload');
+        };
+        $('#JqGridProjection').P2BGrid(ColNamesP, ColModelP, SortNameP, CaptionP, urlP, widthP, heightP, '#pager2Projection');
+
+        $('#Load').on('click', function (e) {
+            // alert($('#Financial_id').val());
+
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Financial Year.");
+                return false;
+            }
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Financial_id').val() });
+        });
+
+        //$('#export').on('click', function (e) {
+        //    $.ajax({
+        //        method: "Get",
+        //        url: "Url.Action('ExportToExcel')",
+        //        data: {data : }
+        //    });
+        //});
+
+
+
+
+        $('#export').on('click', function (e) {
+            // AssignData();
+            ////debugger;
+            var a = $.GetGridSelctedvalue("#JqGrid", "QuarterName");
+            if (a != 0) {
+                console.log(a.toString());
+                $('#export').attr('href', "ITForm24Q/ExportToExcel?data=" + a.toString() + '&Financial=' + $('#Financial_id').val());
+
+            } else if (a == 0) {
+                alert("Please Select The Record");
+                return false;
+            } else
+                if (a.length > 1) {
+                    alert("Please Select Only One Record");
+                    return false;
+                }
+
+
+        });
+
+
+
+        function AssignData() {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            dt = $.GetGridSelctedvalue("#JqGrid", "Id");
+            alert('hello');
+        }
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+
+                },
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+
+        $('#process').on("click", function (event) {
+
+            if (!$("#Financial_id").val()) {
+
+                alert("Please Select Financial Year.")
+                return false;
+            }
+
+            $('#frmITForm24Q').trigger("reset");
+            //$.LoadEmpByDefault();
+            $('#process').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcess")",
+                month: "#Financial_id",
+                msg: "Already Process !!! Do you want to re-process ?",
+                status: function (data) {
+                    if (data == true) {
+
+                        // $("#FinancialYearList").append("<tr><td>" + $("#txtPayMonth").val());
+                        //     $('#txtfinancialyear_id').val($('#Financial_id').val());
+                        //alert($('#txtfinancialyear_id').val());
+
+                        $.get("@Url.Action("getCalendar", "ITInvestmentPayment80CCCTo80CCF")", function (data) {
+                            $('#dispcalender').val(data.Lvcalendardesc);
+                            $('#dispcalender').attr('readonly', 'readonly');
+                            $('#dispcalender_id').val(data.Id);
+                            console.log(data);
+                        });
+
+                        var newrow = $('#txtPayMonth').val();
+
+                        $('#FinancialYearList tr:last').after(newrow);
+                        $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create ITForm24Q', 'open', '@Url.Action("Create")', '#frmITForm24Q', 'Message :', 'Request Falied :', '#JqGrid', 400, 600, '', '', function (data) { });
+                        $('#dispcalender').attr('readonly', 'readonly');
+                        $('#SignPersonlist').P2BSelectMenuAppend('@Url.Action("GetSignPersonList", "ITForm24Q")', "", ""); // To bind dropdown on page load
+                        $('#QuarterNamelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 606, "");
+                        $.LoadEmpByDefault();
+
+                    }
+                }
+            });
+            event.preventDefault();
+        });
+
+        $('input[name="IsCancelled1"]:radio').change(function () {
+            ////debugger;
+            if (this.value == "true") {
+                $.ajax({
+                    url: "@Url.Action("ChkItprojection")",
+                    data: { month: $("#Financial_id").val() },
+                    beforeSend: function () {
+                        ajaxloaderv2('body');
+                    },
+                    success: function (data) {
+                        ajaxLoderRemove();
+                        if (data.status == true) {
+                            var newdia = $("<div id='newDia'>" + "Income Tax Projection Allready Process on this date "+data.date+"!!!Do You Want Reprocess??" + "</div>");
+                            newdia.dialog({
+                                autoOpen: false,
+                                height: 200,
+                                width: 350,
+                                title: "Confirm Box",
+                                modal: true,
+                                beforeclose: function () {
+                                    $(newdia).remove();
+                                },
+                                buttons: {
+                                    Confirm: function () {
+                                        ////debugger;
+                                        var $list = $("#frmITForm24Q :input[name='ItproJectionProcess']");
+                                        console.log($list);
+                                        if ($list.length >0) {
+                                            $list.remove();
+                                        }
+                                        var el = '<input type="hidden" name="ItproJectionProcess" value="true"></input>';
+                                        $('#frmITForm24Q').append(el);
+                                        newdia.dialog("close");
+                                    },
+                                    Cancel: function () {
+                                        var $list = $("#frmITForm24Q :input[name='ItproJectionProcess']");
+                                        console.log($list);
+                                        if ($list.length > 0) {
+                                            $list.remove();
+                                        }
+                                        var el = '<input type="hidden" name="ItproJectionProcess" value="False"></input>';
+                                        $('#frmITForm24Q').append(el);
+                                        newdia.dialog("close");
+                                        
+                                    }
+                                }
+                            });
+                            newdia.dialog('open');
+                        }
+                    }
+                });
+            }
+            else {
+               
+            }
+        });
+
+        $('#release').on('click', function (e) {
+            var a = $.GetGridSelctedvalue("#JqGrid", "Id");
+            a = a != null ? a.toString() : null;
+            $.post("@Url.Action("ReleaseProcess")", { forwardata: a, PayMonth: $("#Financial_id").val() }, function (data) {
+                console.log(data);
+            }).done(function (data) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+
+            }).fail(function (data) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+            });
+            e.preventDefault();
+        });
+
+        $('#Lookup_FinancialYear').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "ITForm16")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmITProjection', 'N', '#remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#remove_FinancialYear').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#FinancialYearList').P2BGetTableDataonSelectedRow('#FinancialYearList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#FinancialYearList', $('#FinancialYearList').val(), 200, 200, '#frmITProjection', '#FinancialYearList', '');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#SignPersonlist').selectmenu().selectmenu("menuWidget");
+        $('#QuarterNamelist').selectmenu().selectmenu("menuWidget");
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "ITForm16")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#Lookup_FinancialYear_Calendar1').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#dispcalender",
+                appendToId: "#dispcalender_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "ITForm16")",
+                NoOfRecordToShow: "10",
+            setnameofthelookupbyppage: "HusbandName_FName-lookup",
+            LookupDiv: "LookupDiv",
+            lookuppagename: "lookup",
+            pagename: "PageNavPosition",
+            readonly: true,
+            });
+    });
+    $('#edit_model_dialog').P2BGridDialog();
+
+
+        $('#View').on('click', function (e) {
+            AssignData();
+            var arr = [];
+            arr.push(dt.Id);
+            // arr.push(struct_id);
+            console.log(arr);
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("")",
+                form: "#frmeditinlinegrid",
+                height: 500,
+                width: 1100,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("ViewProjection", "ITForm16")",
+                editdata: dt.Id,
+                filter: dt.Id,
+                returnToGrid: "#JqGridProjection",
+            });
+        });
+
+        $('#FromPeriod').P2BDatePicker();
+        $('#ToPeriod').P2BDatePicker();
+
+
+
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: -45px;
+            top: -150px;
+        }
+
+        #Lookup_FinancialYear_Calendar {
+            left: 280px;
+            top: 20px;
+        }
+
+        #Lookup_FinancialYear_Calendar1 {
+            left: 464px;
+            top: 43px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            width: 138px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 853px;
+            margin-top: inherit;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 853px;
+            display: inline-flex;
+        }
+
+        .date-picker {
+            z-index: 999;
+        }
+
+        .employeeselectiondiv {
+            float: left;
+        }
+
+        .addons {
+            height: 246px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .section_Method_AnnulaSalR {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            height: 250px;
+        }
+
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 600px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 400px;
+            width: 581px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+
+        .btn {
+            display: inline-block;
+            /*padding: 6px 12px;*/
+            margin-bottom: 0;
+            font-size: 10px;
+            font-weight: normal;
+            line-height: 1.428571429;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            /*border: 1px solid transparent;*/
+            /*border-radius: 4px;*/
+            /*-webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;*/
+            width: auto;
+            position: relative;
+            top: 1px;
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            border: 1px solid #c5c5c5;
+            color: rgba(60, 60, 60, 0.93);
+            padding: 5px 10px;
+            border-radius: 2px;
+        }
+
+        .btn-primary {
+            /*color: #ffffff;*/
+            /*background-color: #428bca;*/
+            border-color: #357ebd;
+        }
+
+        button {
+            width: auto;
+        }
+
+            button:hover {
+                box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8px 25px 0 rgba(0,0,0,0.19);
+                -webkit-transition-duration: 0.4s; /* Safari */
+                transition-duration: 0.4s; /* Normal */
+            }
+
+            button:active {
+                position: relative;
+                top: 1px;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float: left; width: 285px;">
+                    @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
+                    <label id="lblPayMonth" class="popup-content-label must">Financial Year:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" data-typeofbtn="process" id="process">Process</button>
+                <button class="button" data-typeofbtn="release" id="release">Lock</button>
+                <button class="button" data-typeofbtn="view" id="View">View</button>
+                @*@Html.ActionLink("Export to Excel", "ExportToExcel")*@
+                @* <a href="#" class="btn btn-primary button" data-typeofbtn="export" id="export">Export</a>*@
+                <a href="#" class="button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-typeofbtn="export" style="height: 24px;" id="export">
+                    <span class="ui-button-text">Export</span>
+                </a>
+
+
+                @*<button class="button" data-typeofbtn="export" id="export">Export To Excel</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+                <div id="DataArea"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmITForm24Q", name = "frmITForm24Q" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input type="text" id="txtfinancialyear_id" name="txtfinancialyear_id" class="filter_structure_id" />
+            <div class="HideDivForm">
+                @*<div class="section_Method">
+                        <div class="heading">Filter View</div>
+                        <div class="filter-div">
+                            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                            <div id="FormFilter"></div>
+                        </div>
+                    </div>*@
+                @*<div class="section1_Leave">
+                        <div class="heading">Employee List</div>
+                        <div class="employeeselectiondiv">
+                            <div class="transactiondivnew dynamic addons" style="float:left">
+                                <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                                </table>
+                            </div>
+                            <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                            <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                            <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                        </div>
+                    </div>*@
+
+                @*<div class="section2_Leave">*@
+                <div class="heading">Financial Year Selection</div>
+
+                <div class="row2 content_margine">
+                    @*@Html.LabelFor(m => m.Tiltle, "Title:", new { @class = "popup-content-label" })
+                        @Html.TextBoxFor(m => m.Tiltle, new { @class = "popup-content-textbox datepicker must" })
+                        @Html.LabelFor(m => m.FromPeriod, "FromPeriod:", new { @class = "popup-content-label" })
+                        @Html.TextBoxFor(m => m.FromPeriod, new { @class = "popup-content-textbox datepicker must", @name = "FromPeriod" })
+                        @Html.LabelFor(m => m.ToPeriod, "ToPeriod:", new { @class = "popup-content-label" })
+                        @Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox datepicker must", @name = "ToPeriod" })*@
+
+                </div>
+
+                <div class="row3 content_margine">
+                    <div class="row3 content_margine">
+
+                        <div id="FinancialYearList_old"></div>
+                        @Html.LabelFor(m => m.FinancialYear, "Financial year:", new { @class = "popup-content-label1" })
+                        <input type="text" hidden id="dispcalender_id" name="FinancialYearList" />
+                        <input type="text" readonly id="dispcalender" name="" style="width:300px" />
+
+                        <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar1"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                    </div>
+
+                    <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.ITForm16SigningPerson, "Signing Authority :", new { @class = "popup-content-label1 must" })<select id="SignPersonlist" name="SignPersonlist" class="must" style="width:277px;"><option></option></select></div>
+                    <div class="dropdown_row1 row3 content_margine">@Html.Label("Quarter Name :", new { @class = "popup-content-label1 must" })<select id="QuarterNamelist" name="QuarterNamelist" class="must" style="width:277px;"><option></option></select></div>
+
+                    <div class="dropdown_row1 row3 content_margine">
+                        <label class="popup-content-label1">Annexure II Process :</label>
+                        <span class="popup_radio_button radiopush">
+                            <span><input type="radio" id="radio11" name="IsCancelled1" value="true" /> <label for="radio11">Yes</label></span>
+                            <span><input type="radio" id="radio22" name="IsCancelled1" value="false" checked="checked" /> <label for="radio22">No</label></span>
+                        </span>
+                    </div>
+                    <br />
+                    <div class="dropdown_row1 row3 content_margine">
+                        <label class="popup-content-label1"></label>
+                        <span class="popup_radio_button radiopush">
+                            <span><input type="radio" id="radio12" name="IsCancelled2" value="true" /> <label for="radio12">Tax Deducted Employees</label></span>
+                            <span><input type="radio" id="radio24" name="IsCancelled2" value="false" checked="checked" /> <label for="radio24">Tax Deducted for all Employees</label></span>
+                        </span>
+                    </div>
+
+                </div>
+
+                @*</div>*@
+
+            </div>
+
+
+
+
+        }
+    </div>
+    <div id="edit_model_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmITForm24Q", name = "frmITForm24Q" }))
+        {
+
+            <div id="Grid_FormProjection">
+                <div>
+                    <table id="JqGridProjection"></table>
+                    <div id="pager2Projection"></div>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

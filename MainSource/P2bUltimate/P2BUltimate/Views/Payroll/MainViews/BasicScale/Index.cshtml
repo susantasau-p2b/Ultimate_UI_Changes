@@ -1,0 +1,264 @@
+﻿@{
+    ViewBag.Title = "Basic Scale";
+}
+@model Payroll.BasicScale
+@*<link href="~/Content/Basic_Scale/Basic_scale.css" rel="stylesheet" />*@
+<style>
+    .icon-row {
+        left: 80px;
+        top: 31px;
+    }
+
+    .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var btndisablenames = "#BSCALEDETAILS_Edit,#BSCALEDETAILS_Remove";
+        var SortName, Caption, url, width, height;
+        ColModel = ['ScaleName','Id'];
+        ColNames = ['ScaleName', 'Id'];
+        SortName = 'Id';
+        Caption = 'Basic Scale';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('.popup_radio_button').controlgroup();
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#ScaleName').ValidateTextBox({ maxlength: 50, name: true, alphanum: true });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmbasicscale').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Basic Scale', 'open', '@Url.Action("Create")', '#frmbasicscale', 'Message :', 'Request Falied :', '#JqGrid', 326, 620, '#BSCALEDETAILS_List', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Basic Scale", '#frmbasicscale', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 326, 620, '#BSCALEDETAILS_List', '', function (data) {
+                $('#ScaleName').attr('readonly', true);
+
+                $.each(data[1], function (i, k) {
+
+                    $('#BSCALEDETAILS_List').P2BLookUpEncapsulate('#BSCALEDETAILS_List', 'BSCALEDETAILS_List', k.BSDL_Id, k.BSDL_FullDetails, 'BSCALEDETAILS_List', '#BSCALEDETAILS_LookUp,#BSCALEDETAILS_Edit,#BSCALEDETAILS_Remove', 'A');
+                });
+                $.each(data[0], function (i, k) {
+                    $('#frmbasicscale').trigger('reset');
+                    $('#ScaleName').val(k.ScaleName)
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+        //View main page
+        $('#View').button().click(function (event){
+            AssignData();
+            //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#TimingPolicylist', 'Lookup-ContactDetails-TimingGroup,#Create-ContactDetails-TimingGroup,#Edit-ContactDetails-TimingGroup,#Remove-ContactDetails-TimingGroup', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Basic Scale', '#BSCALEDETAILS_List', '#BSCALEDETAILS_Lookup,#BSCALEDETAILS_Create,#BSCALEDETAILS_Edit,#BSCALEDETAILS_Remove', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Id').val(k.Id);
+                    $('#ScaleName').val(k.ScaleName);
+                });
+
+                $.each(data[1], function (i, k) {
+                    // $('#LookupValueslist').P2BLookUpEncapsulate('#LookupValueslist', 'LookupValueslist', k.lookupval_id[i], k.lookupval_val[i], 'LookupValueslist', '', 'A');
+                    //$('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.TimingPolicy_Id[i], k.TimingPolicy_FullDetails[i], 'TimingPolicylist', '#Edit-ContactDetails-TimingGroup,#Remove-ContactDetails-TimingGroup', 'A');
+                    $('#BSCALEDETAILS_List').P2BLookUpEncapsulate('#BSCALEDETAILS_List', 'BSCALEDETAILS_List', k.BSDL_Id, k.BSDL_FullDetails, 'BSCALEDETAILS_List', 'view', 'A');
+
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#ScaleName').StickNote(data[2].ScaleName);
+                    $('#BSCALEDETAILS_List').StickNote(data[2].BasicScaleDetails_Val);
+                }
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete", "BasicScale")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#BSCALEDETAILS_LookUp').button().on('click', function (event) {
+            //$('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "Lookup")', '', 'LookupDiv', 'Look Up Data', '#LookupValueslist', 'LookupValueslist', 10, 'LookupValueslist', '#frmLookup', 'A', '#Edit-LookupValues-Lookup', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetBasicScaleDetails", "BasicScale")', '', 'LookupDiv', 'Look BasicScale Details', '#BSCALEDETAILS_List', 'BSCALEDETAILS_List', 5, 'BSCALEDETAILS_List', '#frmbasicscale', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#BSCALEDETAILS_Create').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "BasicScaleDetails")', 'Create Basic Scale Details', 'open', '@Url.Action("Create", "BasicScaleDetails")', '#frmBasicScaleDetails', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', '#BSCALEDETAILS_List', '', function (data) {
+                $('#BSCALEDETAILS_List').P2BLookUpEncapsulate('#BSCALEDETAILS_List', 'BSCALEDETAILS_List', data[0], data[1], 'BSCALEDETAILS_List', '#BSCALEDETAILS_Edit,#BSCALEDETAILS_Remove', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#BSCALEDETAILS_Edit').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#BSCALEDETAILS_List').P2BGetTableDataonSelectedRow('#BSCALEDETAILS_List', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "BasicScaleDetails")', '@Url.Action("Edit", "BasicScaleDetails")', b, '@Url.Action("Editsave", "BasicScaleDetails")', 'Edit Basic Scale Details', '#frmBasicScaleDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmbasicscale', '#BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'A', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmBasicScaleDetails').trigger("reset");
+                       $('#StartingSlab').val(k.StartingSlab);
+                       $('#IncrementCount').val(k.IncrementCount);
+                       $('#IncrementAmount').val(k.IncrementAmount);
+                       $('#EndingSlab').val(k.EndingSlab);
+                       $('[name="EBMark"]').val([k.EBMark]).button().button("refresh");
+                });
+                //}, 3000);
+            });
+            event.preventDefault();
+        });*@
+
+
+
+        @*//function (url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable, multiple_allowed_or_not, nameidclassofbuttontodisable, returndatafunction) {
+        $('#BSCALEDETAILS_Edit').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#BSCALEDETAILS_List').P2BGetTableDataonSelectedRow('#BSCALEDETAILS_List', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "BasicScaleDetails")', '@Url.Action("Edit", "BasicScaleDetails")', b, '@Url.Action("EditSave", "BasicScaleDetails")', 'Edit Basic scale Dialog', '#frmBasicScaleDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmbasicscale', ' ', '#BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'A', function (data) {
+                //setTimeout(function () {
+
+                $.each(data[0], function (i, k) {
+
+                    $('#frmBasicScaleDetails').trigger("reset");
+                    $('#StartingSlab').val(k.StartingSlab);
+                    $('#IncrementCount').val(k.IncrementCount);
+                    $('#IncrementAmount').val(k.IncrementAmount);
+                    $('#EndingSlab').val(k.EndingSlab);
+                    $('[name="EBMark"]').val([k.EBMark]).button().button("refresh");
+
+
+                });
+                // },1000);
+            });
+            event.preventDefault();
+        });*@
+
+        $('#BSCALEDETAILS_Edit').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#BSCALEDETAILS_List').P2BGetTableDataonSelectedRow('#BSCALEDETAILS_List', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "BasicScaleDetails")', '@Url.Action("Edit", "BasicScaleDetails")', b, '@Url.Action("Editsave", "BasicScaleDetails")', 'Edit Basic Scale Details', '#frmBasicScaleDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmbasicscale', '#BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'BSCALEDETAILS_List', 'A', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+              //  $('#StartingSlab').attr('readonly', true);
+                $('#EndingSlab').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+                    $('#frmBasicScaleDetails').trigger("reset");
+                    $('#StartingSlab').val(k.StartingSlab);
+                    $('#IncrementCount').val(k.IncrementCount);
+                    $('#IncrementAmount').val(k.IncrementAmount);
+                    $('#EndingSlab').val(k.EndingSlab);
+                    $('[name="EBMark"]').val([k.EBMark]).button().button("refresh");
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+                //        function (deleteurl, deletedata, forwarddata, deletemessage, deletesuccessmessage, deleteerrormessage, selectfield, optionvalue, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup) {
+
+        $('#BSCALEDETAILS_Remove').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#BSCALEDETAILS_List').P2BGetTableDataonSelectedRow('#BSCALEDETAILS_List', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#BSCALEDETAILS_List').P2BGetTableDataonSelectedRow('#BSCALEDETAILS_List', 0);
+            console.log("Verify...");
+            
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#BSCALEDETAILS_List').val(), 200, 200, '#frmbasicscale', '#BSCALEDETAILS_List');
+            event.preventDefault();
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#dob').P2BDatePicker();
+    });
+</script>
+
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmbasicscale", name = "frmbasicscaleEdit" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class=" row1 content_margine">
+                @Html.LabelFor(m => m.ScaleName, "Scale Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ScaleName, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row1 content_margine" >
+                <div id="BSCALEDETAILS_List_old"></div>
+                @Html.LabelFor(m => m.BasicScaleDetails, "Details :", new { @class = "popup-content-label" })
+                <div class="popup-content-table" style="width: 516px;">
+                    <table class="lookuptableselected" id="BSCALEDETAILS_List">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select Basic Scale Details" class="popup-content-icon-lookup" id="BSCALEDETAILS_LookUp"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Basic Scale Details" class="popup-content-icon-create" id="BSCALEDETAILS_Create"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Basic Scale Details" class="popup-content-icon-edit" id="BSCALEDETAILS_Edit"><span class=" ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Basic Scale Details" class="popup-content-icon-remove" id="BSCALEDETAILS_Remove"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

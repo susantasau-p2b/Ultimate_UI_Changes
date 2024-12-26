@@ -1,0 +1,413 @@
+﻿@{
+    ViewBag.Title = "JVFile";
+}
+@model Payroll.JVFileName
+<script>
+    $(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+
+        $('#JVName').ValidateTextBox({ maxlength: 20, name: true });
+        $('#JVName').ForceOnlyAlpha();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'JVFile';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmJVFileName').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', 0, '', '', 'Create JVFile Dialog', 'open', '@Url.Action("Create")', '#frmJVFileName', 'Message :', 'Request Falied :', '#JqGrid', 650, 620, '#JVHeadList,#JVFieldList,#JVFileFormatList', '', function () { });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit JV File Data", '#frmJVFileName', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 650, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmJVFileName').trigger("reset");
+                    $('#Name').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#JVFileFormatList').P2BLookUpEncapsulate('#JVFileFormatList', 'JVFileFormatList', k.JVFileFormat_Id, k.JVFileFormat_FullDetails, 'JVFileFormatList', '#Remove-JVFileFormat-JVFileName', 'A');
+                  
+                   
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#JVHeadList').P2BLookUpEncapsulate('#JVHeadList', 'JVHeadList', k.JVHead_Id, k.JVHead_FullDetails, 'JVHeadList', '', 'A');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#JVFieldList').P2BLookUpEncapsulate('#JVFieldList', 'JVFieldList', k.JVField_Id, k.JVField_FullDetails, 'JVFieldList', '', 'A');
+                });
+                $('#Autho_Allow').val(data[3]);
+            });
+
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View JV File Data', '#JVHeadList,#JVFieldList,#JVFileFormatList', '#Lookup-LoanAdvanceHead-LoanAdvanceHead,#Create-LoanAdvanceHead-LoanAdvanceHead,#Edit-LoanAdvanceHead-LoanAdvanceHead,#Remove-LoanAdvanceHead-LoanAdvanceHead,#Lookup-ContactDetails-LoanAdvanceHead,#Create-ContactDetails-LoanAdvanceHead,#Edit-ContactDetails-LoanAdvanceHead,#Remove-ContactDetails-LoanAdvanceHead', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmJVFileName').trigger("reset");
+                    $('#Name').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#JVFileFormatList').P2BLookUpEncapsulate('#JVFileFormatList', 'JVFileFormatList', k.JVFileFormat_Id, k.JVFileFormat_FullDetails, 'JVFileFormatList', '#Remove-JVFileFormat-JVFileName', 'A');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#JVHeadList').P2BLookUpEncapsulate('#JVHeadList', 'JVHeadList', k.JVHead_Id, k.JVHead_FullDetails, 'JVHeadList', '', 'A');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#JVFieldList').P2BLookUpEncapsulate('#JVFieldList', 'JVFieldList', k.JVField_Id, k.JVField_FullDetails, 'JVFieldList', '', 'A');
+                });
+                $('#Autho_Allow').val(data[3]);
+
+                
+            });
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        };
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#frmJVParameter').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JqGrid');
+        });
+
+        $('#Lookup-JVHeadList-JVFileName').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetJVHeadLKDetails", "JVFileName")', '', 'LookupDiv', 'JVHead Look Up Data', '#JVHeadList', 'JVHeadList', 5, 'JVHeadList', '#frmJVFileName', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-JVHeadList-JVFileName').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JVHeadList').P2BGetTableDataonSelectedRow('#JVHeadList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JVHeadList').P2BGetTableDataonSelectedRow('#JVHeadList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JVHeadList', $('#JVHeadList').val(), 200, 200, '#frmJVFileName', '#JVHeadList', '#Remove-JVHeadList-JVFileName');
+            event.preventDefault();
+        });
+
+        $('#Lookup-JVFileFormat-JVFileName').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetJVFileFormatLKDetails", "JVFileName")', '', 'LookupDiv', 'JVHead Look Up Data', '#JVFileFormatList', 'JVFileFormatList', 5, 'JVFileFormatList', '#frmJVFileName', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JVFileFormat-JVFileName').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("_JVFileFormatPartial", "JVFileFormat")', 'Create JVFileFormat', 'open', '@Url.Action("Create", "JVFileFormat")', '#frmJVFileFormat', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmJVFileFormat', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+                // to show data which is created in partial page
+
+                $('#JVFileFormatList').P2BLookUpEncapsulate('#JVFileFormatList', 'JVFileFormatList', data[0], data[1], 'JVFileFormatList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JVFileFormat-JVFileName').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JVFileFormatList').P2BGetTableDataonSelectedRow('#JVFileFormatList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("_JVFileFormatPartial", "JVFileFormat")', '@Url.Action("Edit", "JVFileFormat")', b, '@Url.Action("Editsave", "JVFileFormat")', 'Edit JV FileFormat Details', '#frmJVFileFormat', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJVFileName', '#JVFileFormatList', 'JVFileFormatList', 'JVFileFormatList', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJVFileFormat').trigger('reset');
+                    $('#FormatType_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1075, k.FormatType_Id);
+                    $('#Seperator_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1076, k.Seperator_Id);
+                    $('#CBS_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1077, k.CBS_Id);
+                    $('#Version_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1078, k.Version_Id);
+                });
+                //}, 3000);
+                //$.each(data[1], function (i, k) {
+                //    $('#PayrollPeriodlist').P2BLookUpEncapsulate('#PayrollPeriodlist', 'PayrollPeriodlist', k.PayrollPeriod_Id, k.FullPayrollPeriodDetails, 'PayrollPeriodlist', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', 'N');
+
+                //});
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-JVFileFormat-JVFileName').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JVFileFormatList').P2BGetTableDataonSelectedRow('#JVFileFormatList', 0);
+            //b = a[0];
+           
+            var selectedRows = [];
+            selectedRows = $('#JVFileFormatList').P2BGetTableDataonSelectedRow('#JVFileFormatList', 0); 
+           
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JVFileFormatList', $('#JVFileFormatList').val(), 200, 200, '#frmJVFileFormat', '#JVFileFormatList', '#Remove-JVFileFormat-JVFileName');
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-JVField-JVFileName').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetJVFieldLKDetails", "JVFileName")', '', 'LookupDiv', 'JVField Look Up Data', '#JVFieldList', 'JVFieldList', 5, 'JVFieldList', '#frmJVFileName', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JVField-JVFileName').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("_JVFieldPartial", "JVField")', 'Create JVField', 'open', '@Url.Action("Create", "JVField")', '#frmJVField', 'Message :', 'Request Falied :', '#JqGrid', 680, 600, '', '', '', '#frmJVField', '', function (data) {
+                // to show data which is created in partial page
+                $('#JVFieldList').P2BLookUpEncapsulate('#JVFieldList', 'JVFieldList', data[0], data[1], 'JVFieldList', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JVField-JVFileName').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#JVFieldList').P2BGetTableDataonSelectedRow('#JVFieldList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("_JVFieldPartial", "JVField")', '@Url.Action("Edit", "JVField")', b, '@Url.Action("EditSave", "JVField")', 'Edit JV Field Details', '#frmJVField', b, 'Message :', 'Request Falied :', '#JqGrid', 680, 600, '#frmJVFileName', '#JVFieldList', 'JVFieldList', 'JVFieldList', 'A', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmJVField').trigger('reset');
+                    $('#Size').val(k.Size);
+                    $('#SeqNo').val(k.SeqNo);
+                    $('#ConcatDataSize').val(k.ConcatDataSize);
+                    $('#SplitDataSize').val(k.SplitDataSize);
+                    $('#SeqNo').val(k.SeqNo);
+                    $('[name="PaddingAppl"]').val([k.PaddingAppl]).button().button("refresh");
+                    $('#PaddingChar').val(k.PaddingChar);
+                    $('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1079, k.Name_Id);
+                    $('#PaddingChar_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1080, k.PaddingChar_Id);
+                    $('#Value_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1081, k.Value_Id);
+                    $('#PaddingSide_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1082, k.PaddingSide_Id);
+                    $('#ConcatData_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1083, k.ConcatData_Id);
+                    $('#ConcatDataPaddingSide_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1082, k.ConcatDataPaddingSide_Id);
+                    $('#SplitData_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1083, k.SplitData_Id);
+                    $('#SplitDataPaddingSide_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1082, k.SplitDataPaddingSide_Id);
+                    $('#ConcatDataValue_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1081, k.ConcatDataValue_Id);
+                    $('#SplitDataValue_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1081, k.SplitDataValue_Id);
+                    $('[name="ConcatDataPaddingAppl"]').val([k.ConcatDataPaddingAppl]).button().button("refresh");
+                    $('[name="SplitDataPaddingAppl"]').val([k.SplitDataPaddingAppl]).button().button("refresh");
+                    $('[name="SkipSeperator"]').val([k.SkipSeperator]).button().button("refresh");
+                    $('[name="HeaderAppl"]').val([k.HeaderAppl]).button().button("refresh");
+                    if (k.HeaderAppl == false) {
+                        $('#Hdname').fadeOut();
+
+
+                    }
+                    else {
+
+                        $('#Hdname').fadeIn();
+                    }
+                    $('#HeaderName').val(k.HeaderName);
+                });
+                //}, 3000);
+                //$.each(data[1], function (i, k) {
+                //    $('#ValueList').P2BLookUpEncapsulate('#ValueList', 'ValueList', k.Value_Id, k.ValueFullDetails, 'ValueList', '', 'A');
+
+                //});
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-JVField-JVFileName').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#JVFieldList').P2BGetTableDataonSelectedRow('#JVFieldList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#JVFieldList').P2BGetTableDataonSelectedRow('#JVFieldList', 0); 
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JVFieldList', $('#JVFieldList').val(), 200, 200, '#frmJVFileName', '#JVFieldList', '#Remove-JVField-JVFileName');
+            event.preventDefault(); 
+        });
+
+
+
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+
+
+    });
+</script>
+<style>
+    .icon-row {
+        left: -343px;
+        position: relative;
+        top: 25px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 133px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 551px;
+        display: inline-flex;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 434px;
+    }
+
+    /*.icon-row {
+        left: 94px;
+        position: relative;
+        top: -147px;
+    }*/
+
+    .row1 {
+        width: 190px;
+        display: block;
+        margin: 1px 1px 6px 6px;
+        float: left;
+    }
+
+    .row2 {
+        float: left;
+    }
+
+    .filter_row {
+        padding-top: 60px;
+    }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .transcation_btn {
+        width: 21px;
+        height: 21px;
+    }
+
+    .StrctSelectionClass {
+        float: left;
+    }
+
+    .grid_colllpase_height {
+        height: 43px;
+    }
+
+    .row8 {
+        /*! display: inline-block; */
+        /*! width: 199px; */
+        /*! float: left; */
+    }
+</style>
+<div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dialog">
+            <div title="LookUp Data">
+                <div class="LookupDiv"></div>
+            </div>
+            <div id="PageNavPosition">
+
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <form id="frmJVFileName" method="post" name="frmJVFileName">
+
+            <div class="content_margine row3">
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })</div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="JVHeadlist_old"></div>@Html.LabelFor(m => m.JVHeadList, "JVHeadList :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JVHeadList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select JVHeadList" class="  popup-content-icon-lookup" id="Lookup-JVHeadList-JVFileName"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create JVHeadList" class="  popup-content-icon-create" id="Create-JVHeadList-JVFile"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove JVHeadList" class="  popup-content-icon-remove" id="Remove-JVHeadList-JVFileName"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="JVFileFormatlist_old"></div>@Html.LabelFor(m => m.JVFileFormat, "JVFile Format :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JVFileFormatList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select JVFileFormat" class="  popup-content-icon-lookup" id="Lookup-JVFileFormat-JVFileName"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create JVFileFormat" class="  popup-content-icon-create" id="Create-JVFileFormat-JVFileName"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit JVFileFormat" class="  popup-content-icon-edit" id="Edit-JVFileFormat-JVFileName"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove JVFileFormat" class="  popup-content-icon-remove" id="Remove-JVFileFormat-JVFileName"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="JVFieldlist_old"></div>@Html.LabelFor(m => m.JVField, "JVField :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JVFieldList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select JVField" class="  popup-content-icon-lookup" id="Lookup-JVField-JVFileName"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create JVField" class="  popup-content-icon-create" id="Create-JVField-JVFileName"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit JVField" class="  popup-content-icon-edit" id="Edit-JVField-JVFileName"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove JVField" class="  popup-content-icon-remove" id="Remove-JVField-JVFileName"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,284 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.TADASettlementClaim
+
+<style>
+    #lvdata {
+        float: right;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 122px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 222px;
+    }
+
+    .row3 {
+        /*! width: 600px; */
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 250px;
+        display: inline-block;
+        /*! margin-left: -89px; */
+        position: absolute;
+        left: 191px;
+        top: 137px;
+    }
+
+    .loader {
+        width: 299px;
+        /*! display: inline-flex; */
+        /*! margin-left: -89px; */
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 29px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        /*! margin: 0 auto; */
+        width: 379px;
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*! width: 507px; */
+        border-radius: 5px;
+        height: 100%;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: left;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        /*! width: 511px; */
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 502px;
+        width: 68%;
+        /*! margin: 5px 4px; */
+        position: absolute;
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        /*! height: 502px; */
+        width: 369px;
+        /*! margin: 5px 4px; */
+        /*! position: absolute; */
+        /*! left: 842px; */
+        /*! top: 91px; */
+        float: right;
+    }
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 78%;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    .weeklyoffclass {
+        background-color: #e8fefa;
+    }
+
+    .holidayclass {
+        background-color: #e8f3f1;
+    }
+
+    .hide_textbox {
+        display: none;
+    }
+</style>
+<script>
+
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').buttonset()
+        if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "MySelf".toUpperCase()) {
+            $('#MySelf-div').hide();
+            $('#SanctionReasonDiv,#ApprovalReasonDiv').hide();
+            $('#authority').val($.LocalStorageHelper.Get("Whois"));
+        }
+
+        var SelectTadaId = "";
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            $('#MySelf-div').show();
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+            $.each(target, function (i, k) {
+                var childs = $(k).children().toArray();
+                SelectTadaId = ($(childs[5]).text());               
+            });
+            $.ajax({
+                url: "@Url.Action("TADA_Settelment_Id", "TADASettlementClaim")?SelectTadaIds=" + SelectTadaId,
+                method: "POST",            
+                success: function (data) {
+            }
+        });
+        e.preventDefault();
+    });        
+    });
+</script>
+
+<body>
+    @*<div id="create_dialog1" title="Create TrainingNeed Request">*@
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frm_edit_form", name = "frm_edit_form" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="EmpAppraisal_id" class="filter_structure_id" name="EmpAppraisal_id" />
+            <input type="text" class="hide_textbox" name="authority" id="authority" />
+            <input type="text" class="hide_textbox" name="isClose" id="isClose" />
+
+            <div>
+                <table id="monthTable">
+                    <tr><th>Sr.No</th><th>JourneyStartDate</th><th>JourneyEndDate</th><th>RequisitionDate</th><th>Status</th><th>TadaId</th></tr>
+                </table>
+            </div>
+            <div class="section_Method hide-div" id="MySelf-div">
+                <div id="MySelfDiv">
+                    <div class="heading">MySelf Authority Views</div>
+                    <div id="yes_no_div" class="row1 content_margine">
+                        <label class="popup-content-label">
+                            Is Cancel:
+                        </label>
+                        <div class="popup_radio_button">
+                            <input type="radio" name="IsCancel" value="true" id="rdo5" /><label for="rdo5">Yes</label>
+                            <input type="radio" name="IsCancel" id="rdo6" value="false" /><label for="rdo6">No</label>
+                        </div>
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Reason :</label>
+                        <input type="text" id="Grid-ReasonIsCancel" name="ReasonMySelf" />
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    @*</div>*@
+</body>
+
+

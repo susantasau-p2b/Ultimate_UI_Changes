@@ -1,0 +1,988 @@
+﻿@{
+    ViewBag.Title = "Leave Credit Policy";
+}
+@model Leave.LvCreditPolicy
+<!DOCTYPE html>
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = [ 'PolicyName', 'ProCreditFrequency', 'MaxLeaveDebitInService','Id'];
+        ColNames = [ 'Policy Name', 'Pro Credit Frequency', 'Max Leave Debit In Service','Id'];
+        SortName = 'Id';
+        Caption = 'Leave Credit Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#PolicyName').ValidateTextBox({ maxlength: 25, name: true ,alphanum: true});
+       // $('#PolicyName').toUpperCase();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#ProCreditFrequency').ForceOnlyNumeric();
+        $('#ProCreditFrequency').MaxLength(10);
+        $('#CreditDays').ForceOnlyNumeric();
+        $('#CreditDays').MaxLength(10);
+        $('#WorkingDays').ForceOnlyNumeric();
+        $('#WorkingDays').MaxLength(10);
+        $('#AccumalationLimit').ForceOnlyNumeric();
+        $('#AccumalationLimit').MaxLength(10);
+        $('#ServiceYearsLimit').ForceOnlyNumeric();
+        $('#ServiceYearsLimit').MaxLength(10); 
+        $('#ServicemaxYearsLimit').ForceOnlyNumeric();
+        $('#ServicemaxYearsLimit').MaxLength(10);
+        $('#MaxLeaveDebitInService').ForceOnlyNumeric();
+        $('#MaxLeaveDebitInService').MaxLength(10);
+        $('#AboveServiceMaxYears').ForceOnlyNumeric();
+        $('#AboveServiceMaxYears').MaxLength(10);
+        $('#LvConvertLimit').ForceOnlyNumeric();
+        $('#LvConvertLimit').MaxLength(10);
+        $('#LvConvertLimitBal').ForceOnlyNumeric();
+        $('#LvConvertLimitBal').MaxLength(10);
+        $('#OccInServ').ForceOnlyNumeric();
+        $('#OccInServ').MaxLength(10);
+        $('#AboveServiceSteps').ForceOnlyNumeric();
+        $('#AboveServiceSteps').MaxLength(10);
+
+        $('#FromPeriod').P2BDatePicker();
+        $('#ToPeriod').P2BDatePicker();
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#HideCreditDate').hide();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmLvCreditPolicy').trigger("reset");
+            $('#Lookup_LvheadDetails').attr("disabled", false);
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Credit Policy', 'open', '@Url.Action("Create")', '#frmLvCreditPolicy', 'Message :', 'Request Falied :', '#JqGrid', 600, 850, '#ExcludeLeaveHeadslist,#ConvertLeaveHeadBallist,#ConvertLeaveHeadlist', "", function (data) { });
+            $('#CreditDatelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 447, ""); // To bind dropdown on page load
+
+            $('#AccumalationLimit').prop("disabled", true);
+            $('#ServiceYearsLimit').prop("disabled", true);
+            $('#MaxLeaveDebitInService').prop("disabled", true);
+            $('#AboveServiceSteps').prop("disabled", true);
+            $('#LvConvertLimit').prop("disabled", true);
+            $('#LvConvertLimitBal').prop("disabled", true);
+            $('#OccInServ').prop("disabled", true);
+            $('#CreditDays').prop("disabled", true);
+            $('#txtlvhead').attr('readonly', true);
+            //  //debugger
+           
+
+            var someForm = $('#frmLvCreditPolicy');
+            $.each(someForm[0].elements, function (index, elem) {
+                 
+            });
+
+            //
+            //if (a !== 0)
+            //{
+            //    (a).removeAttr("readonly");
+            //}
+          // var a = $('[input=text]');
+          // $('input:text').removeAttr("readonly");
+            //$("#frmLvCreditPolicy").find(a);
+            //alert(a);
+        
+            //var isDisabled = $(a).is(':readOnly');
+            //if (isDisabled) {
+            //    $("#frmLvCreditPolicy").prop('readOnly', false);
+            //}
+            //if ($('input[a="readonly"]')) {
+            //$('#form1 input').attr('readonly', 'readonly');
+            //}
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Leave Credit Policy Data", '#frmLvCreditPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 850, '#ConvertLeaveHeadlist,#ConvertLeaveHeadBallist,#ExcludeLeaveHeadslist', "", function (data) {
+
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Code);
+                    $('#frmLvCreditPolicy').trigger("reset");
+                    
+                    $('#Head_id').val(k.LvHead_Id);
+                    $('#txtlvhead').val(k.Lvhead_FullDetails);
+                    $('#txtlvhead').attr('readonly', 'readonly');
+                    $('#AboveServiceSteps').val(k.AboveServiceSteps);
+                    $('#AccumalationLimit').val(k.AccumalationLimit);
+                    $('#ConvertedDays').val(k.ConvertedDays);
+                    $('#CreditDays').val(k.CreditDays);
+                    $('#LvConvertLimit').val(k.LvConvertLimit);
+                    $('#LvConvertLimitBal').val(k.LvConvertLimitBal);
+                    $('#MaxLeaveDebitInService').val(k.MaxLeaveDebitInService);
+                    $('#OccInServ').val(k.OccInServ);
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    $('#ProCreditFrequency').val(k.ProCreditFrequency);
+                    $('#ServiceYearsLimit').val(k.ServiceYearsLimit); 
+                    $('#ServicemaxYearsLimit').val(k.ServicemaxYearsLimit);
+                    $('#WorkingDays').val(k.WorkingDays);
+                    $('[name="AboveServiceMaxYears"]').val([k.AboveServiceMaxYears]).button().button("refresh");
+                    if (k.AboveServiceMaxYears == false) {
+                        $('#MaxLeaveDebitInService').prop("disabled", true);
+                        //$('#MaxLeaveDebitInService').val("");
+                        $('#AboveServiceSteps').prop("disabled", true);
+                       // $('#AboveServiceSteps').val("");
+
+                    }
+                    else {
+                        $('#AboveServiceSteps').prop("disabled", false);
+                        $('#MaxLeaveDebitInService').prop("disabled", false);
+                    }
+                    $('[name="Accumalation"]').val([k.Accumalation]).button().button("refresh");
+                    if (k.Accumalation == false) {
+                        $('#AccumalationLimit').prop("disabled", true);
+                        //$('#AccumalationLimit').val("");
+                    }
+                    else {
+                        $('#AccumalationLimit').prop("disabled", false);
+                    }
+                    $('[name="ExcludeLeaves"]').val([k.ExcludeLeaves]).button().button("refresh");
+
+                    $('[name="IsCreditDatePolicy"]').val([k.IsCreditDatePolicy]).button().button("refresh");
+                    if (k.IsCreditDatePolicy == false)
+                    {
+
+                        $('#HideCreditDate').fadeOut();
+                    }
+                    else
+                    {
+                        $('#HideCreditDate').fadeIn();
+                    }
+                    $('[name="FixedCreditDays"]').val([k.FixedCreditDays]).button().button("refresh");
+
+                    if (k.ExcludeLeaves == false)
+                    {
+                        $('#lvexcludeleavediv').fadeOut();
+
+
+                    }
+                    else
+                    {
+
+                        $('#lvexcludeleavediv').fadeIn();
+                    }
+                    if (k.FixedCreditDays == false) {
+                        //$('#CreditDays').prop("disabled", false);
+                        $('#CreditDays').prop("disabled", true);
+                        $('#CreditDays').val("0");
+                    }
+                    else {
+
+                        $('#CreditDays').prop("disabled", false);
+                        //  $('#WorkingDays').prop("disabled", true);
+                        //$('#WorkingDays').val("");
+                    }
+                    $('[name="LVConvert"]').val([k.LVConvert]).button().button("refresh");
+                    if (k.LVConvert == false) {
+                        $('#LvConvertLimit').prop("disabled", true);
+                       // $('#LvConvertLimit').val("");
+                        $('#lvconvertdiv').fadeOut();
+                    }
+                    else {
+                        $('#LvConvertLimit').prop("disabled", false);
+                        $('#lvconvertdiv').fadeIn();
+                    }
+                    $('[name="LVConvertBal"]').val([k.LVConvertBal]).button().button("refresh");
+                    if (k.LVConvertBal == false) {
+                        $('#LvConvertLimitBal').prop("disabled", true);
+                       // $('#LvConvertLimitBal').val("");
+                        $('#lvconvertheadbal').fadeOut();
+                    }
+                    else {
+                        $('#LvConvertLimitBal').prop("disabled", false);
+                        $('#lvconvertheadbal').fadeIn();
+                    }
+                    $('[name="OccCarryForward"]').val([k.OccCarryForward]).button().button("refresh");
+                    $('[name="OccInServAppl"]').val([k.OccInServAppl]).button().button("refresh");
+                    if (k.OccInServAppl == false) {
+                        $('#OccInServ').prop("disabled", true);
+                        //$('#OccInServ').val("");
+                    }
+                    else {
+                        $('#OccInServ').prop("disabled", false);
+                    }
+                    $('[name="ServiceLink"]').val([k.ServiceLink]).button().button("refresh");
+                    if (k.ServiceLink == false) {
+                        $('#ServiceYearsLimit').prop("disabled", true);
+                        //$('#ServiceYearsLimit').val("");
+                    }
+                    else
+                    {
+                        $('#ServiceYearsLimit').prop("disabled", false);
+                    }
+                    $('[name="AccumulationWithCredit"]').val([k.AccumulationWithCredit]).button().button("refresh");
+                    $('[name="ProdataFlag"]').val([k.ProdataFlag]).button().button("refresh");
+                    $('#CreditDatelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 447, k.CreditDate_Id); // Dropdown bind
+                    $('#Lookup_LvheadDetails').attr('disabled', 'disabled');
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#ConvertLeaveHeadlist').P2BLookUpEncapsulate('#ConvertLeaveHeadlist', 'ConvertLeaveHeadlist', k.LvHeadObjCLH_Id, k.LvHeadObjCLH_FullDetails, 'ConvertLeaveHeadlist', '#Remove-ConvertLeaveHead-LvCreditPolicy', 'A');
+                    $('#ExcludeLeaveHeadslist').P2BLookUpEncapsulate('#ExcludeLeaveHeadslist', 'ExcludeLeaveHeadslist', k.LvHeadObjELH_Id, k.LvHeadObjELH_FullDetails, 'ExcludeLeaveHeadslist', '#Remove-ExcludeLeaveHeads-LvCreditPolicy', 'A');
+                    $('#ConvertLeaveHeadBallist').P2BLookUpEncapsulate('#ConvertLeaveHeadBallist', 'ConvertLeaveHeadBallist', k.LvHeadObjCLHB_Id, k.LvHeadObjCLHB_FullDetails, 'ConvertLeaveHeadBallist', '#Remove-ConvertLeaveHeadBal-LvCreditPolicy', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+        //View main page 
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Leave Credit Policy Data', '', '', 600, 850, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Code);
+                    //alert(k.IsCreditDatePolicy);
+                    $('#frmLvCreditPolicy').trigger("reset");
+                    $('#Head_id').val(k.LvHead_Id);
+                    $('#txtlvhead').val(k.Lvhead_FullDetails);
+                    $('#txtlvhead').attr('readonly', 'readonly');
+                    $('#AboveServiceSteps').val(k.AboveServiceSteps);
+                    $('#AccumalationLimit').val(k.AccumalationLimit);
+                    $('#ConvertedDays').val(k.ConvertedDays);
+                    $('#CreditDays').val(k.CreditDays);
+                    $('#LvConvertLimit').val(k.LvConvertLimit);
+                    $('#LvConvertLimitBal').val(k.LvConvertLimitBal);
+                    $('#MaxLeaveDebitInService').val(k.MaxLeaveDebitInService);
+                    $('#OccInServ').val(k.OccInServ);
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    $('#ProCreditFrequency').val(k.ProCreditFrequency);
+                    $('#ServiceYearsLimit').val(k.ServiceYearsLimit); 
+                    $('#ServicemaxYearsLimit').val(k.ServicemaxYearsLimit);
+                    $('#WorkingDays').val(k.WorkingDays);
+                    $('[name="AboveServiceMaxYears"]').val([k.AboveServiceMaxYears]).button().button("refresh");
+                    if (k.AboveServiceMaxYears == false) {
+                        $('#MaxLeaveDebitInService').prop("disabled", true);
+                       // $('#MaxLeaveDebitInService').val("");
+                        $('#AboveServiceSteps').prop("disabled", true);
+                     //   $('#AboveServiceSteps').val("");
+
+                    }
+                    else {
+                        $('#AboveServiceSteps').prop("disabled", false);
+                        $('#MaxLeaveDebitInService').prop("disabled", false);
+                    }
+                    $('[name="Accumalation"]').val([k.Accumalation]).button().button("refresh");
+                    if (k.Accumalation == false) {
+                        $('#AccumalationLimit').prop("disabled", true);
+                      //  $('#AccumalationLimit').val("");
+                    }
+                    else {
+                        $('#AccumalationLimit').prop("disabled", false);
+                    }
+                    $('[name="ExcludeLeaves"]').val([k.ExcludeLeaves]).button().button("refresh");
+
+                    $('[name="IsCreditDatePolicy"]').val([k.IsCreditDatePolicy]).button().button("refresh");
+                    $('[name="FixedCreditDays"]').val([k.FixedCreditDays]).button().button("refresh");
+                    if (k.ExcludeLeaves == false)
+                    {
+                        $('#lvexcludeleavediv').fadeOut();
+
+
+                    }
+                    else
+                    {
+
+                        $('#lvexcludeleavediv').fadeIn();
+                    }
+                    if (k.FixedCreditDays == false) {
+                       // $('#CreditDays').prop("disabled", false);
+                        $('#CreditDays').prop("disabled", true);
+                        $('#CreditDays').val("0");
+                    }
+                    else {
+
+                        $('#CreditDays').prop("disabled", false);
+                      //  $('#CreditDays').prop("disabled", true);
+                     //   $('#CreditDays').val("");
+                    }
+                    $('[name="LVConvert"]').val([k.LVConvert]).button().button("refresh");
+                    if (k.LVConvert == false) {
+                        $('#LvConvertLimit').prop("disabled", true);
+                       // $('#LvConvertLimit').val("");
+                        $('#lvconvertdiv').fadeOut();
+                    }
+                    else {
+                        $('#LvConvertLimit').prop("disabled", false);
+                        $('#lvconvertdiv').fadeIn();
+                    }
+                    $('[name="LVConvertBal"]').val([k.LVConvertBal]).button().button("refresh");
+                    if (k.LVConvertBal == false) {
+                        $('#LvConvertLimitBal').prop("disabled", true);
+                        //$('#LvConvertLimitBal').val("");
+                        $('#lvconvertheadbal').fadeOut();
+                    }
+                    else {
+                        $('#LvConvertLimitBal').prop("disabled", false);
+                        $('#lvconvertheadbal').fadeIn();
+                    }
+                    $('[name="OccCarryForward"]').val([k.OccCarryForward]).button().button("refresh");
+                    $('[name="OccInServAppl"]').val([k.OccInServAppl]).button().button("refresh");
+                    if (k.OccInServAppl == false) {
+                        $('#OccInServ').prop("disabled", true);
+                       // $('#OccInServ').val("");
+                    }
+                    else {
+                        $('#OccInServ').prop("disabled", false);
+                    }
+                   
+                    if (k.IsCreditDatePolicy == false) {
+
+                        $('#HideCreditDate').fadeOut();
+                    }
+                    else {
+                        $('#HideCreditDate').fadeIn();
+                    }
+                    $('[name="ServiceLink"]').val([k.ServiceLink]).button().button("refresh");
+                    if (k.ServiceLink == false) {
+                        $('#ServiceYearsLimit').prop("disabled", true);
+                       // $('#ServiceYearsLimit').val("");
+                    }
+                    else
+                    {
+                        $('#ServiceYearsLimit').prop("disabled", false);
+                    }
+                    $('[name="AccumulationWithCredit"]').val([k.AccumulationWithCredit]).button().button("refresh");
+                    $('[name="ProdataFlag"]').val([k.ProdataFlag]).button().button("refresh");
+                    $('#CreditDatelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 447, k.CreditDate_Id); // Dropdown bind
+                    $('#Lookup_LvheadDetails').attr('disabled', 'disabled');
+                });
+
+                $.each(data[1], function (i, k) {
+
+                    $('#ConvertLeaveHeadlist').P2BLookUpEncapsulate('#ConvertLeaveHeadlist', 'ConvertLeaveHeadlist', k.LvHeadObjCLH_Id, k.LvHeadObjCLH_FullDetails, 'ConvertLeaveHeadlist', 'view', 'A');
+                    $('#ExcludeLeaveHeadslist').P2BLookUpEncapsulate('#ExcludeLeaveHeadslist', 'ExcludeLeaveHeadslist', k.LvHeadObjELH_Id, k.LvHeadObjELH_FullDetails, 'ExcludeLeaveHeadslist', 'view', 'A');
+                    $('#ConvertLeaveHeadBallist').P2BLookUpEncapsulate('#ConvertLeaveHeadBallist', 'ConvertLeaveHeadBallist', k.LvHeadObjCLHB_Id, k.LvHeadObjCLHB_FullDetails, 'ConvertLeaveHeadBallist', 'view', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+        $('#Lookup-ConvertLeaveHead-LvCreditPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvCreditPolicy")', '', 'LookupDiv', 'ConvertLeaveHead Look Up Data', '#ConvertLeaveHeadlist', 'ConvertLeaveHeadlist', 5, 'ConvertLeaveHeadlist', '#frmLvCreditPolicy', 'A', '#Remove-ConvertLeaveHead-LvCreditPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //partial page delete
+        $('#Remove-ConvertLeaveHead-LvCreditPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ConvertLeaveHeadlist').P2BGetTableDataonSelectedRow('#ConvertLeaveHeadlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ConvertLeaveHeadlist').P2BGetTableDataonSelectedRow('#ConvertLeaveHeadlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ConvertLeaveHeadlist', $('#ConvertLeaveHeadlist').val(), 200, 200, '#frmLvCreditPolicy', '#ConvertLeaveHeadlist', '#Remove-ConvertLeaveHead-LvCreditPolicy');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+
+        $('#Lookup-ConvertLeaveHeadBal-LvCreditPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvCreditPolicy")', '', 'LookupDiv', 'ConvertLeaveHeadBal Look Up Data', '#ConvertLeaveHeadBallist', 'ConvertLeaveHeadBallist', 5, 'ConvertLeaveHeadBallist', '#frmLvCreditPolicy', 'A', '#Remove-ConvertLeaveHeadBal-LvCreditPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $('#Remove-ConvertLeaveHeadBal-LvCreditPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ConvertLeaveHeadBallist').P2BGetTableDataonSelectedRow('#ConvertLeaveHeadBallist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ConvertLeaveHeadBallist').P2BGetTableDataonSelectedRow('#ConvertLeaveHeadBallist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ConvertLeaveHeadBallist', $('#ConvertLeaveHeadBallist').val(), 200, 200, '#frmLvCreditPolicy', '#ConvertLeaveHeadBallist', '#Remove-ConvertLeaveHeadBal-LvCreditPolicy');
+            event.preventDefault();
+        });
+
+        $('#Lookup-ExcludeLeaveHeads-LvCreditPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvCreditPolicy")', '', 'LookupDiv', 'ExcludeLeaveHeads Look Up Data', '#ExcludeLeaveHeadslist', 'ExcludeLeaveHeadslist', 5, 'ExcludeLeaveHeadslist', '#frmLvCreditPolicy', 'A', '#Remove-ExcludeLeaveHeads-LvCreditPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-ExcludeLeaveHeads-LvCreditPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ExcludeLeaveHeadslist').P2BGetTableDataonSelectedRow('#ExcludeLeaveHeadslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ExcludeLeaveHeadslist').P2BGetTableDataonSelectedRow('#ExcludeLeaveHeadslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExcludeLeaveHeadslist', $('#ExcludeLeaveHeadslist').val(), 200, 200, '#frmLvCreditPolicy', '#ExcludeLeaveHeadslist', '#Remove-ExcludeLeaveHeads-LvCreditPolicy');
+            event.preventDefault();
+        });
+
+        $('#CreditDatelist').on('selectmenuchange', function () {
+            var x = $('#CreditDatelist option:selected').text().toUpperCase();
+            if (x == "CALENDAR")
+            {
+                $('#ProCreditFrequency').val(12);
+            }
+            else if(x == "YEARLY")
+            {
+                $('#ProCreditFrequency').val(12);
+            }
+            else if (x == "HALFYEARLY") {
+                $('#ProCreditFrequency').val(6);
+            }
+            else if (x == "QUARTERLY") {
+                $('#ProCreditFrequency').val(3);
+            }
+            else if (x == "MONTHLY") {
+                $('#ProCreditFrequency').val(1);
+            }
+            else if (x == "BIMONTHLY") {
+                $('#ProCreditFrequency').val(2);
+            }
+            else
+            {
+                $('#ProCreditFrequency').val(0);
+            }
+               
+
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#CreditDatelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        // $('#CreditDays').prop("disabled", true);
+        $('#AccumalationLimit').prop("disabled", true);
+        $('#ServiceYearsLimit').prop("disabled", true);
+        $('#MaxLeaveDebitInService').prop("disabled", true);
+        $('#LvConvertLimit').prop("disabled", true);
+        $('#LvConvertLimitBal').prop("disabled", true);
+        $('#OccInServ').prop("disabled", true);
+        $('#AboveServiceSteps').prop("disabled", true);
+        // $('#WorkingDays').prop("disabled", true);
+        $('#CreditDays').attr("value", "0");
+        $('#WorkingDays').attr("value", "0");
+
+        $('#AccumalationLimit').attr("value", "0");
+        $('#ServiceYearsLimit').attr("value", "0");
+        $('#MaxLeaveDebitInService').attr("value", "0");
+        $('#ServicemaxYearsLimit').attr("value", "0");
+        $('#LvConvertLimit').attr("value", "0");
+        $('#AboveServiceSteps').attr("value", "0");
+        $('#LvConvertLimitBal').attr("value", "0");
+        $('#OccInServ').attr("value", "0");
+
+        $('#lvconvertdiv').hide();
+        $('#lvconvertheadbal').hide();
+        $('#lvexcludeleavediv').hide();
+        $('input[name="FixedCreditDays"]:radio').change(function ()
+        {
+            if (this.value == "false")
+            {
+               // $('#WorkingDays').prop("disabled", false);
+                $('#CreditDays').prop("disabled", true);
+                $('#CreditDays').val("0");
+
+            }
+            else
+            {
+               $('#CreditDays').prop("disabled", false);
+               // $('#WorkingDays').prop("disabled", true);
+
+            }
+        });
+
+        $('input[name="IsCreditDatePolicy"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#CreditDatelist').removeClass("must");
+            } else {
+                $('#CreditDatelist').addClass("must");
+            }
+        });
+ 
+        $('input[name="Accumalation"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#AccumalationLimit').prop("disabled", true);
+                $('#AccumalationLimit').val("0");
+            }
+            else {
+                $('#AccumalationLimit').prop("disabled", false);
+            }
+        });
+
+        $('input[name="ServiceLink"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#ServiceYearsLimit').prop("disabled", true);
+                $('#ServiceYearsLimit').val("0");
+            }
+            else {
+                $('#ServiceYearsLimit').prop("disabled", false);
+            }
+        });
+
+        $('input[name="AboveServiceMaxYears"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#MaxLeaveDebitInService').prop("disabled", true);
+                $('#MaxLeaveDebitInService').val("0");
+                $('#AboveServiceSteps').prop("disabled", true);
+                $('#AboveServiceSteps').val("0");
+
+            }
+            else {
+                $('#AboveServiceSteps').prop("disabled", false);
+                $('#MaxLeaveDebitInService').prop("disabled", false);
+            }
+        });
+
+        $('input[name="LVConvert"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#LvConvertLimit').prop("disabled", true);
+                $('#LvConvertLimit').val("0");
+                $('#lvconvertdiv').fadeOut();
+            }
+            else {
+                $('#LvConvertLimit').prop("disabled", false);
+                $('#lvconvertdiv').fadeIn();
+            }
+        });
+        $('input[name="LVConvertBal"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#LvConvertLimitBal').prop("disabled", true);
+                $('#LvConvertLimitBal').val("0");
+                $('#lvconvertheadbal').fadeOut();
+            }
+            else {
+                $('#LvConvertLimitBal').prop("disabled", false);
+                $('#lvconvertheadbal').fadeIn();
+            }
+        });
+
+        $('input[name="OccInServAppl"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#OccInServ').prop("disabled", true);
+                $('#OccInServ').val("0");
+            }
+            else {
+                $('#OccInServ').prop("disabled", false);
+            }
+        });
+        $('input[name="ExcludeLeaves"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#lvexcludeleavediv').fadeOut();
+            }
+            else {
+                $('#lvexcludeleavediv').fadeIn();
+            }
+        });
+       
+        $('input[name="IsCreditDatePolicy"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#HideCreditDate').fadeOut();                
+            }
+            else {
+                $('#HideCreditDate').fadeIn();
+            }
+
+
+
+        });
+
+        $('#Lookup_LvheadDetails').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtlvhead",
+                appendToId: "#Head_id",
+                lookupurl: "@Url.Action("GetLookupLvHeadObj", "LvCreditPolicy")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 112px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            width: 750px;
+            display: inline-flex;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .section1 {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 318px;
+            width: 432px;
+            margin: 4px auto;
+            position: absolute;
+            left: 4px;
+            top: -2px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .namepush {
+            margin-right: 30px;
+        }
+
+        .lblwidth {
+            width: 156px;
+        }
+
+        .Clblwidth {
+            width: 111px;
+        }
+
+        .Cnamepush {
+            margin-right: 127px;
+        }
+        #Lookup_LvheadDetails {
+            right: -360px;
+            position: sticky;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvCreditpolicy">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvCreditPolicy", name = "frmLvCreditPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+
+
+            <div class="row4 content_margine">
+
+                @Html.LabelFor(m => m.PolicyName, "Policy Name:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PolicyName, new { @class = "popup-content-textbox must namepush" })
+                
+                <label id="lbllvhead" class="popup-content-label must">LvHead:</label>
+
+                <input name="txtlvhead" type="text" id="txtlvhead" class="date-picker must" />
+                <input type="text" id="Head_id" name="Head_id" class="filter_structure_id" />
+
+                <button data-p2btooltip="Lookup Head Details" class="button popup-content-icon-lookup " id="Lookup_LvheadDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark "></span></button>
+            </div>
+
+             <div class="section_Method">
+                <div class="heading">Credit Date Policy </div>
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.IsCreditDatePolicy, "Is Credit Date Policy:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="IsCreditDatePolicy_radio1" name="IsCreditDatePolicy" value="true" /><label class="ui-corner-left" for="IsCreditDatePolicy_radio1">Yes</label>
+                        <input type="radio" id="IsCreditDatePolicy_radio2" name="IsCreditDatePolicy" value="false" checked="checked" /><label class="ui-corner-right" for="IsCreditDatePolicy_radio2">No</label>
+                    </div>
+                    <div id="HideCreditDate">
+                        @Html.LabelFor(m => m.CreditDate, "Credit Date:", new { @class = "popup-content-label Clblwidth must" })<select id="CreditDatelist" name="CreditDatelist" style="width:120px;"><option value="0">-Select-</option></select>
+                    </div>
+                    </div>
+                 <div class="row3 content_margine">
+                     @Html.LabelFor(m => m.ProCreditFrequency, "Credit Frequency:", new { @class = "popup-content-label  lblwidth  must" })
+                     @Html.TextBoxFor(m => m.ProCreditFrequency, new { @class = "popup-content-textbox must" })
+                 </div>
+
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.CreditDate, "CreditDate:", new { @class = "popup-content-label" })<select id="CreditDatelist" name="CreditDatelist" style="width:120px;"><option value="0">-Select-</option></select></div>*@
+
+            </div>
+            
+            <div class="section_Method">
+                <div class="heading">CreditMethod</div>
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.FixedCreditDays, "Fixed Credit Days:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="FixedCreditDays_radio1" name="FixedCreditDays" value="true" /><label class="ui-corner-left" for="FixedCreditDays_radio1">Yes</label>
+                        <input type="radio" id="FixedCreditDays_radio2" name="FixedCreditDays" value="false" checked="checked" /><label class="ui-corner-right" for="FixedCreditDays_radio2">No</label>
+                    </div>
+                    @Html.LabelFor(m => m.CreditDays, "Credit Days:", new { @class = "popup-content-label Clblwidth" })@Html.TextBoxFor(m => m.CreditDays, new { @class = "popup-content-textbox" })
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.CreditDays, "CreditDays:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.CreditDays, new { @class = "popup-content-textbox must" })</div>*@
+                <div class="row3 content_margine">@Html.LabelFor(m => m.WorkingDays, "Working Days:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.WorkingDays, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ExcludeLeaves, "Exclude Leaves:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ExcludeLeaves_radio1" name="ExcludeLeaves" value="true" /><label class="ui-corner-left" for="ExcludeLeaves_radio1">Yes</label>
+                        <input type="radio" id="ExcludeLeaves_radio2" name="ExcludeLeaves" value="false" checked="checked" /><label class="ui-corner-right" for="ExcludeLeaves_radio2">No</label>
+                    </div>
+                </div>
+                <div id="lvexcludeleavediv">
+                    <div class="row3 content_margine">
+                        <div id="ExcludeLeaveHeadslist_old"></div>
+                        @Html.LabelFor(m => m.ExcludeLeaveHeads, "Exclude Leave Heads :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ExcludeLeaveHeadslist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ExcludeLeaveHeads" class="  popup-content-icon-lookup" id="Lookup-ExcludeLeaveHeads-LvCreditPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ExcludeLeaveHeads" class="popup-content-icon-remove" id="Remove-ExcludeLeaveHeads-LvCreditPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ProdataFlag, "Is On Last Attendance:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ProdataFlag_radio1" name="ProdataFlag" value="true" /><label class="ui-corner-left" for="ProdataFlag_radio1">Yes</label>
+                        <input type="radio" id="ProdataFlag_radio2" name="ProdataFlag" value="false" checked="checked" /><label class="ui-corner-right" for="ProdataFlag_radio2">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section_Method">
+                <div class="heading">Accumulation</div>
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.Accumalation, "Accumulation:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="Accumalation_radio1" name="Accumalation" value="true" /><label class="ui-corner-left" for="Accumalation_radio1">Yes</label>
+                        <input type="radio" id="Accumalation_radio2" name="Accumalation" value="false" checked="checked" /><label class="ui-corner-right" for="Accumalation_radio2">No</label>
+                    </div>
+                    @Html.LabelFor(m => m.AccumalationLimit, "Accumulation Limit:", new { @class = "popup-content-label Clblwidth" })@Html.TextBoxFor(m => m.AccumalationLimit, new { @class = "popup-content-textbox " })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.AccumulationWithCredit, "Accumulation With Credit:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="AccumulationWithCredit_radio1" name="AccumulationWithCredit" value="true" /><label class="ui-corner-left" for="AccumulationWithCredit_radio1">Yes</label>
+                        <input type="radio" id="AccumulationWithCredit_radio2" name="AccumulationWithCredit" value="false" checked="checked" /><label class="ui-corner-right" for="AccumulationWithCredit_radio2">No</label>
+                    </div>
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.AccumalationLimit, "AccumalationLimit:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.AccumalationLimit, new { @class = "popup-content-textbox must" })</div>*@
+            </div>
+
+            <div class="section_Method">
+                <div class="heading">Service Link </div>
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.ServiceLink, "Service Link:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="ServiceLink_radio1" name="ServiceLink" value="true" /><label class="ui-corner-left" for="ServiceLink_radio1">Yes</label>
+                        <input type="radio" id="ServiceLink_radio2" name="ServiceLink" value="false" checked="checked" /><label class="ui-corner-right" for="ServiceLink_radio2">No</label>
+                    </div>
+                    @Html.LabelFor(m => m.ServiceYearsLimit, "Service Years Limit:", new { @class = "popup-content-label Clblwidth" })@Html.TextBoxFor(m => m.ServiceYearsLimit, new { @class = "popup-content-textbox" })
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.ServiceYearsLimit, "ServiceYearsLimit:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ServiceYearsLimit, new { @class = "popup-content-textbox must" })</div>*@
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.MaxLeaveDebitInService, "MaxLeaveDebitInService:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MaxLeaveDebitInService, new { @class = "popup-content-textbox must" })</div>*@
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.AboveServiceMaxYears, "Above Service Max Years:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="AboveServiceMaxYears_radio1" name="AboveServiceMaxYears" value="true" /><label class="ui-corner-left" for="AboveServiceMaxYears_radio1">Yes</label>
+                        <input type="radio" id="AboveServiceMaxYears_radio2" name="AboveServiceMaxYears" value="false" checked="checked" /><label class="ui-corner-right" for="AboveServiceMaxYears_radio2">No</label>
+                    </div>
+                    @*<label>Service Max Years Limit :</label> <input type="text" id="ServicemaxYearsLimit" />*@ 
+                   @Html.LabelFor(m => m.ServicemaxYearsLimit, "Service Max Years Limit:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ServicemaxYearsLimit, new { @class = "popup-content-textbox" })
+                </div>
+              
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.AboveServiceSteps, "Above Service Steps:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.AboveServiceSteps, new { @class = "popup-content-textbox" })</div>
+               @* @Html.LabelFor(m => m.MaxLeaveDebitInService, "Max Leave Debit In Service:", new { @class = "popup-content-label Clblwidth" })@Html.TextBoxFor(m => m.MaxLeaveDebitInService, new { @class = "popup-content-textbox" })*@
+                  @*<label>Max Leave Debit In Service :</label> <input type="text" id="MaxLeaveDebitInService" />*@ 
+                <div class="row3 content_margine">@Html.LabelFor(m => m.MaxLeaveDebitInService, "Max Leave Debit In Service:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MaxLeaveDebitInService, new { @class = "popup-content-textbox" })</div>
+
+            </div>
+
+            <div class="section_Method">
+                <div class="heading">Leave Convert </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LVConvert, "Leave Convert:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="LVConvert_radio1" name="LVConvert" value="true" /><label class="ui-corner-left" for="LVConvert_radio1">Yes</label>
+                        <input type="radio" id="LVConvert_radio2" name="LVConvert" value="false" checked="checked" /><label class="ui-corner-right" for="LVConvert_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvConvertLimit, "Leave Convert Limit:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LvConvertLimit, new { @class = "popup-content-textbox" })</div>
+                <div id="lvconvertdiv">
+                    <div class="row3 content_margine">
+                        <div id="ConvertedLeaveHeadlist_old"></div>
+                        @Html.LabelFor(m => m.ConvertLeaveHead, "Convert Leave Head :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ConvertLeaveHeadlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ConvertLeaveHead" class="  popup-content-icon-lookup" id="Lookup-ConvertLeaveHead-LvCreditPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ConvertLeaveHead" class="popup-content-icon-remove" id="Remove-ConvertLeaveHead-LvCreditPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LVConvertBal, "Leave Convert Limit Bal:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="LVConvertBal_radio1" name="LVConvertBal" value="true" /><label class="ui-corner-left" for="LVConvertBal_radio1">Yes</label>
+                        <input type="radio" id="LVConvertBal_radio2" name="LVConvertBal" value="false" checked="checked" /><label class="ui-corner-right" for="LVConvertBal_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvConvertLimitBal, "Leave Convert Limit Bal:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.LvConvertLimitBal, new { @class = "popup-content-textbox " })</div>
+                <div id="lvconvertheadbal">
+                    <div class="row3 content_margine">
+                        <div id="ConvertedLeaveHeadBallist_old"></div>
+                        @Html.LabelFor(m => m.ConvertLeaveHeadBal, "Convert Leave Head Bal :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ConvertLeaveHeadBallist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ConvertLeaveHeadBal" class="  popup-content-icon-lookup" id="Lookup-ConvertLeaveHeadBal-LvCreditPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ConvertLeaveHeadBal" class="popup-content-icon-remove" id="Remove-ConvertLeaveHeadBal-LvCreditPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            //--lvoccurnce
+            <div class="section_Method">
+                <div class="heading">Leave occurance </div>
+
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.ConvertedDays, "ConvertedDays:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ConvertedDays, new { @class = "popup-content-textbox must" })</div>*@
+
+                <div class="row4 content_margine">
+                    @Html.LabelFor(m => m.OccInServAppl, "occurance In Service Appl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button Cnamepush">
+                        <input type="radio" id="OccInServAppl_radio1" name="OccInServAppl" value="true" /><label class="ui-corner-left" for="OccInServAppl_radio1">Yes</label>
+                        <input type="radio" id="OccInServAppl_radio2" name="OccInServAppl" value="false" checked="checked" /><label class="ui-corner-right" for="OccInServAppl_radio2">No</label>
+                    </div>
+                    @Html.LabelFor(m => m.OccInServ, "occurance In Service:", new { @class = "popup-content-label Clblwidth" })@Html.TextBoxFor(m => m.OccInServ, new { @class = "popup-content-textbox" })
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.OccInServ, "OccInServ:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OccInServ, new { @class = "popup-content-textbox must" })</div>*@
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.OccCarryForward, "occurance Carry Forward:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="OccCarryForward_radio1" name="OccCarryForward" value="true" /><label class="ui-corner-left" for="OccCarryForward_radio1">Yes</label>
+                        <input type="radio" id="OccCarryForward_radio2" name="OccCarryForward" value="false" checked="checked" /><label class="ui-corner-right" for="OccCarryForward_radio2">No</label>
+                    </div>
+                </div>
+            </div>
+           
+        }
+    </div>
+
+</body>
+</html>

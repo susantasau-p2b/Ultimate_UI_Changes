@@ -1,0 +1,147 @@
+﻿@model Leave.LeaveOpenBalance
+@{
+    ViewBag.Title = "Index";
+}
+
+<link href="~/Content/LeaveWFDetails/LeaveWFDetails.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+        $('button').button();
+        var ColCommentss = [];
+        var ColModel = [];
+        var SortComments, Caption, url, width, height;
+        var btndisableCommentss = "";
+        ColModel = ['Id', 'WFStatus','Comments'];
+        ColCommentss = ['Id', 'WFStatus','Comments'];
+        SortComments = 'Code';
+        Caption = 'Leave OpenBal';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColCommentss, ColModel, SortComments, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmLeaveOpenBal').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave OpenBal  Details ', 'open', '@Url.Action("Create")', '#frmLeaveOpenBal', 'Message :', 'Request Falied :', '#JqGrid', 650, 650, '', btndisableCommentss, function (data) { });
+            event.preventDefault();
+        });
+
+        //$('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmLeaveOpenBal', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 160, 450, '', btndisableCommentss, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Comments').val(k.Comments);
+                    $('#Comments').attr('readonly', 'readonly');
+                    $('#WFStatus').val(k.WFStatus);
+                });
+                $('#Autho_Allow').val(data[3]);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '',170, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Comments').val(k.Comments);
+                    $('#Comments').attr('readonly', 'readonly');
+                    $('#WFStatus').val(k.WFStatus);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Comments').oldVal(data[2].Comments);
+                    $('#WFStatus').oldVal(data[2].WFStatus);
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('#Comments').MaxLength(100);
+        $("#WFStatus").ForceOnlyNumeric();
+        $('#WFStatus').MaxLength(4);
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create Leave WF  Details ">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmLeaveOpenBal" }))
+    {   <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvCredit, "Leave Credit :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvCredit, new { @class = "pos_popup-content-textbox", id = "LeaveCode" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvUtilized, "Leave Utilized :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvUtilized, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvLapseBal, "Leave LapseBal :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvLapseBal, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvEncash, "Leave Encash :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvEncash, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvOccurances, "Leave Occurances :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvOccurances, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LVCount, "Leave Count :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LVCount, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvBank, "Leave Bank :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvBank, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.PrefixCount, "PrefixCount :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.PrefixCount, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.SufixCount, "SufixCount :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.SufixCount, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        <div class="pos_row3 content_margine">@Html.LabelFor(m => m.LvCreditDate, "Leave CreditDate :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.LvCreditDate, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>
+        @*<div class="pos_row3 content_margine">@Html.LabelFor(m => m.MaxDays, "Leave Max :", new { @class = "pos_popup-content-label" })@Html.TextBoxFor(m => m.ma, new { @class = "pos_popup-content-textbox", id = "LeaveDesc" })</div>*@
+
+    }
+</div>

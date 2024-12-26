@@ -1,0 +1,375 @@
+﻿@{
+    ViewBag.Title = "EmpLTCBlock";
+}
+@model Payroll.EmpLTCBlock
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 168px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+
+        .form-of-element {
+            display: block;
+            border: #DEDEDE solid 0.1px;
+            width: auto;
+            height: 351px;
+            padding: 5px 2px;
+            margin-top: 3px;
+        }
+
+        .select_div {
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                        <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                        <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                    </div>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="add">Add</button>
+                @*<button class="button" id="Btn-Upload-Data">Upload</button>*@
+                @*<button class="button" id="Delete">Delete</button>*@
+                @*<button class="button" id="release">Release</button>*@
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpLTCBlock", name = "frmEmpLTCBlock" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+           
+            <input id="geo_id" name="geo_id" class="filter_structure_id" />
+            <input id="pay_id" name="pay_id" class="filter_structure_id" />
+            <input id="fun_id" name="fun_id" class="filter_structure_id" />
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <div class="form-of-element">
+
+                <div class="fileremployee">
+                    <div class="employee-transcationdiv" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                        <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="add-dialog-content">
+                    <div class="row2 select_div content_margine"><label class="popup-content-label must">Global LTC Block</label><select id="GlobalBlockList" name="GlobalBlockList" style="width:161px;" class="drop must"><option value="0">-Select-</option></select></div>
+                </div>
+                <div class="add-dialog-content">
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.BlockStart, "Block Start :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BlockStart, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.BlockEnd, "Block End :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BlockEnd, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.Occurances, "Occurances :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Occurances, new { @class = "popup-content-textbox must" })</div>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+
+        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        // PayMonthObj();
+        $('#Load').on('click', function () {
+
+            if ($('#txtPayMonth').val()) {
+                $.LocalStorageHelper("LTCAdvClaim_LoadEmp", $('#txtPayMonth').val());
+                //  localStorage.setItem("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //PayMonthObj.SetMonth($('#txtPayMonth').val());
+            }
+            //paramdataload = PayMonthObj.GetMonth();
+            //   console.log(PayMonthObj.GetMonth());
+            // localStorage.setItem("LoanAdvRequest_LoadEmp", paramdataload);
+
+        });
+        $('#reset').on('click', function () {
+            //localStorage.setItem("LoanAdvRequest_LoadEmp", "");
+            $.LocalStorageHelper("LTCAdvClaim_LoadEmp", $('#txtPayMonth').val());
+            //  PayMonthObj.SetMonth();
+            $('#txtPayMonth').val("");
+            // console.log(PayMonthObj.GetMonth());
+        });
+        //var PayMonthObj = {
+        //    Month: null,
+        //    SetMonth: function (val) {
+        //        if (val != null || val != undefined) this.Month = val;
+        //        this.Month = null;
+        //    },
+        //    GetMonth: function () {
+        //        return this.Month;
+        //    }
+
+        //};
+        //$('#loademp').on('click', function () {
+        //    if ($('#txtPayMonth').val()) {
+        //        PayMonthObj.SetMonth($('#txtPayMonth').val());
+        //    }
+        //});
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "EmpLTCBlock")",
+            htmurl: "@Url.Action("partial", "EmpLTCBlock")",
+            submiturl: "@Url.Action("GridEditSave", "EmpLTCBlock")",
+            columnname: ["Code", "Name", "Location", "Id"],
+            childheader: ["BlockStart", "BlockEnd", "Occurances", "BlockStatus", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            childurl: "@Url.Action("Get_EmpLTCBlock", "EmpLTCBlock")",
+            tableheader: "LTC Advance Claim",
+            childurlColumnNo: "4"
+
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            var chhassa = $(parent_element).find('td:eq(1)').html();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "EmpLTCBlock")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "EmpLTCBlock")",
+                    submiturl: "@Url.Action("GridEditSave", "EmpLTCBlock")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-BlockFrom').val(k.BlockStart);
+                            $('#Edit-BlockEnd').val(k.BlockEnd);
+                            $('#Edit-Occurances').val(k.Occurances);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "EmpLTCBlock")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "EmpLTCBlock")",
+                    submiturl: "@Url.Action("GridEditSave", "EmpLTCBlock")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-BlockFrom').val(k.BlockStart);
+                            $('#Edit-BlockEnd').val(k.BlockEnd);
+                            $('#Edit-Occurances').val(k.Occurances);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                // alert(chhassa);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    editdata: chhassa,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    //console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                // alert($(this).val());
+                var id = $(this).val();
+                $('#GlobalBlockList').P2BSelectMenuAppend('@Url.Action("GetGlobalLTCBlockDetails", "EmpLTCBlock")', id, 0); // To bind dropdown on page load
+              
+
+            }
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#CreateRelease_dialog').P2BCreateDialog();
+        //Create Function
+        $('#add').on("click", function (event) {
+
+            $('#frmEmpLTCBlock').trigger("reset");
+            $.LoadEmpByDefault(false, '#txtPayMonth');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Employee LTC Block', 'open', '@Url.Action("Create")', '#frmEmpLTCBlock', 'Message :', 'Request Falied :', '#JqGrid', 570, 1055, '', '', function (data) { }, '');
+
+            @*$('#GlobalBlockList').P2BSelectMenuAppend('@Url.Action("GetGlobalLTCBlockDetails", "EmpLTCBlock")', 0, 0); // To bind dropdown on page load*@
+
+
+            event.preventDefault();
+
+        });
+
+
+        $('#GlobalBlockList').on("selectmenuchange",
+   function () {
+       var a = $("#GlobalBlockList option:selected").val();
+       $.post("@Url.Action("GetGlobalLTCBlock", "EmpLTCBlock")", {
+           data: a,
+           data2: ""
+       }, function (data) {
+           //$.each(data, function (i, k) {
+           $("#BlockStart").val(DateConvert(data.BlockStart));
+           $("#BlockEnd").val(DateConvert(data.BlockEnd));
+           //});
+
+       });
+   });
+
+
+
+
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+        $('#BlockStart,#BlockEnd').P2BDatePicker();
+        $('#Occurances').ForceOnlyNumeric();
+
+    });
+</script>

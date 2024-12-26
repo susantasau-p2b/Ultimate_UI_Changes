@@ -1,0 +1,339 @@
+﻿@{
+    ViewBag.Title = "ManPower Analysis";
+}
+@model Recruitment.ManPowerDetailsBatch
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 99px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 145px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 450px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .test {
+        }
+
+        .test1 {
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>
+                    <button class="button" id="Edit">Edit</button>*@
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create ManPower Provision">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmCorporate", name = "frmCorporateEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessDate, "ProcessDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.BatchName, "Batch Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BatchName, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">
+                <div id="ManPowerPostDatalist_old"></div>
+                <label class="popup-content-label">ManPower Budget :</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ManPowerPostDatalist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup ManpowerBudget" class="  popup-content-icon-lookup" id="Lookup-ManPowerPostData-ManPowerDetailsBatch"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ManpowerBudget" class="popup-content-icon-remove" id="Remove-ManPowerPostData-ManPowerDetailsBatch"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine"><input type="button" id="Process" name="Analysis" value="Analysis"></div>
+            <div class="row3 content_margine">
+                <div id="Grid_Form2">
+                    <div>
+                        <table id="JqGridNew"></table>
+                        <div id="pager22"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['BatchName', 'ProcessDate', 'Id'];
+        ColNames = ['Batch Name', 'Process Date', 'Id'];
+        SortName = 'Id';
+        Caption = 'ManPower Analysis';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $("#ActionDate").P2BDatePicker();
+        $("#ProcessDate").P2BDatePicker();
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['Id', 'BudgetAmount', 'SanctionedPosts', 'Job', 'FilledPosts', 'VacantPosts', 'ExcessPosts', 'CurrentCTC', 'ExcessCTC', 'TotalCTC'];
+        inline_ColNames = ['Id', 'BudgetAmount', 'SanctionedPosts', 'Job', 'FilledPosts', 'VacantPosts', 'ExcessPosts', 'CurrentCTC', 'ExcessCTC', 'TotalCTC'];
+        inline_SortName = 'ID';
+        inline_Caption = 'Employee List';
+        inline_url = '@Url.Action("Load")';
+        inline_width = 900;
+        inline_height = 150;
+
+        @*ColDisplayNames = ['Id', 'BudgetAmount', 'SanctionedPosts', 'Job', 'FilledPosts', 'VacantPosts', 'ExcessPosts', 'CurrentCTC', 'ExcessCTC', 'TotalCTC'];
+        ColDisplayModel = ['Id', 'BudgetAmount', 'SanctionedPosts', 'Job', 'FilledPosts', 'VacantPosts', 'ExcessPosts', 'CurrentCTC', 'ExcessCTC', 'TotalCTC'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "EmpSalStruct",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("Load")';
+        widthD = 700;
+        heightD = 200;*@
+
+
+
+       // $('#JqGridNew').P2BGrid()
+
+
+        // ('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+        $('#Process').button().on("click", function (event) {
+           // $('#frmCorporate').trigger('reset');
+            var allElements = [];
+            if ($("#ManPowerPostDatalist tr input").length > 0) {
+                $("#ManPowerPostDatalist tr input").each(function () {
+                    allElements.push($(this).val());
+                });
+            } else {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select ManpowerBudget!");
+                return false;
+            }
+         //   $('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+
+            $('#JqGridNew').InlineEditGrid({
+                ColNames: inline_ColNames,
+                ColModel: inline_ColModel,
+                SortName: inline_SortName,
+                Caption: inline_Caption,
+                url: inline_url,
+                tablename: '#JqGridNew',
+                eddelurl: '@Url.Action("Create")',
+                width: inline_width,
+                height: inline_height,
+                CheckCol: "Editable",
+                EditableCol: ['BudgetAmount', 'SanctionedPosts'],
+                forwarddata: allElements,
+                //forwarddata: [RatingPoints, Comments],
+            });
+            event.preventDefault();
+        });
+
+
+
+        @*$('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmCorporate').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create ManPower Provision', 'open', '@Url.Action("Create")', '#frmCorporate', 'Message :', 'Request Falied :', '#JqGrid', 500, 720, '#AddressList,#ContactDetailsList', btndisablenames, function (data) { });
+            $('#Categorylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });*@
+
+        $('#Create_Dialog').P2BGridDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmCorporate').trigger('reset');
+
+            $('#Create_Dialog').P2BGridDialog({
+                title: "Create Manpower Analysis",
+                submiturl: "@Url.Action("create")",
+                form: "#frmCorporate",
+                height: 475,
+                width: 1000,
+                state: "open",
+               //  gridname: "#JqGridNew",
+                //editurl: urlD,
+                //gridfunction: "GetGridSelctedvalue",
+                gridreloadname: "#JqGrid",
+               // returnToGrid: "#JqGridNew",
+            });
+
+            event.preventDefault();
+        });
+        @*$('#Create_Dialog').P2BGridDialog({
+            maindialogtitle: "Create Dialog",
+            submiturl: "@Url.Action("create")",
+            form: "#frmCorporate",
+        height: 475,
+        width: 800,
+        state: "open",
+        gridname: "#JqGridNew",
+        editurl: urlD,
+        gridfunction: "GetGridSelctedvalue",
+        gridreloadname: "#JqGrid",
+        returnToGrid: "#JqGridNew",
+        });*@
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ManPowerProvision Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 402, k.BusinessType_Id); // Dropdown bind
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ManPowerProvision Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Code').val(k.Code);
+                    $('#Name').val(k.Name);
+                    $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 402, k.BusinessType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '', 'N');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-ManPowerPostData-ManPowerDetailsBatch').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "ManPowerProvision")', '', 'LookupDiv', 'ManPowerPostData Look Up Data', '#ManPowerPostDatalist', 'ManPowerPostDatalist', 5, 'ManPowerPostDatalist', '#frmCorporate', 'A', '#Edit-ManPowerPostData-ManPowerDetailsBatch,#Remove-ManPowerPostData-ManPowerDetailsBatch', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-ManPowerPostData-ManPowerDetailsBatch').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#ManPowerPostDatalist').P2BGetTableDataonSelectedRow('#ManPowerPostDatalist', 0);
+            //b = a[0];
+           
+            var selectedRows = [];
+            selectedRows = $('#ManPowerPostDatalist').P2BGetTableDataonSelectedRow('#ManPowerPostDatalist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ManPowerPostDatalist', $('#ManPowerPostDatalist').val(), 200, 200, '#frmCorporate', '#ManPowerPostDatalist');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

@@ -1,0 +1,561 @@
+﻿@{
+    ViewBag.Title = "ExpenseBudget";
+}
+@model P2B.EExMS.ExpenseBudget
+<style>
+    .overflow {
+        height: auto;
+    }
+
+    .popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 200px;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 68px;
+        top: -150px;
+    }
+
+    #Lookup_FinancialYear_Calendar {
+        padding: 6px;
+        margin-left: 8px;
+    }
+
+    .filter {
+        display: none;
+        pointer-events: none;
+    }
+</style>
+
+@*<div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left">
+
+                    <label id="lblExpCalender" style="width:130px" class="popup-content-label must">Expense Calender:</label>
+
+                    <input name="ExpCalender" type="text" id="ExpCalender" class="date-picker" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+                    <button data-p2btooltip="Lookup Expense Calendar Details" class="popup-content-drop-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark" style="margin-left:8px;"></span></button>
+
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+@*<div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>*@
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left">
+                    <label id="lblExpCalender" style="width:130px" class="popup-content-label must">Expense Calender:</label>
+                    <input name="ExpCalender" type="text" id="ExpCalender" class="date-picker" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+                    <button data-p2btooltip="Lookup Expense Calendar Details" class="popup-content-drop-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark" style="margin-left:8px;"></span></button>
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                @*<div id="Grid_Form1" style="margin-top:50px">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable1" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Geostruct</th>
+                                            <th>Calender</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>*@
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Geostruct</th>
+                                            <th>Calender</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog">
+            <div title="LookUp Data">
+                <div class="LookupDiv" id="Lookup"></div>
+            </div>
+            <div id="PageNavPosition">
+
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmExpenseBudget", name = "frmExpenseBudget" }))
+    {
+        @*<p id="expidss" style="display:none;pointer-events:none;"></p>*@
+        @*<input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />*@
+        @*<input id="geo_id" name="geo_id" class="filter_structure_id" />
+            <input id="pay_id" name="pay_id" class="filter_structure_id" />
+            <input id="fun_id" name="fun_id" class="filter_structure_id" />*@
+        @*<div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>*@
+        <div>
+            @Html.LabelFor(m => m.GeoStruct, "GeoStruct :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="Geostructlist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row itsec_icon-row" style="margin-left:100px">
+                <button data-p2btooltip="LookUp Geostruct " class="popup-content-icon-lookup" id="Lookup-Geostruct-ExpenseBudget"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Geostruct  " class="popup-content-icon-remove" id="Remove-Geostruct-ExpenseBudget"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div><br />
+        <div>
+            @Html.LabelFor(m => m.ExpenseCalendar, "Expense Calendar :", new { @class = "popup-content-label must" })
+            <select style="width:180px" class="drop must" name="ExpenseCalendarList" id="ExpenseCalendarList">
+                <option></option>
+            </select>
+        </div><br />
+
+
+        <div>
+            @Html.LabelFor(m => m.ExpenseType, "Expense Type :", new { @class = "popup-content-label must" })
+            <select style="width:180px" class="drop must" name="ExpenseTypelist" id="ExpenseTypelist">
+                <option></option>
+            </select>
+        </div><br />
+
+        <div>
+            @Html.LabelFor(m => m.SanctionAmount, "Sanction Amount :", new { @class = "popup-content-label must" })
+            <input type="text" id="SanctionAmount" name="SanctionAmount" class="popup-content-textbox must" />
+        </div><br />
+
+
+        <div>
+            @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+        </div><br />
+
+    }
+</div>
+
+
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+
+<script>
+    //$(document).ready(function () {
+
+    //    //$('#Name').ForceOnlyAlphaNumeric();
+    //    //$('#Name').MaxLength(50);
+    //});
+
+    $(document).ready(function () {
+        $('#SanctionAmount').MaxLength(10).ForceOnlyNumeric();
+        $('#Name').ValidateTextBox({ maxlength: 35, PersonName: true });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#SeqNo').MaxLength(3).ForceOnlyNumeric();
+        $('button').button();
+
+        @*var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['GeoStruct', 'ExpenseType', 'SanctionAmount', 'Narration', 'Id'];
+        ColNames = ['GeoStruct', 'ExpenseType', 'SanctionAmount', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Expense Budget';
+        url = '@Url.Action("P2BGrid", "ExpenseBudget")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);*@
+        @*$('#Grid_Form').hide();
+        $('#Grid_Form1').show();
+        $('#MyTable1').MultiLevelInlineEditGrid({
+            url: "@Url.Action("ExpenseBudget_Grid", "ExpenseBudget")",
+            editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+             htmurl: "@Url.Action("partial", "SalHeadFormula")",
+             submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",
+            columnname: ["Geostruct", "Calender", "Id"],
+            childheader: ["ExpenseType", "SanctionAmount", "Narration", "Id"],
+            childurl: "@Url.Action("A_ExpenseBudget_Grid", "ExpenseBudget")",
+            tableheader: "ExpenseBudget",
+            childurlColumnNo: "3"
+        });*@
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("ExpenseBudget_Grid", "ExpenseBudget")",
+            @*editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+             htmurl: "@Url.Action("partial", "SalHeadFormula")",
+             submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",*@
+            columnname: ["Geostruct", "Calender", "Id"],
+            childheader: ["ExpenseType", "SanctionAmount", "Narration", "Id"],
+            childurl: "@Url.Action("A_ExpenseBudget_Grid", "ExpenseBudget")",
+            tableheader: "ExpenseBudget",
+            childurlColumnNo: "3"
+        });
+
+        $('#Load').button().on("click", function () {
+            //$('#Grid_Form1').hide();
+            //$('#Grid_Form').show();
+            var v2 = $("#Financial_id").val();
+            var v1 = $("#ExpCalender").val();
+            if (v1 == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Expense Calendar !");
+                return false;
+            }
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("ExpenseBudget_Grid", "ExpenseBudget")?ExpCalendar=" + v2,
+                @*editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+                htmurl: "@Url.Action("partial", "SalHeadFormula")",
+                submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",*@
+                columnname: ["Geostruct", "Calender", "Id"],
+                childheader: ["ExpenseType", "SanctionAmount", "Narration", "Id"],
+                childurl: "@Url.Action("A_ExpenseBudget_Grid", "ExpenseBudget")",
+                tableheader: "ExpenseBudget",
+                childurlColumnNo: "3"
+            });
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };*@
+        //function AssignData() {
+        //    dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        //}
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            ////debugger;
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#ExpCalender",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetExpCalendar", "ExpenseBudget")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "ExpCalender_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+
+
+        @*$('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    //console.log(data);
+
+                    var forwarddata = JSON.stringify(data);
+                    //alert(forwarddata);
+                    $('#geo_id').val(forwarddata);
+                    $('#pay_id').val(forwarddata);
+                    $('#fun_id').val(forwarddata);
+
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter",
+            });
+        });*@
+
+
+        $('#Lookup-Geostruct-ExpenseBudget').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetGeostruct", "ExpenseBudget")', '', 'LookupDiv', 'Geostruct Look Up Data', '#Geostructlist', 'Geostructlist', 12, 'Geostructlist', '#frmExpenseBudget', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-Geostruct-ExpenseBudget').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#AppraisalAttributeModelObjectList').P2BGetTableDataonSelectedRow('#AppraisalAttributeModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Geostructlist').P2BGetTableDataonSelectedRow('#Geostructlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Geostructlist', $('#Geostructlist').val(), 200, 200, '#frmExpenseBudget', '#Geostructlist');
+            event.preventDefault();
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        @*$('#Create').button().on("click", function (event) {
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Expense Year.");
+                return false;
+            }
+            $('#frmExpenseBudget').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Expense Budget', 'open', '@Url.Action("create")', '#frmExpenseBudget', 'Message :', 'Request Falied :', '#JqGrid', 480, 600, '', '', function (data) { }, '');
+
+            $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', '', "");
+
+            $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, "");
+            $('#SanctionAmount').val();
+            $('#Narration').val();
+            event.preventDefault();
+        });*@
+
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmExpenseBudget');
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Expense Year.");
+                return false;
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Attribute Model Object', 'open', '@Url.Action("Create")', '#frmExpenseBudget', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', '', "");
+            $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, "");
+            $('#SanctionAmount').val();
+            $('#Narration').val();
+            event.preventDefault();
+        });
+
+        @*var aaa;
+        $('#Load').button().on("click", function () {
+
+            var v2 = $("#Financial_id").val();
+            var v1 = $("#ExpCalender").val();
+            if (v1 == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Expense Calendar !");
+                return false;
+            }
+            console.log("v2: " + v2 + " v1: " + v1);
+            $.ajax({
+                url: "@Url.Action("LoadExpBudget", "ExpenseBudget")?ExpCalendar=" + v2,
+                method: "POST",
+                success: function () { }
+
+            });
+            //$('#MyTable').DataTable().ajax.url('./ManPowerBudget/Formula_Grid?Filterdata=' + $("#Financial_id").val()).load();
+        });*@
+
+
+        @*$('#Edit').on('click', function () {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit ExpenseBudget", '#frmExpenseBudget', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+
+                $.each(data[0], function (i, k) {
+                    $('#frmExpenseBudget').trigger("reset");
+
+                    $('#SanctionAmount').val(k.SanctionAmount);
+                    $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', "", k.ExpenseCalendar_Id);
+
+                    $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, k.ExpenseType_Id);
+                    $('#Narration').val(k.Narration);
+
+                });
+            });
+        });*@
+
+        $('#Edit').on('click', function () {
+            $('#frmExpenseBudget').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit ExpenseBudget", '#frmExpenseBudget', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#SanctionAmount').val(k.SanctionAmount);
+                    $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', "", k.ExpenseCalendar_Id);
+                    $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, k.ExpenseType_Id);
+                    $('#Narration').val(k.Narration);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.GeoStructId, k.GeoStructFullDetails, 'Geostructlist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'N');
+                });
+
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        @*$('#Delete').button().click(function () {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });*@
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmExpenseBudget');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#View').on('click', function () {
+            $('#frmExpenseBudget').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View ExpenseBudget', '', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#SanctionAmount').val(k.SanctionAmount);
+                    $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', "", k.ExpenseCalendar_Id);
+                    $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, k.ExpenseType_Id);
+                    $('#Narration').val(k.Narration);
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#Geostructlist').P2BLookUpEncapsulate('#Geostructlist', 'Geostructlist', k.GeoStructId, k.GeoStructFullDetails, 'Geostructlist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'N');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+
+
+
+        @*$('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View ExpenseBudget', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmExpenseBudget').trigger("reset");
+                    $('#Autho_Action').val(k.Action);
+                    $('#SanctionAmount').val(k.SanctionAmount);
+                    $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseBudget")', "", k.ExpenseCalendar_Id);
+                    $('#ExpenseCalendarList-button').css("opacity", "0.5");
+                    $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, k.ExpenseType_Id);
+                    $('#ExpenseTypelist-button').css("opacity", "0.5");
+                    $('#Narration').val(k.Narration);
+
+                });
+
+            });
+        });*@
+
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+    });
+
+
+
+
+</script>

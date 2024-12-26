@@ -1,0 +1,184 @@
+﻿@model Payroll.VDADependRule
+@{
+    Layout = null;
+}
+<div>
+
+    <div class="ser_row1">
+        @Html.LabelFor(m => m.CPIRule, new { @class = "ser_popup-content-label" })<div class="popup-content-table">
+            <table class="lookuptableselected" id="CPIRuleList">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="ser_icon-row">
+        <button data-p2btooltip="Select CPIRule" class="popup-content-icon-lookup" id="Lookup-VDARule-SalHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Create CPIRule" class="popup-content-icon-create" id="Create-VDARule-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Edit WageRange" class="popup-content-icon-edit" id="Edit-VDARule-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+        <button data-p2btooltip="View WageRange" class="popup-content-icon-view" id="view-VDARule-SalHeadFormula"> <span class="ui-icon ui-icon-extlink popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Remove ServiceRange" class="popup-content-icon-remove" id="Remove-VDARule-SalHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+    </div>
+
+</div>
+
+
+<div class="dialog_CPIRule">
+    <div title="LookUp Data">
+        <div class="lookupdiv_CPIRule"></div>
+    </div>
+    <div id="pageNavPosition_CPIRule">
+
+    </div>
+</div>
+<style>
+    .ser_popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .ser_icon-row {
+        position: relative;
+        left: 58px;
+        top: -150px;
+    }
+
+    .ser_row1 {
+        width: 400px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        /*ServiceRange CRUD Start*/
+        $('button').button();
+        $('#Lookup-VDARule-SalHeadFormula').button().on('click', function (event) {
+            $('.dialog_CPIRule').P2BLookUpModal('@Url.Action("GetCPIRuleLKDetails", "CPIRule")', '', 'lookupdiv_CPIRule', 'CPIRule Look Up Data', '#CPIRuleList', 'CPIRuleList', 5, 'CPIRuleList', '#frmVDADependRule', 'A', '', 'Lookup_table_CPIRule', 'pageNavPosition_CPIRule');
+            event.preventDefault();
+        });
+        @*$('#Lookup-CPIUnitCalc').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "CPIUnitCalc")', '', 'LookupDiv', ' CPI Unit Calc Look Up Data', '#CPIUnitCalclist', 'CPIUnitCalclist', 5, 'CPIUnitCalclist', '#frmCPIRule', 'A', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'Lookup_table', 'PageNavPosition');
+            e.preventDefault();
+        });*@
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-VDARule-SalHeadFormula').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateVDARule_partial", "SalHeadFormula")', 'Create VDARule', 'open', '@Url.Action("Create", "CPIRule")', '#frmCPIRule', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmVDADependRule', '', function (data) {
+
+                $('#CPIRuleList').P2BLookUpEncapsulate('#CPIRuleList', 'CPIRuleList', data[0], data[1], 'CPIRuleList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        @*$('#Edit-VDARule-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CPIRuleList').P2BGetTableDataonSelectedRow('#CPIRuleList', 0);
+            b = a[0];
+            console.log(b);
+
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateVDARule_partial", "SalHeadFormula")', '@Url.Action("Edit", "CPIRule")', b, '@Url.Action("EditSave", "CPIRule")', 'Edit CPIRule', '#frmCPIRuleP', b, 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#frmVDADependRule', '', '#CPIRuleList', 'CPIRuleList', 'CPIRuleList', 'A', function (data) {
+                //setTimeout(function () {
+
+                $.each(data[0], function (i, k) {
+                    $('#frmCPIRule').trigger("reset");
+                    $('#Name').val(k.Name);
+                    $('#IBaseDigit').val(k.IBaseDigit);
+                    $('#MinAmountIBase').val(k.MinAmountIBase);
+                    $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                });
+                $.each(data[2], function (i, k) {
+                    $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+                });
+                //}, 3000);
+
+
+            });
+        });*@
+
+        $('#Edit-VDARule-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CPIRuleList').P2BGetTableDataonSelectedRow('#CPIRuleList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateVDARule_partial", "SalHeadFormula")', '@Url.Action("Edit", "CPIRule")', b, '@Url.Action("EditSave", "CPIRule")', 'Edit CPIRule', '#frmCPIRule', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmVDADependRule', '#CPIRuleList', 'CPIRuleList', 'CPIRuleList', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmCPIRule').trigger("reset");
+                    //alert(k.Name);
+                    $('#CpiP_Name').val(k.Name);
+                    $('#IBaseDigit').val(k.IBaseDigit);
+                    $('[name="VDAOnDirectBasic"]').val([k.VDAOnDirectBasic]).button().button("refresh");
+                    $('#MinAmountIBase').val(k.MinAmountIBase);
+                    $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                });
+                $.each(data[2], function (i, k) {
+                    $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#View-VDARule-SalHeadFormula').on('click', function (e) {
+            var a = [], b;
+            a = $('#CPIRuleList').P2BGetTableDataonSelectedRow('#CPIRuleList', 0);
+            b = a[0];
+            $('<div></div>').P2bViewPartialDialog({
+                htmurl: '@Url.Action("CreateVDARule_partial", "SalHeadFormula")',
+                btnid: '#View-VDARule-SalHeadFormula',
+                editurl: "@Url.Action("Edit", "CPIRule")",
+                height: 'auto',
+                width: 'auto',
+                returndatafunction: function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmCPIRule').trigger("reset");
+                        $('#Name').val(k.Name);
+                        $('#IBaseDigit').val(k.IBaseDigit);
+                        $('[name="VDAOnDirectBasic"]').val([k.VDAOnDirectBasic]).button().button("refresh");
+                        $('#MinAmountIBase').val(k.MinAmountIBase);
+                        $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                        $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                    });
+                    $.each(data[2], function (i, k) {
+                        $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+                    });
+
+                },
+                editdata: b,
+            });
+            e.preventDefault();
+        });
+
+
+
+        $('#Remove-VDARule-SalHeadFormula').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#CPIRuleList').P2BGetTableDataonSelectedRow('#CPIRuleList', 0);
+            //b = a[0];
+            //console.log(b);
+
+            var selectedRows = [];
+            selectedRows = $('#CPIRuleList').P2BGetTableDataonSelectedRow('#CPIRuleList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CPIRuleList', $('#CPIRuleList').val(), 200, 200, '#FormSalHeadFormula', '#CPIRuleList');
+            event.preventDefault();
+        });
+        /*ServiceRange CRUD End*/
+    });
+</script>

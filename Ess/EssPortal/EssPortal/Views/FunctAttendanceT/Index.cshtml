@@ -1,0 +1,215 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.FunctAttendanceT
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 100px;
+        top: -120px;
+    }
+
+    .emplist_row {
+        width: 700px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .popup-content-label {
+        width: 100px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 450px;
+        display: inline-flex;
+    }
+
+    .btn-action-class {
+        padding: 1px;
+    }
+
+    .btn-action-div {
+        float: left;
+        padding: 1px 12px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#txtPayMonth').MonthYearPicker();
+        $('#fromdate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+            dateFormat: 'dd/mm/yy'
+        });
+        $('#Todate').datepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#structload_frmFunctAttendanceT').on('click', function (e) {
+            //event.preventDefault();
+            var Processmonth = $('#Create_Processmonth').val();
+
+            if (Processmonth != "") {
+                $('#Empstruct_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownStructureList", "FunctAttendanceT")', Processmonth, "");
+                $.get("@Url.Action("GetStructureDates", "FunctAttendanceT")", { data: Processmonth, data2: "" }, function (data) {
+                    $('#fromdate').val(data.data.FromDate);
+                    var temp = data.data.FromDate.split("/");
+                    var ConfirmationDate = new Date(parseInt(temp[2]), parseInt(temp[1]), parseInt(temp[0]));
+                    var date = new Date(ConfirmationDate), y = date.getFullYear(), m = date.getMonth();
+                    var firstDay = new Date(y, m, 1);
+                    var lastDay = new Date(y, m, 0);
+                    $('#Todate').FormatDate(lastDay);
+                    if (data.data.ToDate != null) {
+                        $('#Todate').val(data.data.ToDate);
+                    }
+                    $('#Create_Paymonth').val($('#Create_Processmonth').val());
+                    if (data.data.FromDate != null)
+                        alert("Structure Loaded..!");
+                    else
+                        alert("Error in loading structure..!");
+                });
+            }
+            else {
+                alert("Please Select ProcesssMonth && Employee");
+            }
+            e.preventDefault();
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        $('#Create_Processmonth').MonthAndYear();
+        $('#Create_Paymonth').MonthAndYear('#Create_PayableDays');
+
+
+        $('#lookup-SalaryHead-FunctAttendance').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSalaryHeadDetails", "FunctAttendanceT")', '', 'lookupdiv', ' Look Up Data', '#SalaryHeadlist', 'SalaryHeadlist', 5, 'SalaryHeadlist', '#frmFunctAttendanceT', 'A', '#remove-SalaryHead-FunctAttendance', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+        $('#remove-SalaryHead-FunctAttendance').button().on('click', function (event) {
+            //dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            var a = [], b;
+            a = $('#SalaryHeadlist').P2BGetTableDataonSelectedRow('#SalaryHeadlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SalaryHeadlist', $('#SalaryHeadlist').val(), 200, 200, '#frmFunctAttendanceT', '#SalaryHeadlist', '#remove-SalaryHead-FunctAttendance');
+            event.preventDefault();
+        });
+
+        $('#ReqDate').TodayDate();
+
+
+    });
+
+</script>
+<div id="loder_div"></div>
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="lookupdiv"></div>
+    </div>
+    <div id="pageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmFunctAttendanceT", name = "frmFunctAttendanceT" }))
+    {
+        <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="filter_structure_id" />
+
+        <div class="row1">
+            <label id="lblcreatepaymonth" class="emplist_label must">Requestion Date :</label>
+            <input type="text" id="ReqDate" name="ReqDate" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="row1">
+            <label id="lblcreatepaymonth" class="emplist_label must">Process Month</label>
+            <input type="text" id="Create_Processmonth" name="Create_Processmonth" class="popup-content-textbox-rowfirst must" />
+            <button class="button" id="structload_frmFunctAttendanceT" style="top:0px;left:0px">LoadStructure</button>
+        </div>
+        <div class="emplist_row">
+            <label for="Empstruct_drop" class="emplist_label must">Employee Structure:</label>
+            <select id="Empstruct_drop" name="Empstruct_drop" class="drop" style="width:180px;"><option value="0">-Select-</option></select>
+        </div>
+        <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label must">From Date</label>
+            <input type="text" id="fromdate" name="fromdate" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label must">To Date</label>
+            <input type="text" id="Todate" name="Todate" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+
+        <div class="emplist_row">
+            <label for="SalaryHead_drop" class="emplist_label must">Salary Head:</label>
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="SalaryHeadlist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup SalaryHead" class="button popup-content-icon-lookup" id="lookup-SalaryHead-FunctAttendance"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove SalaryHead" class="button popup-content-icon-remove" id="remove-SalaryHead-FunctAttendance"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="emplist_row">
+            <label id="lblcreatepaymonth" class="emplist_label must">Pay Month</label>
+            <input type="text" id="Create_Paymonth" name="Create_Paymonth" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="emplist_row">
+            <label id="lblcreatepayableDays" class="emplist_label must">Hour Days</label>
+            <input type="text" id="Create_HourDays" name="Create_HourDays" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="emplist_row">
+            <label id="lblcreatepayableDays" class="emplist_label must">Reason </label>
+            <input type="text" id="Create_Reason" name="Create_Reason" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+    }
+</div>

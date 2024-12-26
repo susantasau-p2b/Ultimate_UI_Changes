@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "fun", name = "fun" }))
+    {
+        <div class="all-table">
+            <div class="emp_filter" style="display:none">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="job-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="job-table">
+                        <tr><th><input type="checkbox" id="case-job" /></th><th>Job</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <button id="load-next" class="loan-btn" data-tabletype="job">LoadNext</button>
+                    </span>
+                </div>
+            </div>
+            <div class="emp_filter" style="display:none">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="jobposition-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="jobposition-table">
+                        <tr><th><input type="checkbox" id="case-jobposition" /></th><th>JobPosition</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <button id="load-next" class="loan-btn" data-tabletype="jobposition">LoadNext</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        /*height: 300px;*/
+    }
+
+    .all-table {
+        display: inline-block;
+        float: left;
+    }
+
+    .emp_filter {
+        float: left;
+        margin: 1px 1px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+
+        $('#job-table').P2BTransactionTableDynamic('#job-search', '#case-job', '@Url.Action("Check_ExitanceFirstLevelFun", "Transcation")', []);
+        $('#jobposition-table').P2BTransactionTableDynamic('#jobposition-search', '#case-jobposition', '', []);
+
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+        $('form#fun .btn-span button').on("click", function (e) {
+            var a = $(this).data('tabletype');
+            var newValT = $('#' + a + '-search').val();
+            ////debugger;
+            var b = TranscationTableCheckboxCount('#' + a + '-table');
+            if (b > 1) {
+                alert("select one record");
+                return false;
+            } else if (b == 0 && newValT == "") {
+                alert("select Atleast one record");
+                return false;
+            }
+            var forwardata = $('#' + a + '-table').P2BGetTableDataonSelectedRow('#' + a + '-table', 1);
+            $('#' + a + '-table').P2BTransactionTableDynamic('#' + a + '-search', '#case-' + a + '', "@Url.Action("GenrationFun", "Transcation")?typeoftable=" + a + "-table", forwardata, '#applyfilter-fun');
+            e.preventDefault();
+        });
+
+        $('button').button();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+
+    });
+</script>

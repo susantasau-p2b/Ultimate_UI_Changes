@@ -1,0 +1,83 @@
+﻿@model Payroll.RateMaster
+@{
+    Layout = null;
+}
+@*<link href="~/Content/Rate_master/Rate_master.css" rel="stylesheet" />*@
+<style></style>
+<div class="dialog_RateCode">
+    <div title="LookUp Data">
+        <div class="lookupdiv_RateCode" id="Lookup"></div>
+    </div>
+    <div id="PageNavPosition">
+
+
+    </div>
+</div>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmRateMaster" }))
+    {
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Code, "Rate Code :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "RateCode", @maxlength = "10" })
+            <input type="text" id="Head_id" name="Head_id" class="filter_structure_id" maxlength="10"/>
+            <button data-p2btooltip="Select RateMaster Name" class="button popup-content-icon-lookup" id="Lookup-Name-RateMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.SalHead, "Sal Head :", new { @class = "popup-content-label must" })
+            <select class="drop must" name="SalHead_drop" style="width:120px;" id="SalHead_drop">
+                <option>-Select-</option>
+            </select>
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Percentage, "Percentage :", new { @class = "popup-content-label" })
+            @Html.TextBoxFor(m => m.Percentage, new { id = "rate_Percentage", @class = "popup-content-textbox search must" })
+            @*<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" />*@
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Amount, "Amount :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Amount, new { @class = "popup-content-textbox must", id = "rate_Amount" })
+        </div>
+    }
+</div>
+@*<link href="~/Content/Rate_master/Rate_master.css" rel="stylesheet" />*@
+
+<script>
+    $(document).ready(function () {
+        $('#RateCode').MaxLength(10);
+        $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('#SalHead_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "SalaryHead")", "", "", '');
+        $('button').button();
+        //  $('#Code').attr('readonly', true);
+        $('#rate_Percentage').ForcePercent().MaxLength(4).val(0.0);
+        $('#rate_Amount').ForceAmount().MaxLength(10).val(0);
+
+        @*$('#Lookup-Name-RateMaster').on('click', function (event) {
+            $('.dialog_RateCode').AddDataToTextbox({
+                appendTo: '#Code',
+                lookupurl: '@Url.Action("GetRateMasterLKDetails", "SalHeadFormula")',
+                NoOfRecordToShow: 5,
+                setnameofthelookupbyppage: 'Lookup_table',
+                LookupDiv: 'lookupdiv_RateCode',
+                lookuppagename: "lookup",
+                pagename: "pageNavPosition_RateCode"
+            });
+
+            event.preventDefault();
+        });*@
+
+        $('#Lookup-Name-RateMaster').on('click', function () {
+            $('.dialog_RateCode').AddDataToTextbox({
+                appendTo: "#Code",
+                // appendToId: "#Head_id",
+                lookupurl: "@Url.Action("GetRateMasterLKDetails", "SalHeadFormula")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "lookupdiv_RateCode",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                // readonly: true,
+            });
+        });
+    });
+</script>

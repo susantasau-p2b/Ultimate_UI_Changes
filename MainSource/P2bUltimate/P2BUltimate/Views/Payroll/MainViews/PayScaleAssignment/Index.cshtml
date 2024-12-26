@@ -1,0 +1,262 @@
+﻿@{
+    ViewBag.Title = "PayScale Assignment";
+}
+@model Payroll.PayScaleAssignment
+<style>
+    .icon-row {
+        position: relative;
+        left: 96px;
+        top: -151px;
+    }
+
+    .radio_section {
+        position: absolute;
+        right: 1%;
+        top: 2%;
+    }
+
+    .radio_section1 {
+        display: block;
+        height: auto;
+        position: relative;
+        margin: 5px 0px 0px 7px;
+    }
+
+    .popup-content-table {
+        width: 94%;
+        margin: 1px 1px;
+    }
+
+    .popup_radio_button, .popup_radio_button1, .popup_radio_button2, .popup_radio_button3 {
+/*        margin: 4px 0px 5px 2px;*/
+    }
+
+    .popup-content-textbox {
+        width: 150px;
+    }
+
+    .popup-content-label {
+        display: block;
+        width: 140px;
+        margin: 1px;
+        display: block;
+        float: left;
+    }
+
+    .row1 {
+        display: inline-block;
+        width: 500px;
+        margin-top: 10px;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dia;
+        $('#EffDate').P2BDatePicker();
+        var forwardata;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['SalaryHead', 'PayScaleAgreement', 'Id'];
+        ColNames = ['SalaryHead', 'PayScaleAgreement','Id',];
+        SortName = 'Id';
+        Caption = 'Pay Scale Assignment';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmPayScaleAssign').trigger("reset");
+
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PayScaleAssignment', 'open', '@Url.Action("Create")', '#frmPayScaleAssign', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', function () { });
+
+            $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "PayScaleAssignment")", "", "");
+            event.preventDefault();
+            //var forwardata = "";
+        });
+
+        
+        $('#View').button().click(function (event) {
+            @*AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View SalaryHeadConfig Data', '#PayScaleConfigJobStatuslist,#SalHeadFormulalist', '#Lookup-SalHeadFormula-SalHeadConfig,#Lookup-PayScaleConfigJobStatus-SalHeadConfig,#Create-PayScaleConfigJobStatus-SalHeadConfig', 600, 866, '', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.each(data[1], function (i, k) {
+                    $('#SalHeadFormulalist').P2BLookUpEncapsulate('#SalHeadFormulalist', 'SalHeadFormulalist', k.SalHeadFormula_Id, k.SalHeadFormula_Val, 'SalHeadFormulalist', '', 'N');
+                });
+
+
+                $.each(data[1], function (i, k) {
+                    $('#PayScaleConfigJobStatuslist').P2BLookUpEncapsulate('#PayScaleConfigJobStatuslist', 'PayScaleConfigJobStatuslist', k.PayScaleConfigJobStatus_Id, k.PayScaleConfigJobStatus_Val, 'PayScaleConfigJobStatuslist', '', 'N');
+                });
+
+
+            });*@
+
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Pay Scale Assignment', '#PayScaleAgreementlist,#SalHeadFormulalist', '#Lookup-SalHeadFormula-PayScaleAssignment,#Lookup-PayScaleAgreement-PayScaleAssignment,#Create-PayScaleAgreement-PayScaleAssignment', 500, 600, '', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[1], function (i, k) {
+                    $('#SalHeadFormulalist').P2BLookUpEncapsulate('#SalHeadFormulalist', 'SalHeadFormulalist', k.SalHeadFormula_id, k.SalHeadFormula_val, 'SalHeadFormulalist', 'view', 'A');
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgr_id, k.PayScaleAgr_val, 'PayScaleAgreementlist', 'view', 'N');
+                });
+
+                $.each(data[0], function (i, k) {
+                    $('#frmPayScaleAssign').trigger('reset');
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "PayScaleAssignment")", "", k.SalaryHead_Id);
+                });
+            });
+        });
+
+        $('#Edit').button().click(function (event) {
+            AssignData(); 
+          
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Pay Scale Asignment", '#frmPayScaleAssign', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 600, '#SalHeadFormulalist', '', function (data) {
+                $('#frmPayScaleAssign').trigger("reset");
+                $.each(data[1], function (i, k) {
+                    $('#SalHeadFormulalist').P2BLookUpEncapsulate('#SalHeadFormulalist', 'SalHeadFormulalist', k.SalHeadFormula_id, k.SalHeadFormula_val, 'SalHeadFormulalist', '#Remove-SalHeadFormula-PayScaleAssignment', 'A');
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgr_id, k.PayScaleAgr_val, 'PayScaleAgreementlist', '#Remove-PayScaleAgreement-PayScaleAssignment', 'N');
+                });
+
+                $.each(data[0], function (i, k) { 
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "PayScaleAssignment")", "", k.SalaryHead_Id);
+                });
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        // PArtial page create
+
+        $('#Lookup-PayScaleAgreement-PayScaleAssignment').on('click', function (event) {
+            $('.dialog_SalHead').P2BLookUpModal('@Url.Action("GetPayScaleAgreement", "PayScaleAssignment")', '', 'lookupdiv_SalHead', ' Look Up Data', '#PayScaleAgreementlist', 'PayScaleAgreementlist', 5, 'PayScaleAgreementlist', '#frmPayScaleAssign', 'A', '', 'Lookup_table', 'pageNavPosition_SalHead');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-SalHeadFormula-PayScaleAssignment').on('click', function (event) {
+            $('.dialog_SalHead').P2BLookUpModal('@Url.Action("GetSalHeadFormulaLKDetails", "PayScaleAssignment")', '', 'lookupdiv_SalHead', 'SalHeadFormula Look Up Data', '#SalHeadFormulalist', 'SalHeadFormulalist', 5, 'SalHeadFormulalist', '#frmPayScaleAssign', 'A', '', 'Lookup_table', 'pageNavPosition_SalHead');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayScaleAgreement-PayScaleAssignment').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "PayScaleAgreement")', 'Create Pay Scale Agreement', 'open', '@Url.Action("Create", "PayScaleAgreement")', '#frmPayScaleAgreement', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmSalaryHeadConfig', '', function (data) {
+
+                $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', data[0], data[1], 'PayScaleAgreementlist', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-SalHeadFormula-PayScaleAssignment').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#SalHeadFormulalist').P2BGetTableDataonSelectedRow('#SalHeadFormulalist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#SalHeadFormulalist').P2BGetTableDataonSelectedRow('#SalHeadFormulalist', 0);
+
+            console.log("Verify...");
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SalHeadFormulalist', $('#SalHeadFormulalist').val(), 200, 200, '#frmPayScaleAssign', '#SalHeadFormulalist', '#Remove-SalHeadFormula-PayScaleAssignment');
+            event.preventDefault();
+        });
+
+        $('#Remove-PayScaleAgreement-PayScaleAssignment').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+            
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+            console.log("Verify...");
+            
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayScaleAgreementlist', $('#PayScaleAgreementlist').val(), 200, 200, '#frmPayScaleAssign', '#PayScaleAgreementlist', '#Remove-PayScaleAgreement-PayScaleAssignment');
+            event.preventDefault();
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+    });
+</script>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            @*<button class="button" id="Autho">Authorised</button>*@
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog_SalHead">
+    <div title="LookUp Data">
+        <div class="lookupdiv_SalHead"></div>
+    </div>
+    <div id="pageNavPosition_SalHead">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPayScaleAssign", name = "frmPayScaleAssign" }))
+    {
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.PayScaleAgreement, "Pay Scale Agreement :", new { @class = "popup-content-label must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="PayScaleAgreementlist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select PayScale" class="popup-content-icon-lookup" id="Lookup-PayScaleAgreement-PayScaleAssignment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create PayScale" class="popup-content-icon-create" id="Create-PayScaleAgreement-PayScaleAssignment"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-Address-Corporate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove PayScale" class="popup-content-icon-remove" id="Remove-PayScaleAgreement-PayScaleAssignment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label must" })
+            <select class="drop must" style="width:300px;" name="SalaryHeadlist" id="SalaryHeadlist"><option></option></select>
+        </div>
+
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.SalHeadFormula, "Salary Head Formula :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="SalHeadFormulalist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select SalHeadFormula" class="  popup-content-icon-lookup" id="Lookup-SalHeadFormula-PayScaleAssignment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove SalHeadFormula" class="  popup-content-icon-remove" id="Remove-SalHeadFormula-PayScaleAssignment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create Contact Details" class="  popup-content-icon-create" Id="Create-ContactDetails-Corporate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Contact Details" class="  popup-content-icon-edit" Id="Edit-ContactDetails-Corporate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" Id="Remove-ContactDetails-Corporate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>*@
+            </div>
+        </div>
+
+    }
+</div>

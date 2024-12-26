@@ -1,0 +1,555 @@
+﻿@{
+    ViewBag.Title = "Extension Reduction Service Book";
+}
+@model Payroll.ExtnRednServiceBook
+<html>
+
+<head>
+
+    <title></title>
+    <style>
+        .without-btn {
+            height: 216px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .newcontentdiv {
+            float: right;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+
+
+        .oldstruct-div {
+            width: 192px;
+            float: left;
+            margin: 1px 105px;
+            position: relative;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .oldstruct-label-class {
+            margin: 0 44px;
+            font-weight: bold;
+        }
+
+        .oldstruct-textarea-class {
+            height: 192px;
+        }
+
+        .row3 {
+            display: inline-block;
+            width: 563px;
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            $('#Employee-Table').P2BTransactionTable('#Employee-Search', '#Case-Employee', '@Url.Action("GetEmployeeDetails")', "");
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#CreateRelease_dialog').P2BCreateDialog();
+            $('#ProcessDate').P2BDatePicker();
+            $('#ReleaseDate').P2BDatePicker();
+            $('#ExpiryDate').prop("disabled", true);
+
+            
+
+            var ColNames_release = [];
+            var ColModel_release = [];
+            var SortName_release, Caption_release, url_release, width_release, height_release;
+
+            ColNames_release = ['EmpCode', 'EmpName', 'Activity', 'Process Date', 'Period', 'Unit', 'Count', 'Id'];
+            ColModel_release = ['EmpCode', 'Emp Name', 'Activity', 'Process Date', 'Period', 'Unit', 'Count', 'Id'];
+            SortName_release = 'Id';
+            Caption_release = 'ExtnRednServiceBook';
+            url_release = '@Url.Action("P2BGridRelease")';
+            width_release = 1000;
+            height_release = 150;
+
+            $('#JqGrid_release').on('click', function () {
+                setTimeout(function () {
+                    //   var EmpId = $.GetGridSelctedvalue("#JqGrid_release", "EmpId");
+                    var Id = $.GetGridSelctedvalue("#JqGrid_release", "Id");
+                    console.log(Id);
+                    //$('#emp_Id').val(EmpId);
+                    $('#releas_Id').val(Id);
+                    @*$.get("@Url.Action("Edit")", { data: $('#releas_Id').val() }, function (data) {
+                        $.each(data[0], function (i, k) {
+                            if (k.ProcessIncrDate != null) {
+                                $('#txtProcessIncrDateRelease').val(DateConvert(k.ProcessIncrDate));
+                            }
+                            $('#txtIncrActivityrelease').val(k.IncrActivity);
+                            $('#Narration').val(k.Narration);
+
+                        });
+                        console.log(data);
+                    });*@
+
+                }, 500);
+
+            });
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#pay_id').val(data.PayStruct);
+                        //$('#fun_id').val(data.FunStruct);
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+            //$('#ReleaseDate').prop("disabled", true);
+            $('input[name="ReleaseFlag"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#ReleaseDate').prop("disabled", true);
+                    $('#ReleaseDate').val("");
+                }
+                else {
+                    $('#ReleaseDate').prop("disabled", false);
+                }
+            });
+            $('#add').on("click", function (event) {
+                $('#frmExtnRednServiceBookT').trigger("reset");
+                //$.LoadEmpByDefault(true);
+                $.LoadEmpByDefaultWOGeoId(true, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Extension Reduction Service Book', 'open', '@Url.Action("Create")', '#frmExtnRednServiceBookT', 'Message :', 'Request Falied :', '#JqGrid', 600, 1020, '', '', function (data) { }, { datatablename: "#MyTable" });
+                event.preventDefault();
+            });
+
+            $('#txtNarrationRelease').prop("disabled", true);
+            
+            $('#txtPeriodUnit').prop("disabled", true);
+           
+            var Empdata = {
+                Get: $('#Emp').val(),
+                Set: function (data) {
+                    $('#Emp').val(data);
+                },
+                Remove: function () {
+                    $('#Emp').val()
+                }
+            };
+            $('#release').on("click", function (event) {
+                $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+                $('#frmExtnRednServiceBookTRelease').trigger("reset");
+                $('#CreateRelease_dialog').P2BGridDialog({
+                    maindialogtitle: "Release Extn Redn Activity",
+                    submiturl: "@Url.Action("Release")",
+                    form: "#frmExtnRednServiceBookTRelease",
+                    height: 555,
+                    width: 1100,
+                    state: "open",
+                    gridname: "#JqGrid_release",
+                    gridfunction: "GetGridSelctedvalue",
+                    editurl: url_release,
+                    returnToGrid: "#JqGrid_release",
+                });
+                // To bind dropdown on page load
+
+            });
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["Release", "ReleaseDate", "Activity", "ProcessDate", "Period", "Unit", "Count", "Id"],
+                childurl: "@Url.Action("Get_ExtnRednServBook", "ExtnRednServiceBook")",
+                tableheader: "ExtnRedn Service Book",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                // console.log($(init).parents('tr:eq(0)'));
+                var parent_element = $(init).parents('td:last').parent().prev();
+                //var element = $(init).parents('tr:eq(0)');
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                //   console.log(element);
+                var dt = $('#MyTable').DataTable();
+
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    //    $('<div></div>').PartialCreateDialog({
+                    //        height: 'auto',
+                    //        width: 'auto',
+                    //        form: "#frm-YearlyPaymentT-partial",
+                    //        htmlurl: htmurl,
+                    //        state: "open",
+                    //        mode: "View",
+                    //        editurl: editurl,
+                    //        submiturl: submiturl,
+                    //        editdata: id,
+                    //        forwarddata: id,
+                    //        returndatafunction: function (data) {
+                    //            $.each(data.data, function (i, k) {
+                    //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                    //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                    //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                    //                $('#yearlypayment-Narration').val(k.NarrationP);
+                    //            });
+                    //        }
+                    //    });
+                    //} else if ($(init).hasClass('ui-icon-pencil')) {
+                    //    $('<div></div>').PartialCreateDialog({
+                    //        height: 'auto',
+                    //        width: 'auto',
+                    //        form: "#frm-YearlyPaymentT-partial",
+                    //        htmlurl: htmurl,
+                    //        state: "open",
+                    //        mode: "Edit",
+                    //        editurl: editurl,
+                    //        submiturl: submiturl,
+                    //        editdata: id,
+                    //        forwarddata: id,
+                    //        returndatafunction: function (data) {
+                    //            $.each(data.data, function (i, k) {
+                    //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                    //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                    //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                    //                $('#yearlypayment-Narration').val(k.NarrationP);
+                    //            });
+                    //        },
+                    //        submitfun: function (data) {
+                    //            var row = dt.row(parent_element);
+                    //            if (row.child.isShown()) {
+                    //                parent_element.removeClass('details');
+                    //                row.child.hide();
+                    //            }
+                    //        }
+                    //    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+
+            $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+                // $('input[type="checkbox"]').not(this).prop("checked", false);
+                if (this.checked) {
+                    var id = $(this).val();
+                    $('#ExpiryDate').val('');
+                    $('#Period').val('');
+                    $('#txtPeriodUnit').val('');
+                    $('#txtUtilized').val('');
+                    $('#txtRetirementDate').val('');
+                    $('#ProcessDate').val('');
+                    $('#txtProbationPeriod').val('');
+                    //$('#ExtnRednActivitylist').selectmenu('refresh');
+                    //$('#extnrednpolicy_drop').selectmenu('refresh');
+                    
+                    $('#ExtnRednActivitylist').SelectMenuAppend('@Url.Action("PopulateDropDownActivityList", "ExtnRednServiceBook")', id, "EXTNREDNACTIVITY");
+                    $('#ExtnRednActivitylist').SelectMenuOnChange("@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")", "#extnrednpolicy_drop", id, "EXTNREDNPOLICY");
+                }
+                else {
+                    Empdata.Remove();
+                    return false;
+                }
+            });
+           
+
+            //$('#TransActivitylist').on('selectmenuopen', function () {
+            //    var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            //    console.log(a);
+            //    if (a != null && a.length > 0) {
+            //    } else {
+            //        alert('Select Employee..!');
+            //        $('#ExtnRednActivitylist').selectmenu('refresh');
+            //    }
+            //});
+
+
+
+            $('#extnrednpolicy_drop').on('selectmenuchange', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                console.log(a);
+               
+                if (a != null && a.length > 0) {
+                    $.post("@Url.Action("GetApplicableData")", { data: a[0], data2: $('#extnrednpolicy_drop').val() }, function (data) {
+                        
+                        if (data != null) {
+                            $('#ExpiryDate').val(data.ExpiryDate);
+                            $('#Period').val(data.Period);
+                            $('#txtPeriodUnit').val(data.UnitValue);
+                            $('#txtUtilized').val(data.UtilizedTillDate);
+                            $('#txtRetirementDate').val(data.ProcessActDate);
+                            $('#ProcessDate').val(data.ProcessDate);
+                            if (data.ProbationPeriod == null) {
+                                $('#dvProbation').hide();
+                            }
+                            else {
+                                $('#txtProbationPeriod').val(data.ProbationPeriod);
+                                $('#dvProbation').show(); 
+                                $("#label-ActualDate").text("Probation Date:");
+                            }
+                            
+                            
+                        }
+                    }); 
+                } else {
+                    alert('Select Employee..!');
+                    $('#ExtnRednActivitylist').selectmenu('refresh');
+                }
+            });
+
+            @*$('#ProcessDate').on('change', function () {
+
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+
+                if (a != null && a.length > 0) {
+                    console.log(a[0]);
+                    $.post("@Url.Action("GetApplicableData")", { data: $(this).val(), data2: $('#extnrednpolicy_drop').val() }, function (data) {
+                        
+                        if (data != null) {
+                            $('#ExpiryDate').val(data.ExpiryDate);
+                            $('#Period').val(data.Period);
+                            $('#txtPeriodUnit').val(data.UnitValue);
+                            $('#txtUtilized').val(data.UtilizedTillDate);
+                            $('#txtRetirementDate').val(data.RetirementDate);
+                            $('#ProcessDate').val(data.ProcessDate);
+                        }
+                    }); 
+                } else {
+                    alert('Select Employee..!');
+                    $('#extnrednpolicy_drop').selectmenu('refresh');
+                }
+
+            });*@
+           
+           
+          
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="add">Add</button>
+                <button class="button" id="release">Release</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                @*<button class="button" id="filterShow">filterShow</button>*@
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+
+
+
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Yearly payment T">
+   
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmExtnRednServiceBookT", name = "frmExtnRednServiceBookT" }))
+        {
+                 <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        <div class="fileremployee">
+            <div class="employee-transcationdiv" style="float:left">
+                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                </table>
+            </div>
+        </div>
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="Emp" class="filter_structure_id" name="Employee-Table" />
+
+
+            <div class="FormYearlypymentt">
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ExtnRednActivity, "Activity:", new { @class = "popup-content-label" })<select id="ExtnRednActivitylist" name="ExtnRednActivitylist" class="drop" style="width:159px;"><option value="0">-Select-</option></select>
+                    <div class="newcontentdiv">
+                        <label class="popup-content-label">ExtnRednPolicy :</label><select class="drop" id="extnrednpolicy_drop" name="extnrednpolicy" style="width:159px;"></select> 
+                    </div>
+
+                </div>
+                <div class="row3 content_margine" id="dvDatePerPolicy">
+                    <label id="label-ActualDate" for="ActualDate">Retirement Date:</label><input type="text" id="txtRetirementDate" name="txtRetirementDate" /> 
+                    <div class="newcontentdiv" id="dvProbation">
+                        @Html.Label("ProbationPeriod", "ProbationPeriod:", new { @class = "popup-content-label" } )<input type="text" id="txtProbationPeriod" name="ProbationPeriod" /> 
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                   @Html.LabelFor(m => m.ProcessDate, "Process Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessDate, new { @class = "popup-content-textbox must" })
+                    <div class="newcontentdiv">
+                        @Html.LabelFor(m => m.ExpiryDate, "Extended Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ExpiryDate, new { @class = "popup-content-textbox must" })
+                    </div> 
+                </div>
+                <div class="row3 content_margine">
+                  @Html.LabelFor(m => m.Period, "Period :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Period, new { @class = "popup-content-textbox must" })
+                    <div class="newcontentdiv">
+                        @Html.Label("PeriodUnit", "PeriodUnit:", new { @class = "popup-content-label" })<input type="text" id="txtPeriodUnit" name="PeriodUnit" /> 
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.Label("Utilized", "Utilized till Date:", new { @class = "popup-content-label" })<input type="text" id="txtUtilized" />
+                    <div class="newcontentdiv">
+                      @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-narration must", id = "Narration" })
+                    </div>
+                </div>
+             
+               
+            </div>
+
+        }
+    </div>
+
+    <div id="CreateRelease_dialog" title="Create  Yearly payment T Release">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmExtnRednServiceBookTRelease", name = "frmExtnRednServiceBookTRelease" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+            <input id="releas_Id" class="filter_structure_id" name="releas_Id" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <div class="Release_grid">
+                <div id="Grid_Form_release">
+                    <div>
+                        <table id="JqGrid_release"></table>
+                        <div id="pager2_release"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="FormRelaseYearlypymentt">
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ReleaseFlag, "Release Flag:", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ProcessFlag_radio1" name="ReleaseFlag" value="true" /><label for="ProcessFlag_radio1">Yes</label>
+                        <input type="radio" id="ProcessFlag_radio2" name="ReleaseFlag" value="false" checked="checked" /><label for="ProcessFlag_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ReleaseDate, "Release Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ReleaseDate, new { @class = "popup-content-textbox must" })</div>
+                @*<div class="row3 content_margine">
+                    <label id="lblNarrationRelease" class="popup-content-label">Narration:</label>
+                    <input type="text" id="txtNarrationRelease" name="txtNarrationRelease" class="popup-content-textbox must" />
+                </div>*@
+            </div>
+        }
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,524 @@
+﻿@{
+    ViewBag.Title = "Emp Reporting Timing Struct";
+}
+@model P2b.Global.Employee
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+
+    <style>
+        #lvdata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 29px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+        .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: left;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 610px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablename = "";
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "ReportingInfo")",
+                htmurl: "@Url.Action("GridPartial", "ReportingInfo")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["AccessRights", "FuncModules", "FuncSubModules", "ReportingStruct", "Id"],
+                childurl: "@Url.Action("Get_EmpRepoTimingStructData", "ReportingInfo")",
+                tableheader: "Emp ReportingInfo ",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("", "")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                $('#Grid-ReqDate').val(k.ReqDate);
+                                $('#Grid-FromDate').val(k.FromDate);
+                                $('#Grid-ToDate').val(k.ToDate);
+                                $('#Grid-TotalDays').val(k.TotalDays);
+                                $('#Grid-Reason').val(k.Reason);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: "@Url.Action("", "")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("", "")",
+                        submiturl: "@Url.Action("", "")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                //console.log(k.MonthlyInstallmentAmount);
+                                $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                                //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: [id,parentid].toString(),
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            $("#FuncModuleslist").on('selectmenuchange', function () {
+                var submoduledata=  $('#FuncModuleslist option:selected').val();
+                //   alert(submoduledata);
+                $('#FuncSubModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "ReportingStructRights")", submoduledata, "");
+            });
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmEmpReportingTimingStruct').trigger('reset');
+                $.LoadEmpByDefault();
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Emp Reporting Timing Struct ', 'open', '@Url.Action("create") ', '#frmEmpReportingTimingStruct', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', btndisablename, function (data) { }, {
+                    datatablename: "#MyTable"
+                });
+                e.preventDefault();
+            });
+
+            $('#Lookup-ReportingStructRights-Employee').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "ReportingStructRights")', '', 'LookupDiv', 'ReportingStructRights Look Up Data', '#ReportingStructRightslist', 'ReportingStructRightslist', 5, 'ReportingStructRightslist', '#frmEmpReportingTimingStruct', 'A', '', 'CorrsAddrslist_table', 'PageNavPosition');
+                e.preventDefault();
+            });
+
+            $('#Create-ReportingStructRights-Employee').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ReportingStructRights")', 'Create ReportingStructRights', 'open', '@Url.Action("Create","ReportingStructRights")', '#frmReportingStructRights', 'Message :', 'Request Falied :', '#JqGrid', 600, 700, '', '', '', '#frmEmpReportingTimingStruct', '', function (data) {
+                    $('#ReportingStructRightslist').P2BLookUpEncapsulate('#ReportingStructRightslist', 'ReportingStructRightslist', data[0], data[1], 'ReportingStructRightslist', '#Edit-ReportingStructRights-Employee,#Remove-ReportingStructRights-Employee', 'A');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-ReportingStructRights-Employee').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "ReportingStructRights")', '@Url.Action("edit", "ReportingStructRights")', b, '@Url.Action("Editsave","ReportingStructRights")', 'Edit ReportingStructRights', '#frmReportingStructRights', b, 'Message :', 'Request Falied :', '#JqGrid', 600, 700, '#frmEmpReportingTimingStruct', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#ReportingStructRightslist', 'ReportingStructRightslist', 'ReportingStructRightslist', 'A', function (data) {
+                    $.each(data[0], function (i, k) {
+
+                        $('#FuncModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 601, k.FuncModules_Id, '');
+                        //$('#FuncSubModuleslist').P2BSelectMenuAppend("@@Url.Action("GetLookupValue", "ReportingStructRights")", k.FuncModules_Id, 600);
+                         $('#FuncSubModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "ReportingStructRights")", k.FuncModules_Id, k.FuncSubModules_Id, '');
+
+                        $('#AccessRightslist').P2BLookUpEncapsulate('#AccessRightslist', 'AccessRightslist', k.AccessRights_Id, k.AccessRights_Val, 'AccessRightslist', '', 'A');
+                        $('#ReportingStructlist').P2BLookUpEncapsulate('#ReportingStructlist', 'ReportingStructlist', k.ReportingStruct_Id, k.ReportingStruct_Val, 'ReportingStructlist', '', 'A');
+                    });
+                });
+                event.preventDefault();
+            });
+
+            $('#Remove-ReportingStructRights-Employee').button().on('click', function (event) {
+                //var a = [], b;
+                //a = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
+                //b = a[0];
+
+
+                var selectedRows = [];
+
+                selectedRows = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ReportingStructRightslist', $('#ReportingStructRightslist').val(), 200, 200, '#frmEmpReportingTimingStruct', '#ReportingStructRightslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
+                event.preventDefault();
+            });
+
+            $('#Edit').on('click', function () {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Emp Reporting Timing Struct Data", '#frmEmpReportingTimingStruct', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 650, 1200, '#ReportingTimingStructlist', '', function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        console.log(k.EffectiveDate);
+                        if (k.EffectiveDate != null) {
+                            $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                        }
+                        if (k.EndDate != null) {
+                            $('#EndDate').val(DateConvert(k.EndDate));
+                        }
+                        //   $('#Code').attr('readonly', 'readonly');
+                    });
+                    $.each(data[1], function (i, k) {
+                        console.log(k.GeoGraphList_Id);
+                        $('#ReportingTimingStructlist').P2BLookUpEncapsulate('#ReportingTimingStructlist', 'ReportingTimingStructlist', k.GeoGraphList_Id, k.GeoGraphList_val, 'ReportingTimingStructlist', '', 'N');
+                    });
+                    //$.each(data[1], function (i, k) {
+                    //    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.GeoGraphList_Id, k.GeoGraphList_val, 'TimingPolicylist', '', 'N');
+                    //});
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+
+            $('#EffectiveDate').P2BDatePicker();
+            $('#EndDate').P2BDatePicker();
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        if (data.GeoStruct != null) {
+                            $('#geo_id').val(data.GeoStruct);
+                        }
+                        if (data.PayStruct != null) {
+                            $('#pay_id').val(data.PayStruct);
+                        }
+                        if (data.FunStruct != null) {
+                            $('#fun_id').val(data.FunStruct);
+                        }
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#FormFilter",
+                    hierarchy: true,
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpReportingTimingStruct", name = "frmEmpReportingTimingStruct" }))
+        {
+            <div class="heading">Filter View</div>
+
+            <div class="filter-div">
+                <label class="advance_filter_label">
+                    Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                    </span>
+                </label>
+                <div id="FormFilter"></div>
+            </div>
+
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="Employee-Search" style="width: 425px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr>
+                                <th><input type="checkbox" id="Case-Employee" /></th>
+                                <th>Employee</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+
+            <div class="heading">Filter View</div>
+            <div class="section2_Leave">
+
+                <div class="heading">Leave Requisition Details</div>
+                <div id="sec2" style="padding: 0em;">
+                    <div class="empreporting_row content_margine">
+                        <label class="popup-content-label">ReportingStructRights :</label>
+                        <div class="popup-content-table" style="margin-left:79px">
+                            <table class="lookuptableselected" id="ReportingStructRightslist" style="height:239px;width:495px">
+                                <tr><th>ID</th><th style="width:487px">LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-rowreporting icon-row" style="margin-left:169px;margin-top:-64px">
+                            <button data-p2btooltip="Lookup ReportingStructRights" class="popup-content-icon-lookup" id="Lookup-ReportingStructRights-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create ReportingStructRights" class="popup-content-icon-create" id="Create-ReportingStructRights-Employee"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit ReportingStructRights" class="popup-content-icon-edit" id="Edit-ReportingStructRights-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove ReportingStructRights" class="popup-content-icon-remove" id="Remove-ReportingStructRights-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+﻿@model P2b.Global.Login
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Login";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/P2B_Scripts")
+    @Styles.Render("~/Content/P2B_CSS")
+    <link href="~/Content/P2B_CSS/Standard.css" rel="stylesheet" />
+    <link href="~/Content/Login/Login.css" rel="stylesheet" />
+    <script>
+        $(document).ready(function (event) {
+            var parm = "@HttpContext.Current.Request.RequestContext.RouteData.Values["id"]";
+            //console.log(parm);
+            if (parm == "00") {
+                $.Snackbar({
+                    msg: "Session Expired,Please Logged In Again..!",
+                    setTimeout: false
+                });
+            }
+            $('#txt_username').focus();            
+
+
+            //function ShowErrorMessage(control, message) {
+            //    var pos = $(control).offset();
+            //    var h = $(control).height();
+            //    var w = $(control).width();
+            //    if ($(control).is(':checkbox')) {
+            //        $("<div class='error'>" + message + "</div>").appendTo("body").css({ left: pos.left, top: pos.top + h + 10 }).fadeOut(3000);
+            //    }
+            //    else {
+            //        $("<div class='error'>" + message + "</div>").appendTo("body").css({ left: pos.left + w + 10, top: pos.top }).fadeOut(3000);
+            //    }
+            //};
+            function perform() {
+                var all = $(".page_credential").map(function () { return $(this).attr('id'); }).get();
+                var x = true;
+                jQuery.each(all, function (index, value) {
+                    if (!$('#' + this + '').val()) {
+                        x = false;
+                        $('#' + this + '').prop("checked", true);
+                        ShowErrorMessage($('#' + this + ''), 'Required !');
+                    }
+                });
+                return x;
+            };
+            $('#submit').button().click(function (event) {
+                $("#show").empty();
+                $('#submit').button('disable').addClass('login-btn-active');
+                $('#txt_username,#txt_password').attr('disabled', 'disabled').addClass('login-textbox-disable-class');
+                var err = true;//perform();
+                if (err == true) {
+                    var username = document.getElementById("txt_username").value;
+                    var pass = document.getElementById("txt_password").value;
+                    var ajaxreq = $.ajax({
+                        url: "@Url.Action("check")",
+                        method: "POST",
+                        data: { x: username, y: pass },
+                        beforeSend: function () {
+                            $('<a><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw login_loader" id="login_loder" style="color: rgba(27, 187, 173, 0.93)" aria-hidden="true"></i></a>').appendTo("#show");
+                        },
+                        success: function (data) {
+                            if (data.success == true) {
+                                if (data.mod == 1) {
+                                    var dia = $('#createdialog').dialog({
+                                        autoOpen: false,
+                                        height: 200,
+                                        width: 500,
+                                        modal: true,
+                                        closeOnEscape: false,
+                                        open: function () {
+                                            $('#Fy_id').P2BSelectMenuMuliSelectAppend("@Url.Action("GetFinancialYear", "IntialSelection")", "", "");
+                                            $('#Ly_id').P2BSelectMenuMuliSelectAppend("@Url.Action("GetLeaveYear", "IntialSelection")", "", "");
+                                        },
+                                        title: "Select List",
+
+                                        buttons: {
+                                            Submit: function (e) {
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "@Url.Action("Update", "IntialSelection")",
+                                                    data: $('#frmChangePassword').serialize(),
+                                                    success: function (data) {
+                                                        if (data.success == false) {
+                                                            alert(data.responseText);
+                                                        } else {
+                                                            dia.dialog('close');
+
+                                                            window.location.reload(true);
+
+                                                        }
+                                                    },
+                                                });
+                                            },
+
+                                        }
+                                    });
+                                    dia.dialog("open");
+                                } else {
+                                    window.location.href = "" + data.data + "";
+                                }
+                            } else {
+                                $("#login_loder").remove();
+                                $('#submit').button('enable').removeClass('login-btn-active');
+                                $('#txt_username,#txt_password').removeAttr('disabled').removeClass('login-textbox-disable-class');
+                                $("<p class='error'>" + data.data + "</p>").appendTo("#show");
+                                //.fadeOut(3000);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        },
+
+                    });
+                } else {
+                    $('#submit').button('enable').removeClass('login-btn-active');
+                    $('#txt_username,#txt_password').removeAttr('disabled').removeClass('login-textbox-disable-class');
+                }
+                event.preventDefault();
+            });
+
+        });
+    </script>
+</head>
+<body class="">
+    <div class="bg-img"></div>
+    <div class="body-content">
+        <div class="header-content">
+            @*<div class="company_name_harder"><h1 class="company_name">P2B Ultimate</h1></div>*@
+            <h2 class="hrms">Human Resource Management System</h2>
+        </div>
+        <div class="middle-content">
+            <div class="login-pane">
+                <div class="login-pane-child col-md-12">
+                    <div class="company-avatar"></div>
+                    <div class="cer_tbl">
+                        <form>
+                            <div>
+                                @Html.TextBoxFor(m => m.UserId, new { id = "txt_username", @class = "txt_username page_credential", @placeholder = "UserName", @autocomplete = "off" })                                
+                            </div>
+                            <div>@Html.TextBoxFor(m => m.Password, new { id = "txt_password", @class = "txt_password page_credential", type = "password", @placeholder = "PassWord", @autocomplete = "off" })</div>
+                            <div class="login_button_div"><button type="submit" id="submit" class="login_button">Login</button></div>
+                        </form>
+                        <div id="show"></div>
+                    </div>
+                    <div><a class="forgot_password" href="@Url.Action("Index","ForgotPassword")">Forgot Password</a></div>
+                </div>
+            </div>
+        </div>
+        <div id="createdialog" hidden>
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChangePassword" }))
+            {
+                <div class="parent_div">
+                    <div class="child-div">
+                        <label class="content-label must">Financial Year :</label>
+                        <select class="drop must" id="Fy_id" name="Fy_id"></select>
+                    </div>
+                    <div class="child-div">
+                        <label class="content-label must">Leave Year :</label>
+                        <select class="drop must" id="Ly_id" name="Ly_id"></select>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="footer-content">
+            <div class="sp"></div>
+            <div class="footer-content-menu-list">
+                <ul>
+                    @*<li><a>About P2B Ultimate</a></li>*@
+                    <li><a>About Ultimate</a></li>
+                    <li><a>Support</a></li>
+                    <li><a>Help</a></li>
+                </ul>
+            </div>
+            @*<div class="footer-content-copyright">
+                <a>Copyright &copy; - 2015 Developed By P2BAce Solutions Pvt Ltd.</a>
+            </div>*@
+        </div>
+    </div>
+</body>
+</html>

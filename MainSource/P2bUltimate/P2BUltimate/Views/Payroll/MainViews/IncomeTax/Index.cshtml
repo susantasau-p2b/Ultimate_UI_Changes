@@ -1,0 +1,345 @@
+﻿@{
+    ViewBag.Title = "Income Tax";
+}
+@model Payroll.IncomeTax
+
+@*<link href="~/Content/it_config/it_config.css" rel="stylesheet" />*@
+<style>
+    .icon-row {
+        left: 211px;
+        top: -145px;
+        position: relative;
+    }
+
+    .row3 {
+        width: 100%;
+    }
+
+    .Financial_width {
+        width: 60%;
+    }
+
+    .popup-content-label {
+        width: 104px;
+        display: block;
+        float: left;
+    }
+
+    .lookuptableselected th, .lookuptableselected td {
+        color: rgba(114, 113, 113, 0.9);
+        border-bottom-width: 1px;
+        border-bottom-color: #51e7d0;
+        border-bottom-style: solid;
+        width: 500px;
+        border-collapse: collapse;
+        height: 23px;
+        overflow: hidden;
+        padding: 1px 2px;
+        white-space: pre;
+        padding: 2px;
+        /*! text-align: left; */
+    }
+
+    .popup-content-table {
+        width: 689px;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Calendar', 'Id'];
+        ColNames = ['Calendar', 'Id'];
+        SortName = 'ID';
+        Caption = 'Income Tax';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#Lookup_FinancialYear').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "ITProjection")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmincometax', 'N', '#remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#remove_FinancialYear').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#FinancialYearList').P2BGetTableDataonSelectedRow('#FinancialYearList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#FinancialYearList', $('#FinancialYearList').val(), 200, 200, '#frmincometax', '#FinancialYearList', '');
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            ////debugger;
+            $('#frmincometax').trigger("reset");
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Income tax  Data", '#frmincometax', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 670, '', "", function (data) {
+                $('#dispcalender').attr('readonly', 'readonly');
+                //$.each(data[0], function (i, k) {
+                //    $('#FinancialYearList').P2BLookUpEncapsulate('#FinancialYearList', 'FinancialYearList', k.FyCalendar_Id, k.FyCalendar_FullDetails, 'FinancialYearList', '#remove_FinancialYear', 'N');
+                //});
+                @*$.get("@Url.Action("getCalendar", "ITInvestmentPayment80CCCTo80CCF")", function (data) {*@
+                    $.each(data[0], function (i, k) {
+                        $('#dispcalender').val(k.FyCalendar_FullDetails);
+                        $('#dispcalender_id').val(k.FyCalendar_Id);
+                    });
+                    console.log(data);
+                //});
+                $.each(data[1], function (i, k) {
+                    $('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', k.ITSection_Id, k.ITSection_FullDetails, 'ITSectionlist', '#Remove-IncomeTax-ITSection', 'A');
+                    $('#tdslist').P2BLookUpEncapsulate('#tdslist', 'tdslist', k.ITTDS_Id, k.ITTDS_FullDetails, 'tdslist', '#Remove-IncomeTax-ITTDS', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+        $('#View').button().click(function (event) {
+            $('#frmincometax').trigger("reset");
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Income Tax Data', '#FinancialYearList,#ITSectionlist,#tdslist', '', 500, 670, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#dispcalender').attr('readonly', 'readonly');
+                //$.each(data[0], function (i, k) {
+                //    $('#FinancialYearList').P2BLookUpEncapsulate('#FinancialYearList', 'FinancialYearList', k.FyCalendar_Id, k.FyCalendar_FullDetails, 'FinancialYearList', '#remove_FinancialYear', 'N');
+                //});
+                @*$.get("@Url.Action("getCalendar", "ITInvestmentPayment80CCCTo80CCF")", function (data) {*@
+                $.each(data[0], function (i, k) {
+                    $('#dispcalender').val(k.FyCalendar_FullDetails);
+                    $('#dispcalender_id').val(k.FyCalendar_Id);
+                });
+                    console.log(data);
+                //});
+                $.each(data[1], function (i, k) {
+                    $('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', k.ITSection_Id, k.ITSection_FullDetails, 'ITSectionlist', 'View', 'A');
+                    // $('#tdslist').P2BLookUpEncapsulate('#tdslist', 'tdslist', k.ITTDS_Id, k.ITTDS_FullDetails, 'tdslist', '#Remove-IncomeTax-ITTDS', 'A');//console.log(k.Code);
+                    $('#tdslist').P2BLookUpEncapsulate('#tdslist', 'tdslist', k.ITTDS_Id, k.ITTDS_FullDetails, 'tdslist', 'View', 'A');
+
+                });
+            });
+        });
+
+
+        $('#Edit-IncomeTax-ITTDS').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#tdslist').P2BGetTableDataonSelectedRow('#tdslist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("ittds_partial", "ittds")', '@Url.Action("Editbasicdetails_partial", "it_config")', b, '@Url.Action("Edit", "BasicScaleDetails")', 'Edit Basic Details', '#frmempoffitialDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmincometax', '#Address_Edit,#Address_remove', '#tdslist', 'tdslist', 'tdslist', function (data) {
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        $('#frmempoffitialDetails').trigger('reset');
+                        $('#StartingSlab').val(k.StartingSlab);
+                        $('#IncrementCount').val(k.IncrementCount);
+                        $('#IncrementAmount').val(k.IncrementAmount);
+                        $('#EndingSlab').val(k.EndingSlab);
+                    });
+                }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-IncomeTax-ITSection').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ITSectionlist').P2BGetTableDataonSelectedRow('#ITSectionlist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("itsection_partial", "itsection")', '@Url.Action("edit", "itsection")', b, ' ', 'Edit Basic Details', '#frmempoffitialDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmincometax', '#Address_Edit,#Address_remove', '#tdslist', 'tdslist', 'tdslist', function (data) {
+                console.log(data);
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        $('#frmitsection').trigger('reset');
+                        $('#ExemptionLimit').val(k.exemptionlimit);
+                        $('#itsec-itinvestment-list').P2BLookUpEncapsulate('#itsec-itinvestment-list', 'itsec-itinvestment-list', k.itinvestment_id, k.itinvestment_Name, 'itsec-itinvestment-list');
+                        $('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.itsec10_id, k.itsec10_ExceptionCode, 'ITSection10list');
+                        $('#ITLoanlist').P2BLookUpEncapsulate('#ITLoanlist', 'ITLoanlist', k.itloan_id, k.itloan_IntAppl, 'ITLoanlist');
+                        $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.itrebate_id, k.itrebate_StartAmount, 'ITRebatelist');
+
+                    });
+                }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmincometax').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Income Tax Configration', 'open', '@Url.Action("Create")', '#frmincometax', 'Message :', 'Request Falied :', '#JqGrid', 500, 670, '', "", function (data) { });
+            // $('#CreditDatelist').P2BSelectMenuAppend('@@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            $('#dispcalender').attr('readonly', 'readonly');
+            $.get("@Url.Action("getCalendar", "ITInvestmentPayment80CCCTo80CCF")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+
+                $('#dispcalender_id').val(data.Id);
+                console.log(data);
+            });
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-IncomeTax-ITTDS').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("tds_partial", "ITTDS")', 'Create Tds Master', 'open', '@Url.Action("Create", "tds")', '#frmtds', 'Message :', 'Request Falied :', '#JqGrid', 320, 280, '', '', '', '#frmincometax', '', function (data) {
+                console.log(data);
+                $('#tdslist').P2BLookUpEncapsulate('#tdslist', 'tdslist', data[0], data[1], 'tdslist');
+            });
+            e.preventDefault();
+        });
+
+        $('#Create-IncomeTax-ITSection').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Itsection_partial", "IncomeTax")', 'Create Itsection', 'open', '@Url.Action("Create", "Itsection")', '#frmitsection', 'Message :', 'Request Falied :', '#JqGrid', 437, 556, '', '', '', '#frmincometax', '', function (data) {
+                console.log(data);
+                $('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', data[0], data[1], 'ITSectionlist');
+            });
+            e.preventDefault();
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#Remove-IncomeTax-ITSection').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITSectionlist').P2BGetTableDataonSelectedRow('#ITSectionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ITSectionlist').P2BGetTableDataonSelectedRow('#ITSectionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSectionlist', $('#ITSectionlist').val(), 200, 200, '#frmincometax', '#ITSectionlist', '');
+            event.preventDefault();
+        });
+
+        $('#Remove-IncomeTax-ITTDS').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#tdslist').P2BGetTableDataonSelectedRow('#tdslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#tdslist').P2BGetTableDataonSelectedRow('#tdslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#tdslist', $('#tdslist').val(), 200, 200, '#frmincometax', '#tdslist', '');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-IncomeTax-ITTDS').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsITTDS", "IncomeTax")', '', 'LookupDiv', ' Look Up Data', '#tdslist', 'tdslist', 5, 'tdslist', '#frmincometax', 'A', '#Remove-IncomeTax-ITTDS', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-IncomeTax-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsITSec", "IncomeTax")', '', 'LookupDiv', ' Look Up Data', '#ITSectionlist', 'ITSectionlist', 20, 'ITSectionlist', '#frmincometax', 'A', '#Remove-IncomeTax-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $('.date').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+    });
+</script>
+<html>
+<head>
+    <title></title>
+</head>
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Income Tax Configration">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmincometax", name = "frmincometax" }))
+        {
+            @*<div class="row3 content_margine">
+
+                    <div id="FinancialYearList_old"></div>
+                        @Html.LabelFor(m => m.FyCalendar, "Financial year:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="FinancialYearList" style="width: 450px;">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                            <button data-p2btooltip="Remove FinancialYear Details" class="button popup-content-icon-remove" id="remove_FinancialYear"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+
+                </div>*@
+            <div class="row3 content_margine">
+
+                <div id="FinancialYearList_old"></div>
+                @Html.LabelFor(m => m.FyCalendar, "Financial year:", new { @class = "popup-content-label" })
+                <input type="text" hidden id="dispcalender_id" name="FinancialYearList" />
+                <input type="text" readonly id="dispcalender" name="" class="Financial_width" />
+            </div>
+            <br />
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ITSection, "IT Section :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ITSectionlist" style="width: 450px;">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp IncomeTax ITSection Details" class="popup-content-icon-lookup" id="Lookup-IncomeTax-ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Contact Details" class="popup-content-icon-create" id="Create-IncomeTax-ITSection"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-IncomeTax-ITSection"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove IncomeTax ITSection Details" class="popup-content-icon-remove" id="Remove-IncomeTax-ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ITTDS, "TDS :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="tdslist" style="width: 450px;">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp IncomeTax ITTDS Details" class="popup-content-icon-lookup" id="Lookup-IncomeTax-ITTDS"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" id="Create-IncomeTax-ITTDS"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-IncomeTax-ITTDS"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove IncomeTax ITTDS Details" class="popup-content-icon-remove" id="Remove-IncomeTax-ITTDS"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>

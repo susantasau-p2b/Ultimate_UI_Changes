@@ -1,0 +1,341 @@
+﻿@{
+    ViewBag.Title = "Functional Allowance ";
+}
+
+@model Payroll.FunctAttendanceT
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        var btndisablenames = "#Edit-empdetails,#Remove-empdetails";
+        ColModel = ['Id', 'EmpCode', 'EmpName', 'EffectiveDate', 'End Date', 'PayScaleAgreement'];
+        ColNames = ['Id', 'EmpCode', 'EmpName', 'Effective Date', 'End Date', 'PayScaleAgreement'];
+
+        ColDisplayNames = ['Id', 'EmpCode', 'EmpName'];
+        ColDisplayModel = ['Id', 'EmpCode', 'EmpName'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "Functional Allowance ",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 700;
+        heightD = 200;
+        // jQuery("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+        //$("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['Id', 'ProcessMonth', 'HourDays', 'Reason', 'Editable'];
+        inline_ColNames = ['Id', 'ProcessMonth', 'HourDays', 'Reason', 'Editable'];
+        inline_SortName = 'Id';
+        inline_Caption = 'List';
+        inline_url = 0;
+        inline_width = 900;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+        //$('#select_date').MonthAndYear('');
+        $('#ProcessMonth').datepicker({
+
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+            //monthNames: ["1","2","3","4","5","6","7","8","9","10","11","12"],
+            //monthNamesShort: ["1","2","3","4","5","6","7","8","9","10","11","12"],
+            dateFormat: 'mm/yy',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('mm yy', new Date(year, month, 1)));
+                function getNumberOfDays(year, month) {
+                    var isLeap = ((year % 4) == 0 && ((year % 100) != 0 || (year % 400) == 0));
+                    return [31, (isLeap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+                }
+            }
+
+
+        });
+        $('#ProcessMonth').change(function () {
+            var value = parseInt($('#ProcessMonth').val());
+            $('#PayMonth').val(value);
+        });
+
+
+
+
+
+        //$('#PayMonth').datepicker({
+
+
+
+
+        //    changeMonth: true,
+        //    changeYear: true,
+        //    stepMonths: true,
+
+        //    dateFormat: 'MM yy',
+        //    onClose: function (dateText, inst) {
+        //        var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+        //        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+        //        $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+        //    }
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption_one, url, width, height, '#pager2');
+        $("#JqGrid").jqGrid('hideCol', "PayScaleAgreement").trigger('reloadGrid');
+
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+        $('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+        $('#inline_JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#inline-JqGrid',
+            eddelurl: '@Url.Action("edit")',
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            EditableCol: ["Amount"],
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#select_date').val(dt.EffectiveDate).attr("readonly", "readonly");
+            $.get("@Url.Action("edit")", { data: dt.Id }, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#EditPayprocessgroup').val(k.EditPayprocessgroup);
+                    $('#DDLPayProcessGroupEdit').P2BSelectMenuAppend('@Url.Action("PopulatePayprocesssgrouplist", "FunctionalAllowanceT")', "", k.Payprocessgroup_Id);
+                    $('#select_date').val(k.ProcessMonth);
+                    $('#HourDays').val(k.HourDays);
+                    $('#Reason').val(k.Reason);
+                });
+
+                console.log(data);
+            });
+        };
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmEmpList').trigger('reset');
+            $('#DDLPayProcessGroup').P2BSelectMenuAppend('@Url.Action("PopulatePayprocesssgrouplist", "FunctionalAllowanceT")', "", "");
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create Dialog",
+                submiturl: "@Url.Action("create")",
+                form: "#frmEmpList",
+                height: 475,
+                width: 800,
+                state: "open",
+                gridname: "#JqGridNew",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            $.AdvanceFilterFunction();
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("EditSave")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+
+            });
+        });
+
+
+        $('#View').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        //  $('#payscaleagreement_drop2').P2BSelectMenuAppend("@Url.Action("Polulate_payscale_agreement")","","","");
+
+
+
+        //var value = parseInt($('#select_date').val());
+        //$('#PayMonthEdit').val(value);
+
+    });
+
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            @*<button class="button" id="Autho">Authorized</button>*@
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    {
+        <fieldset style="border: 0.1px; border-color: #d1d1d1b3; border-style: solid;width:100%;">
+            <legend id="first">
+                <a data-p2bheadertooltip="Collapse">
+                    <i class="fa fa-angle-double-right fa-fw " style="cursor:pointer" aria-hidden="true"></i>&nbsp;Filter&nbsp;
+                </a>
+                <input type="checkbox" id="apply_geo_filter" disabled />
+            </legend>
+            <div id="filter_stick_div"></div>
+        </fieldset>
+        <div class="">
+            <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+            <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+            <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+        </div>
+        <div class="emplist_row">
+            <label for="payprocessgroup_drop" class="emplist_label">PayProcess Group:</label>
+            @*<select id="payprocessgroup_drop" name="payprocessgroup_drop" style="width:120px;"><option></option></select>*@
+            <select id="DDLPayProcessGroup" name="DDLPayProcessGroup" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+
+        </div>
+        <div class="emplist_row">@Html.LabelFor(m => m.ProcessMonth, "Process Month:", new { @class = "emplist_label" })@Html.TextBoxFor(m => m.ProcessMonth, new { @class = "popup-content-textbox-rowfirst must" })</div>
+
+        <div class="emplist_row" style="display:none">@Html.LabelFor(m => m.PayMonth, "Pay Month:", new { @class = "emplist_label" })@Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox-rowfirst must" })</div>
+
+        <div class="emplist_row">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew"></table>
+                    <div id="pager22"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+
+        @*<div class="emplist_row">
+                <label for="ProcessMonth" class="emplist_label">Pay Process Group:</label>
+                <input type="text" style="display:none" id="EditPayprocessgroup_id" name="EditPayprocessgroup_id" />
+                <input type="text" id="EditPayprocessgroup" name="EditPayprocessgroup" />
+            </div>*@
+        <div class="emplist_row">
+            <label for="payprocessgroup_drop" class="emplist_label">PayProcess Group:</label>
+            @*<select id="payprocessgroup_drop" name="payprocessgroup_drop" style="width:120px;"><option></option></select>*@
+            <select id="DDLPayProcessGroupEdit" name="DDLPayProcessGroupEdit" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+
+        </div>
+        <div class="emplist_row">
+            <label class="emplist_label">Process Month :</label><input type="text" name="Effective_Date" id="select_date" />
+        </div>
+        <div class="emplist_row" style="display:none">
+            <label class="emplist_label">Pay Month :</label><input type="text" name="PayMonthEdit" id="PayMonthEdit" />
+        </div>
+
+
+        <div class="emplist_row">@Html.LabelFor(m => m.HourDays, "Hour Days:", new { @class = "emplist_label" })@Html.TextBoxFor(m => m.HourDays, new { @class = "popup-content-textbox-rowfirst must" })</div>
+        <div class="emplist_row">@Html.LabelFor(m => m.Reason, "Reason:", new { @class = "emplist_label" })@Html.TextBoxFor(m => m.HourDays, new { @class = "popup-content-textbox-rowfirst must" })</div>
+
+        <div>
+            <table id="inline_JqGrid"></table>
+            <div id="inline_pager"></div>
+        </div>
+    }
+</div>

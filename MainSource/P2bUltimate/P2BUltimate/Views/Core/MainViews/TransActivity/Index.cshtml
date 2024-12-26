@@ -1,0 +1,271 @@
+﻿@{
+    ViewBag.Title = "TransActivity";
+}
+@model P2b.Global.TransActivity
+@*<link href="~/Content/incractivity/incractivity.css" rel="stylesheet" />*@
+<style>
+    .overflow {
+        height: auto;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dt;
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Transfer Activity';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+       
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Payscaleagreementdetailslist').val() });
+        });
+        //create main
+        $('#Payscaleagreementdetailslist').selectmenu().selectmenu("menuWidget");
+        $('#Payscaleagreementdetailslist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "TransActivity")', "", "");
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+
+        $('#Create').on("click", function (event) {
+
+            $('#frmTransActivity').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Transfer Activity', 'open', '@Url.Action("Create")', '#frmTransActivity', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#TransPolicyList', '', function (data) {
+              
+                $('#TransList_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 446, "");
+                $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "TransActivity")', "", "");
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Lookup-TransPolicy-TransActivity').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_TransPolicy", "TransPolicy")', '', 'LookupDiv', 'Trans Policy Look Up Data', '#TransPolicyList', 'TransPolicyList', 5, 'TransPolicyList', '#frmTransActivity', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-TransPolicy-TransActivity').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateTransPolicy_partial", "TransPolicy")', 'Create Trans Policy', 'open', '@Url.Action("Create", "TransPolicy")', '#frmTransPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 600, '', '', '', '#frmIncrActivity', '', function (data) {
+                // to show data which is created in partial page
+                $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', data[0], data[1], 'TransPolicyList', '#Edit-TransPolicy-TransActivity,#Remove-TransPolicy-TransActivity', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-TransPolicy-TransActivity').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TransPolicyList').P2BGetTableDataonSelectedRow('#TransPolicyList', 0);
+            b = a[0];
+            console.log(b);
+            
+           
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateTransPolicy_partial", "TransPolicy")', '@Url.Action("Edit", "TransPolicy")', b, '@Url.Action("EditSave", "TransPolicy")', 'Edit Trans Policy Details', '#frmTransPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTransActivity', '#TransPolicyList', 'TransPolicyList', 'TransPolicyList', 'N', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmTransPolicy').trigger("reset");
+                    $('#TransPolicy_Name').val(k.Name);
+                    $('[name="IsDepartmentChange"]').val([k.IsDepartmentChange]).button().button("refresh");
+                    $('[name="IsDivsionChange"]').val([k.IsDivsionChange]).button().button("refresh");
+                    $('[name="IsFuncStructChange"]').val([k.IsFuncStructChange]).button().button("refresh");
+                    $('[name="IsGroupChange"]').val([k.IsGroupChange]).button().button("refresh");
+                    $('[name="IsLocationChange"]').val([k.IsLocationChange]).button().button("refresh");
+                    $('[name="IsUnitChange"]').val([k.IsUnitChange]).button().button("refresh");
+                  });
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-TransPolicy-TransActivity').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TransList_drop').P2BGetTableDataonSelectedRow('#TransPolicyList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#TransList_drop').P2BGetTableDataonSelectedRow('#TransPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TransPolicyList', $('#TransPolicyList').val(), 200, 200, '#frmTransActivity', '#TransPolicyList', '');
+            event.preventDefault();
+        });
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Transfer Activity Data", '#frmTransActivity', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#TransPolicyList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Name);
+                    $('#Name').val(k.Name);
+                    $('#TransList_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 446, k.TransList_id); // Dropdown bind
+                    $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.TranPolicy_Id, k.TranPolicy_FullDetails, 'TransPolicyList', '#Edit-TransPolicy-TransActivity,#Remove-TransPolicy-TransActivity', 'N');
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                     $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.TranPolicy_Id, k.TranPolicy_FullDetails, 'TransPolicyList', '#Edit-TransPolicy-TransActivity,#Remove-TransPolicy-TransActivity', 'N');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //$('.popup_radio_button').buttonset({});
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Transfer Activity Data', '#TransPolicyList', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data)
+            {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Name').val(k.Name);
+                    $('#TransList_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 446, k.TransList_id);
+                    $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.TranPolicy_Id, k.TranPolicy_FullDetails, 'TransPolicyList', 'view', 'N');
+                    // alert('0');
+                });
+
+                $.each(data[1], function (i, k) {
+                    //alert('1');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                    //$('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.TranPolicy_Id, k.TranPolicy_FullDetails, 'TransPolicyList', '#Edit-TransPolicy-TransActivity,#Remove-TransPolicy-TransActivity', 'N');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    //alert('2');
+                    // alert(data[2].Name, data[2].IncrList_val)
+                    $('#Name').oldVal(data[2].Name);
+                    $('#TransList').oldDropval(data[2].IncrList_val);
+                    $('#StagIncr_old').oldLookupVal(data[2].IncrPolicy_val);
+
+                    @*$.each(data[2], function (i, k) {
+                        // $('#Code').Oldval(k.Code);
+                        alert(k.Name)
+                        $('#Name').oldVal(k.Name);
+                        $('#Categorylist').oldDropval(k.BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(k.Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(k.Contact_Val);
+                        //$('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                    });*@
+                }
+                //}, 2000);
+            });
+        });
+
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#PayscaleagreementdetailsCreatelist').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left">
+                @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
+                <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+                <select id="Payscaleagreementdetailslist" name="Payscaleagreementdetailslist" style="width:120px;"><option></option></select>
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog" title="Create Increment Activity">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTransActivity", name = "frmTransActivity" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row1 content_margine">
+            <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+            <select id="PayscaleagreementdetailsCreatelist" name="PayscaleagreementdetailsCreatelist" style="width:120px;"><option></option></select>
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })
+        </div>
+
+        <div class="dropdown_row1 row3 content_margine">
+            @Html.LabelFor(m => m.TransList, "TransList Type :", new { @class = "popup-content-label" })
+            <select name="TransList_drop" class="drop" id="TransList_drop" style="width:120px;"><option></option></select>
+        </div>
+        <div class="row1 content_margine">
+            <div id="TransPolicyList_old"></div>
+            @Html.LabelFor(m => m.TranPolicy, "Trans Policy:", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="TransPolicyList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select TransPolicy" class="popup-content-icon-lookup" id="Lookup-TransPolicy-TransActivity"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create TransPolicy" class="popup-content-icon-create" id="Create-TransPolicy-TransActivity"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit TransPolicy" class="popup-content-icon-edit" id="Edit-TransPolicy-TransActivity"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove TransPolicy" class="popup-content-icon-remove" id="Remove-TransPolicy-TransActivity"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+
+        </div>
+
+
+    }
+</div>
+<style>
+    .icon-row {
+        left: 58px;
+        position: relative;
+        top: -145px;
+    }
+    .popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 101px;
+    }
+</style>

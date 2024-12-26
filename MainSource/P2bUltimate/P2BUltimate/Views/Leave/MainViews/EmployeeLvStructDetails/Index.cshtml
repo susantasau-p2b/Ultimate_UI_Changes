@@ -1,0 +1,279 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@model Leave.EmployeeLvStructDetails
+<!DOCTYPE html>
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        $('#LeaveBankName').MaxLength(50);
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['Id', 'LvHead', 'LvDebitInCredit', 'LvAssignment'];
+        ColNames = ['Id', 'LvHead', 'LvDebitInCredit', 'LvAssignment'];
+        SortName = 'Id';
+        Caption = 'LvBank';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#CreditDate').P2BDatePicker();
+         $('#ApplyPastGrace').P2BDatePicker();
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmLvBank').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create LvBank', 'open', '@Url.Action("Create")', '#frmEmployeeLvStructDetails', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '#LvHeadCollectionlist', "", function (data) { });
+           // $('#CreditDatelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        function DateConvert(JsonDate)
+        {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit LvBank  Data", '#frmEmployeeLvStructDetails', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#LvHeadCollectionlist', "", function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Code);
+                    $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', k.LvHead_Id, k.LvHead_FullDetails, 'LvHeadlist', '#Remove-LvHead-EmployeeLvStructDetails', 'N');
+                    $('#LvAssignmentlist').P2BLookUpEncapsulate('#LvAssignmentlist', 'LvAssignmentlist', k.LvAssignment_Id, k.LvAssignment_FullDetails, 'LvAssignmentlist', '#Remove-LvAssignment-EmployeeLvStructDetails', 'N');
+
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    ////debugger;
+                 //   $('#LvHeadCollectionlist').P2BLookUpEncapsulate('#LvHeadCollectionlist', 'LvHeadCollectionlist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBank', 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View LvBank Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', k.LvHead_Id, k.LvHead_FullDetails, 'LvHeadlist', '#Remove-LvHead-EmployeeLvStructDetails', 'N');
+                    $('#LvAssignmentlist').P2BLookUpEncapsulate('#LvAssignmentlist', 'LvAssignmentlist', k.LvAssignment_Id, k.LvAssignment_FullDetails, 'LvAssignmentlist', '#Remove-LvAssignment-EmployeeLvStructDetails', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+
+                //    $('#LvHeadCollectionlist').P2BLookUpEncapsulate('#LvHeadCollectionlist', 'LvHeadCollectionlist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBank', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+        $('#Lookup-LvHead-EmployeeLvStructDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvhead", "EmployeeLvStructDetails")', '', 'LookupDiv', 'LeaveHead Look Up Data', '#LvHeadlist', 'LvHeadlist', 5, 'LvHeadlist', '#frmEmployeeLvStructDetails', 'A', '#Remove-LvHead-EmployeeLvStructDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //partial page delete
+        $('#Remove-LvHead-EmployeeLvStructDetails').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmEmployeeLvStructDetails', '#LvHeadlist', '#Remove-LvHead-EmployeeLvStructDetails');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LvAssignment-EmployeeLvStructDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvAssignment", "EmployeeLvStructDetails")', '', 'LookupDiv', 'LeaveHead Look Up Data', '#LvAssignmentlist', 'LvAssignmentlist', 5, 'LvAssignmentlist', '#frmEmployeeLvStructDetails', 'A', '#Remove-LvAssignment-EmployeeLvStructDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LvAssignment-EmployeeLvStructDetails').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LvAssignmentlist').P2BGetTableDataonSelectedRow('#LvAssignmentlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvAssignmentlist', $('#LvAssignmentlist').val(), 200, 200, '#frmEmployeeLvStructDetails', '#LvAssignmentlist', '#Remove-LvAssignment-EmployeeLvStructDetails');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $('.popup_radio_button').controlgroup();
+        $('#CreditDatelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 112px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmployeeLvStructDetails", name = "frmEmployeeLvStructDetails" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+                <div id="LvHeadlist_old"></div>
+                @Html.LabelFor(m => m.LvHead, "Leave Head:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LvHeadlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select LvHead" class="  popup-content-icon-lookup" id="Lookup-LvHead-EmployeeLvStructDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove LvHead" class="popup-content-icon-remove" id="Remove-LvHead-EmployeeLvStructDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="LvHeadlist_old"></div>
+                @Html.LabelFor(m => m.LvAssignment, "LvAssignment:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LvAssignmentlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select LvAssignment" class="  popup-content-icon-lookup" id="Lookup-LvAssignment-EmployeeLvStructDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove LvAssignment" class="popup-content-icon-remove" id="Remove-LvAssignment-EmployeeLvStructDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>

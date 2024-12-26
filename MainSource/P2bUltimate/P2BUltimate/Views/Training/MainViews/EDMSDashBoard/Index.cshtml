@@ -1,0 +1,261 @@
+﻿
+<script src="~/Scripts/DashBoard_Script/fusioncharts-suite-xt/js/fusioncharts.js"></script>
+<script src="~/Scripts/DashBoard_Script/fusioncharts-jquery-plugin.js"></script>
+<script src="~/Scripts/DashBoard_Script/fusioncharts-suite-xt/js/fusioncharts.charts.js"></script>
+@{
+    ViewBag.Title = "DashBoard";
+}
+<script>
+    $(function () {
+        var fullScreen = function (chartid) {
+            console.log(getElementsByClassName($(chartid).attr('class')));
+            var el =document.getElementsByClassName($(chartid).attr('class'))
+                , rfs = // for newer Webkit and Firefox
+                       el.requestFullScreen
+                    || el.webkitRequestFullScreen
+                    || el.mozRequestFullScreen
+                    || el.msRequestFullScreen
+            ;
+            if (typeof rfs != "undefined" && rfs) {
+                rfs.call(el);
+            } else if (typeof window.ActiveXObject != "undefined") {
+                // for Internet Explorer
+                var wscript = new ActiveXObject("WScript.Shell");
+                if (wscript != null) {
+                    wscript.SendKeys("{F11}");
+                }
+            }
+
+        };
+        $.fn.FusionChartHelper = function (chartType, renderAt, url, width, height, refreshBtn, runtimeChartType,fullscreenBtn) {
+            var Chart = new FusionCharts({
+                type: chartType,
+                renderAt: renderAt,
+                width: width,
+                height: height,
+                dataFormat: 'json',
+            }).render();
+
+            var chart_id = $(this).parents('div.chart-container').children().eq(2).attr('id');
+            /*
+                Send Url tp get Data
+            */
+            $.getJSON(url, function (data) {
+                Chart.setJSONData(data);
+            });
+
+            /*
+                Refresh Fusion chart
+            */
+            $(refreshBtn).on("click", function (e) {
+                $.getJSON("@Url.Action("getJsondata")", function (data) {
+                    $('#' + chart_id + '').updateFusionCharts({
+                        dataSource: data,
+                        dataFormat: 'json',
+                    });
+                });
+            });
+            /*
+                Change the Chart type
+            */
+            $(runtimeChartType).on("selectmenuchange", function (e) {
+                if ($(this).val() != 0) {
+                    $('#' + chart_id + '').updateFusionCharts({
+                        'type': $(this).val()
+                    });
+                }
+            });
+            /*
+                Make Chart Full Screen
+            */
+            $('#' + fullscreenBtn + '').on('click', function () {
+                fullScreen($('#' + chart_id + '').parents('div.chart-container'));
+            });
+
+        };
+        $('#chart-container').FusionChartHelper('column2d', 'chart-container', '@Url.Action("getJsondata")', '300', '180', '#refresh', '#chart-type', 'fullscreenchart1');
+        $('#chart-container2').FusionChartHelper('column2d', 'chart-container2', '@Url.Action("getJsondata")', '300', '180', '#refresh1', '#chart-type1', 'fullscreenchart2');
+        $('#chart-container3').FusionChartHelper('column2d', 'chart-container3', '@Url.Action("getJsondata")', '300', '180', '#refresh3', '#chart-type3', 'fullscreenchart3');
+        $('#chart-container4').FusionChartHelper('column2d', 'chart-container4', '@Url.Action("getJsondata")', '300', '180', '#refresh4', '#chart-type4', 'fullscreenchart4');
+
+        $('.chart-type').selectmenu();
+        $('.chart-type').selectmenu("option","width",100);
+        $('.fa-refresh').hover(function () {
+            $(this).toggleClass('fa-spin');
+        });
+    });
+</script>
+<body>
+    <div class="Form_Bg">
+
+        <div class="chart-container-parent">
+            <div class="chart-container">
+                <div class="chart-container-heading">
+                    ChartOne
+                    <div class="chart-container-buttons">
+                        <ul>
+                            <li>
+                                <select class="chart-type" id="chart-type">
+                                    <option value="0">ChartType</option>
+                                    <option value="line">Line</option>
+                                    <option value="bar2d">Bar</option>
+                                    <option value="column2d">Column</option>
+                                </select>
+                            </li>
+                            <li>
+                                <span id="fullscreenchart1" class="fullscreenchart">
+                                    <i class="fa fa-arrows-alt"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="refresh-btn" id="refresh">
+                                    <i class="fa fa-refresh"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="hori_line">
+                <div class="chart-div" id="chart-container" style=" margin:10px auto;width:307px;"></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-container-heading">
+                    ChartSecond
+                    <div class="chart-container-buttons">
+                        <ul>
+                            <li>
+                                <select class="chart-type" id="chart-type1">
+                                    <option value="0">ChartType</option>
+                                    <option value="line">Line</option>
+                                    <option value="bar2d">Bar</option>
+                                    <option value="column2d">Column</option>
+                                </select>
+                            </li>
+                            <li>
+                                <span id="fullscreenchart2" class="fullscreenchart">
+                                    <i class="fa fa-arrows-alt"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="refresh-btn" id="refresh1">
+                                    <i class="fa fa-refresh"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="hori_line">
+                <div id="chart-container2" class="chart-div" style=" margin:10px auto;width:307px;"></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-container-heading">
+                    ChartOne
+                    <div class="chart-container-buttons">
+                        <ul>
+                            <li>
+                                <select class="chart-type" id="chart-type3">
+                                    <option value="0">ChartType</option>
+                                    <option value="line">Line</option>
+                                    <option value="bar2d">Bar</option>
+                                    <option value="column2d">Column</option>
+                                </select>
+                            </li>
+                            <li>
+                                <span id="fullscreenchart3" class="fullscreenchart">
+                                    <i class="fa fa-arrows-alt"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="refresh-btn" id="refresh3">
+                                    <i class="fa fa-refresh"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="hori_line">
+                <div class="chart-div" id="chart-container3" style=" margin:10px auto;width:307px;"></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-container-heading">
+                    ChartSecond
+                    <div class="chart-container-buttons">
+                        <ul>
+                            <li>
+                                <select class="chart-type" id="chart-type4">
+                                    <option value="0">ChartType</option>
+                                    <option value="line">Line</option>
+                                    <option value="bar2d">Bar</option>
+                                    <option value="column2d">Column</option>
+                                </select>
+                            </li>
+                            <li>
+                                <span id="fullscreenchart4" class="fullscreenchart">
+                                    <i class="fa fa-arrows-alt"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="refresh-btn" id="refresh4">
+                                    <i class="fa fa-refresh"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="hori_line">
+                <div id="chart-container4" class="chart-div" style=" margin:10px auto;width:307px;"></div>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    .chart-container-parent {
+        width: 100%;
+    }
+
+    .chart-container {
+        width: 350px;
+        position: relative;
+        display: inline-block;
+        margin: 2px;
+        height: auto;
+        border: 0.5px solid #ccc;
+    }
+
+    .chart-container-heading {
+        font-weight: bold;
+        font-size: 12px;
+        margin: 4px;
+    }
+
+    .hori_line {
+        display: block;
+        width: 99%;
+        height: auto;
+        color: black;
+        height: 1px;
+        margin: 13px auto auto;
+    }
+
+    .chart-container-buttons {
+        float: right;
+        /*! top: 0; */
+        margin: -5px auto;
+    }
+
+        .chart-container-buttons > ul > li {
+            display: inline-flex;
+            margin: -15px auto;
+            padding: 1px;
+        }
+
+    .refresh-btn, .fullscreenchart {
+        cursor: pointer;
+        font-size: 1.5em;
+        color: grey;
+    }
+
+    .chart-type {
+        position: relative;
+    }
+</style>

@@ -1,0 +1,177 @@
+﻿@{
+    ViewBag.Title = "Training Expenses";
+}
+
+@model Training.TrainingExpenses
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+
+
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+   //"#StayFees","#TrainingFees",  "#TravelFees"
+        ColModel = ['Id', 'FoodFees', 'MiscFees', 'StayFees', 'TrainingFees', 'TravelFees'];
+        ColNames = ['Id', 'FoodFees', 'MiscFees', 'StayFees', 'TrainingFees', 'TravelFees'];
+        SortName = 'Code';
+        Caption = 'Training  Expenses';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+       // $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmTrainingExpenses').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training  Expenses ', 'open', '@Url.Action("Create")', '#frmTrainingExpenses', 'Message :', 'Request Falied :', '#JqGrid',300,595, '', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Training  Expenses Data", '#frmTrainingExpenses', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 340, 595, '', btndisablenames, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#FoodFees').val(k.FoodFees);
+                   // $('#FoodFees').attr('readonly', 'readonly');
+                    $('#MiscFees').val(k.MiscFees);
+                   // $('#MiscFees').attr('readonly', 'readonly');
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').val(k.StayFees);
+                    $('#TrainingFees').val(k.TrainingFees);
+                    $('#TravelFees').val(k.TravelFees);
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Training  Expenses Data', '', '', 370, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#FoodFees').val(k.FoodFees);
+                   // $('#FoodFees').attr('readonly', 'readonly');
+                    $('#MiscFees').val(k.MiscFees);
+                    //$('#MiscFees').attr('readonly', 'readonly');
+                    $('#StayFees').val(k.StayFees);
+                    $('#TrainingFees').val(k.TrainingFees);
+                    $('#TravelFees').val(k.TravelFees);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#FoodFees').oldVal(data[2].FoodFees);
+                    $('#MiscFees').oldVal(data[2].MiscFees);
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').oldVal(data[2].StayFees);
+                    $('#TrainingFees').oldVal(data[2].TrainingFees);
+                    $('#TravelFees').oldVal(data[2].TravelFees);
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $("#FoodFees").ForceOnlyNumeric().MaxLength(20);
+        $("#MiscFees").ForceOnlyNumeric().MaxLength(20);
+        $("#StayFees").ForceOnlyNumeric().MaxLength(20);
+        $("#TrainingFees").ForceOnlyNumeric().MaxLength(20);
+        $("#TravelFees").ForceOnlyNumeric().MaxLength(20);
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <div id="Create_Dialog" title="Create Training  Expensess ">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingExpenses" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.FoodFees, "Food Fees:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FoodFees, new { @class = "popup-content-textbox must", @id = "FoodFees", @Value="0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MiscFees, "Misc Fees:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MiscFees, new { @class = "popup-content-textbox must", @id = "MiscFees", @Value = "0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.StayFees, "Stay Fees:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.StayFees, new { @class = "popup-content-textbox must", @id = "StayFees", @Value = "0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.TrainingFees, "Training Fees:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TrainingFees, new { @class = "popup-content-textbox must", @id = "TrainingFees", @Value = "0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.TravelFees, "Travel Fees:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelFees, new { @class = "popup-content-textbox must", @id = "TravelFees", @Value = "0" })</div>
+        }
+    </div>
+</body>

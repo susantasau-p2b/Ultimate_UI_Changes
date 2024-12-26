@@ -1,0 +1,355 @@
+﻿@{
+    ViewBag.Title = "OfficiatingParameter";
+}
+@model Payroll.OfficiatingParameter
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'OfficiatingParameter';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Payscaleagreementdetailslist').val() });
+        });
+        $('#Create_Dialog').P2BCreateDialog();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#FixedAmount').val("0");
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#hidelv').hide();
+        $('#FixedAmount').attr('readonly', 'readonly');
+        $('input[name="AllowanceAppl"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hidelv').fadeOut();
+            }
+            else {
+                $('#hidelv').fadeIn();
+
+            }
+        });
+
+        $('input[name="FixedAmountAppl"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#FixedAmount').attr('readonly', 'readonly');
+            }
+            else {
+                $('#FixedAmount').removeAttr();
+            }
+        });
+        //$.OnlyOneYesAllowed('OfficiatingEmpPayStructAppl,NewPayStructOnScreenAppl');
+        $('#Payscaleagreementdetailslist').selectmenu().selectmenu("menuWidget");
+        $('#Payscaleagreementdetailslist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+        $('#Create').on("click", function (event) {
+            $('#frmOfficiatingParameter').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Officiating Parameter', 'open', '@Url.Action("Create")', '#frmOfficiatingParameter', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '', '', function (data) { });
+            $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#FixedAmount').attr('readonly', false);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit OfficiatingParameter Data", '#frmOfficiatingParameter', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 463, 600, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmOfficiatingParameter').trigger("reset");
+                    $('[name="AllowanceAppl"]').val([k.AllowanceAppl]).button().button("refresh");
+                    $('[name="NewGradeBasicAppl"]').val([k.NewGradeBasicAppl]).button().button("refresh");
+                    $('[name="OfficiatingToSalary"]').val([k.OfficiatingToSalary]).button().button("refresh");
+                    $('[name="ScaleFirstBasic"]').val([k.ScaleFirstBasic]).button().button("refresh");
+                    $('[name="FixedAmountAppl"]').val([k.FixedAmountAppl]).button().button("refresh");
+                    $('#FixedAmount').val(k.FixedAmount);
+                    $('#Name').val(k.Name);
+                    $('[name="OfficiatingEmpPayStructAppl"]').val([k.OfficiatingEmpPayStructAppl]).button().button("refresh");
+                    $('[name="PayAmountuppergradediffAppl"]').val([k.PayAmountuppergradediffAppl]).button().button("refresh");
+                    $('[name="NewPayStructOnScreenAppl"]').val([k.NewPayStructOnScreenAppl]).button().button("refresh");
+                    $('#GradeShiftCount').val(k.GradeShiftCount);
+                    $('#IncrementCount').val(k.IncrementCount);
+                });
+
+                $.each(data[1], function (i, k) {
+                    if (k.SalHead_Id != null) {
+                        $('#hidelv').fadeIn();
+                    }
+                    else {
+                        $('#hidelv').fadeOut();
+                    }
+                    $('#AllowanceList').P2BLookUpEncapsulate('#AllowanceList', 'AllowanceList', k.SalHead_Id, k.SalHead_FullDetails, 'AllowanceList', '#Remove-AllowanceList-OfficiatingParameter', 'A');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                });
+
+            });
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Salary Head', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmOfficiatingParameter').trigger("reset");
+                    $('[name="AllowanceAppl"]').val([k.AllowanceAppl]).button().button("refresh");
+                    $('[name="NewGradeBasicAppl"]').val([k.NewGradeBasicAppl]).button().button("refresh");
+                    $('[name="OfficiatingToSalary"]').val([k.OfficiatingToSalary]).button().button("refresh");
+                    $('[name="ScaleFirstBasic"]').val([k.ScaleFirstBasic]).button().button("refresh");
+                    $('[name="FixedAmountAppl"]').val([k.FixedAmountAppl]).button().button("refresh");
+                    $('#FixedAmount').val(k.FixedAmount);
+                    $('#Name').val(k.Name);
+                    $('[name="OfficiatingEmpPayStructAppl"]').val([k.OfficiatingEmpPayStructAppl]).button().button("refresh");
+                    $('[name="PayAmountuppergradediffAppl"]').val([k.PayAmountuppergradediffAppl]).button().button("refresh");
+                    $('[name="NewPayStructOnScreenAppl"]').val([k.NewPayStructOnScreenAppl]).button().button("refresh");
+                    $('#GradeShiftCount').val(k.GradeShiftCount);
+                    $('#IncrementCount').val(k.IncrementCount);
+                });
+
+                $.each(data[1], function (i, k) {
+                    if (k.SalHead_Id != null) {
+                        $('#hidelv').fadeIn();
+                    }
+                    else {
+                        $('#hidelv').fadeOut();
+                    }
+                    $('#AllowanceList').P2BLookUpEncapsulate('#AllowanceList', 'AllowanceList', k.SalHead_Id, k.SalHead_FullDetails, 'AllowanceList', '', 'A');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                });
+            })
+        });
+
+        $('#Delete').button().click(function (event) {
+            AssignData();
+            $('#frmOfficiatingParameter').trigger("reset");
+            $('#frmOfficiatingParameter').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Lookup-AllowanceList-OfficiatingParameter').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSalHeadLKDetails", "OfficiatingParameter")', '', 'LookupDiv', 'SalaryHead Look Up Data', '#AllowanceList', 'AllowanceList', 5, 'AllowanceList', '#frmOfficiatingParameter', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-AllowanceList-OfficiatingParameter').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#AllowanceList').P2BGetTableDataonSelectedRow('#AllowanceList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#AllowanceList').P2BGetTableDataonSelectedRow('#AllowanceList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AllowanceList', $('#AllowanceList').val(), 200, 200, '#frmOfficiatingParameter', '#AllowanceList', '');
+            event.preventDefault();
+        });
+
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#FixedAmount').ForceOnlyNumeric();
+        $('#GradeShiftCount').ForceOnlyNumeric();
+        $('#IncrementCount').ForceOnlyNumeric();
+        $('#FixedAmount').attr("value", "0");
+        $('#GradeShiftCount').attr("value", "0");
+        $('#IncrementCount').attr("value", "0");
+        // $('#FixedAmount').MaxLength(3).ForceOnlyNumeric();
+
+    });
+</script>
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 140px;
+            top: -149px;
+        }
+
+        .row1 {
+            width: 600px;
+        }
+
+        .popup-content-textbox {
+            min-width: 122px;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 180px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left">
+                    <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+                    <select id="Payscaleagreementdetailslist" name="Payscaleagreementdetailslist" style="width:120px;" class="drop"><option></option></select>
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmOfficiatingParameter", name = "frmOfficiatingParameter" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">
+                <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+                <select id="PayscaleagreementdetailsCreatelist" name="PayscaleagreementdetailsCreatelist" style="width:120px;" class="drop"><option></option></select>
+
+
+            </div>
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })
+            </div>
+
+
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.AllowanceAppl, "Allowance Appl :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio1" name="AllowanceAppl" value="true" /><label class="ui-corner-left" for="radio1">Yes</label>
+                        <input type="radio" id="radio2" name="AllowanceAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio2">No</label>
+                    </span>
+                </div>
+            </div>
+            <div id="hidelv">
+                <div class="row3 content_margine">
+                    <div id="AllowanceList_old"></div>
+                    @Html.LabelFor(m => m.AllowanceList, "Allowance List :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="AllowanceList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Contact Details" class="  popup-content-icon-lookup" id="Lookup-AllowanceList-OfficiatingParameter"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Contact Details" class="  popup-content-icon-create" id="Create-ContactDetails-Company"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Contact Details" class="  popup-content-icon-edit" id="Edit-ContactDetails-Company"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" id="Remove-AllowanceList-OfficiatingParameter"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.PayAmountuppergradediffAppl, "PayAmountuppergradediff :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio15" name="PayAmountuppergradediffAppl" value="true" /><label class="ui-corner-left" for="radio15">Yes</label>
+                        <input type="radio" id="radio16" name="PayAmountuppergradediffAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio16">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.OfficiatingEmpPayStructAppl, "OfficiatingEmpPayStructAppl :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio11" name="OfficiatingEmpPayStructAppl" value="true" /><label class="ui-corner-left" for="radio11">Yes</label>
+                        <input type="radio" id="radio12" name="OfficiatingEmpPayStructAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio12">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.NewPayStructOnScreenAppl, "NewPayStructOnScreenAppl :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio13" name="NewPayStructOnScreenAppl" value="true" /><label class="ui-corner-left" for="radio13">Yes</label>
+                        <input type="radio" id="radio14" name="NewPayStructOnScreenAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio14">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.GradeShiftCount, "GradeShiftCount :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.GradeShiftCount, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.NewGradeBasicAppl, "NewGradeBasicAppl :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="NewGradeBasicAppl" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="NewGradeBasicAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IncrementCount, "New Grade increment count :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.IncrementCount, new { @class = "popup-content-textbox" })
+            </div>
+
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.OfficiatingToSalary, "OfficiatingToSalary :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="OfficiatingToSalary" value="true" /><label class="ui-corner-left" for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="OfficiatingToSalary" value="false" checked="checked" /><label class="ui-corner-right" for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.ScaleFirstBasic, "ScaleFirstBasic :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio7" name="ScaleFirstBasic" value="true" /><label class="ui-corner-left" for="radio7">Yes</label>
+                        <input type="radio" id="radio8" name="ScaleFirstBasic" value="false" checked="checked" /><label class="ui-corner-right" for="radio8">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3  content_margine">
+                @Html.LabelFor(m => m.FixedAmountAppl, "Fixed Amount Appl:", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio9" name="FixedAmountAppl" value="true" /><label class="ui-corner-left" for="radio9">Yes</label>
+                        <input type="radio" id="radio10" name="FixedAmountAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio10">No</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.FixedAmount, "Fixed Amount :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.FixedAmount, new { @class = "popup-content-textbox" })
+            </div>
+
+        }
+    </div>
+</body>
+</html>

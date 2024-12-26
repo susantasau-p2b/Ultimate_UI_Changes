@@ -1,0 +1,151 @@
+﻿@{
+    Layout = null;
+}
+@*<link href="~/Content/PayScaleAgreement/PayScaleAgreement.css" rel="stylesheet" />*@
+@model P2b.Global.PayScaleAgreement
+
+
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#EffDate,#EndDate').P2BDatePicker();
+        var btndisablenames = "#Edit-PayScale-PayScaleAgreement,Remove-PayScale-PayScaleAgreement";
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Lookup-PayScale-PayScaleAgreement').button().on('click', function (event) {          
+            $('.dialog2').P2BLookUpModal('@Url.Action("GetPayScaleLKDetails", "PayScaleAgreement")', '', 'lookupdiv2', 'Look PayScale Details', '#PayScalelist', 'PayScalelist', 5, 'PayScalelist', 'frmPayScaleAgreement', 'N', '#Remove-PayScale-PayScaleAgreement', '#Lookup_table', 'pageNavPosition2');
+            event.preventDefault();
+        });
+
+
+       
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayScale-PayScaleAgreement').button().on("click", function (event) {
+            //alert('l');
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreatePayScale_partial", "PayScaleAgreement")', 'Create PayScale Details', 'open', '@Url.Action("Create", "PayScale")', '#frmPayScaleP', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmPayScaleAgreement', '', function (data) {                     
+                
+                $('#PayScalelist').P2BLookUpEncapsulate('#PayScalelist', 'PayScalelist', data[0], data[1], 'PayScalelist', '#Remove-PayScale-PayScaleAgreement', 'A');
+            });            
+        });
+        
+
+
+        $('#Edit-PayScale-PayScaleAgreement').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PayScalelist').P2BGetTableDataonSelectedRow('#PayScalelist', 0);
+            b = a[0];
+            //alert(k.Name);
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreatePayScale_partial", "PayScaleAgreement")', '@Url.Action("EditMedicine_partial", "PayScaleAgreement")', b, '@Url.Action("EditSave", "PayScale")', 'Edit PayScale', '#frmPayScaleP', b, 'Message :', 'Request Falied :', '#JqGrid', 300, 400, 'frmPayScaleAgreement', btndisablenames, '#PayScalelist', 'PayScalelist', 'PayScalelist', function (data) {
+                setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        //alert(k.Name);
+                        $('#Name').val(k.Name);
+                        $('#MedPower').val(k.MedPower);
+                        $('#Manufacturer').val(k.Manufacturer);
+                        $('#PayScaleTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 002, "");
+                    });
+                }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        @*$('#Remove-PayScale-PayScaleAgreement').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#PayScalelist').P2BGetTableDataonSelectedRow('#PayScalelist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "PayScale")', b, dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#PayScalelist').val(), 200, 200, '#frmPayScaleAgreement', '#PayScalelist');
+            event.preventDefault();
+        });*@
+
+
+        $('#Remove-PayScale-PayScaleAgreement').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PayScalelist').P2BGetTableDataonSelectedRow('#PayScalelist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#PayScalelist').P2BGetTableDataonSelectedRow('#PayScalelist', 0);
+
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayScalelist', $('#PayScalelist').val(), 200, 200, '#frmPayScaleAgreement', '#PayScalelist', '');
+            event.preventDefault();
+        });
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+    });
+</script>
+<style>   
+    .icon-rowP {
+        position: relative;
+        left: 54px;
+        top: -150px;
+    }
+
+    .all_row3 {
+        width: 402px;
+    }
+    .row3 {
+        width: 402px;
+    }
+    .all_popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .all_popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+</style>
+
+<html>
+<body>
+
+
+    <div class="dialog2">
+        <div title="LookUp Data">
+            <div class="lookupdiv2"></div>
+        </div>
+        <div id="pageNavPosition2">
+
+        </div>
+    </div>
+
+    <div id="create_dialog1" title="Create PayScaleAgreement">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPayScaleAgreement" }))
+        {
+            <div class="all_row3 content_margine">@Html.LabelFor(m => m.EffDate, "EffDate:", new { @class = "all_popup-content-label" })@Html.TextBoxFor(m => m.EffDate, new { @class = "all_popup-content-textbox", @maxlength = "50" })</div>
+            <div class="all_row3 content_margine">@Html.LabelFor(m => m.EndDate, "EndDate:", new { @class = "all_popup-content-label" })@Html.TextBoxFor(m => m.EndDate, new { @class = "all_popup-content-textbox", @maxlength = "50" })</div>
+   
+        
+             <div class="row3 content_margine">
+        @Html.LabelFor(m => m.PayScale, "PayScale :", new { @class = "all_popup-content-label" })  </div>
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="PayScalelist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+
+                <div class="icon-rowP">
+                    <button data-p2btooltip="LookUp PayScale Details" class="popup-content-icon-lookup" id="Lookup-PayScale-PayScaleAgreement"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Crate PayScale Details" class="popup-content-icon-create" id="Create-PayScale-PayScaleAgreement"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove PayScale Details" class="  popup-content-icon-remove" id="Remove-PayScale-PayScaleAgreement"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>

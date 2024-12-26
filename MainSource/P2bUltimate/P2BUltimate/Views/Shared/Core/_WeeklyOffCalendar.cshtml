@@ -1,0 +1,95 @@
+﻿@model P2b.Global.WeeklyOffCalendar
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <title></title>
+    @*<link href="~/Content/Hollyday%20Calender/hollyday_calender.css" rel="stylesheet" />*@
+    <script>
+    $(document).ready(function (e) {
+     
+        @*$('#Lookup-WeeklyOffList-WeeklyOffCalendar').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "WeeklyOffList")', '', 'LookupDiv', 'Look Up Data', '#WeeklyOffListList', 'WeeklyOffListList', 5, 'WeeklyOffListList', '#frmWeeklyOffList', 'A', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('#Lookup-WeeklyOffList-WeeklyOffCalendar').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "WeeklyOffList")', '', 'LookupDiv', 'Look Up Data', '#WeeklyOffListList', 'WeeklyOffListList', 5, 'WeeklyOffListList', '#FormParWeeklyOffCalendar', 'A', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        @*$('#Create-WeeklyOffList-WeeklyOffCalendar').button().on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "WeeklyOffList")', 'Create WeeklyOffList', 'open', '@Url.Action("Create", "WeeklyOffList")', '#frmWeeklyOffList', 'Mess age :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWeeklyOffCalendar', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#WeeklyOffListList').P2BLookUpEncapsulate('#WeeklyOffListList', 'WeeklyOffListList', data[0], data[1], 'WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'A');
+                });
+                event.preventDefault();
+            });*@
+        //$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-WeeklyOffList-WeeklyOffCalendar').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "WeeklyOffList")', 'Create WeeklyOffList', 'open', '@Url.Action("Create", "WeeklyOffList")', '#frmWeeklyOffList', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormParWeeklyOffCalendar', '', function (data) {
+                // to show data which is created in partial page
+                $('#WeeklyOffListList').P2BLookUpEncapsulate('#WeeklyOffListList', 'WeeklyOffListList', data[0], data[1], 'WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'A');
+            },{ validurl: "@Url.Action("ValidateForm", "WeeklyOffList")" });
+            event.preventDefault();
+        });
+        $('#Edit-WeeklyOffList-WeeklyOffCalendar').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#WeeklyOffListList').P2BGetTableDataonSelectedRow('#WeeklyOffListList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "WeeklyOffList")', '@Url.Action("edit", "WeeklyOffList")', b, '@Url.Action("EditSave", "WeeklyOffList")', 'Edit Contact Details', '#frmWeeklyOffList', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormParWeeklyOffCalendar', '#WeeklyOffListList', 'WeeklyOffListList', 'WeeklyOffListList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                $.each(data[0], function (i, k) {
+                    //$('#WeeklyOffListList').P2BLookUpEncapsulate('#WeeklyOffListList', 'WeeklyOffListList', data[0], data[1], 'WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'A');
+                    $('#WeekDayslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 200, k.weekdays_Id);
+                    $('#WeeklyOffStatuslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 201, k.weekoffstatus);
+                });
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-WeeklyOffList-WeeklyOffCalendar').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#WeeklyOffListList').P2BGetTableDataonSelectedRow('#WeeklyOffListList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WeeklyOffListList').P2BGetTableDataonSelectedRow('#WeeklyOffListList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WeeklyOffListList', $('#WeeklyOffListList').val(), 200, 200, '#FormParWeeklyOffCalendar', '#WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar');
+            event.preventDefault();
+        });
+        $('.drop1').selectmenu().selectmenu('menuWidget').addClass('overflow');
+       //$('#WOCalendar_DDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "WeeklyOffCalendar")', "", '');
+    });
+    </script>
+</head>
+<body>
+   
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormParWeeklyOffCalendar", name = "frmWeeklyOffCalendar" }))
+        {
+            <div class="dropdown_row1 row3 content_margine">
+                @Html.LabelFor(m => m.WOCalendar, "Calender :", new { @class = "popup-content-label must" })
+                <select id="WOCalendar_DDL" style="width:200px" name="WOCalendar_DDL" class="drop1 must"></select>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.WeeklyOffList, "WeeklyOff List:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="WeeklyOffListList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUP WeeklyOffList" id="Lookup-WeeklyOffList-WeeklyOffCalendar" class="popup-content-icon-lookup"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create WeeklyOffList" id="Create-WeeklyOffList-WeeklyOffCalendar" class=" popup-content-icon-create"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit WeeklyOffList" id="Edit-WeeklyOffList-WeeklyOffCalendar" class=" popup-content-icon-edit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove WeeklyOffList" id="Remove-WeeklyOffList-WeeklyOffCalendar" class=" popup-content-icon-remove"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+
+</body>
+</html>
+
+

@@ -1,0 +1,565 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model P2B.PFTRUST.InterestPolicies
+
+<style>
+    .row1 {
+        width: 320px;
+        margin-bottom: 4px;
+    }
+
+    .row2 {
+        width: 449px;
+        margin-bottom: 4px;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 62px;
+        top: -150px;
+    }
+
+
+
+    .popup-content-label {
+        /*  width:120px ;*/
+        width: 113px;
+        display: block;
+        float: left;
+        margin-bottom: 4px;
+    }
+    .popup-content-label1 {
+        /*  width:120px ;*/
+        width: 113px;
+        display: block;
+        float: left;
+        margin-bottom: 4px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 4px;
+        width: 53%;
+        margin-left: 15px;
+    }
+    .popup-content-textbox1 {
+        margin-bottom: 4px;
+        width: 26%;
+        margin-left: 15px;
+    }
+    .add_icon-row {
+        left: 6px;
+        top: -49px;
+        position: relative;
+    }
+
+    .popup-content-drop-icon-edit, .popup-content-drop-icon-create, .popup-content-drop-icon-lookup {
+        height: 20px;
+        margin: auto;
+        /*position: absolute;*/
+        width: 20px;
+        left: 0px;
+    }
+</style>
+
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+
+
+
+
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="dialog">
+    <div title="Look Up Data">
+        <div class="LookupDiv" id="Lookup"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+
+
+
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmInterestPolicies", name = "frmInterestPolicies" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+        <div class="row content_margine">
+            @*@Html.LabelFor(m => m.InterestFrequency, "Frequency :", new { @class = "popup-content-label must" })*@
+            <label for="PFTACCalendar" class="popup-content-label must"> PFTACCalendar</label>
+            <select class="drop must" style="width:321px; margin-left:10px" name="PFTACCalendar" id="PFTACCalendar">
+                <option></option>
+            </select>
+        </div>
+                
+        <div>
+            @Html.LabelFor(m => m.IntPolicyName, "Interest Policy : ", new { @class = "Popup-content-label" })
+            <input type="text" id="IntPolicyName" name="IntPolicyName" class="popup-content-textbox" />
+        </div>
+
+
+
+
+        @*<div class="row2 content_margine">
+                @Html.LabelFor(m => m.PFTACCalendar, "PF Trust Calendar: ", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+
+                    <table class="lookuptableselected" id="CalendarList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+
+
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Calendar Details" class="  popup-content-icon-lookup" id="Lookup-Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                    <button data-p2btooltip="Remove Calendar Details" class="popup-content-icon-remove" id="Remove-Calendar"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>*@
+        @*<button data-p2btooltip="Create Calendar Details" class="popup-content-icon-create" id="Create-Calendar"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Calendar Details" class="popup-content-icon-edit" id="Edit-Calendar"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+
+        <div class="row2 content_margine">
+            @Html.LabelFor(m => m.InterestRate, "Interest Rate :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+
+                <table class="lookuptableselected" id="InterestList">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Interest Rate" class="  popup-content-icon-lookup" id="Lookup-Interest-Rate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Interest Rate" class="popup-content-icon-create" id="Create-Interest-Rate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Interest Rate" class="popup-content-icon-edit" id="Edit-Interest-Rate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Interest Rate" class="popup-content-icon-remove" id="Remove-Interest-Rate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+        @*<div class="row1 content_margine" style="width: 420px;">
+                @Html.LabelFor(m => m.InterestFrequency, "Interest Frequency :", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="InterestFrequencylist" id="InterestFrequencylist">
+                    <option></option>
+                </select>
+            </div>*@
+
+        <div class="row content_margine" style="width: 420px;">
+            @Html.LabelFor(m => m.InterestFrequency, "Frequency :", new { @class = "popup-content-label must" })
+            <select class="drop must" style="width:120px;" name="InterestFrequency" id="InterestFrequency">
+                <option></option>
+            </select>
+        </div>
+
+
+
+
+        <div class="row2 content_margine">
+            @Html.LabelFor(m => m.StatutoryEffectiveMonthsPFT, "Effective Months :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+
+                <table class="lookuptableselected" id="EffectiveMonthsList">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Effective Months" class="popup-content-icon-lookup" id="Lookup-Effective-Months"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Effective Months" class="popup-content-icon-create" id="Create-Effective-Months"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                   @* <button data-p2btooltip="Edit Interest Rate" class="popup-content-icon-edit" id="Edit-Effective-Months"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove Effective Months" class="popup-content-icon-remove" id="Remove-Effective-Months"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        
+        
+         <div class="row2 content_margine">
+            @*@Html.LabelFor(m => m.InterestRate, "Interest Rate :", new { @class = "popup-content-label" })*@
+             <label for="TDSMASTER" class="popup-content-label "> TDSMASTER</label>
+            <div class="popup-content-table">
+
+                <table class="lookuptableselected" id="TDSMASTERList">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Tds Master" class="  popup-content-icon-lookup" id="Lookup-Tds-Master"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Tds Master" class="popup-content-icon-create" id="Create-Tds-Master"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Tds Master" class="popup-content-icon-edit" id="Edit-Tds-Master"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Tds Master" class="popup-content-icon-remove" id="Remove-Tds-Master"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+    <div class="row content_margine" style="width: 420px;">
+        @Html.LabelFor(m => m.SettlementProductmonthAdj, "Sett. adj. month :", new { @class = "Popup-content-label1"})
+        <input type="text" id="SettlementProductmonthAdj" name="SettlementProductmonthAdj" class="popup-content-textbox1" />
+    </div>
+        <div class="row content_margine" style="width: 420px;">
+            @Html.LabelFor(m => m.InterestPostingType, "Interest Posting Type :", new { @class = "popup-content-label must" })
+            <select class="drop must" style="width:120px;" name="InterestPostingType" id="InterestPostingType">
+                <option></option>
+            </select>
+        </div>
+         <div class="row content_margine" style="width: 420px;">
+            @Html.LabelFor(m => m.IntPostingMethod, "Interest Posting Method :", new { @class = "popup-content-label must" })
+             <select class="drop must" style="width:120px;" name="IntPostingMethod" id="IntPostingMethod">
+                 <option></option>
+             </select>
+        </div>
+        
+         <div class=" content_margine">
+                @Html.LabelFor(m => m.IsIntCarryForward, "IntCarryForward :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="IntCarryForward" value="true" /><label for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="IntCarryForward" value="false" checked="checked" /><label for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+         <div class=" content_margine">
+                @Html.LabelFor(m => m.IsIntMergePF, "IntMergePF :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="IntMergePF" value="true" /><label for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="IntMergePF" value="false" checked="checked" /><label for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+        
+
+
+
+    }
+
+</div>
+
+@* *************************************************************    Start Of JQuery code    **************************************************************************************** *@
+<script>
+    $(document).ready(function (e) {
+
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Policy Name', 'Calendar', 'Interest Frequency', 'Posting Type'];
+        ColNames = ['Id', 'IntPolicyName', 'PFTACCalendar', 'InterestFrequency', 'InterestPostingType'];
+        SortName = 'Id';
+        Caption = 'Interest Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        //function DateConvert(JsonDate) {
+        //    var date = new Date(parseInt(JsonDate.substr(6)));
+        //    var displayDate = formatDate("dd/MM/yyyy", date);
+        //    return displayDate;
+        //};
+
+        $.OnlyOneYesAllowed('IntMergePF,IntCarryForward');
+
+        //Create button
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+
+            $('#frmInterestPolicies').trigger("reset");
+
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Interest Policy',
+                'open', '@Url.Action("Create")', '#frmInterestPolicies', 'Message :', 'Request Failed :', '#JqGrid', 500, 500, '#CalendarList,#InterestList', '', function (data) { });
+            $('#InterestFrequency').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, "");
+            $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "InterestPolicies")', '', "");
+            $('#InterestPostingType').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 511, "");
+            $('#IntPostingMethod').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 513, "");
+
+            /*event.preventDefault();*/
+        });
+
+        //******For Drop Down******
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        //========================================================================================================
+
+
+        //Lookup for calendar
+        $('#Lookup-Calendar').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsCalendar", "InterestPolicies")', '', 'LookupDiv', 'Look Up Data', '#CalendarList', 'CalendarList', 6, 'CalendarList', '#frmInterestPolicies', 'N', '#Edit-Calendar', '#Remove-Calendar', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+        //Lookup interest rate
+        $('#Lookup-Interest-Rate').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupInterestRate", "InterestPolicies")', '', 'LookupDiv', 'Look Up Data', '#InterestList', 'InterestList', 28, 'InterestList', '#frmInterestPolicies', 'A', '#Edit-Interest-Rate', '#Remove-Interest-Rate', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //Lookup Tds-Master
+        $('#Lookup-Tds-Master').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTdsMaster", "InterestPolicies")', '', 'LookupDiv', 'Look Up Data', '#TDSMASTERList', 'TDSMASTERList', 28, 'TDSMASTERList', '#frmInterestPolicies', 'N', '#Edit-Tds-Master', '#Remove-Tds-Master', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        //Lookup Effective months
+
+        $('#Lookup-Effective-Months').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupEffectiveMonths", "InterestPolicies")', '', 'LookupDiv', 'Look Up Data', '#EffectiveMonthsList', 'EffectiveMonthsList', 28, 'EffectiveMonthsList', '#frmInterestPolicies', 'A', ' #Remove-Effective-Months', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Effective-Months').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "StatutoryEffectiveMonthsPFT")', 'Create Effective Months', 'open', '@Url.Action("Create", "StatutoryEffectiveMonthsPFT")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 350, 600, '', '', '', '#frmInterestPolicies', '', function (data) {
+                $('#EffectiveMonthsList').P2BLookUpEncapsulate('#EffectiveMonthsList', 'EffectiveMonthsList', data[0], data[1], 'EffectiveMonthsList', '#Lookup-Effective-Months', 'A');
+               
+            });
+
+            event.preventDefault();
+        });
+
+        //Remove Calendar from Lookup
+        $('#Remove-Calendar').on('click', function (event) {
+            var selectedRow = [];
+            selectedRow = $('#CalendarList').P2BGetTableDataonSelectedRow('#CalendarList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CalendarList', $('#CalendarList').val(), 200, 200, '#frmInterestPolicies', '#CalendarList', '#Edit-Calendar,#Remove-Calendar');
+            event.preventDefault();
+
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+
+        //Remove Interest Rate from Lookup
+        $('#Remove-Interest-Rate').on('click', function (event) {
+            var selectedRow = [];
+            selectedRow = $('#InterestList').P2BGetTableDataonSelectedRow('#InterestList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#InterestList', $('#InterestList').val(), 200, 200, '#frmInterestPolicies', '#InterestList', '#Edit-Interest-Rate,#Remove-Interest-Rate');
+            event.preventDefault();
+
+        });
+
+        $('#Remove-Tds-Master').on('click', function (event) {
+            var selectedRow = [];
+            selectedRow = $('#TDSMASTERList').P2BGetTableDataonSelectedRow('#TDSMASTERList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TDSMASTERList', $('#TDSMASTERList').val(), 200, 200, '#frmInterestPolicies', '#TDSMASTERList', '#Edit-Tds-Master,#Remove-Tds-Master');
+            event.preventDefault();
+
+        });
+
+
+
+
+
+        //Remove Effective month from Lookup
+        $('#Remove-Effective-Months').on('click', function (event) {
+            var selectedRow = [];
+            selectedRow = $('#EffectiveMonthsList').P2BGetTableDataonSelectedRow('#EffectiveMonthsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EffectiveMonthsList', $('#EffectiveMonthsList').val(), 200, 200, '#frmInterestPolicies', '#EffectiveMonthsList', '');
+            event.preventDefault();
+
+        });
+
+
+        //Create Interest Rate partial page
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Interest-Rate').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateInterestRate_Partial", "InterestPolicies")', 'Create Interest Rate', 'open', '@Url.Action("CreateSave", "InterestRate")', '#frmInterestRate', 'Message :', 'Request Falied :', '#JqGrid', 380, 420, '', '', '', '#frmInterestRate', '', function (data) {
+                $('#InterestList').P2BLookUpEncapsulate('#InterestList', 'InterestList', data[0], data[1], 'InterestList', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Tds-Master').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateTdsmaster_Partial", "InterestPolicies")', 'Create Tds Master', 'open', '@Url.Action("CreateSave", "TdsMaster")', '#frmTdsMaster', 'Message :', 'Request Falied :', '#JqGrid', 380, 420, '', '', '', '#frmTdsMaster', '', function (data) {
+                $('#TDSMASTERList').P2BLookUpEncapsulate('#TDSMASTERList', 'TDSMASTERList', data[0], data[1], 'TDSMASTERList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        //Delete Interest Policy
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+
+
+
+
+
+
+
+        //Edit Interest Policy
+
+        $('#Edit').on('click', function () {
+            AssignData();
+
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Interest Policy", '#frmInterestPolicies', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                //  var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmInterestPolicies').trigger("reset");
+                    $('#IntPolicyName').val(k.IntPolicyName);
+                    $('#SettlementProductmonthAdj').val(k.SettlementProductmonthAdj);
+                    $('#InterestFrequency').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.InterestFrequency);
+                    $('#InterestPostingType').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 511, k.InterestPostingType);
+                    $('#IntPostingMethod').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 513, k.IntPostingMethod);
+                    $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "InterestPolicies")', '', k.Calendar_Id);
+                    $('[name="IntCarryForward"]').val([k.IntCarryForward]).button().button("refresh");
+                    $('[name="IntMergePF"]').val([k.IntMergePF]).button().button("refresh");
+                    $('#TDSMASTERList').P2BLookUpEncapsulate('#TDSMASTERList', 'TDSMASTERList', k.PFTTDS_Id, k.PFTTDS_FullDetails, 'TDSMASTERList', '#Remove-Tds-Master,#Edit-Tds-Master', 'N');
+
+                });
+                $.each(data[1], function (i, k) {
+
+
+                    //  $('#CalendarList').P2BLookUpEncapsulate('#CalendarList', 'CalendarList', k.Calendar_Id, k.Calendar_FullDetails, 'CalendarList', '#Remove-Calendar', 'N');
+                    $('#InterestList').P2BLookUpEncapsulate('#InterestList', 'InterestList', k.Interest_Id, k.Interest_FullDetails, 'InterestList', '#Remove-Interest-Rate,#Edit-Interest-Rate', 'A');
+                    $('#EffectiveMonthsList').P2BLookUpEncapsulate('#EffectiveMonthsList', 'EffectiveMonthsList', k.EffectiveMonths_Id, k.EffectiveMonths_FullDetails, 'EffectiveMonthsList', '#Remove-Effective-Months', 'A');
+                });
+
+            });
+        });
+
+
+        //View Interest Polcies
+
+        $('#View').on('click', function () {
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View Interest Policy", '#frmInterestPolicies', '#Lookup-Calendar,#Remove-Calendar,#Lookup-Interest-Rate,#Create-Interest-Rate,#Edit-Interest-Rate,#Remove-Interest-Rate,#Lookup-Effective-Months,#Remove-Effective-Months', 500, 620, '', '', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                   $('#frmInterestPolicies').trigger("reset");
+                   $('#IntPolicyName').val(k.IntPolicyName);
+                   $('#SettlementProductmonthAdj').val(k.SettlementProductmonthAdj);
+                    $('#InterestFrequency').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.InterestFrequency);
+                    $('#InterestPostingType').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 511, k.InterestPostingType);
+                    $('#IntPostingMethod').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 513, k.IntPostingMethod);
+                    $('#PFTACCalendar').P2BSelectMenuAppend('@Url.Action("PFCalenderDropdownlist", "InterestPolicies")', '', k.Calendar_Id);
+                    $('[name="IntCarryForward"]').val([k.IntCarryForward]).button().button("refresh");
+                    $('[name="IntMergePF"]').val([k.IntMergePF]).button().button("refresh");
+                    $('#TDSMASTERList').P2BLookUpEncapsulate('#TDSMASTERList', 'TDSMASTERList', k.PFTTDS_Id, k.PFTTDS_FullDetails, 'TDSMASTERList', '#Remove-Tds-Master,#Edit-Tds-Master', 'N');
+                });
+                $.each(data[1], function (i, k) {
+
+                    $('#InterestList').P2BLookUpEncapsulate('#InterestList', 'InterestList', k.Interest_Id, k.Interest_FullDetails, 'InterestList', '#Remove-Interest-Rate,#Edit-Interest-Rate', 'A');
+                    $('#EffectiveMonthsList').P2BLookUpEncapsulate('#EffectiveMonthsList', 'EffectiveMonthsList', k.EffectiveMonths_Id, k.EffectiveMonths_FullDetails, 'EffectiveMonthsList', '#Remove-Effective-Months', 'A');
+
+
+                });
+
+            });
+        });
+
+
+
+        //Edit Interest Rate Partial
+
+        $('#Edit-Interest-Rate').button().on("click", function (event) {
+
+            var a = [], b;
+            a = $('#InterestList').P2BGetTableDataonSelectedRow('#InterestList', 0);
+            b = a[0];
+            // url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateInterestRate_Partial", "InterestPolicies")', '@Url.Action("EditInterestRate_partial", "InterestPolicies")', b, '@Url.Action("EditsaveInterestRate", "InterestPolicies")', 'Edit Interest Rate', '#frmInterestRate', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmInterestPolices', '#InterestList', 'Interestlist', 'Interestlist', 'N', '#Edit-Interest-Rate,#Remove-Interest-Rate', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmInterestRate').trigger("reset");
+                    $('#Name').val(k.Name);
+                    $('#EffectiveFrom').val(DateConvert(k.EffectiveFrom));
+                    $('#EffectiveTo').val(DateConvert(k.EffectiveTo));
+                    //$('#EffectiveFrom').val(k.EffectiveFrom);
+                    //$('#EffectiveTo').val(k.EffectiveTo);
+                    $('#GovtEMPPFInt').val(k.GovtEMPPFInt);
+                    $('#GovtVPFInt').val(k.GovtVPFInt);
+                    $('#TrustEMPPFInt').val(k.TrustEMPPFInt);
+                    $('#TrustVPFInt').val(k.TrustVPFInt);
+
+                });
+
+            });
+
+        });
+
+        $('#Edit-Tds-Master').button().on("click", function (event) {
+
+            var a = [], b;
+            a = $('#TDSMASTERList').P2BGetTableDataonSelectedRow('#TDSMASTERList', 0);
+            b = a[0];
+
+            // url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateTdsmaster_Partial", "InterestPolicies")', '@Url.Action("EditTdsMaster_partial", "InterestPolicies")', b, '@Url.Action("EditSaveTdsMaster", "InterestPolicies")', 'Edit Tds Master', '#frmTdsMaster', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmInterestPolices', '#TDSMASTERList', 'TDSMASTERList', 'TDSMASTERList', 'N', '#Edit-Tds-Master,#Remove-Tds-Master', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                   
+                    $('#frmTdsMaster').trigger("reset");
+                    $('#TDSRate').val(k.TDSRate);
+                    $('#TaxableAccountCelling').val(k.TaxableAccountCelling);
+                    $('[name="IntOnIntTDSAppl"]').val([k.IntOnIntTDSAppl]).button().button("refresh");
+                    $('[name="OwnerTDSAppl"]').val([k.OwnerTDSAppl]).button().button("refresh");
+                    $('[name="OwnTDSAppl"]').val([k.OwnTDSAppl]).button().button("refresh");
+                    $('[name="VPFTDSAppl"]').val([k.VPFTDSAppl]).button().button("refresh");
+
+
+                  
+
+
+                });
+
+            });
+
+        });
+
+        $('#SettlementProductmonthAdj').attr("value", "0");
+        $('.popup_radio_button').controlgroup();
+
+        //=========================================================================================================================================
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

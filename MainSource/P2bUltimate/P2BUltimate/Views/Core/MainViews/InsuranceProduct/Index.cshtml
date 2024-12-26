@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "Insurance Products";
+}
+@model Payroll.InsuranceProduct
+<link href="~/Content/Insurance_product/Insurance_product.css" rel="stylesheet" />
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Exception Code','Max Amount'];
+        ColNames = ['Id', 'Exception Code','Max Amount'];
+        SortName = 'Id';
+        Caption = 'PayBank';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        var btndisablename;
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            $('#frmIncrPolicy').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create It Section 10 ', 'open', '@Url.Action("create") ', '#frmIncrPolicy', 'Message :', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) { });
+            e.preventDefault();
+        });
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmIncrPolicy').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            $('#frmIncrPolicy').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit IT Section 10", '#frmIncrPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Itsection10salheadlist', btndisablename, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#ExceptionCode').val(k.ExceptionCode);
+                    $('#MaxAmount').val(k.MaxAmount);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.itsec10salhead_id, k.itsec10salhead_fulldetails, 'AddressList', btndisablename, 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.itsec10salhead_id, k.itsec10salhead_fulldetails, 'ContactDetailsList', btndisablename, 'N');
+                });
+            });
+            e.preventDefault();
+        });
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        var Viewbtndisable = '#Lookup-ContactDetails-IncrPolicy,#Create-ContactDetails-IncrPolicy,#Edit-ContactDetails-IncrPolicy,#Remove-ContactDetails-IncrPolicy,#Lookup-RegIncrPolicy-IncrPolicy,#Create-RegIncrPolicy-IncrPolicy,#Edit-RegIncrPolicy-IncrPolicy,#Remove-RegIncrPolicy-IncrPolicy';
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#Itsection10salheadlist', Viewbtndisable, 356, 612, '#Autho', '', '', '', '', 'Message : ', 'Request Falied :', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#ExceptionCode').val(k.ExceptionCode);
+                    $('#MaxAmount').val(k.MaxAmount);
+                });
+                $.each(data[1], function (i, k) {
+                    for (i = 0; i < k.itsec10salhead_id.length && k.itsec10salhead_fulldetails.length; i++) {
+                        $('#Itsection10salheadlist').P2BLookUpEncapsulate('#Itsection10salheadlist', 'Itsection10salheadlist', k.itsec10salhead_id[i], k.itsec10salhead_fulldetails[i], 'Itsection10salheadlist');
+                    }
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    $.each(data[2], function (i, k) {
+                        $('#ExceptionCode').oldVal(k.ExceptionCode);
+                        $('#MaxAmount').oldVal(k.MaxAmount);
+                        $('#Itsection10salheadlist_old').oldLookupVal(k.itsec10salhead_fulldetails);
+                    });
+                }
+            });
+            event.preventDefault();
+        });
+        $('#MaxAmount').ForceOnlyNumeric();
+        $('#ExceptionCode').ForceOnlyAlphaNumeric();
+        $('#ExceptionCode').MaxLength(20);
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('.date').P2BDatePicker();
+        });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorise</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="Create_Dialog">
+   <div class="row1 content_margine" >@Html.LabelFor(m => m.InsuranceProductDesc, "Name :", new { @class = "insu_popup-content-label must" }) @Html.TextBoxFor(m => m.InsuranceProductDesc, new { @class = "insu_popup-content-textbox must" })</div>
+       <div class="row1 content_margine">
+           @Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "insu_popup-content-label must" }) @Html.TextBoxFor(m => m.StartDate, new { @class = "insu_popup-content-textbox date must" })</div>
+
+       </div>

@@ -1,0 +1,267 @@
+﻿@{
+    ViewBag.Title = "IT Investment";
+}
+@model Payroll.ITInvestment
+@*<link href="~/Content/it_investment/itinvestment.css" rel="stylesheet" />*@
+<style>
+    .icon-row {
+        position: absolute;
+        left: 93px;
+        top: 80px;
+    }
+	.itin_popup-content-label {
+        width: 124px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }						   
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+
+        var btnnamedisable = '#Edit-ITInvestment-ITSubInvestment,#Remove-ITInvestment-ITSubInvestment';
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['ITInvestmentName', 'MaxAmount', 'MaxPercentage', 'Id'];
+        ColNames = ['IT Investment Name', 'Max Amount', 'Max Percentage', 'Id'];
+        SortName = 'Id';
+        Caption = 'IT Investment';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#ITInvestmentName').ValidateTextBox({ maxlength: 100, name: true, alphanum: true });
+        //  $('#ITInvestmentName').ForceOnlyAlphaNumeric().MaxLength(25);
+        $('#MaxAmount').ForceAmount().MaxLength(10);
+        $('#MaxAmount').val("0");
+        $('#MaxPercentage').ForcePercent().MaxLength(4);
+        $('#MaxPercentage').val("0");
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function () {
+            $('#frmItInvestment').trigger('reset');
+            $('#hidesal').hide();
+
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create IT Investment', 'open', '@Url.Action("create", "ITInvestment")', '#frmItInvestment', 'Message :', 'Request Falied :', '#JqGrid', 400, 549, '', '', function (data) { });
+            $('[name="IsSalaryHead"]').val([false]).button().button("refresh");
+            $('#MaxAmount').val("0");
+            $('#MaxPercentage').val("0");
+            $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateSalHeadDropDownList", "ItInvestment")', "", "");
+         
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            $('#frmItInvestment').trigger('reset');
+            AssignData();
+            $('#hidesal').hide();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit IT Investment Data", '#frmItInvestment', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#ITSubInvestmentlist', '', function (data) {
+                $('#MaxAmount').val("0");
+                $('#MaxPercentage').val("0");
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#ITInvestmentName').val(k.ITInvestmentName);
+                    $('#ITInvestmentName').attr('readonly', 'readonly');
+                    $('#MaxAmount').val(k.MaxAmount);
+                    $('#MaxPercentage').val(k.MaxPercentage);
+                    // alert(k.SalHead_Id)
+                    if (k.IsSalaryHead == true) {
+                        $('[name="IsSalaryHead"]').val([k.IsSalaryHead]).button().button("refresh");
+                        //  $('[name="IsSalaryHead"]').val([true]).button().button("refresh");
+                        $('#hidesal').fadeIn();
+                    }
+                    else {
+                        //   $('[name="IsSalaryHead"]').val([false]).button().button("refresh");
+                        $('#hidesal').fadeOut();
+                    }
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "ItInvestment")", "", k.SalHead_Id); // Dropdown bind
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', k.ITSubInvestment_Id, k.ITSubInvestment_FullDetails, 'ITSub', '', 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#hidesal').hide();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View IT Investment Data', '#ITSubInvestmentlist', '#Lookup-ITInvestment-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ITInvestment-ITSubInvestment,#Create-ITInvestment-ITSubInvestment,#Edit-ITInvestment-ITSubInvestment,#Remove-ITInvestment-ITSubInvestment', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    if (k.IsSalaryHead == true) {
+                        $('[name="IsSalaryHead"]').val([k.IsSalaryHead]).button().button("refresh");
+                        //  $('[name="IsSalaryHead"]').val([true]).button().button("refresh");
+                        $('#hidesal').fadeIn();
+                    }
+                    else {
+                        //   $('[name="IsSalaryHead"]').val([false]).button().button("refresh");
+                        $('#hidesal').fadeOut();
+                    }
+                    $('#Autho_Action').val(k.Action);
+                    $('#ITInvestmentName').val(k.ITInvestmentName);
+                    $('#ITInvestmentName').attr('readonly', 'readonly');
+                    $('#MaxAmount').val(k.MaxAmount);
+                    $('#MaxPercentage').val(k.MaxPercentage);
+
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "ItInvestment")", "", k.SalHead_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', k.ITSubInvestment_Id, k.ITSubInvestment_FullDetails, 'ITSub', 'view', 'A');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+
+                        $('#Name').oldVal(data[2].Name);
+                        $('#MaxAmount').oldVal(data[2].MaxAmount);
+                        $('#MaxPercentage').oldVal(data[2].MaxPercentage);
+                        $('#SalaryHeadlist').oldDropval(data[2].SalHead_Val);
+                        $('#ITSubInvestmentlist_old').oldLookupVal(data[2].ITSubInvestment_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-ITSubInvestment-ITInvestment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITSubInvLKDetails", "ITInvestment")', '', 'LookupDiv', 'ITSubInvestment Look Up Data', '#ITSubInvestmentlist', 'ITSubInvestmentlist', 5, 'ITSubInvestmentlist', '#frmItInvestment', 'N', '#Edit-ITSubInvestment-ITInvestment,#Remove-ITSubInvestment-ITInvestment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Create-ITSubInvestment-ITInvestment').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("itsubinvestment_partial", "itinvestment")', 'Create It Sub Investment', 'open', '@Url.Action("Create", "itsubinvestment")', '#frmsubinvestment', 'Message :', 'Request Falied :', '#JqGrid', 200, 260, '', '', '', '#frmItInvestment', '', function (data) {
+                $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', data[0], data[1], 'ITSubInvestmentlist', '#Edit-ITSubInvestment-ITInvestment,#Remove-ITSubInvestment-ITInvestment', 'A');
+            });
+            e.preventDefault();
+        });
+        // Partial page edit
+        $('#Edit-ITSubInvestment-ITInvestment').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ITSubInvestmentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("itsubinvestment_partial", "ItInvestment")', '@Url.Action("EditITSubInvestment_partial", "ItInvestment")', b, '@Url.Action("editsave", "itsubinvestment")', 'Edit It Sub Investment', '#frmsubinvestment', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmItInvestment', '#ITSubInvestmentlist', 'ITSubInvestmentlist', 'ITSubInvestmentlist', 'N', '#Edit-ITSubInvestment-ITInvestment,#Remove-ITSubInvestment-ITInvestment', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#SubInvestmentName').val(k.SubInvestmentName);
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ITSubInvestment-ITInvestment').button().on('click', function (event) {
+            var a = [], b;
+            //a = $('#ITSubInvestmentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ITSubInvestmentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSubInvestmentlist', $('#ITSubInvestmentlist').val(), 200, 200, '#frmItInvestment', '#ITSubInvestmentlist', '#Edit-ITSubInvestment-ITInvestment,#Remove-ITSubInvestment-ITInvestment');
+            event.preventDefault();
+        });
+        $('#hidesal').hide();
+        $('input[name="IsSalaryHead"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#hidesal').fadeOut();
+            }
+            else {
+                $('#hidesal').fadeIn();
+
+            }
+        });
+        $('.popup_radio_button').controlgroup();
+        $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmItInvestment", name = "frmItInvestment" }))
+    {
+        <div class="itin_row1 content_margine">@Html.LabelFor(m => m.ITInvestmentName, "Name :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.ITInvestmentName, new { @class = "itin_popup-content-textbox must" })</div>
+        <div class="itin_row1 content_margine"> @Html.LabelFor(m => m.MaxAmount, " Max Amount :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.MaxAmount, new { @class = "itin_popup-content-textbox must" })</div>
+        <div class="itin_row1 content_margine">@Html.LabelFor(m => m.MaxPercentage, " Max Percentage :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.MaxPercentage, new { @class = "itin_popup-content-textbox search must" })%</div>@*<img Id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" />*@
+        <div class="itin_row1 content_margine">
+            @Html.LabelFor(m => m.ITSubInvestment, " Sub Investment :", new { @class = "itin_popup-content-label" })
+            <div id="ITSubInvestmentlist_old"></div>
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="ITSubInvestmentlist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select ITSubInvestment" class="popup-content-icon-lookup" id="Lookup-ITSubInvestment-ITInvestment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create ITSubInvestment" class="popup-content-icon-create" id="Create-ITSubInvestment-ITInvestment"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit ITSubInvestment" class="popup-content-icon-edit" id="Edit-ITSubInvestment-ITInvestment"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove ITSubInvestment" class="popup-content-icon-remove" id="Remove-ITSubInvestment-ITInvestment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+        <div class="itin_row1 content_margine">
+            @Html.LabelFor(m => m.IsSalaryHead, "Salary Head :", new { @class = "itin_popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio1" name="IsSalaryHead" value="true" /><label class="ui-corner-left" for="radio1">Yes</label>
+                    <input type="radio" id="radio2" name="IsSalaryHead" value="false" checked="checked" /><label class="ui-corner-right" for="radio2">No</label>
+                </span>
+            </div>
+        </div>
+        <div id="hidesal">
+            <div class="itin_row1 content_margine">
+                @Html.LabelFor(m => m.SalaryHead, "Salary Head :", new { @class = "itin_popup-content-label" })
+                <select id="SalaryHeadlist" name="SalaryHeadlist" class="drop" style="width:161px;"><option></option></select>
+            </div>
+        </div>
+    }
+</div>

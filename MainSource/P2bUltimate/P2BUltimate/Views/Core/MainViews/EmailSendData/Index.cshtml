@@ -1,0 +1,409 @@
+﻿@{
+    ViewBag.Title = "Email";
+}
+@model P2b.Global.EmailSendData
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 95px;
+            top: -150px;
+        }
+
+        .icon-row2 {
+            position: relative;
+            left: 257px;
+            top: -22px;
+        }
+
+        .icon-row3 {
+            position: relative;
+            left: 257px;
+            top: -262px;
+        }
+
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 136px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<button class="button" id="Create">Create</button>*@
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="send">Send</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmailSendData", name = "frmEmailSendData" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+
+            <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.EmailAction, "Email Action :", new { @class = "popup-content-label must" })<select id="EmailActionlist" name="EmailActionlist" class="must" style="width:161px;"><option></option></select></div>
+            <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.EmailTemplateCode, "EmailTemplateCode :", new { @class = "popup-content-label must" })<select id="EmailTemplateCodelist" name="EmailTemplateCodelist" class="must" style="width:161px;"><option></option></select></div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EmailCompose.FromAddress, "Sender Address :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EmailCompose.FromAddress, new { @class = "popup-content-textbox must", style = "width:290px" })</div>
+            <div class="dropdown_row1 row3 content_margine"><label for="html" class="popup-content-label">Email Address Type : </label><select id="EmailAddrsTypelist" name="EmailAddrsTypelist" style="width:161px;"><option></option></select></div>
+
+            <div class="row3 content_margine">
+                <div id="AddressList_Old"></div>
+                @Html.LabelFor(m => m.EmailCompose.ToAddresses, "Receiver Addresses :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="AddressList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup ToAddresses" class="  popup-content-icon-lookup" id="Lookup-Address-Email"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ToAddresses" class="popup-content-icon-create" id="Create-Address-Email"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit ToAddresses" class="popup-content-icon-edit" id="Edit-Address-Email"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ToAddresses" class="popup-content-icon-remove" id="Remove-Address-Email"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmailCompose.Subject, "Subject :", new { @class = "popup-content-label must" })
+                @*@Html.TextBoxFor(m => m.Subject, new { @class = "popup-content-textbox must", style = "width:489px" })*@
+
+                <input name="Subject" type="text" id="Subject" class="popup-content-textbox must" style="width: 444px" />
+                <input type="text" id="Subject_id" name="Subject_id" class="filter_structure_id" />
+
+                <div class="icon-row2 ">
+                    <button data-p2btooltip="Lookup Subject" class="  popup-content-icon-lookup" id="Lookup-Subject-Email"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmailCompose.Body, "Body :", new { @class = "popup-content-label must" })
+                @Html.TextAreaFor(m => m.EmailCompose.Body, new { @class = "popup-content-textbox must", style = "width:444px ;height:250px", id = "Body" })
+                @*<textarea name="Body" id="Body" class="popup-content-textbox must" style="width:489px" />*@
+                <input type="text" id="Body_id" name="Body_id" class="filter_structure_id" />
+                <div class="icon-row3 ">
+                    <button data-p2btooltip="Lookup Body" class="  popup-content-icon-lookup" id="Lookup-Body-Email"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EmailCompose.Narration, "Narration :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EmailCompose.Narration, new { @class = "popup-content-textbox must", style = "width:453px" })</div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmailCompose.Signature, "Signature :", new { @class = "popup-content-label must" })
+                @Html.TextAreaFor(m => m.EmailCompose.Signature, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmailCompose.SignatureLogo, "Signature Logo :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.EmailCompose.SignatureLogo, new { @class = "popup-content-textbox must" })
+                <button id="Upload">Upload</button>
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        // $('#Name').ForceOnlyAlpha();
+        // $('#Name').MaxLength(50);
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#SignatureLogo').attr("readonly", "readonly");
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Email,#Remove-Address-Email";
+        ColModel = ['EmailAction', 'EmailTemplateCode','EntityRefCode', 'Id'];
+        ColNames = ['EmailAction', 'EmailTemplateCode','EntityRefCode', 'Id'];
+        SortName = 'Id';
+        Caption = 'Email';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#pager2', { multiple: true, rowNum: 30, selectall: true });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Upload').on("click", function (event) {
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("UploadLogo", "Email")",
+                submiturl: "@Url.Action("CreateSignatureLogo", "Email")",
+                form: '#frmSignatureLogo',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+
+                    $('#SignatureLogo').val(data.Val);
+                    //$('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data.Id, data.Val, 'CandidateDocumentslist', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+        $('#send').on('click', function (e) {
+            var a = $.GetGridSelctedvalue("#JqGrid", "Id");
+            //if ($('#emp_Id').val()) {
+            //    console.log($('#emp_Id').val())
+            //    a = $('#emp_Id').val();
+            //    console.log(a);
+            //}
+            //else {
+            //    a = a.toString();
+            //}
+            a = a != null ? a.toString() : null;
+             
+            $.ajax({
+                method: "POST",
+                url: "@Url.Action("ChangeProcess")",
+                data: { forwardata: a },
+            beforeSend: function () {
+                ajaxloaderv2('body');
+            },
+            success: function (data) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+            },
+            error: function (data) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText); 
+            }, complete: function (data) {
+                $('#JqGrid').trigger('reloadGrid');
+                $('.ajax_loder').remove(); 
+            }
+        });
+
+        e.preventDefault();
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+         
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Email Data", '#frmEmail', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 900, 900, '#AddressList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                   
+                    $('#EmailActionlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 800, k.EmailAction_Id); // Dropdown bind
+                    $('#EmailTemplateCodelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 806, k.EmailTemplateCode_Id); // Dropdown bind
+                    $('#EmailAddrsTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 801, "");
+                    $('#Subject').val(k.Subject);
+                    $('#Body').val(k.Body);
+                    $('#EmailCompose_FromAddress').val(k.FromAddress);
+                    $('#EmailCompose_Narration').val(k.Narration);
+                    $('#EmailCompose_Signature').val(k.Signature);
+                    $('#EmailCompose_SignatureLogo').val(k.SignatureLogo);
+                    $('#EmailCompose_SignatureLogo').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Address_Id, k.Address_val, 'AddressList', '#Edit-Address-Email,#Remove-Address-Email', 'A');
+                });
+
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Email Data', '#AddressList', '#Lookup-Address-Email,#Create-Address-Email,#Edit-Address-Email,#Remove-Address-Email', 900, 900, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.each(data[0], function (i, k) {
+
+                    $('#EmailActionlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 800, k.EmailAction_Id); // Dropdown bind
+                    $('#EmailTemplateCodelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 808, k.EmailTemplateCode_Id); // Dropdown bind
+                    $('#EmailAddrsTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 801, "");
+                    $('#Subject').val(k.Subject);
+                    $('#Body').val(k.Body);
+                    $('#EmailCompose_FromAddress').val(k.FromAddress);
+                    $('#EmailCompose_Narration').val(k.Narration);
+                    $('#EmailCompose_Signature').val(k.Signature);
+                    $('#EmailCompose_SignatureLogo').val(k.SignatureLogo);
+                    $('#EmailCompose_SignatureLogo').attr("readonly", "readonly");
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', 'view', 'A');
+                });
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+        $('#Lookup-Address-Email').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Email")?AddrsType=' + $('#EmailAddrsTypelist').val() + '', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmEmail', 'A', '#Edit-Address-Email,#Remove-Address-Email', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Address-Email').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "EmailAddress")', 'Create Address', 'open', '@Url.Action("Create", "EmailAddress")', '#frmEmailAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmEmail', '', function (data) {
+                // to show data which is created in partial page
+                $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        // Partial page edit
+        $('#Edit-Address-Email').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "EmailAddress")', '@Url.Action("edit", "EmailAddress")', b, '@Url.Action("Editsave", "EmailAddress")', 'Edit Address', '#frmEmailAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmEmail', '#AddressList', 'AddressList', 'AddressList', 'A', '#Edit-Address-Email,#Remove-Address-Email', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    //$('#FormAddress').trigger("reset");
+
+                    $('#Address').val(k.Address);
+
+                    $('#EmailAddressTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 801, k.EmailAddressType_Id, '');
+
+                });
+
+
+            });
+            event.preventDefault();
+        });
+
+        //partial page delete
+        $('#Remove-Address-Email').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmEmail', '#AddressList', '#Edit-Address-Email,#Remove-Address-Email');
+            event.preventDefault();
+        });
+
+        //////////subject lookup details
+
+        //To get data in Lookup
+        $('#Lookup-Subject-Email').on('click', function () {
+            $('.dialog').AddDataToTextboxNew({
+                appendTo: "#Subject",
+                appendToId: "#Subject_id",
+                lookupurl: "@Url.Action("GetSubject", "Email")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "Subject",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: false,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#Lookup-Body-Email').on('click', function () {
+            $('.dialog').AddDataToTextboxNew({
+                appendTo: "#Body",
+                appendToId: "#Body_id",
+                lookupurl: "@Url.Action("GetBody", "Email")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "Body",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: false,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#EmailActionlist,#EmailTemplateCodelist,#EmailAddrsTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

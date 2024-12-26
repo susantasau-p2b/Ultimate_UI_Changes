@@ -1,0 +1,269 @@
+﻿@{
+    ViewBag.Title = "Promotion Activity";
+}
+@model P2b.Global.PromoActivity
+<style>
+      .popup-content-label{
+        width:110px; 
+        display: block;
+        float: left;
+}
+    .popup-content-textbox{
+        min-width:120px;
+    }
+    .row1{
+        width:411px;
+    }
+    .horizontal_row2,.radio_button_div_2{
+        display:inline-block;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit_PromoPolicy,#Remove_PromoPolicy";
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'PromoActivity';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Payscaleagreementdetailslist').val() });
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Payscaleagreementdetailslist').selectmenu().selectmenu("menuWidget");
+        $('#Payscaleagreementdetailslist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmPromoAcitvity').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PromoActivity', 'open', '@Url.Action("Create")', '#frmPromoAcitvity', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#PromoPolicy_list', btndisablenames, function (data) { });
+            $('#Category').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 313, "");
+            $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", "");
+            // To bind dropdown on page load //regular increment
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PromoPolicy Data", '#frmPromoAcitvity', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#PromoPolicy_list,#ContactDetailsList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#PromoActivity_Name').val(k.Name);
+                    $('#Category').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 313, k.PromoList_Id); // Dropdown bind
+                    $('#PromoPolicy_list').P2BLookUpEncapsulate('#PromoPolicy_list', 'PromoPolicy_list', k.PromoPolicy_Id, k.PromoPolicy_Details, 'PromoPolicy_list', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'N');
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#PromoPolicy_list').P2BLookUpEncapsulate('#PromoPolicy_list', 'PromoPolicy_list', k.PromoPolicy_Id, k.PromoPolicy_Details, 'PromoPolicy_list', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'N');
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PromoPolicy Data', '#PromoPolicy_list', '#Lookup_PromoPolicy,#Create_PromoPolicy,#Edit_PromoPolicy,#Remove_PromoPolicy', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#PromoActivity_Name').val(k.Name);
+                    $('#Category').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 313, k.PromoList_Id); // Dropdown bind
+                    $('#PromoPolicy_list').P2BLookUpEncapsulate('#PromoPolicy_list', 'PromoPolicy_list', k.PromoPolicy_Id, k.PromoPolicy_Details, 'PromoPolicy_list', 'view', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#PayscaleagreementdetailsCreatelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "IncrActivity")', "", k.Payscaleagg_Id);
+                   // $('#PromoPolicy_list').P2BLookUpEncapsulate('#PromoPolicy_list', 'PromoPolicy_list', k.Policy_Id, k.FullPolicyDetails, 'PromoPolicy_list', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'N');
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#PromoActivity_Name').oldVal(data[2].Name);
+                        $('#Category').oldDropval(data[2].Type_Val);
+                        $('#PromoPolicy_list_old').oldLookupVal(data[2].PromoPolicy_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+        @*$('#Lookup_PromoPolicy').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPolicy", "PromoPolicy")', '', 'LookupDiv', 'Promo Activity Look Up Data', '#PromoPolicy_list', 'PromoPolicy_list', 5, 'PromoPolicy_list', '#frmPromoPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });*@
+
+
+        @*$('#Lookup_PromoPolicy').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPolicy", "PromoPolicy")', '', 'LookupDiv', 'Look Up Data', '#PromoPolicy_list', 'PromoPolicy_list', 5, 'PromoPolicy_list', '#frmPromoPolicy', 'N', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });*@
+
+        $('#Lookup_Agreement').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupAgreement", "PromoActivity")', '', 'LookupDiv', 'Promo Policy Look Up Data', '#txtPayMonth', 'txtPayMonth', 5, 'txtPayMonth', '#frmPromoAcitvity', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup_PromoPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPolicy", "PromoPolicy")', '', 'LookupDiv', 'Promo Policy Look Up Data', '#PromoPolicy_list', 'PromoPolicy_list', 5, 'PromoPolicy_list', '#frmPromoAcitvity', 'N', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_PromoPolicy').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "PromoActivity")', 'Create Promo Policy', 'open', '@Url.Action("Create", "PromoPolicy")', '#frmPromoPolicyP', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '', '', '', '#frmPromoAcitvity', '', function (data) {
+                // to show data which is created in partial page
+                $('#PromoPolicy_list').P2BLookUpEncapsulate('#PromoPolicy_list', 'PromoPolicy_list', data[0], data[1], 'PromoPolicy_list', '#Edit_PromoPolicy,#Remove_PromoPolicy', 'N');
+            });
+            event.preventDefault();
+        });
+        $('#Edit_PromoPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PromoPolicy_list').P2BGetTableDataonSelectedRow('#PromoPolicy_list', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "PromoActivity")', '@Url.Action("Edit", "PromoPolicy")', b, '@Url.Action("EditSave", "PromoPolicy")', 'Edit Promo Policy Details', '#frmPromoPolicyP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 650, '#frmPromoAcitvity', '#PromoPolicy_list', 'PromoPolicy_list', 'PromoPolicy_list', 'N', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmPromoPolicyP').trigger('reset');
+
+                    $('#Name_PromopolicyP').val(k.Name);
+                    $('[name="IsActionDateAsIncrDate"]').val([k.IsActionDateAsIncrDate]).button().button("refresh");
+                 //   $('[name="IsNewScaleAction"]').val([k.IsNewScaleAction]).button().button("refresh");
+                    $('[name="IsFuncStructChange"]').val([k.IsFuncStructChange]).button().button("refresh");
+                  //  $('[name="IsOldScaleAction"]').val([k.IsOldScaleAction]).button().button("refresh");
+
+                    $('[name="IsPayJobStatusChange"]').val([k.IsPayJobStatusChange]).button().button("refresh");
+                    $('[name="IsPayStructChange"]').val([k.IsPayStructChange]).button().button("refresh");
+
+                    $('[name="IsNewScaleAction"]').val([k.IsNewScaleIncrAction]).button().button("refresh");
+                    $('[name="IsOldScaleAction"]').val([k.IsOldScaleIncrAction]).button().button("refresh");
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#IncrActivitylist').P2BLookUpEncapsulate('#IncrActivitylist', 'IncrActivitylist', k.IncrActivity_Id, k.IncrActivity_FullDetails, 'IncrActivitylist', '#Edit-IncrActivity-PromoPolicy,#Remove-IncrActivity-PromoPolicy', 'N');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_PromoPolicy').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PromoPolicy_list').P2BGetTableDataonSelectedRow('#PromoPolicy_list', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PromoPolicy_list').P2BGetTableDataonSelectedRow('#PromoPolicy_list', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PromoPolicy_list', $('#PromoPolicy_list').val(), 200, 200, '#frmPromoAcitvity', '#PromoPolicy_list', '');
+            event.preventDefault();
+        });
+        $('#PromoActivity_Name').ValidateTextBox({ maxlength: 50, name: true });
+        
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#PayscaleagreementdetailsCreatelist').selectmenu().selectmenu("menuWidget");
+        $('#Category').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left">
+                @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
+                <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+                <select id="Payscaleagreementdetailslist" name="Payscaleagreementdetailslist" style="width:120px;"><option></option></select>
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+
+<div id="Create_Dialog" title="PromotionActivity">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPromoAcitvity" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row1 content_margine">
+            <label id="lblPayMonth" class="popup-content-label must">Agreement:</label>
+            <select id="PayscaleagreementdetailsCreatelist" name="PayscaleagreementdetailsCreatelist" style="width:120px;"><option></option></select>
+
+
+        </div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", id = "PromoActivity_Name" })</div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.PromoList, "Activity List :", new { @class = "popup-content-label  must" })<select class="must" id="Category" name="Category" style="width:120px;"><option></option></select>
+        </div>
+
+        <div class="row1 content_margine">
+            <div id="PromoPolicy_list_old"></div>
+            @Html.LabelFor(m => m.PromoPolicy, "Promotion Policy :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="PromoPolicy_list">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="LookUp Promotion Policy" class="popup-content-icon-lookup" id="Lookup_PromoPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Crate Promotion Policy" class="popup-content-icon-create" id="Create_PromoPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Promotion Policy" class="popup-content-icon-edit" id="Edit_PromoPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Promotion Policy" class="popup-content-icon-remove" id="Remove_PromoPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+    }
+</div>
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 68px;
+        top: -150px;
+    }
+</style>

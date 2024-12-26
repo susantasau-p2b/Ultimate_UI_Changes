@@ -1,0 +1,591 @@
+﻿@{
+    ViewBag.Title = "Leave Head Formula";
+}
+@model Leave.LvHeadFormula
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        $('#PolicyName').ForceOnlyAlphaNumeric();
+        $('#PolicyName').MaxLength(10);
+        $('#EncashSpanYear').ForceOnlyNumeric(),
+        $('#FromServ').ForceOnlyNumeric(),
+        $('#ToServ').ForceOnlyNumeric(),
+        $('#MinBalance').ForceOnlyNumeric(),
+        $('#MinEncashment').ForceOnlyNumeric(),
+        $('#MinUtilized').ForceOnlyNumeric()
+    });
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#OpeningDate').P2BDatePicker();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = [ 'FullDetails','Id',];
+        ColNames = [ 'FullDetails','Id',];
+        SortName = 'Id';
+        Caption = 'LV Head Formula';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Formula_Grid", "LvHeadFormula")",
+            editurl: "@Url.Action("EditGridDetails", "LvHeadFormula")",
+            htmurl: "@Url.Action("partial", "LvHeadFormula")",
+            submiturl: "@Url.Action("GridEditSave", "LvHeadFormula")",
+            //columnname: ["Id", "Name", "CeilingMin", "CeilingMax", "DependRule"],
+            columnname: ["Name", "Id"],
+            childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+            childurl: "@Url.Action("Get_FormulaStructDetails", "LvHeadFormula")",
+            tableheader: "Leave Head Formula",
+            childurlColumnNo: "2"
+
+
+        });
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmLvHeadFormula').trigger("reset");
+            $('input:checkbox').removeAttr('checked');
+            $('tr').removeClass('selectedtr');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Lvhead Formula', 'open', '@Url.Action("Create")', '#frmLvHeadFormula', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '', "", function (data) { }, { datatablename: "#MyTable" });
+
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            //AssignData();
+            $('#frmLvHeadFormula').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Leave Head Formula Data", '#frmLvHeadFormula', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#WagesList', '#Edit-Wages-SalHeadFormula', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#CreditPolicy').prop('checked', 'checked');
+                    //CreditPolicy Debitpolicy EncashPolicy BankPolicy
+                    $('#Debitpolicy,#EncashPolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvCreditPolicyList').P2BLookUpEncapsulate('#LvCreditPolicyList', 'LvCreditPolicyList', k.Lvcreditpolicy_Id, k.Lvcreditpolicy_Fulldetails, 'LvCreditPolicyList', '#Remove-LvCreditPolicy-LvHeadFormula', 'N');
+                    });
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#Debitpolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#EncashPolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvDebitPolicyList').P2BLookUpEncapsulate('#LvDebitPolicyList', 'LvDebitPolicyList', k.LvDebitpolicy_Id, k.Lvdebitpolicy_Fulldetails, 'LvDebitPolicyList', '#Remove-LvDebitPolicy-LvHeadFormula', 'N');
+                    });
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#EncashPolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#Debitpolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvEncashPolicyList').P2BLookUpEncapsulate('#LvEncashPolicyList', 'LvEncashPolicyList', k.LvEncashtpolicy_Id, k.LvEncashpolicy_Fulldetails, 'LvEncashPolicyList', '#Remove-LvEncashPolicy-LvHeadFormula', 'N');
+                    });
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#BankPolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#Debitpolicy,#EncashPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').fadeIn();
+                    $.each(data[1], function (i, k) {
+                        $('#LvBankPolicyList').P2BLookUpEncapsulate('#LvBankPolicyList', 'LvBankPolicyList', k.LvBankpolicy_Id, k.LvBankpolicy_Fulldetails, 'LvBankPolicyList', '#Remove-LvBankPolicy-LvHeadFormula', 'N');
+                    });
+                }
+
+
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Leave Head Formula data', '#LvCreditPolicyList', '#Remove-LvCreditPolicy-LvHeadFormula', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#CreditPolicy').prop('checked', 'checked');
+                    //CreditPolicy Debitpolicy EncashPolicy BankPolicy
+                    $('#Debitpolicy,#EncashPolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvCreditPolicyList').P2BLookUpEncapsulate('#LvCreditPolicyList', 'LvCreditPolicyList', k.Lvcreditpolicy_Id, k.Lvcreditpolicy_Fulldetails, 'LvCreditPolicyList', '#Remove-LvCreditPolicy-LvHeadFormula', 'N');
+                    });
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#Debitpolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#EncashPolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvDebitPolicyList').P2BLookUpEncapsulate('#LvDebitPolicyList', 'LvDebitPolicyList', k.LvDebitpolicy_Id, k.Lvdebitpolicy_Fulldetails, 'LvDebitPolicyList', '', 'N');
+                    });
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#EncashPolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#Debitpolicy,#BankPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#LvEncashPolicyList').P2BLookUpEncapsulate('#LvEncashPolicyList', 'LvEncashPolicyList', k.LvEncashtpolicy_Id, k.LvEncashpolicy_Fulldetails, 'LvEncashPolicyList', '', 'N');
+                    });
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#BankPolicy').prop('checked', 'checked');
+                    $('#CreditPolicy,#Debitpolicy,#EncashPolicy').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').fadeIn();
+                    $.each(data[1], function (i, k) {
+                        $('#LvBankPolicyList').P2BLookUpEncapsulate('#LvBankPolicyList', 'LvBankPolicyList', k.LvBankpolicy_Id, k.LvBankpolicy_Fulldetails, 'LvBankPolicyList', '', 'N');
+                    });
+                }
+            });
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Lookup-LvHeadCollection-LvBankPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvBankPolicy")', '', 'LookupDiv', 'Type Of head Look Up Data', '#LvHeadCollectionlist', 'LvHeadCollectionlist', 5, 'LvHeadCollectionlist', '#frmBankPolicy', 'N', '#Remove-LvHeadCollection-LvBankPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LvHeadCollection-LvBankPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadCollectionlist', $('#LvHeadCollectionlist').val(), 200, 200, '#frmLvCreditPolicy', '#LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy');
+            event.preventDefault();
+        });
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+
+                    $('#fun_id').val(data.FunStruct);
+                    $('#pay_id').val(data.PayStruct);
+                    $('#geo_id').val(data.GeoStruct);
+                },
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+        $('#Lookup-LvCreditPolicy-LvHeadFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvCreditPolicy", "LvHeadFormula")', '', 'LookupDiv', 'Lvcredit Look Up Data', '#LvCreditPolicyList', 'LvCreditPolicyList', 5, 'LvCreditPolicyList', '#frmLvHeadFormula', 'N', '#Remove-LvCreditPolicy-LvHeadFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-LvCreditPolicy-LvHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvCreditPolicyList').P2BGetTableDataonSelectedRow('#LvCreditPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvCreditPolicyList').P2BGetTableDataonSelectedRow('#LvCreditPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvCreditPolicyList', $('#LvCreditPolicyList').val(), 200, 200, '#frmLvHeadFormula', '#LvCreditPolicyList', '#Remove-LvCreditPolicy-LvHeadFormula');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LvDebitPolicy-LvHeadFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvDebitpolicy", "LvHeadFormula")', '', 'LookupDiv', 'Lvdebit Look Up Data', '#LvDebitPolicyList', 'LvDebitPolicyList', 5, 'LvDebitPolicyList', '#frmLvHeadFormula', 'N', '#Remove-LvDebitPolicy-LvHeadFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-LvDebitPolicy-LvHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvDebitPolicyList').P2BGetTableDataonSelectedRow('#LvDebitPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvDebitPolicyList').P2BGetTableDataonSelectedRow('#LvDebitPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvDebitPolicyList', $('#LvDebitPolicyList').val(), 200, 200, '#frmLvHeadFormula', '#LvDebitPolicyList', '#Remove-LvDebitPolicy-LvHeadFormula');
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-LvEncashPolicy-LvHeadFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvEncashpolicy", "LvHeadFormula")', '', 'LookupDiv', 'Lvdebit Look Up Data', '#LvEncashPolicyList', 'LvEncashPolicyList', 5, 'LvEncashPolicyList', '#frmLvHeadFormula', 'N', '#Remove-LvEncashPolicy-LvHeadFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-LvEncashPolicy-LvHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvEncashPolicyList').P2BGetTableDataonSelectedRow('#LvEncashPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvEncashPolicyList').P2BGetTableDataonSelectedRow('#LvEncashPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvEncashPolicyList', $('#LvEncashPolicyList').val(), 200, 200, '#frmLvHeadFormula', '#LvEncashPolicyList', '#Remove-LvEncashPolicy-LvHeadFormula');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LvBankPolicy-LvHeadFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvBankPolicy", "LvHeadFormula")', '', 'LookupDiv', 'Lvdebit Look Up Data', '#LvBankPolicyList', 'LvBankPolicyList', 5, 'LvBankPolicyList', '#frmLvHeadFormula', 'N', '#Remove-LvBankPolicy-LvHeadFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-LvBankPolicy-LvHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvBankPolicyList').P2BGetTableDataonSelectedRow('#LvBankPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvBankPolicyList').P2BGetTableDataonSelectedRow('#LvBankPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvBankPolicyList', $('#LvBankPolicyList').val(), 200, 200, '#frmLvHeadFormula', '#LvBankPolicyList', '#Remove-LvBankPolicy-LvHeadFormula');
+            event.preventDefault();
+        });
+
+        $('#creditpolicyId').hide();
+        $('#debitPolicyId ').hide();
+        $('#encashpolicyId').hide();
+        $('#BankpolicyId  ').hide();
+
+        $('.popup_radio_button').on('change', function () {
+            var selected = $(".popup_radio_button input[type='radio']:checked").val();
+            if (selected == "1") {
+                $('#creditpolicyId').fadeIn();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "2") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').fadeIn();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "3") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').fadeIn();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "4") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId  ').fadeIn();
+            }
+
+        });
+
+
+    });
+</script>
+<style>
+    .icon-row {
+        left: 44px;
+        position: relative;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 88px;
+    }
+
+    .popup-content-label-short {
+        display: block;
+        float: left;
+        width: 87px;
+    }
+
+    .popup-content-textbox {
+        width: 87px;
+    }
+
+    .row1 {
+        width: 431px;
+        /*! margin: 0 auto; */
+    }
+
+    .row2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 500px;
+    }
+
+    .row2 {
+        width: 198px;
+    }
+
+    .popup-row {
+        width: 446px;
+        margin: 1px 0px 0px 69px;
+    }
+
+    .name {
+        width: 293px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+<html>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                            @*<th>CeilingMin</th>
+                                                <th>CeilingMax</th>
+                                                <th>DependRule</th>*@
+                                        </tr>
+                                    </thead>
+                                    @*<tfoot>
+                                            <tr>
+                                                <th>DD</th>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>CeilingMin</th>
+                                                <th>CeilingMax</th>
+                                                <th>DependRule</th>
+                                            </tr>
+                                        </tfoot>*@
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <div class="section_Method">
+            <div class="heading">Filter View</div>
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+        </div>
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmLvHeadFormula", name = "frmLvHeadFormula" }))
+        {
+
+
+            <input name="geo_id" id="geo_id" class="filter_structure_id" />
+            <input name="pay_id" id="pay_id" class="filter_structure_id" />
+            <input name="fun_id" id="fun_id" class="filter_structure_id" />
+
+
+            @*<div style="float:left;">*@
+            <div class="section_Method">
+                <div class="heading">LvHeadFomula Details</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox name must" })</div>
+
+
+                <div class="popup-row">
+                    <div class="popup_radio_button">
+                        <input type="radio" id="CreditPolicy" name="radio" value="1" /><label for="CreditPolicy">CreditPolicy Wise</label>
+                        <input type="radio" id="Debitpolicy" name="radio" value="2" /><label for="Debitpolicy">Debitpolicy</label>
+                        <input type="radio" id="EncashPolicy" name="radio" value="3" /><label for="EncashPolicy">EncashPolicy </label>
+                        <input type="radio" id="BankPolicy" name="radio" value="4" /><label for="BankPolicy">BankPolicy</label>
+
+                    </div>
+                </div>
+                <div id="load_div" style="display:none;"></div>
+
+                <div id="creditpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LvCreditPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvCreditPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select LvCreditPolicy" class="popup-content-icon-lookup" id="Lookup-LvCreditPolicy-LvHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove LvCreditPolicy" class="popup-content-icon-remove" id="Remove-LvCreditPolicy-LvHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="debitPolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LvDebitPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvDebitPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select LvDebitPolicy" class="popup-content-icon-lookup" id="Lookup-LvDebitPolicy-LvHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove LvDebitPolicy" class="popup-content-icon-remove" id="Remove-LvDebitPolicy-LvHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="encashpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LvEncashPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvEncashPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select LvEncashPolicy" class="popup-content-icon-lookup" id="Lookup-LvEncashPolicy-LvHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove LvEncashPolicy" class="popup-content-icon-remove" id="Remove-LvEncashPolicy-LvHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="BankpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LvBankPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvBankPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select LvBankPolicy" class="popup-content-icon-lookup" id="Lookup-LvBankPolicy-LvHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove LvBankPolicy" class="popup-content-icon-remove" id="Remove-LvBankPolicy-LvHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*</div>*@
+
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,246 @@
+﻿@{
+    ViewBag.Title = "Insurance";
+}
+
+@model Payroll.Insurance
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@*<link href="~/Content/insurance/insurance.css" rel="stylesheet" />*@
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+@*<link rel="stylesheet" type="text/css" href="~/Content/mb-ui.css" />*@
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 63px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 105px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+
+
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#ComCode').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        //$('#Code').MaxLength(10);
+        $('#Name').MaxLength(50);
+    });
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        btndisablenames = "#Edit-Insurance,#Remove-Insurance";
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['InsuranceCompCode', 'InsuranceDesc', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Insurance';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmInsurance').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Insurance', 'open', '@Url.Action("Create")', '#frmInsurance', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#InsuranceProducts,#ContactDetailsList', btndisablenames, function (data) { });
+            $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateSalHeadDropDownList", "Insurance")', "", ""); // To bind dropdown on page load
+            $('#ItCategoryList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 406, "");
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+        $('#Lookup-Insurance').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetInsruanceProdcutsDetails", "Insurance")', '', 'LookupDiv', 'Look Up Data', '#InsuranceProducts', 'InsuranceProducts', 5, 'InsuranceProducts', '#frmInsurance', 'N', '#Edit-Address-Insurance,#Remove-Address-Insurance', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Insurance').on("click", function () {
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Insurance_Partial", "Insurance")', 'Create Insurance Products', 'open', '@Url.Action("CreateSave", "InsuranceProduct")', '#frmInsuranceProductus', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmInsurance', '', function (data) {
+                $('#InsuranceProducts').P2BLookUpEncapsulate('#InsuranceProducts', 'InsuranceProducts', data[0], data[1], 'InsuranceProducts', '', 'A');
+            });
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Insurance Data", '#frmInsurance', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#InsuranceProducts,#ContactDetailsList', btndisablenames, function (data) {
+
+       
+                $.each(data[0], function (i, k) {
+                    console.log(k.CompCode);
+                    $('#InsuranceCompCode').val(k.InsuranceCompCode);
+                    $('#InsuranceCompCode').attr('readonly', 'readonly');
+                    $('#InsuranceDesc').val(k.InsuranceDesc);
+
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "Insurance")", "", k.SalHead_Id);
+                    $('#ItCategoryList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 406, k.ITCategory_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#InsuranceProducts').P2BLookUpEncapsulate('#InsuranceProducts', 'InsuranceProducts', k.InsProduct_Id, k.InsProduct_FullDetails, 'InsuranceProducts', '#Remove-Insurance', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+          
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Insurance Data', '#InsuranceProducts,#ContactDetailsList', '#Lookup-Address-Insurance,#Create-Address-Insurance,#Edit-Address-Insurance,#Remove-Address-Insurance,#Lookup-ContactDetails-Insurance,#Create-ContactDetails-Insurance,#Edit-ContactDetails-Insurance,#Remove-ContactDetails-Insurance', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#InsuranceCompCode').val(k.InsuranceCompCode);
+                    $('#InsuranceDesc').val(k.InsuranceDesc);
+
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "Insurance")", "", k.SalHead_Id); // Dropdown bind
+                    $('#ItCategoryList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 406, k.ITCategory_Id); 
+                });
+                $.each(data[1], function (i, k) {
+                    $('#InsuranceProducts').P2BLookUpEncapsulate('#InsuranceProducts', 'InsuranceProducts', k.InsProduct_Id, k.InsProduct_FullDetails, 'InsuranceProducts', 'view', 'N');
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#InsuranceProducts_old').oldLookupVal(data[2].Insurance_Val);
+                    }
+                }
+            });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+        $('#Remove-Insurance').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#InsuranceProducts').P2BGetTableDataonSelectedRow('#InsuranceProducts', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#InsuranceProducts').P2BGetTableDataonSelectedRow('#InsuranceProducts', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#InsuranceProducts', $('#InsuranceProducts').val(), 200, 200, '#frmInsurance', '#InsuranceProducts', '#Remove-Insurance');
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#ItCategoryList').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+
+<div id="Create_Dialog">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmInsurance" }))
+    {
+        <div class="row1 content_margine"> @Html.LabelFor(m => m.InsuranceCompCode, " Comp Code:", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.InsuranceCompCode, new { @class = "popup-content-textbox must" })</div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.InsuranceDesc, "  Insurance Desc :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.InsuranceDesc, new { @class = "popup-content-textbox-long must" })
+        </div>
+        
+        <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.ITCategory, "IT Category :", new { @class = "popup-content-label must" } )<select class="must" id="ItCategoryList" name="ItCategoryList" style="width:105px;"><option></option></select></div>
+      
+          <div class="row1 content_margine">
+            @Html.LabelFor(m => m.InsuranceProduct, "Product :", new { @class = "popup-content-label" }) <div class="popup-content-table">
+                <table class="lookuptableselected" id="InsuranceProducts">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select InsuranceProducts" class="popup-content-icon-lookup" id="Lookup-Insurance"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create InsuranceProducts" class="popup-content-icon-create" id="Create-Insurance"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-Insurance"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove InsuranceProducts" class="popup-content-icon-remove" id="Remove-Insurance"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+         <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.SalaryHead, "Salary Head :", new { @class = "popup-content-label must" })<select class="must" id="SalaryHeadlist" name="SalaryHeadlist" style="width:161px;"><option></option></select></div>
+    }
+</div>

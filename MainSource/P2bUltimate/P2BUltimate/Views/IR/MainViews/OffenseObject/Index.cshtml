@@ -1,0 +1,252 @@
+﻿<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.OffenseObject
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+    .popup-content-table{
+        right:120px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        
+        ColModel = [ 'OffenceName', 'OffenceType', 'DischargeOffencesCount', 'Id'];
+        ColNames = [ 'OffenceName', 'OffenceType', 'DischargeOffencesCount', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Offence Object';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmOffenseObject').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Offence Object', 'open', '@Url.Action("create")', '#frmOffenseObject', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });           
+            $('#OffenceNameList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, "");
+            $('#OffenceTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, "");
+
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+
+        @*$('#View').button().click(function (event) {
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Salary Head', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmSalaryHead').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#Name').val(k.Name);
+                    $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.Frequency_Id);
+                    $('#RoundingMethodlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 422, k.RoundingMethod_Id);
+                    $('#Typelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 420, k.Type_Id);
+                    $('#SalHeadOperationTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 426, k.SalHeadOpeType_Id);
+                    $('#ProcessTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 427, k.ProcessType_Id);
+                    $('[name="OnAttend"]').val([k.OnAttend]).button().button("refresh");
+                    $('[name="OnLeave"]').val([k.OnLeave]).button().button("refresh");
+                    $('[name="InPayslip"]').val([k.InPayslip]).button().button("refresh");
+                    $('[name="InITax"]').val([k.InITax]).button().button("refresh");
+                    $('#RoundDigit').val(k.RoundDigit);
+                    $('#SeqNo').val(k.SeqNo);
+                    $('#Autho_Action').val(k.Action);
+                });*@
+
+        //To bind old data if authorisation is true
+        //        if ($("#Autho").hasClass('auto_active')) {
+        //            if (data[2] != null) {
+        //                $('#Name').oldVal(data[2].Name);
+        //                $('#Code').Oldval(k.Code);
+        //                $('#Type').Oldval(k.Type);
+        //                $('[id="radio4"]').Oldval(k.OnAttend);
+        //                $('[id="radio6"]').Oldval(k.OnLeave);
+        //                $('[id="radio8"]').Oldval(k.InPayslip);
+        //                $('[id="radio10"]').Oldval(k.InITax);
+        //                $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+        //                $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+        //                $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+        //            }
+        //        }
+        //    });
+        //});
+
+
+
+        $('#View').button().click(function (event) {
+            AssignData();           
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View OffenceObject', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 271, 400, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmOffenseObject').trigger("reset");
+                    $('#DischargeOffencesCount').val(k.DischargeOffencesCount);
+                    $('#OffenceNameList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, k.OffenceName);
+                    $('#OffenceTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, k.OffenceType);
+                });
+            });
+        });
+
+           
+
+            $('#Edit').on('click', function () {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit OffenceObject", '#frmOffenseObject', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                    //Compulsory for authorisation
+                    var val = null;
+                    $.each(data[0], function (i, k) {
+                        $('#frmOffenseObject').trigger("reset");
+                        $('#DischargeOffencesCount').val(k.DischargeOffencesCount);
+                        $('#OffenceNameList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, k.OffenceName);
+                        $('#OffenceTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, k.OffenceType);
+
+
+                    });
+
+                });
+            });
+
+
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+            //$('#hidelv').hide();
+            //$('input[name="OnLeave"]:radio').change(function () {
+            //    if (this.value == "false") {
+
+            //        $('#hidelv').fadeOut();
+            //    }
+            //    else {
+            //        $('#hidelv').fadeIn();
+
+            //    }
+            //});
+            /* Address button click*/
+
+
+            @*$('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        //To get data in Lookup
+        $('#Lookup-LeaveHead-SalaryHead').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLeaveHeadLKDetails", "SalaryHead")', '', 'LookupDiv', 'LeaveHead Look Up Data', '#LvHeadlist', 'LvHeadlist', 5, 'LvHeadlist', '#frmSalaryHead', 'A', '#Edit-LeaveHead-SalaryHead,#Remove-LeaveHead-SalaryHead', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+            // partial page delete
+            // $('#Remove-LeaveHead-SalaryHead').button().on('click', function (event) {
+            //     dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //     var a = [], b;
+            //     a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+            //     b = a[0];
+            //     $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmSalaryHead', '#LvHeadlist', '');
+            //     event.preventDefault();
+            // });
+
+             $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+             $('.popup_radio_button').controlgroup();
+
+        });
+</script>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmOffenseObject", name = "frmOffenseObject" }))
+        {
+
+            <div class="row1 content_margine" style="width: 420px;">
+        @Html.LabelFor(m => m.OffenceName, "Offence Name :", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="OffenceNamelist" id="OffenceNameList">
+                    <option></option>
+                </select>
+    </div>
+             <div class="row1 content_margine" style="width: 420px;">
+        @Html.LabelFor(m => m.OffenceType, "Offence Type :", new { @class = "popup-content-label must" })
+                 <select class="drop must" style="width:120px;" name="OffenceTypelist" id="OffenceTypeList">
+                     <option></option>
+                 </select>
+    </div>
+             <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.DischargeOffencesCount, "Discharge Offences Count :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.DischargeOffencesCount, new { @class = "popup-content-textbox must" })
+        </div>
+
+
+
+        }
+    </div>
+</body>
+</html>

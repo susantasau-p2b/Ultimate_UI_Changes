@@ -1,0 +1,394 @@
+﻿@{
+    ViewBag.Title = "Salary Hold Details";
+}
+@model Payroll.SalaryHoldDetails
+
+<html>
+
+<head>
+
+    <title>
+
+    </title>
+
+    <script>
+        $(document).ready(function (e) {
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#FromDate,#ToDate').P2BDatePicker();
+            $('button').button();
+
+            $('.popup_radio_button').controlgroup();
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "SalaryHoldDetails")",
+                htmurl: "@Url.Action("Index", "SalaryHoldDetails")",
+                columnname: ["Code", "Name", "Id" ],
+                childheader: [ "FromDate", "ToDate", "Id" ],
+                childurl: "@Url.Action("Get_SalaryHoldDetails", "SalaryHoldDetails")",
+                tableheader: "Salary Hold Details",
+                childurlColumnNo: "3"
+            });
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+            });
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $('#frmSalaryHoldDetails').trigger("reset");
+                //$.LoadEmpByDefault(true);
+                $.LoadEmpByDefaultWOGeoId(true, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Salary Hold Details', 'open', '@Url.Action("Create")', '#frmSalaryHoldDetails', 'Message :', 'Request Falied :', '#JqGrid', 500, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+                event.preventDefault();
+            });
+            // $('.drop').selectmenu().selectmenu("menuWidget");
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvCancelReqGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "LvCancelReq")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData", "LvCancelReq")",
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $('#Grid-ReqDate').val(data.ReqDate);
+                            $('#Grid-LvNewReq').val(data.LvNewReq);
+                            $('#Grid-Reason').val(data.Reason);
+
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#SalaryHoldDetailsGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "SalaryHoldDetails")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "SalaryHoldDetails")",
+                        submiturl: "@Url.Action("GridEditsave", "SalaryHoldDetails")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data1) {
+                            ////debugger;
+                            var data = data1.data;
+
+                            $('#FromDate-edit').val(data.FromDate);
+                            $('#ToDate-edit').val(data.ToDate);
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    //   return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            // $.FormReset('#frmServiceSecurity');
+
+        });
+    </script>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 555px;
+            float: right;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 350px;
+            display: inline-flex;
+            margin-left: -89px;
+        }
+
+        .loader {
+            width: 299px;
+            display: inline-flex;
+            margin-left: -89px;
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 4px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            /*! position: absolute; */
+            float: left;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 621px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="LV Cancel Req">
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmSalaryHoldDetails", name = "frmSalaryHoldDetails" }))
+        {
+
+
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left" id="asd">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table" name="Employee-Table" style="height: 1035px">
+                        <tr><th><input type="checkbox" id="Case-Employee" class="Chck_emp" /></th><th>Employee</th></tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="section2_Leave">
+                <div class=" " style="width: 506px;">
+                    <input id="Autho_Action" type="hidden" name="Autho_Action" />
+                    <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+                    <div class="heading">Salary Hold Details Details</div>
+
+                    <div class="row1 content_margine">@Html.LabelFor(m => m.FromDate, "FromDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row1 content_margine">@Html.LabelFor(m => m.ToDate, "ToDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox must" })</div>
+
+
+
+                </div>
+            </div>
+            <div class="emplist_row">
+                <div id="Grid_Form2">
+
+                </div>
+            </div>
+
+        }
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,355 @@
+﻿@{
+    ViewBag.Title = "Menu Authority";
+}
+<link href="~/Scripts/JQurey.tree/src/themes/default/style.css" rel="stylesheet" />
+<script src="~/Scripts/JQurey.tree/src/jstree.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.dnd.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.contextmenu.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.checkbox.js"></script>
+<!Doctype html>
+<html>
+<head>
+    <title></title>
+    <style>
+        ul > li {
+            margin-left: 10px;
+        }
+
+        .menutreeclass {
+            display: block;
+            float: left;
+            height: 314px;
+            width: 519px;
+            overflow: auto;
+            border: 0.1px solid #ddd;
+        }
+
+        .form {
+            width: 762px;
+        }
+
+        .sec2 {
+            float: left;
+            top: 0;
+            margin: 0 13px;
+        }
+
+        .dynamic {
+            width: 293px;
+        }
+
+        #Write {
+            width: 100px;
+            margin-left: -125px;
+            margin-top: 327px;
+            /* position: relative; */
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="create_MenuAuthority">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGridAuthority"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="create_dialog_Menuauthority" class="menuhide" title="Create MenuAuthority">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmMenuauthority", name = "frmMenuauthority" }))
+        {
+            <div class="row1 content_margine">
+                @*<label for="employee" class="popup-content-label">Assign Employee :</label>
+                    <select id="employee" class="drop" name="employee" style="width:200px">
+                        <option>-Select-</option>
+                    </select>*@
+                <div id="EmployeeName">
+                    <label>Employee Name:</label>
+                    <input name="EmpName" type="text" id="EmpName" />
+                    <input type="text" id="EmpName_id" name="EmpName_id" class="filter_structure_id" />
+                    <button data-p2btooltip="Lookup Employee Name" class="popup-content-drop-icon-lookup" id="Lookup-EmpName-FName">
+                        <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="menutreeclass">
+                <div id="menu_tree"></div>
+            </div>
+            <button id="Write" style="width:100px;">Write</button>
+            <div class="sec2">
+                <div>
+                    @*<label> Select Who is.?<i class="fa fa-info-circle" aria-hidden="true"></i></label>
+                    <span class="popup_radio_button radiopush">
+                        <span><input type="radio" id="radio1" name="IsESSAppl" value="checker" /> <label for="radio1">Checker</label></span>
+                        <span><input type="radio" id="radio2" name="IsESSAppl" value="meaker" checked="checked" /> <label for="radio2">Maker</label></span>
+                    </span><br />*@
+                    @*<ul>
+                            <li>
+                                <input type="radio" id="checker" name="whois" value="checker" /> <label for="checker">Checker</label>
+                            </li>
+                            <li>
+                                <label> Or</label>
+                            </li>
+                            <li>
+                                <input type="radio" id="meaker" name="whois" value="meaker" checked /> <label for="meaker">Maker</label>
+                            </li>
+                        </ul>*@
+                    @*<div id="CrudeWrites">
+                        <label>Select Authority</label>
+                        <ul>
+                            <li><input type="checkbox" id="select_all" /> <label for="select_all">Select All</label></li>
+                            <li><label> Or</label></li>
+                            <li><input type="checkbox" id="Create" name="autho_rights[]" value="create" /> <label for="create">Create</label></li>
+                            <li><input type="checkbox" id="View" value="view" name="autho_rights[]" /> <label for="view">View</label></li>
+                            <li><input type="checkbox" id="Edit" value="edit" name="autho_rights[]" /> <label for="edit">Edit</label></li>
+                            <li><input type="checkbox" id="Delete" value="delete" name="autho_rights[]" /> <label for="delete">Delete</label></li>
+                        </ul>
+                    </div>*@
+                   
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('.drop').selectmenu();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        //$('#employee').P2BSelectMenuAppend("@@Url.Action("GetEmp1", "AddNewUser")", "", "");
+        //$('#create_dialog_Menuauthority .ui-dialog-content').remove();
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#menu_tree').jstree({
+            'plugins': ["checkbox", "state"],
+            'core': {
+                "check_callback": true,
+                "multiple": true,
+                "themes": {
+                    "variant": "large"
+                }
+            },
+
+        });
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        // var btndisablenames = "#Edit-Address-Location,#Remove-Address-Location,#Edit-ContactDetails-Location,#Remove-ContactDetails-Location";
+        // a.Id, Convert.ToString(a.DiviName), Convert.ToString(a.Code), Convert.ToString(a.Name)
+        ColModel = ['EmpCode', 'Fulldetails', 'Id'];
+        ColNames = ['EmpCode', 'Fulldetails', 'Id'];
+        SortName = 'Id';
+        Caption = 'EmployeeDetails';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGridAuthority').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function AssignData() {
+            dt = $('#JqGridAuthority').P2BGrid.P2BEdDelV('#JqGridAuthority', 'Id');
+
+        }
+        $('#Edit').hide();
+        $('#Lookup-EmpName-FName').on('click', function (event) {
+
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#EmpName",
+                lookupurl: "@Url.Action("GetEmp1", "MenuAuthority")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "EmpName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#EmpName_id",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $.getJSON("@Url.Action("GetJson", "MenuConfig")", function (data) {
+            console.log(data);
+            $('#menu_tree').jstree(true).settings.core.data = data;
+            $('#menu_tree').jstree('open_node');
+            $('#menu_tree').jstree(true).refresh();
+        });
+        var nodeArray = [];
+        setTimeout(function () {
+            $('#menu_tree').jstree('open_all');
+            var anchr = $('#menu_tree  li');
+            var a = anchr.toArray();
+            console.log(a);
+            $.each(a, function (i, k) {
+                var id = $(this).attr('id');
+                if (id != 1) {
+                    nodeArray.push(id);
+                }
+            });
+            $("#menu_tree").jstree("deselect_all");
+            $('#menu_tree').jstree('close_all');
+            $('#Edit').show();
+        }, 2000)
+        $('#create_dialog_Menuauthority').P2BCreateDialog();
+        $('#create_MenuAuthority').on("click", function (e) {
+           // $('#CrudeWrites').hide();
+            $('#EmpName_id').val("");
+            $('#EmpName').val("");
+            $('#EmployeeName').show();
+            $('#create_dialog_Menuauthority').P2BCreateDialog('', '', '', '', 'Create MenuAuthority ', 'open', '@Url.Action("Create")', '#frmMenuauthority', 'Message :', 'Request Falied :', '#JqGridAuthority', 520, 865, '', '', function (data) { });
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            setTimeout(function () {
+                $('#menu_tree').jstree(true).show_all();
+                $("#menu_tree").jstree("deselect_all");
+                $('#menu_tree').jstree('close_all');
+            }, 1000)
+            e.preventDefault();
+        });
+
+        $('#select_all').on('click', function () {
+            if ($('#select_all').is(":checked")) {
+                $('#Create, #View, #Edit,#Delete').checked(true);
+            } else {
+                $('#Create, #View, #Edit,#Delete').checked(false);
+            }
+        });
+        $('#Edit').on('click', function () {
+           // $('#CrudeWrites').show();
+            var SelectedNodeTextName = [];
+            var selectedenodearray = [];
+            //var hidenodeArrray = [];
+            $('#EmployeeName').hide();
+            AssignData();
+            $('#EmpName_id').val(dt.Id);
+            $('#create_dialog_Menuauthority').P2BEditModalDialog("@Url.Action("GetJsonEmpWise", "MenuAuthority")", dt.Id, '@Url.Action("EditSave")', "Edit Employee Data ->" + JSON.stringify(dt) + "", '#frmMenuauthority', dt.Id, 'Message : ', 'Request Falied :', '#JqGridAuthority', 520, 865, '', '', function (data) {
+                console.log("MenuAuthoriyEdit");
+                console.log(data["urlauthority"]);
+                $.each(data["urlauthority"], function (i, k) {
+                    SelectedNodeTextName.push(i);
+                    console.log("Inside Edit button");
+                    console.log(k[0]);
+                    if (k[0] == "checker") {
+                        $('[name="IsESSAppl"]').val(['checker']).button().button("refresh");
+                    }
+                    if (k[0] == "meaker") {
+                        $('[name="IsESSAppl"]').val(['meaker']).button().button("refresh");
+                    }
+                    $.each(k[1], function (l, m) {
+                        console.log(m);
+                    });
+                });
+            });
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            setTimeout(function () {
+                //$('#menu_tree').jstree(true).show_all();
+                $('#menu_tree').jstree('close_all');
+                $("#menu_tree").jstree("deselect_all");
+                $.each(SelectedNodeTextName, function (i, j) {
+                    if (nodeArray.length > 0) {
+                        $.each(nodeArray, function (i, k) {
+                            if (k != 1) {
+                                var parent = $('#menu_tree').jstree(true).get_node("" + k + "").data.url.toLowerCase();
+                                if (parent != "#") {
+                                    if (j == parent) {
+                                        selectedenodearray.push(k);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+                // $("#menu_tree").jstree(true).hide_node(hidenodeArrray);
+                $('#menu_tree').jstree(true).select_node(selectedenodearray);
+                //$(".jstree-open").each(function () {
+                //    //alert($(this).attr('id'));
+                //    var a = ($(this).attr('id'));
+                //    if (a != 1) {
+                //        hidenodeArrray.push(a);
+                //    }
+                //});
+                //var selectednode = $('#menu_tree').jstree("get_selected");
+               
+                //$.each(selectednode, function (i, k) {
+                //    hidenodeArrray.push(k);
+                //});
+                //hidenodeArrray.push(selectednode);
+                //console.log(hidenodeArrray);
+                //var res = nodeArray.filter(function (n) { return !this.has(n) }, new Set(hidenodeArrray));
+                // $("#menu_tree").jstree(true).hide_node(res);
+                //console.log(res);
+            }, 1000);
+        });
+        $("#menu_tree").on("open_node.jstree", function (e, data) {
+            console.log(data.node.id);
+        });
+        $('#Write').on('click', function (e) {
+            if ($('#group_type').val() == 0) {
+                alert("Select Group Type");
+                return false;
+
+            } else {
+                //  menuobj.EmpCode = ;
+                var menuobj = new Object();
+                menuobj.urlauthority = {};
+
+                var array = [];
+                //if ($('input[name="IsESSAppl"]:checked').val() == undefined) {
+                //    alert("Select Whos Is!");
+                //    return false;
+                //}
+                //array.push($('input[name="IsESSAppl"]:checked').val().toLowerCase());
+
+                array.push($.map($('input[name="autho_rights[]"]:checked'), function (c) {
+                    return c.value.toLowerCase();
+                }));
+
+                var a = $('#menu_tree').jstree("get_selected");
+                ////debugger;
+                //console.log(a);
+                if (array.length && a.length != 0) {
+                    $.each(a, function (i, k) {
+                        var parent = $('#menu_tree').jstree(true).get_node("" + k + "").data.url.toLowerCase();
+                        //console.log(parent);
+                        menuobj.urlauthority[parent] = array;
+                    });
+
+                    // var jsonstr = JSON.stringify(menuobj);
+                    // console.log(jsonstr);
+                    alert("Authority Submitted..!");
+
+                    $.ajax({
+                        method: "POST",
+                        url: "@Url.Action("PutJson", "MenuAuthority")?EmpCode=" + $('#EmpName_id').val(),
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify(menuobj),
+                        success: function (data) {
+                            alert(data.responseText);
+                            jQuery('#JqGridAuthority').trigger('reloadGrid');
+                        },
+                        error: function (data) { console.log(data); }
+                    });
+                } else {
+                    alert("Select Tree Node");
+                    return false;
+                }
+            }
+        });
+
+    });
+</script>

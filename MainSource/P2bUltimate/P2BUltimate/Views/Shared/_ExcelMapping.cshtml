@@ -1,0 +1,154 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script>
+        $(function () {
+            $('button').button();
+            if ($('#dataFile').val()) {
+                var tempExcel = new FormData($('#frmjsonupload')[0]);
+                $.ajax({
+                    url: "@Url.Action("Upload","JsonUpload")",
+                    type: "POST",
+                    data: tempExcel,
+                    cache: false,
+                    timeout: 600000,
+                    datatype: "json",
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        var htm = "";
+                        var count = 0;
+                        if (data.success == false) {
+                            alert(data.responseText);
+                            return false;
+                        }
+                        //console.log(data.json);
+                        var jsontemp = JSON.parse(data.json);
+
+                        $.each(data.col, function (i, k) {
+                            htm += "<div class='row1'><label class='row1-label' >" + k + "</label><input id=" + k + "_drop class=drop name=" + k + " /></div>";
+                        });
+                        $('#preview_mapping').append(htm);
+                        htm = "";
+                        $.each(jsontemp, function (i, k) {
+                            if (i == 0) {
+                                $.each(k, function (i, j) {
+                                    htm += "<div class='drag' id=" + j + "_drag  class=drag data-id=" + j + ">" + j + "</div>";
+                                });
+                            }
+                        });
+                        $('#drag_container').append(htm);
+                        $('.drag,.drop').off();
+                        $('.drag').draggable({ revert: "invalid" });
+                        $('.drop').droppable({
+                            drop: function (event, ui) {
+                                var draggableId = ui.draggable;
+                                var val = draggableId.attr('data-id');
+                                $(this).addClass("ui-state-highlight").val(val);
+                            }, out: function (event, ui) {
+                                $(this).val("");
+                            }
+                        });
+                    }
+                });
+            }
+            $('#TableName_excelmap').val($('#TableName').val());
+           
+        });
+    </script>
+</head>
+
+<body>
+   
+    <div id="drag_container" class="drag_container_class"><div class="header_class">Excel Column</div></div>
+    <div class="frm-div">
+        <form method="post" id="frmExcelMapping" class="preview-table-div">
+            <div class="header_class">Database Column</div>
+            <div id="preview_mapping"></div>
+            <div class="row1"><label class="row1-label">Table Name :</label><input type="text" id="TableName_excelmap" name="TableName" /></div>
+            <div class="row1"><label class="row1-label">Line No :</label><input type="text" id="LineNo" name="LineNo" value="0" /></div>
+        </form>
+    </div>
+</body>
+</html>
+<style>
+
+
+    .downloadformate-class {
+        font-size: 1em;
+        display: block;
+        width: auto;
+    }
+
+        .downloadformate-class > a {
+            color: blue;
+        }
+
+    .header_class {
+        background-color: #e0e0e0;
+        padding: 4px 2px;
+    }
+
+    .drag_container_class {
+        display: block;
+        border: 0.1px solid grey;
+        width: 20%;
+        min-height: 440px;
+        float: right;
+        margin-right: 271px;
+    }
+
+    .preview-table-div {
+        float: left;
+        width: 47%;
+    }
+
+    .drag_container_class {
+    }
+
+    .drag_div {
+    }
+
+    .drag {
+        float: left;
+        display: block;
+        padding: 9px 5px;
+        /*width: 100%;*/
+    }
+
+    .drop {
+        width: 100px;
+        height: 20px;
+        display: block;
+        border: 0.1px solid grey;
+        float: left;
+    }
+
+    .frm-div {
+        /*! float: left; */
+    }
+
+    .row1 {
+        display: block;
+        /*! float: left; */
+        width: 100%;
+        padding: 2px;
+    }
+
+    .row1-label {
+        display: block;
+        float: left;
+        width: 250px;
+    }
+
+
+</style>

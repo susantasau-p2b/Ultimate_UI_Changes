@@ -1,0 +1,718 @@
+﻿@{
+    ViewBag.Title = "OrganizationHierarchy";
+}
+<script>
+    $(function () {
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8'];
+        ColNames = ['Id', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8'];
+        SortName = 'Id';
+        Caption = 'OrganizationHierarchy';
+        url = '@Url.Action("P2BGrid", "OrganizationHierarchy`")';
+        width = 1300;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#corporate-table').P2BTransactionTableAnimation();
+        $('#region-table').P2BTransactionTableAnimation();
+        $('#company-table').P2BTransactionTableAnimation();
+
+        $('#company1-table').P2BTransactionTableAnimation();
+        $('#company2-table').P2BTransactionTableAnimation();
+        $('#division-table').P2BTransactionTableAnimation();
+        $('#location-table').P2BTransactionTableAnimation();
+        $('#department-table').P2BTransactionTableAnimation();
+        $('#group-table').P2BTransactionTableAnimation();
+        $('#unit-table').P2BTransactionTableAnimation();
+
+        $('#job-table').P2BTransactionTableAnimation();
+        $('#jobposition-table').P2BTransactionTableAnimation();
+
+        $('#grade-table').P2BTransactionTableAnimation();
+        $('#jobstatus-table').P2BTransactionTableAnimation();
+        $('#level-table').P2BTransactionTableAnimation();
+
+        var dia = $('#Create_Dialog').dialog({
+            title: 'Object Mapping',
+            height: "500",
+            width: "1000",
+            buttons: {
+                Submit: function () {
+
+                    $.ajax({
+                        method: "post",
+                        url: '@Url.Action("Create","geostruct")',
+                        data: $('#frmgeostruct').serialize(),
+                        success: function (data) {
+                            alert(data[2]);
+                        }, error: function (data) {
+
+                        }
+                    });
+                },
+                Cancel: function () {
+                    $(dia).dialog('close');
+                }
+            }
+        });
+        $(dia).dialog('open');
+        //    $('#Create_Dialog').P2BCreateDialog();
+        //  $('#Create_Dialog').P2BCreateDialog('', '', '', '', , 'open', , '#frmgeostruct', 'Message :', 'Request Falied :', '#JqGrid', 500, 1000, '#BSCALEDETAILS_List', '', function (data) { });
+
+        $('#corporate-table').P2BTransactionTable('#corporate-search', '#case-corporate', '@Url.Action("Get_Corporate", "geostruct")', []);
+
+
+        $('#company1-table').P2BTransactionTable('#company1-search', '#case-company1', '@Url.Action("Get_company", "geostruct")', []);
+        $('#company2-table').P2BTransactionTable('#company2-search', '#case-company2', '@Url.Action("Get_company", "geostruct")', []);
+        $('#jobstatus-table').P2BTransactionTable('#jobstatus-search', '#case-jobstatus', '@Url.Action("Get_jobstatus", "geostruct")', []);
+
+        $('#Load-region').on("click", function (e) {
+            $('#region-table').find('td').remove();
+            var forwardata = $('#corporate-table').P2BGetTableDataonSelectedRow('#corporate-table', 1);
+            $('#region-table').P2BTransactionTable('#region-search', '#case-region', '@Url.Action("Get_region", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+        $('#Load-grade').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#company2-table');
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#grade-table').find('td').remove();
+            var forwardata = $('#company2-table').P2BGetTableDataonSelectedRow('#company2-table', 1);
+            $('#grade-table').P2BTransactionTable('#grade-search', '#case-grade', '@Url.Action("Get_grade", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        $('#Load-job').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#company1-table');
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#job-table').find('td').remove();
+            var forwardata = $('#company1-table').P2BGetTableDataonSelectedRow('#company1-table', 1);
+            $('#job-table').P2BTransactionTable('#job-search', '#case-job', '@Url.Action("Get_job", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        $('#Load-company').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#region-table');
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#company-table').find('td').remove();
+            var forwardata = $('#region-table').P2BGetTableDataonSelectedRow('#region-table', 1);
+            $('#company-table').P2BTransactionTable('#company-search', '#case-company', '@Url.Action("Get_company", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        var ajxUrlFun = function (url, data) {
+            return $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                cache: false,
+                data: JSON.stringify({ data: data })
+            });
+        };
+        $('#Load-division').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#company-table');
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#division-table').find('td').remove();
+            var forwardata = $('#company-table').P2BGetTableDataonSelectedRow('#company-table', 1);
+            ajxUrlFun("@Url.Action("Check_Division", "geostruct")", forwardata).done(function (data) {
+                // console.log(data);
+                if (data.toLowerCase() == "true") {
+                    $('#division-table').P2BTransactionTable('#division-search', '#case-division', '@Url.Action("Get_division", "geostruct")', forwardata);
+                } else {
+                    ajxUrlFun("@Url.Action("Check_Location", "geostruct")", forwardata).done(function (data) {
+                        //console.log(data);
+                        if (data.toLowerCase() == "true") {
+                            $('#location-table').P2BTransactionTable('#location-search', '#case-location', '@Url.Action("Get_location", "geostruct")', forwardata);
+                        }
+                    });
+                }
+            });
+            e.preventDefault();
+        });
+        $('#Load-location').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#division-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            }
+            //else if (a == 0) {
+            //    alert("select Atleast one record");
+            //    return false;
+            //}
+            $('#location-table').find('td').remove();
+            var forwardata = $('#division-table').P2BGetTableDataonSelectedRow('#division-table', 1);
+            $('#location-table').P2BTransactionTable('#location-search', '#case-location', '@Url.Action("Get_location", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        $('#Load-department').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#location-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#department-table').find('td').remove();
+            var forwardata = $('#location-table').P2BGetTableDataonSelectedRow('#location-table', 1);
+            $('#department-table').P2BTransactionTable('#department-search', '#case-department', '@Url.Action("Get_department", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        $('#Load-group').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#department-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#group-table').find('td').remove();
+            var forwardata = $('#department-table').P2BGetTableDataonSelectedRow('#department-table', 1);
+            $('#group-table').P2BTransactionTable('#group-search', '#case-group', '@Url.Action("Get_group", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+        $('#Load-unit').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#group-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#unit-table').find('td').remove();
+            var forwardata = $('#group-table').P2BGetTableDataonSelectedRow('#group-table', 1);
+            $('#unit-table').P2BTransactionTable('#unit-search', '#case-unit', '@Url.Action("Get_unit", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+
+        //
+        $('#Load-jobposition').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#job-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#jobpostion-table').find('td').remove();
+            var forwardata = $('#job-table').P2BGetTableDataonSelectedRow('#job-table', 1);
+            $('#jobposition-table').P2BTransactionTable('#jobposition-search', '#case-jobposition', '@Url.Action("Get_jobPosition", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+
+        $('#Load-level').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#grade-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#level-table').find('td').remove();
+            var forwardata = $('#grade-table').P2BGetTableDataonSelectedRow('#grade-table', 1);
+            $('#level-table').P2BTransactionTable('#level-search', '#case-level', '@Url.Action("Get_level", "geostruct")', forwardata);
+            e.preventDefault();
+        });
+
+        $('button').button();
+        $('div.transactiondiv>span.btn-span>button.transcation-lookup').on('click', function (e) {
+            var a = $(this).data('type');
+            $('.dialog').AddDataToTranscation('' + a + '-table', 'geostruct/GetLookup_' + a + '', 10, '' + a + '-lookup', 'LookupDiv', 'lookup', 'PageNavPosition');
+            e.preventDefault();
+        });
+
+        $('div.transactiondiv>span.btn-span>button.transcation-refresh').on('click', function (e) {
+            var a = $(this).data('type');
+            $('#' + a + '-table').find('td').remove();
+            $('#' + a + '-table').P2BTransactionTable('#' + a + '-search', '#case-' + a + '', 'geostruct/Get_' + a + '', []);
+            e.preventDefault();
+        });
+        $('div#functionalstruct_div,div#paystruct_div,div#geostruct_div').hide();
+        $('input[name="struct_type"]').on('change', function (e) {
+            var a = $(this).val();
+            console.log(a);
+            if (a == "geostruct") {
+                //  structtype.type = a;
+                $('div#geostruct_div').show();
+                $('div#functionalstruct_div,div#paystruct_div').hide();
+            }
+            if (a == "functionalstruct") {
+                //structtype.type = a;
+                $('div#functionalstruct_div').show();
+                $('div#paystruct_div,div#geostruct_div').hide();
+            }
+            if (a == "paystruct") {
+                //structtype.type = a;
+                $('div#paystruct_div').show();
+                $('div#functionalstruct_div,div#geostruct_div').hide();
+            }
+        });
+        var urls = {
+            geo: "@Url.Action("P2BGrid_Geo", "GeoStruct")",
+            pay: "@Url.Action("P2BGrid_Pay", "GeoStruct")",
+            fun: "@Url.Action("P2BGrid_Fun", "GeoStruct")",
+        };
+        $('[name="grid"]').on('change', function () {
+            var val = $(this).val();
+            console.log(val);
+            $('#JqGrid').setGridParam({ url: urls[val], postData: { filter: "" } }).trigger('reloadGrid');
+        });
+
+    });
+</script>
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv" id="Lookup"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <input type="radio" data-typeofbtn="delete" id="geo" value="geo" name="grid" /><label for="geo">GeoStruct</label>
+            <input type="radio" data-typeofbtn="Negative" id="pay" value="pay" name="grid" /><label for="pay">PayStruct</label>
+            <input type="radio" data-typeofbtn="Negative" id="fun" value="fun" name="grid" /><label for="fun">FunStruct</label>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2" style="z-index: 0"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmgeostruct", name = "frmgeostruct" }))
+    {
+        <div class="StrctSelectionClass">
+            <input type="radio" name="struct_type" id="geo_struct" value="geostruct" /><label for="geo_struct">Create GeoStruct</label>
+            <input type="radio" name="struct_type" id="fun_stuct" value="functionalstruct" /><label for="fun_stuct">Create FunctionalStruct</label>
+            <input type="radio" name="struct_type" id="pay_struct" value="paystruct" /><label for="pay_struct">Create PayStruct</label>
+        </div>
+        <div class="filter_row" id="geostruct_div">
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="corporate-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="corporate-table">
+                                    <tr><th><input type="checkbox" id="case-corporate" /></th><th>Corporate</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="corporate" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="corporate" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-region" class="loan-btn">Load Region</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="region-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="region-table">
+                                    <tr><th><input type="checkbox" id="case-region" /></th><th>Region</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="region" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="region" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-company" class="loan-btn">Load Comp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="company-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="company-table">
+                                    <tr><th><input type="checkbox" id="case-company" /></th><th>Company</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="company" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="company" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-division" class="loan-btn">Load Divi</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div id="" style="">
+                        <div class="Division">
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="division-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="division-table">
+                                    <tr><th><input type="checkbox" id="case-division" /></th><th>Division</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="division" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="division" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-location" class="loan-btn">Load Loction</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="location-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="location-table">
+                                    <tr><th><input type="checkbox" id="case-location" /></th><th>Location</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="location" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="location" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-department" class="loan-btn">Load Dept</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="department-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="department-table">
+                                    <tr><th><input type="checkbox" id="case-department" /></th><th>Department</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="department" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="department" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-group" class="loan-btn">Load Group</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="group-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="group-table">
+                        <tr><th><input type="checkbox" id="case-group" /></th><th>Group</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="group" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="group" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                        <button id="load-unit" data-type="group" class="loan-btn">Load Unit</button>
+                    </span>
+                </div>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="unit-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="unit-table">
+                        <tr><th><input type="checkbox" id="case-unit" /></th><th>Unit</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="unit" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="unit" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="filter_row" id="functionalstruct_div">
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="company1-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="company1-table">
+                                    <tr><th><input type="checkbox" id="case-company1" /></th><th>Company</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="company1" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="company1" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-job" class="loan-btn">Load job</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="job-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="job-table">
+                        <tr><th><input type="checkbox" id="case-job" /></th><th>job</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="job" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="job" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                        <button id="load-jobposition" class="loan-btn">LoadJobPos</button>
+                    </span>
+                </div>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="jobposition-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="jobposition-table">
+                        <tr><th><input type="checkbox" id="case-jobposition" /></th><th>jobposition</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="jobposition" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="jobposition" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="filter_row" id="paystruct_div">
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="company2-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="company2-table">
+                                    <tr><th><input type="checkbox" id="case-company2" /></th><th>Company</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="company2" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="company2" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                    <button id="load-grade" class="loan-btn">Load Grade</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="grade-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="grade-table">
+                        <tr><th><input type="checkbox" id="case-grade" /></th><th>grade</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="grade" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="grade" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                        <button id="load-level" class="loan-btn">Load Level</button>
+                    </span>
+                </div>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="level-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="level-table">
+                        <tr><th><input type="checkbox" id="case-level" /></th><th>level</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="level" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="level" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                    </span>
+                </div>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="jobstatus-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="jobstatus-table">
+                        <tr><th><input type="checkbox" id="case-jobstatus" /></th><th>jobstatus</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="jobstatus" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                        @*<button class="transcation_btn transcation-lookup" data-type="jobstatus" style="left: 15%;" id="">
+                                <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                            </button>*@
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .icon-row {
+        left: -33px;
+        position: relative;
+        top: -147px;
+    }
+
+    .row1 {
+        width: 190px;
+        display: block;
+        margin: 1px 1px 6px 6px;
+        float: left;
+    }
+
+    .row2 {
+        float: left;
+    }
+
+    .filter_row {
+        padding-top: 60px;
+    }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .transcation_btn {
+        width: 21px;
+        height: 21px;
+    }
+
+    .StrctSelectionClass {
+        float: left;
+    }
+
+    .grid_colllpase_height {
+        height: 43px;
+    }
+</style>

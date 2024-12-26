@@ -1,0 +1,1033 @@
+﻿@{
+    ViewBag.Title = "Training Schedule";
+}
+@model Training.TrainingSchedule
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var btndisablenames = "#Edit_Venue_TrnSchedule,#Remove_Venue_TrnSchedule,#Edit_Session_TrnSchedule,#Remove_Session_TrnSchedule,#Edit_Expenses_TrnSchedule,#Remove_Expenses_TrnSchedule";
+        ColModel = ['Id', 'City'];
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "TrainingSchedule")",
+            htmurl: "@Url.Action("partial", "TrainingSchedule")",
+            columnname: ["Details", "StartDate", "EndDate", "Venue", "Id"],
+            childheader: ["Details", "ProgramList", "Id"],
+            childurl: "@Url.Action("Get_Session", "TrainingSchedule")",
+            tableheader: "Training Schedule",
+            childurlColumnNo: "5"
+        });
+
+
+        $('#Load').on('click', function (e) {
+            $('#MyTable').DataTable().ajax.url('./TrainingSchedule/Emp_Grid?y=' + $('#Financial_id').val()).load();
+
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frmSubCategoryP",
+                    htmlurl: "@Url.Action("GridPartial", "SubCategory")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "SubCategory")",
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data[0], function (i, k) {
+                            $('#Code').val(k.Code);
+                            $('#Code').attr('readonly', 'readonly');
+                            $('#Details').val(k.Details);
+
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                        });
+
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 500,
+                    width: 600,
+                    form: "#frmSubCategoryP",
+                    htmlurl: "@Url.Action("Partial", "SubCategory")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "SubCategory")",
+                    submiturl: "@Url.Action("EditSave", "SubCategory")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        console.log("dnfkjsndf");
+                        console.log(data);
+                        console.log("dnfkjsndf");
+                        console.log(data.data);
+                        $.each(data[0], function (i, k) {
+                            $('#Code').val(k.Code);
+                            $('#Code').attr('readonly', 'readonly');
+                            $('#Details').val(k.Details);
+
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                return false;
+                //   return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete", "SubCategory")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        //Create Function
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            if (!$("#txtPayMonth1").val()) {
+
+                alert("Please Select Training Year.")
+                return false;
+            }
+            $('#frmTrainingSchedule').trigger("reset");
+            //$('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training Schedule', 'open', '@Url.Action("Create")', '#frmTrainingSchedule', 'Message :', 'Request Falied :', '#JqGrid', 650, 600, '#SessionListSch,#VenueList,#ExpensesList', btndisablenames, function (data) { datatablename: "#MyTable" });
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training Schedule', 'open', '@Url.Action("Create")', '#frmTrainingSchedule', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', "", function (data) { }, { datatablename: "#MyTable" });
+            @*$('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", "");*@
+            $('#traincal').show();
+            $('#txtprogassign').addClass('must');
+            $('#dispcalender').attr('readonly', true);
+            $('#Lookup_progassign').attr('disabled', false);
+
+            $.get("@Url.Action("getCalendar", "TrainingAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+
+                $('#dispcalender_id').val(data.Id);
+                console.log(data);
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            //$('#frmTrainingSchedule').trigger('reset');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Training Schedule", '#frmTrainingSchedule', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 550, '#ExpensesList,#VenueList,#SessionListSch,#TrainingMaterialList,#TrainingEmployeeSourceList', btndisablenames, function (data) {
+
+                $('#dispcalender').attr('readonly', true);
+
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Id);
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", k.City_Id);
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "State")", "", k.State_Id);
+                    $('#TrainingBatchCode').val(k.TrainingBatchCode);
+                    $('#TrainingBatchName').val(k.TrainingBatchName);
+                    $('[name="IsBatchClose"]').val([k.IsBatchClose]).button().button("refresh");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ExpensesList').P2BLookUpEncapsulate('#ExpensesList', 'ExpensesList', k.Expenses_Id, k.Expenses_FullName, 'ExpensesList', '#LookUp_Expenses_TrnSchedule,#Create_Expenses_TrnSchedule', 'N');
+                    $('#VenueList').P2BLookUpEncapsulate('#VenueList', 'VenueList', k.Venue_Id, k.Venue_FullName, 'VenueList', '#LookUp_Venue_TrnSchedule,#Create_Venue_TrnSchedule', 'N');
+                });
+
+                $.each(data[6], function (i, k) {
+                    console.log(k);
+                    $('#SessionListSch').P2BLookUpEncapsulate('#SessionListSch', 'SessionListSch', k.sessionDtl_Id, k.SessionDtl_val, 'SessionListSch', '#LookUp_Session_TrnSchedule,#Create_Session_TrnSchedule', 'A');
+                    $('#TrainingMaterialList').P2BLookUpEncapsulate('#TrainingMaterialList', 'TrainingMaterialList', k.TrMaterial_Id, k.TrMaterial_val, 'TrainingMaterialList', '#LookUp_TrainingMaterial_TrnSchedule,#Create_TrainingMaterial_TrnSchedule', 'A');
+                    $('#TrainingEmployeeSourceList').P2BLookUpEncapsulate('#TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', k.EmpSourceAssign_Id, k.EmpSourceAssign_val, 'TrainingEmployeeSourceList', '#LookUp_EmpAssignSource_TrnSchedule,#Create_EmpAssignSource_TrnSchedule', 'A');
+                });
+                var s = data[2];
+                $('#txtprogassign').val(s.YearlyProgramAssignment_fullD);
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            }, { datatablename: "#MyTable" });
+        });
+
+        $('#View').button().click(function (event) {
+            //$('#frmTrainingSchedule').trigger('reset');
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            @*$.get("@Url.Action("getCalendar", "TrainingAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+
+                $('#dispcalender_id').val(data.Id);
+                console.log(data);
+            });*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Training Schedule', '#ExpensesList,#VenueList,#SessionListSch,#TrainingMaterialList,#TrainingEmployeeSourceList', btndisablenames, 600, 550, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Id);
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", k.City_Id);
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "State")", "", k.State_Id);
+                    $('#TrainingBatchCode').val(k.TrainingBatchCode);
+                    $('#TrainingBatchName').val(k.TrainingBatchName);
+                    $('[name="IsBatchClose"]').val([k.IsBatchClose]).button().button("refresh");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ExpensesList').P2BLookUpEncapsulate('#ExpensesList', 'ExpensesList', k.Expenses_Id, k.Expenses_FullName, 'ExpensesList', 'view', 'N');
+                    $('#VenueList').P2BLookUpEncapsulate('#VenueList', 'VenueList', k.Venue_Id, k.Venue_FullName, 'VenueList', 'view', 'N');
+
+                });
+
+                $.each(data[6], function (i, k) {
+                    console.log(k);
+                    $('#SessionListSch').P2BLookUpEncapsulate('#SessionListSch', 'SessionListSch', k.sessionDtl_Id, k.SessionDtl_val, 'SessionListSch', 'view', 'A');
+                    $('#TrainingMaterialList').P2BLookUpEncapsulate('#TrainingMaterialList', 'TrainingMaterialList', k.TrMaterial_Id, k.TrMaterial_val, 'TrainingMaterialList', 'view', 'A');
+                    $('#TrainingEmployeeSourceList').P2BLookUpEncapsulate('#TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', k.EmpSourceAssign_Id, k.EmpSourceAssign_val, 'TrainingEmployeeSourceList', 'view', 'A');
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#SessionListSch').oldDropval(data[2].Session_Val);
+                    $('#VenueList').oldLookupVal(data[2].Venue_Val);
+                    $('#CityList').oldLookupVal(data[2].City_Val);
+                    $('#StateList').oldLookupVal(data[2].City_Val);
+                    $('#ExpensesList').oldLookupVal(data[2].Expenses_Val);
+                    @*$.each(data[2], function (i, k) {
+                        // $('#Code').Oldval(k.Code);
+                        alert(k.Name)
+                        $('#Name').oldVal(k.Name);
+                        $('#Categorylist').oldDropval(k.BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(k.Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(k.Contact_Val);
+                        //$('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                    });*@
+                }
+                //}, 2000);
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+
+            event.preventDefault();
+        });
+
+        //main page end
+
+        $('#LookUp_TrainingCalendar_TrnSchedule').on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsTrainingCalendar", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#TrainingCalendarList', 'TrainingCalendarList', 5, 'TrainingCalendarList', '#frmTrainingSchedule', 'A', '#LookUp_TrainingCalendar_OrgTraining,#Create_TrainingCalendar_OrgTraining', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        //to select menu
+        $('#CityList').on("selectmenuopen", function () {
+            $('#CityList').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+            $.post("@Url.Action("PopulateDropDownList","City")", {
+                data: "",
+                data2: ""
+            }, function (data) {
+                $.each(data, function (i, k) {
+                    $('#CityList').append($("<option>", {
+                        value: k.Value,
+                        text: k.Text,
+                        selcted: k.Selected
+                    }));
+                });
+                jQuery('#CityList').selectmenu('refresh').selectmenu("menuWidget").css({ "height": "120px" });
+            });
+        });
+        $('#StateList').on("selectmenuopen", function () {
+            $('#StateList').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+            $.post("@Url.Action("PopulateDropDownList","State")", {
+                data: "",
+                data2: ""
+            }, function (data) {
+                $.each(data, function (i, k) {
+                    $('#StateList').append($("<option>", {
+                        value: k.Value,
+                        text: k.Text,
+                        selcted: k.Selected
+                    }));
+                });
+                jQuery('#StateList').selectmenu('refresh').selectmenu("menuWidget").css({ "height": "120px" });
+            });
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //to create city
+        $('#create_city').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "City")', 'Create City', 'open', '@Url.Action("Createfortrainng", "City")', '#frmCity', 'Message :', 'Request Falied :', '#JqGrid', 217, 339, 1010, 'controller', 'change', '', '', function (data) {
+                $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", data[0]);
+            });
+            e.preventDefault();
+        });
+        //to create city
+        $('#create_State').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "State")', 'Create State', 'open', '@Url.Action("CreateforTraningState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 217, 339, 1010, 'controller', 'change', '', '', function (data) {
+                $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "State")", "", data[0]);
+            });
+            e.preventDefault();
+        });
+
+        //create edit delete for partial session page
+
+        $('#LookUp_Session_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsSession", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#SessionListSch', 'SessionListSch', 5, 'SessionListSch', '#frmTrainingSchedule', 'A', '#Edit_Session_TrnSchedule,#Remove_Session_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+
+            event.preventDefault();
+        });
+
+        $('#Create_Session_TrnSchedule').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_Session", "TrainingSession")', 'Create Session Details', 'open', '@Url.Action("Create", "TrainingSession")', '#frmTrainingSession', 'Message :', 'Request Failed :', '#JqGrid', 600, 600, '', '', '', '#frmTrainingSchedule', '', function (data) {
+                $('#SessionDate').attr('readonly', true);
+                $('#StartTime').attr('readonly', true);
+                $('#EndTime').attr('readonly', true);
+                $('#SessionListSch').P2BLookUpEncapsulate('#SessionListSch', 'SessionListSch', data[0], data[1], 'SessionListSch', '#Edit-ContactDetails-Disease,#Remove-ContactDetails-Disease', 'N');
+                $('#Categorylist1').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, "");
+            });
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_Session_TrnSchedule').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TrainingSession")', 'Create Session Details', 'open', '@Url.Action("Create", "TrainingSession")', '#frmTrainingSession', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '', function (data) {
+                // to show data which is created in partial page
+                $('#SessionDate').attr('readonly', true);
+                $('#StartTime').attr('readonly', true);
+                $('#EndTime').attr('readonly', true);
+                $('#SessionListSch').P2BLookUpEncapsulate('#SessionListSch', 'SessionListSch', data[0], data[1], 'SessionListSch', '#Edit-ContactDetails-Disease,#Remove-ContactDetails-Disease', 'N');
+            });
+            event.preventDefault();
+        });*@
+
+
+        $('#Edit_Session_TrnSchedule').button().on("click", function (event) {
+            $('#frmTrainingSession').trigger('reset');
+            var a = [], b;
+            a = $('#SessionListSch').P2BGetTableDataonSelectedRow('#SessionListSch', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TrainingSession")', '@Url.Action("Edit", "TrainingSession")', b, '@Url.Action("EditSave", "TrainingSession")', 'Edit Training Session Details', '#frmTrainingSession', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingSchedule', '#SessionListSch', 'SessionListSch', 'SessionListSch', 'A', '#Remove-FacultySpecializationNo-ContDetails,#Edit-FacultySpecializationNo-ContDetails', function (data) {
+                $('#SessionDate').attr('readonly', true);
+                $('#StartTime').attr('readonly', true);
+                $('#EndTime').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+                    $('#SessionDate').val(k.SessionDate);
+                    if (k.SessionDate != null) {
+                        $('#SessionDate').val(DateConvert(k.SessionDate));
+                    }
+                    $('#StartTime').val(k.StartTime);
+                    $('#EndTime').val(k.EndTime);
+                    $('#TotalHours').val(k.TotalHours);
+
+                    $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1055, k.SessionType_Id)
+                });
+                $.each(data[1], function (i, k) {
+                    $('#Faculty_List').P2BLookUpEncapsulate('#Faculty_List', 'Faculty_List', k.Faculty_Id, k.Faculty_Details, 'Faculty_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_Session_TrnSchedule').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#SessionListSch').P2BGetTableDataonSelectedRow('#SessionListSch', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#SessionListSch').P2BGetTableDataonSelectedRow('#SessionListSch', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SessionListSch', $('#SessionListSch').val(), 200, 200, '#frmTrainingSchedule', '#SessionListSch', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+        // end of session page
+
+        //create edit delete for partial expenses page
+        $('#LookUp_Expenses_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsExpenses", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#ExpensesList', 'ExpensesList', 5, 'ExpensesList', '#frmTrainingSchedule', 'N', '#Edit_Expenses_TrnSchedule,#Remove_Expenses_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create_Expenses_TrnSchedule').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TrainingExpenses")', 'Create Expenses', 'open', '@Url.Action("Create", "TrainingExpenses")', '#frmTrainingExpenses', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '#Edit_Expenses_TrnSchedule,#Remove_Expenses_TrnSchedule', function (data) {
+
+                $('#ExpensesList').P2BLookUpEncapsulate('#ExpensesList', 'ExpensesList', data[0], data[1], 'ExpensesList', '#Edit_Expenses_TrnSchedule,#Remove_Expenses_TrnSchedule', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit_Expenses_TrnSchedule').button().on("click", function (event) {
+            //$('#TotalFees').val(sum)
+            var a = [], b;
+            a = $('#ExpensesList').P2BGetTableDataonSelectedRow('#ExpensesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TrainingExpenses")', '@Url.Action("Edit", "TrainingExpenses")', b, '@Url.Action("EditSave", "TrainingExpenses")', 'Edit Training Session Details', '#frmTrainingExpenses', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingSchedule', '#ExpensesList', 'ExpensesList', 'ExpensesList', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+
+
+                     $('#FoodFees').val(k.FoodFees);
+                   
+
+                    $('#MiscFees').val(k.MiscFees);
+                   
+                    // $('#MiscFees').attr('readonly', 'readonly');
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').val(k.StayFees);
+                    $('#TrainingFees').val(k.TrainingFees);
+                    $('#TravelFees').val(k.TravelFees);
+                    var a = (k.FoodFees);
+                    var b = (k.MiscFees);
+                    var e = (k.StayFees);
+                    var c = (k.TrainingFees);
+                    var d = (k.TravelFees);
+
+                    var foodfees = parseInt(a) || 0;
+                    var miscfees = parseInt(b) || 0;
+                    var stayfees = parseInt(e) || 0;
+                    var trainingfees = parseInt(c) || 0;
+                    var travalfees = parseInt(d) || 0;
+                    var sum = foodfees + miscfees + stayfees + trainingfees + travalfees;
+                    $('#TotalFees').val(sum)   //.toFixed(2)
+                   
+
+
+                });
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_Expenses_TrnSchedule').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ExpensesList').P2BGetTableDataonSelectedRow('#ExpensesList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ExpensesList').P2BGetTableDataonSelectedRow('#ExpensesList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExpensesList', $('#ExpensesList').val(), 200, 200, '#frmTrainingSchedule', '#ExpensesList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+        // end of expenses page
+
+        //create edit delete for partial venue page
+
+        $('#LookUp_Venue_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsVenue", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#VenueList', 'VenueList', 5, 'VenueList', '#frmTrainingSchedule', 'N', '#Edit_Venue_TrnSchedule,#Remove_Venue_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create_Venue_TrnSchedule').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partialEmpSource", "TrainingSchedule")', 'Create Venue', 'open', '@Url.Action("Create", "Venue")', '#frmVenue', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#VenueList').P2BLookUpEncapsulate('#VenueList', 'VenueList', data[0], data[1], 'VenueList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit_Venue_TrnSchedule').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#VenueList').P2BGetTableDataonSelectedRow('#VenueList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partialEmpSource", "TrainingSchedule")', '@Url.Action("Edit", "Venue")', b, '@Url.Action("EditSave", "Venue")', 'Edit Venue Details', '#frmVenue', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingSchedule', '#VenueList', 'VenueList', 'VenueList', 'N', '#Remove-FacultySpecializationNo-ContDetails,#Edit-FacultySpecializationNo-ContDetails', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmTrainingSession').trigger('reset');
+
+
+                    $('#Name').val(k.Name);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('#Fees').val(k.Fees);
+                    $('#Narration').val(k.Narration);
+                    $('#VenuTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1054, k.VenuType_Id)
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.ContactDetails_Id, k.ContactDetails_FullDetails, 'ContactDetailsList', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_Venue_TrnSchedule').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#VenueList').P2BGetTableDataonSelectedRow('#VenueList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#VenueList').P2BGetTableDataonSelectedRow('#VenueList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#VenueList', $('#VenueList').val(), 200, 200, '#frmTrainingSchedule', '#VenueList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+
+        // end of venue page
+
+        //create edit delete for partial training material page
+
+        $('#LookUp_TrainingMaterial_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsTrainingMaterial", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#TrainingMaterialList', 'TrainingMaterialList', 5, 'TrainingMaterialList', '#frmTrainingSchedule', 'N', '#Edit_TrainingMaterialList_TrnSchedule,#Remove_TrainingMaterialList_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create_TrainingMaterial_TrnSchedule').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TrainingMaterial")', 'Create TrainingMaterial', 'open', '@Url.Action("Create", "TrainingMaterial")', '#frmTrainingMaterial', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#TrainingMaterialList').P2BLookUpEncapsulate('#TrainingMaterialList', 'TrainingMaterialList', data[0], data[1], 'TrainingMaterialList', '', 'N');
+            });*@
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "TrainingMaterial")",
+                submiturl: "@Url.Action("Create", "TrainingMaterial")",
+                form: '#frmTrainingMaterial',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#TrainingMaterialList').P2BLookUpEncapsulate('#TrainingMaterialList', 'TrainingMaterialList', data.Id, data.Val, 'TrainingMaterialList', '', 'N');
+                },
+            });
+            event.preventDefault();
+
+        });
+
+        $('#Edit_TrainingMaterial_TrnSchedule').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TrainingMaterialList').P2BGetTableDataonSelectedRow('#TrainingMaterialList', 0);
+            b = a[0];
+            @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TrainingMaterial")', '@Url.Action("Edit", "TrainingMaterial")', b, '@Url.Action("EditSave", "TrainingMaterial")', 'Edit Details', '#frmTrainingMaterial', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingSchedule', '#TrainingMaterialList', 'TrainingMaterialList', 'TrainingMaterialList', 'N', '#Edit_TrainingMaterial_TrnSchedule,#Remove_TrainingMaterial_TrnSchedule', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#TrainingMaterialList').trigger('reset');
+                    $('#FileName').val(k.FileName);
+                    $('#MaterialFilePath').val(k.MaterialFilePath);
+                });
+
+            });
+            event.preventDefault();*@
+
+            $.post("@Url.Action("CheckUploadFile", "TrainingMaterial")?Id=" + b, function (data) {
+
+                ////debugger;
+                if (data.success == false) {
+
+                    alert("File Not Found");
+                    return false;
+                } else if (data.fileextension == ".pdf") {
+                    window.location = "@Url.Action("GetCompImage", "TrainingMaterial")?data=" + b;
+                }
+                else {
+                    $('<div></div>').PartialCreateDialog({
+                        height: '500',
+                        width: '500',
+                        form: "#FormImageViewer",
+                        title: "Image Viewer",
+                        htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GetCompImage", "TrainingMaterial")",
+                        editdata: b,
+                        forwarddata: b,
+                        returndatafunction: function (data) {
+                            ////debugger;
+                            console.log(data);
+
+                            if (data != null) {
+                                $("#Dashboard-Investment-Viewer").attr('src', "data:image/png;base64," + data + "");
+                            } else {
+                                alert("First Upload the File");
+                            }
+                        }
+                    });
+                }
+            });
+
+            event.preventDefault();
+        });
+
+
+        $('#Remove_TrainingMaterial_TrnSchedule').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#TrainingMaterialList').P2BGetTableDataonSelectedRow('#TrainingMaterialList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TrainingMaterialList').P2BGetTableDataonSelectedRow('#TrainingMaterialList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingMaterialList', $('#TrainingMaterialList').val(), 200, 200, '#frmTrainingSchedule', '#TrainingMaterialList', '#Edit_TrainingMaterial_TrnSchedule,#Remove_TrainingMaterial_TrnSchedule');
+            event.preventDefault();
+        });
+
+        // end of training material page
+
+        //create edit delete for partial training employee source page
+        $('#LookUp_EmpAssignSource_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmpAssignSource", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#EmpAssignSource', 'EmpAssignSource', 5, 'EmpAssignSource', '#frmTrainingSchedule', 'N', '#Edit_Venue_TrnSchedule,#Remove_Venue_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // end of  training employee source page
+
+
+        $('#Create_EmpAssignSource_TrnSchedule').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partialEmpSource", "TrainingSchedule")', 'Create EmpAssignSource', 'open', '@Url.Action("Create", "EmpAssignSource")', '#frmEmpAssignSource', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#VenueList').P2BLookUpEncapsulate('#VenueList', 'VenueList', data[0], data[1], 'VenueList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        //training emp source
+
+        $('#LookUp_TrainingEmployeeSource_TrnSchedule').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsTrainingEmployeeSource", "TrainingSchedule")', '', 'LookupDiv', 'Look Up Data', '#TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', 5, 'TrainingEmployeeSourceList', '#frmTrainingSchedule', 'A', '#Edit_TrainingEmployeeSource_TrnSchedule,#Remove_TrainingEmployeeSource_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_TrainingEmployeeSource_TrnSchedule').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partialE", "TrainingSchedule")', 'Create TrainingEmployeeSource', 'open', '@Url.Action("CreateTrainingEmployeeSource", "TrainingSchedule")', '#frmTrainingEmployeeSource', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTrainingSchedule', '#Edit_TrainingEmployeeSource_TrnSchedule,#Remove_TrainingEmployeeSource_TrnSchedule', function (data) {
+                $('#TrainingEmployeeSourceList').P2BLookUpEncapsulate('#TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', data[0], data[1], 'TrainingEmployeeSourceList', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit_TrainingEmployeeSource_TrnSchedule').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TrainingEmployeeSourceList').P2BGetTableDataonSelectedRow('#TrainingEmployeeSourceList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partialE", "TrainingSchedule")', '@Url.Action("EditTrainingEmployeeSource", "TrainingSchedule")', b, '@Url.Action("EditSave", "Venue")', 'Edit Details', '#frmTrainingEmployeeSource', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingSchedule', '#TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', 'TrainingEmployeeSourceList', 'A', '#Edit_TrainingEmployeeSource_TrnSchedule,#Remove_TrainingEmployeeSource_TrnSchedule', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmTrainingEmployeeSource').trigger('reset');
+
+                    $('#TrainingEmployeeSourceList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1054, k.VenuType_Id)
+                });
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_TrainingEmployeeSource_TrnSchedule').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+            //var a = [], b;
+            //a = $('#TrainingEmployeeSourceList').P2BGetTableDataonSelectedRow('#TrainingEmployeeSourceList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TrainingEmployeeSourceList').P2BGetTableDataonSelectedRow('#TrainingEmployeeSourceList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingEmployeeSourceList', $('#TrainingEmployeeSourceList').val(), 200, 200, '#frmTrainingSchedule', '#TrainingEmployeeSourceList', '#Edit_TrainingEmployeeSource_TrnSchedule,#Remove_TrainingEmployeeSource_TrnSchedule');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth1",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarLKDetails", "TrainingSchedule")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+
+        $('#TrainingBatchCode').keyup(function () {
+            $(this).val($(this).val().toString().replace(/\,/g, ''));//comma discard for reporting purpose
+        })
+
+        $('#TrainingBatchName').keyup(function () {
+            $(this).val($(this).val().toString().replace(/\,/g, ''));//comma discard for reporting purpose
+        })
+
+        $('#edit_model_dialog').P2BGridDialog();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+
+</script>
+
+<html>
+<head>
+    <title></title>
+    @* <link href="~/Content/Unit/Unit.css" rel="stylesheet" />*@
+    @*<link href="~/Content/TrainingSchedule/TrainingSchedule.css" rel="stylesheet" />
+        <link href="~/Content/popup_form.css" rel="stylesheet" />*@
+    <style>
+        .add_icon-row {
+            position: relative;
+            left: -73px;
+            top: -46px;
+        }
+
+        .ui-selectmenu-text {
+            color: black;
+        }
+
+        .add_popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 109px;
+        }
+
+        .add_popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 300px;
+        }
+
+        .add_row {
+            width: 448px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 28px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 70px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 435px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        #Lookup_progassign {
+            left: 387px;
+            top: 9px;
+        }
+
+        .rown {
+            width: 512.4px;
+            height: 49px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        #Lookup_FinancialYear_Calendar {
+            left: 280px;
+            top: 20px;
+        }
+
+        #Lookup_FinancialYear_Calendar1 {
+            left: 66%;
+            top: 7%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left;width:30%">
+                    <label id="lblPayMonth" class="popup-content-label must">Training Year:</label>
+                    <input name="txtPayMonth1" type="text" id="txtPayMonth1" class="date-picker" style="width:45%" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup Training Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                @*<th>Code</th>*@
+                                <th>Details</th>
+                                <th>StartDate</th>
+                                <th>EndDate</th>
+                                <th>Venue</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                @*<th>Code</th>*@
+                                <th>Details</th>
+                                <th>StartDate</th>
+                                <th>EndDate</th>
+                                <th>Venue</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create TrainingSchedule">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingSchedule", name = "frmTrainingScheduleEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+            @*<div class="rown content_margine">*@
+
+
+            @*<label class="popup-content-label">Yearly Program Assignment</label>
+                <input type="text" hidden id="dispcalender_id" name="FinancialYearList" />
+                <input type="text" readonly id="dispcalender" name="" style="width:350px" />*@
+
+            <div style="float: left; width: 440px;" id="traincal">
+
+                <span>@Html.LabelFor(m => m.TrainingBatchCode, "BatchCode :", new { @class = "add_popup-content-label must" })@Html.TextBoxFor(m => m.TrainingBatchCode, new { @class = "popup-content-textbox must" })</span>
+
+            </div>
+            <div style="float: left; width: 440px;" id="traincal">
+
+                <span>@Html.LabelFor(m => m.TrainingBatchName, "BatchName :", new { @class = "add_popup-content-label must" })@Html.TextBoxFor(m => m.TrainingBatchName, new { @class = "popup-content-textbox must" })</span>
+
+            </div>
+            @*</div>*@
+                // state
+            <div class="add_row content_margine">
+                @Html.LabelFor(m => m.State, "State :", new { @class = "add_popup-content-label" })
+                <select id="StateList" name="StateList" class="drop" style="width:161px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row ">
+                    <button data-p2btooltip="Create State" class="popup-content-icon-create" id="create_State">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+
+            
+
+            <div class="add_row content_margine">
+                @Html.LabelFor(m => m.City, "City :", new { @class = "add_popup-content-label" })
+                <select id="CityList" name="CityList" class="drop" style="width:161px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row ">
+                    <button data-p2btooltip="Create City" class="popup-content-icon-create" id="create_city">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+        
+
+
+
+            <div class="row1 content_margine">
+                <div id="SessionList_old"></div>
+                @Html.LabelFor(m => m.TrainingSession, "Session :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="SessionListSch">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Session" class="popup-content-icon-lookup" id="LookUp_Session_TrnSchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Session" class="popup-content-icon-create" id="Create_Session_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Sessions" class="popup-content-icon-edit" id="Edit_Session_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Session" class="popup-content-icon-remove" id="Remove_Session_TrnSchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">
+                <div id="ExpensesList_old"></div>
+                @Html.LabelFor(m => m.Expenses, "Expenses :", new { @class = "popup-content-label" })
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ExpensesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Expenses" class="popup-content-icon-lookup" id="LookUp_Expenses_TrnSchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Expenses" class="popup-content-icon-create" id="Create_Expenses_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Expenses" class="popup-content-icon-edit" id="Edit_Expenses_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Expenses" class="popup-content-icon-remove" id="Remove_Expenses_TrnSchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+
+
+
+            <div class="row1 content_margine">
+                <div id="VenueList_old"></div>
+                @Html.LabelFor(m => m.Venue, "Venue :", new { @class = "popup-content-label must" })
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="VenueList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp VenueList" class="popup-content-icon-lookup" id="LookUp_Venue_TrnSchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create VenueList" class="popup-content-icon-create" id="Create_Venue_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit VenueList" class="popup-content-icon-edit" id="Edit_Venue_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove VenueList" class="popup-content-icon-remove" id="Remove_Venue_TrnSchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">
+                <div id="TrainingMaterialList_old"></div>
+                @Html.LabelFor(m => m.TrainingMaterial, "Training Material :", new { @class = "popup-content-label" })
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="TrainingMaterialList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp TrainingMateria" class="popup-content-icon-lookup" id="LookUp_TrainingMaterial_TrnSchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create TrainingMaterial" class="popup-content-icon-create" id="Create_TrainingMaterial_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit TrainingMaterial" class="popup-content-icon-edit" id="Edit_TrainingMaterial_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove TrainingMaterial" class="popup-content-icon-remove" id="Remove_TrainingMaterial_TrnSchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">
+                <div id="TrainingEmployeeSource_old"></div>
+                @*@Html.LabelFor(m => m.EmpAssigPara, "Emp Assign Parameter :", new { @class = "popup-content-label" })*@
+                <label class="popup-content-label must">Training Request Parameter :</label>
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="TrainingEmployeeSourceList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp TrainingEmployeeSource" class="popup-content-icon-lookup" id="LookUp_TrainingEmployeeSource_TrnSchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create TrainingEmployeeSource" class="popup-content-icon-create" id="Create_TrainingEmployeeSource_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit TrainingEmployeeSource" class="popup-content-icon-edit" id="Edit_TrainingEmployeeSource_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove TrainingEmployeeSource" class="popup-content-icon-remove" id="Remove_TrainingEmployeeSource_TrnSchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div style="float: left; width: 480px;" id="trainBatchClose">
+
+                <label class="popup-content-label">BatchClose:</label>
+                <span class="popup_radio_button radiopush">
+                    <span><input type="radio" id="radio5" name="IsBatchClose" value="true" /> <label for="radio5">Yes</label></span>
+                    <span><input type="radio" id="radio6" name="IsBatchClose" value="false" checked="checked" /> <label for="radio6">No</label></span>
+                </span>
+
+            </div>
+
+
+        }
+    </div>
+</body>
+</html>

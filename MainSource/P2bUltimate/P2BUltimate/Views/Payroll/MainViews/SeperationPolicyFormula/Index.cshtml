@@ -1,0 +1,820 @@
+﻿@{
+    ViewBag.Title = "SeperationPolicyFormula";
+}
+@model EMS.SeperationPolicyFormula
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        $('#PolicyName').ForceOnlyAlphaNumeric();
+        $('#PolicyName').MaxLength(10);
+        $('#EncashSpanYear').ForceOnlyNumeric(),
+        $('#FromServ').ForceOnlyNumeric(),
+        $('#ToServ').ForceOnlyNumeric(),
+        $('#MinBalance').ForceOnlyNumeric(),
+        $('#MinEncashment').ForceOnlyNumeric(),
+        $('#MinUtilized').ForceOnlyNumeric()
+    });
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#OpeningDate').P2BDatePicker();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name'];
+        ColNames = ['Id', 'Name'];
+        SortName = 'Id';
+        Caption = 'Seperation Policy Formula';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Formula_Grid", "SeperationPolicyFormula")",
+            editurl: "@Url.Action("EditGridDetails", "SeperationPolicyFormula")",
+            htmurl: "@Url.Action("partial", "SeperationPolicyFormula")",
+            submiturl: "@Url.Action("GridEditSave", "SeperationPolicyFormula")",
+            //columnname: ["Id", "Name", "CeilingMin", "CeilingMax", "DependRule"],
+            columnname: ["Name", "Id"],
+            childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+            childurl: "@Url.Action("Get_FormulaStructDetails", "SeperationPolicyFormula")",
+            tableheader: "Seperation Policy Formula",
+            childurlColumnNo: "2"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            // console.log($(init).parents('tr:eq(0)'));
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //var element = $(init).parents('tr:eq(0)');
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            //   console.log(element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "Edit",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                console.log(id);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwardata: id,
+                submitfun: function (data) {
+                    var row = dt.row(parent_element);
+                    if (row.child.isShown()) {
+                        parent_element.removeClass('details');
+                        row.child.hide();
+                    }
+                }
+            });
+        }
+    };
+
+
+
+
+
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('input:checkbox').removeAttr('checked');
+            $('tr').removeClass('selectedtr');
+            $('#frmSeperationPolicyFormula').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Seperation Policy Formula', 'open', '@Url.Action("Create")', '#frmSeperationPolicyFormula', 'Message :', 'Request Falied :', '#JqGrid', 550, 750, '', "", function (data) { }, { datatablename: "#MyTable" });
+
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Seperation Policy Formula Data", '#frmSeperationPolicyFormula', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#WagesList', '#Edit-Wages-SalHeadFormula', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcess_ProcessPolicy1').prop('checked', 'checked');
+                    $('#ExitProcessCheckListPolicy1,#ExitProcessConfigPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcess_ProcessPolicyList').P2BLookUpEncapsulate('#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', k.ExitProcess_ProcessPolicy_Id, k.ExitProcess_ProcessPolicy_Fulldetails, 'ExitProcess_ProcessPolicyList', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', 'A');
+                    });
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcessCheckListPolicy1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessConfigPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcessCheckListPolicyList').P2BLookUpEncapsulate('#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', k.ExitProcessCheckListPolicy_Id, k.ExitProcessCheckListPolicy_Fulldetails, 'ExitProcessCheckListPolicyList', '#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', 'A');
+                    });
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcessConfigPolicy1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessCheckListPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcessConfigPolicyList').P2BLookUpEncapsulate('#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', k.ExitProcessConfigPolicy_Id, k.ExitProcessConfigPolicy_Fulldetails, 'ExitProcessConfigPolicyList', '#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', 'A');
+                    });
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#NoticePeriodObject1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessCheckListPolicy1,#ExitProcessConfigPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#NoticePeriodId').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#NoticePeriodObjectList').P2BLookUpEncapsulate('#NoticePeriodObjectList', 'NoticePeriodObjectList', k.NoticePeriodObjectPolicy_Id, k.NoticePeriodObjectPolicy_Fulldetails, 'NoticePeriodObjectList', '#Remove-NoticePeriodObject-SeperationPolicyFormula', 'A');
+                    });
+                }
+
+
+
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Seperation Policy Formula Data', '#ExitProcess_ProcessPolicyList', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+
+                });
+
+
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcess_ProcessPolicy1').prop('checked', 'checked');
+                    $('#ExitProcessCheckListPolicy1,#ExitProcessConfigPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').hide();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcess_ProcessPolicyList').P2BLookUpEncapsulate('#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', k.ExitProcess_ProcessPolicy_Id, k.ExitProcess_ProcessPolicy_Fulldetails, 'ExitProcess_ProcessPolicyList', 'view', 'A');
+                    });
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcessCheckListPolicy1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessConfigPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcessCheckListPolicyList').P2BLookUpEncapsulate('#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', k.ExitProcessCheckListPolicy_Id, k.ExitProcessCheckListPolicy_Fulldetails, 'ExitProcessCheckListPolicyList', 'view', 'A');
+                    });
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#ExitProcessConfigPolicy1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessCheckListPolicy1,#NoticePeriodObject1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#NoticePeriodId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#ExitProcessConfigPolicyList').P2BLookUpEncapsulate('#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', k.ExitProcessConfigPolicy_Id, k.ExitProcessConfigPolicy_Fulldetails, 'ExitProcessConfigPolicyList', 'view', 'A');
+                    });
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#NoticePeriodObject1').prop('checked', 'checked');
+                    $('#ExitProcess_ProcessPolicy1,#ExitProcessCheckListPolicy1,#ExitProcessConfigPolicy1').prop('disabled', 'disabled');
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId ').hide();
+                    $('#NoticePeriodId').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId  ').hide();
+                    $.each(data[1], function (i, k) {
+                        $('#NoticePeriodObjectList').P2BLookUpEncapsulate('#NoticePeriodObjectList', 'NoticePeriodObjectList', k.NoticePeriodObjectPolicy_Id, k.NoticePeriodObjectPolicy_Fulldetails, 'NoticePeriodObjectList', '#Remove-NoticePeriodObject-SeperationPolicyFormula', 'A');
+                    });
+                }
+
+
+            });
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmSeperationPolicyFormula').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            @*$('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);*@
+            $('#frmSeperationPolicyFormula').P2BDeleteModalDialog('@Url.Action("Delete", "SeperationPolicyFormula")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Lookup-LvHeadCollection-LvBankPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvBankPolicy")', '', 'LookupDiv', 'Type Of head Look Up Data', '#LvHeadCollectionlist', 'LvHeadCollectionlist', 5, 'LvHeadCollectionlist', '#frmBankPolicy', 'A', '#Remove-LvHeadCollection-LvBankPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LvHeadCollection-LvBankPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadCollectionlist', $('#LvHeadCollectionlist').val(), 200, 200, '#frmLvCreditPolicy', '#LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy');
+            event.preventDefault();
+        });
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+
+                    $('#fun_id').val(data.FunStruct);
+                    $('#pay_id').val(data.PayStruct);
+                    $('#geo_id').val(data.GeoStruct);
+                },
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+
+        ///////NoticePeriodObject
+
+        $('#Lookup-NoticePeriodObject-SeperationPolicyFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetNoticeperiodObjDetails", "NoticePeriodObject")', '', 'LookupDiv', 'Look Up Data', '#NoticePeriodObjectList', 'NoticePeriodObjectList', 5, 'NoticePeriodObjectList', '#frmSeperationPolicyFormula', 'A', '#Remove-NoticePeriodObject-SeperationPolicyFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Edit-NoticePeriodObject-SeperationPolicyFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#NoticePeriodObjectList').P2BGetTableDataonSelectedRow('#NoticePeriodObjectList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_NoticePeriodObject", "SeperationPolicyFormula")', '@Url.Action("Edit", "NoticePeriodObject")', b, '@Url.Action("EditSave", "NoticePeriodObject")', 'Edit Wages', '#frmNoticePeriodObject', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmSeperationPolicyFormula', '#NoticePeriodObjectList', 'NoticePeriodObjectList', 'NoticePeriodObjectList', 'N', '#Edit-ServiceRange-NoticePeriod_Object,#Remove-ServiceRange-NoticePeriod_Object,#Edit-Wages-NoticePeriod_Object,#Remove-Wages-NoticePeriod_Object', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmNoticePeriodObject').trigger("reset");
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#NoticePeriod').val(k.NoticePeriod);
+                    $('#ServiceRangeList').P2BLookUpEncapsulate('#ServiceRangeList', 'ServiceRangeList', k.ServiceranngeId, k.ServicerangeFulldetails, 'ServiceRangeList', '#Edit-ServiceRange-NoticePeriod_Object,#Remove-ServiceRange-NoticePeriod_Object', 'N');
+                    $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', k.wagesid, k.wagesfulldetails, 'WagesList', '#Edit-Wages-NoticePeriod_Object,#Remove-Wages-NoticePeriod_Object', 'N');
+
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Create-NoticePeriodObject-SeperationPolicyFormula').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_NoticePeriodObject", "SeperationPolicyFormula")', 'Create NoticePeriodObject', 'open', '@Url.Action("Create", "NoticePeriodObject")', '#frmNoticePeriodObject', 'Message :', 'Request Falied :', '#JqGrid', 500, 500, '', '', '', '#frmNoticePeriodObject', '#Edit-NoticePeriodObject-SeperationPolicyFormula,#Remove-NoticePeriodObject-SeperationPolicyFormula', function (data) {
+                $('#NoticePeriodObjectList').P2BLookUpEncapsulate('#NoticePeriodObjectList', 'NoticePeriodObjectList', data[0], data[1], 'NoticePeriodObjectList', '#Edit-NoticePeriodObject-SeperationPolicyFormula,#Remove-NoticePeriodObject-SeperationPolicyFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-NoticePeriodObject-SeperationPolicyFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#NoticePeriodObjectList').P2BGetTableDataonSelectedRow('#NoticePeriodObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#NoticePeriodObjectList').P2BGetTableDataonSelectedRow('#NoticePeriodObjectList', 0); 
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NoticePeriodObjectList', $('#NoticePeriodObjectList').val(), 200, 200, '#frmSeperationPolicyFormula', '#NoticePeriodObjectList', '#Remove-NoticePeriodObject-SeperationPolicyFormula');
+            event.preventDefault();
+        });
+
+
+
+
+
+        ///////ExitProcess_Process Policy
+
+        $('#Lookup-ExitProcess_ProcessPolicy-SeperationPolicyFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetExitProcessProcessPolicy", "SeperationPolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', 5, 'ExitProcess_ProcessPolicyList', '#frmSeperationPolicyFormula', 'A', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        @*$('#Create-ExitProcess_ProcessPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_ExitProcessProcessPolicy", "SeperationPolicyFormula")', 'Create ExitProcess_Process Policy', 'open', '@Url.Action("Create", "ExitProcess_Process_Policy")', '#frmExitProcessProcessPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmExitProcessProcessPolicy', '#Edit-ExitProcess_ProcessPolicy-SeperationPolicyFormula,#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', function (data) {
+                $('#ExitProcess_ProcessPolicyList').P2BLookUpEncapsulate('#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', data[0], data[1], 'ExitProcess_ProcessPolicyList', '#Edit-ExitProcess_ProcessPolicy-SeperationPolicyFormula,#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ExitProcess_ProcessPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ExitProcess_ProcessPolicyList').P2BGetTableDataonSelectedRow('#ExitProcess_ProcessPolicyList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_ExitProcessProcessPolicy", "SeperationPolicyFormula")', '@Url.Action("Edit", "ExitProcess_Process_Policy")', b, '@Url.Action("EditSave", "ExitProcess_Process_Policy")', 'Edit ExitProcess_ProcessPolicy Details', '#frmExitProcessProcessPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSeperationPolicyFormula', '#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', 'N', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ExitProcess_ProcessPolicyList').P2BLookUpEncapsulate('#ExitProcess_ProcessPolicyList', 'ExitProcess_ProcessPolicyList', k.Rate_id, k.Rate_val, 'ExitProcess_ProcessPolicyList', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });*@
+
+
+        $('#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ExitProcess_ProcessPolicyList').P2BGetTableDataonSelectedRow('#ExitProcess_ProcessPolicyList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ExitProcess_ProcessPolicyList').P2BGetTableDataonSelectedRow('#ExitProcess_ProcessPolicyList', 0); 
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExitProcess_ProcessPolicyList', $('#ExitProcess_ProcessPolicyList').val(), 200, 200, '#frmSeperationPolicyFormula', '#ExitProcess_ProcessPolicyList', '#Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula');
+            event.preventDefault();
+        });
+
+        ///////ExitProcessCheckList Policy
+
+        $('#Lookup-ExitProcessCheckListPolicy-SeperationPolicyFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetExitProcessCheckListPolicy", "SeperationPolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', 5, 'ExitProcessCheckListPolicyList', '#frmSeperationPolicyFormula', 'A', '#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        @*$('#Create-ExitProcessCheckListPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "SeperationPolicyFormula")', 'Create Exit Process CheckList Policy', 'open', '@Url.Action("CreateSave", "ExitProcessCheckListPolicy")', '#frmSeperationPolicyFormula', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmSeperationPolicyFormula', '#Edit-ExitProcessCheckListPolicy-SeperationPolicyFormula,#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', function (data) {
+                $('#ExitProcessCheckListPolicyList').P2BLookUpEncapsulate('#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', data[0], data[1], 'ExitProcessCheckListPolicyList', '#Edit-ExitProcessCheckListPolicy-SeperationPolicyFormula,#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ExitProcessCheckListPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ExitProcess_ProcessPolicyList').P2BGetTableDataonSelectedRow('#ExitProcess_ProcessPolicyList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "SeperationPolicyFormula")', '@Url.Action("Edit", "ExitProcessCheckListPolicy")', b, '@Url.Action("EditSave", "ExitProcessCheckListPolicy")', 'Edit ExitProcessCheckListPolicy Details', '#frmExitProcessCheckListPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSeperationPolicyFormula', '#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', 'N', '#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ExitProcessCheckListPolicyList').P2BLookUpEncapsulate('#ExitProcessCheckListPolicyList', 'ExitProcessCheckListPolicyList', k.Rate_id, k.Rate_val, 'ExitProcessCheckListPolicyList', '#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });*@
+
+
+
+        $('#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ExitProcessCheckListPolicyList').P2BGetTableDataonSelectedRow('#ExitProcessCheckListPolicyList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ExitProcessCheckListPolicyList').P2BGetTableDataonSelectedRow('#ExitProcessCheckListPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExitProcessCheckListPolicyList', $('#ExitProcessCheckListPolicyList').val(), 200, 200, '#frmSeperationPolicyFormula', '#ExitProcessCheckListPolicyList', '#Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula');
+            event.preventDefault();
+        });
+
+        ///////ExitProcessConfig Policy
+
+        $('#Lookup-ExitProcessConfigPolicy-SeperationPolicyFormula').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetExitProcessConfigPolicy", "SeperationPolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', 5, 'ExitProcessConfigPolicyList', '#frmSeperationPolicyFormula', 'A', '#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        @*$('#Create-ExitProcessConfigPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_ExitProcessConfigPolicy", "SeperationPolicyFormula")', 'Create Exit Process Config Policy', 'open', '@Url.Action("Create", "ExitProcess_Config_Policy")', '#frmExitProcessConfigPolicy', 'Message :', 'Request Falied :', '#JqGrid', 510, 670, '', '', '', '#frmExitProcessConfigPolicy', '#Edit-ExitProcessConfigPolicy-SeperationPolicyFormula,#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', function (data) {
+                $('#ExitProcessConfigPolicyList').P2BLookUpEncapsulate('#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', data[0], data[1], 'ExitProcessConfigPolicyList', '#Edit-ExitProcessConfigPolicy-SeperationPolicyFormula,#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ExitProcessConfigPolicy-SeperationPolicyFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ExitProcessConfigPolicyList').P2BGetTableDataonSelectedRow('#ExitProcessConfigPolicyList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial_ExitProcessConfigPolicy", "SeperationPolicyFormula")', '@Url.Action("Edit", "ExitProcessConfigPolicy")', b, '@Url.Action("EditSave", "ExitProcessConfigPolicy")', 'Edit ExitProcessConfigPolicy Details', '#frmExitProcessConfigPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSeperationPolicyFormula', '#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', 'N', '#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmExitProcessConfigPolicy').trigger('reset');
+                    $('#ProcessConfigName').val(k.ProcessConfigName);
+                    $('#NoDuesActivation_BFLastWorkDayList').val(k.NoDuesActivation_BFLastWorkDayList);
+                    $('#FFSSettlementPeriod_FromLastWorkDayList').val(k.FFSSettlementPeriod_FromLastWorkDayList);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ExitProcessConfigPolicyList').P2BLookUpEncapsulate('#ExitProcessConfigPolicyList', 'ExitProcessConfigPolicyList', k.Rate_id, k.Rate_val, 'ExitProcessConfigPolicyList', '#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });*@
+
+        $('#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ExitProcessConfigPolicyList').P2BGetTableDataonSelectedRow('#ExitProcessConfigPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ExitProcessConfigPolicyList').P2BGetTableDataonSelectedRow('#ExitProcessConfigPolicyList', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExitProcessConfigPolicyList', $('#ExitProcessConfigPolicyList').val(), 200, 200, '#frmSeperationPolicyFormula', '#ExitProcessConfigPolicyList', '#Remove-ExitProcessConfigPolicy-SeperationPolicyFormula');
+            event.preventDefault();
+        });
+
+
+
+        $('#creditpolicyId').hide();
+        $('#debitPolicyId ').hide();
+        $('#encashpolicyId').hide();
+        $('#NoticePeriodId').hide();
+        $('#BankpolicyId  ').hide();
+
+        $('.popup_radio_button').on('change', function () {
+            var selected = $(".popup_radio_button input[type='radio']:checked").val();
+            if (selected == "1") {
+                $('#creditpolicyId').fadeIn();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').hide();
+                $('#NoticePeriodId').hide();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "2") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').fadeIn();
+                $('#encashpolicyId').hide();
+                $('#NoticePeriodId').hide();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "3") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').fadeIn();
+                $('#NoticePeriodId').hide();
+                $('#BankpolicyId  ').hide();
+            }
+            if (selected == "4") {
+                $('#creditpolicyId').hide();
+                $('#debitPolicyId ').hide();
+                $('#encashpolicyId').hide();
+                $('#BankpolicyId  ').hide();
+                $('#NoticePeriodId').fadeIn();
+            }
+
+        });
+
+
+    });
+</script>
+<style>
+    .icon-row {
+        left: 95px;
+        position: relative;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 135px;
+    }
+
+    .popup-content-label-short {
+        display: block;
+        float: left;
+        width: 87px;
+    }
+
+    .popup-content-textbox {
+        width: 87px;
+    }
+
+    .row1 {
+        width: 440px;
+        /*! margin: 0 auto; */
+    }
+    .popup_radio_button {
+        font-size:9px;
+        margin:0 0 2px -94px;
+    }
+    .row2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 645px;
+    }
+
+    .row2 {
+        width: 198px;
+    }
+
+    .popup-row {
+        width: 490px;
+        margin: 1px 0px 0px 127px;
+    }
+
+    .name {
+        width: 293px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+<html>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <div class="section_Method">
+            <div class="heading">Filter View</div>
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+        </div>
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmSeperationPolicyFormula", name = "frmSeperationPolicyFormula" }))
+        {
+
+
+            <input name="geo_id" id="geo_id" class="filter_structure_id" />
+            <input name="pay_id" id="pay_id" class="filter_structure_id" />
+            <input name="fun_id" id="fun_id" class="filter_structure_id" />
+
+
+            @*<div style="float:left;">*@
+            <div class="section_Method">
+                <div class="heading">PolicyFomula Details</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox name must" })</div>
+
+               
+
+                <div class="popup-row">
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ExitProcess_ProcessPolicy1" name="radio" value="1" /><label for="ExitProcess_ProcessPolicy1">ExitProcess_ProcessPolicy</label>
+                        <input type="radio" id="ExitProcessCheckListPolicy1" name="radio" value="2" /><label for="ExitProcessCheckListPolicy1">ExitProcessCheckListPolicy</label>
+                        <input type="radio" id="ExitProcessConfigPolicy1" name="radio" value="3" /><label for="ExitProcessConfigPolicy1">ExitProcessConfigPolicy </label>
+                        <input type="radio" id="NoticePeriodObject1" name="radio" value="4" /><label for="NoticePeriodObject1">NoticePeriodObject </label>
+
+                    </div>
+                </div>
+                <div id="load_div" style="display:none;"></div>
+
+                <div id="creditpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ExitProcess_Process_Policy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ExitProcess_ProcessPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ExitProcess_ProcessPolicy" class="popup-content-icon-lookup" id="Lookup-ExitProcess_ProcessPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create ExitProcess_ProcessPolicy" class="popup-content-icon-create" id="Create-ExitProcess_ProcessPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit ExitProcess_ProcessPolicy" class="popup-content-icon-edit" id="Edit-ExitProcess_ProcessPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ExitProcess_ProcessPolicy" class="popup-content-icon-remove" id="Remove-ExitProcess_ProcessPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="debitPolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ExitProcess_CheckList_Policy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ExitProcessCheckListPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ExitProcessCheckListPolicy" class="popup-content-icon-lookup" id="Lookup-ExitProcessCheckListPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create ExitProcessCheckListPolicy" class="popup-content-icon-create" id="Create-ExitProcessCheckListPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit ExitProcessCheckListPolicy" class="popup-content-icon-edit" id="Edit-ExitProcessCheckListPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ExitProcessCheckListPolicy" class="popup-content-icon-remove" id="Remove-ExitProcessCheckListPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="encashpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ExitProcess_Config_Policy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ExitProcessConfigPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select ExitProcessConfigPolicy" class="popup-content-icon-lookup" id="Lookup-ExitProcessConfigPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create ExitProcessConfigPolicy" class="popup-content-icon-create" id="Create-ExitProcessConfigPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit ExitProcessConfigPolicy" class="popup-content-icon-edit" id="Edit-ExitProcessConfigPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove ExitProcessConfigPolicy" class="popup-content-icon-remove" id="Remove-ExitProcessConfigPolicy-SeperationPolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="NoticePeriodId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.NoticePeriod_Object, "Notice Period Object Details:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="NoticePeriodObjectList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup NoticePeriodObject Details" class="button popup-content-icon-lookup" id="Lookup-NoticePeriodObject-SeperationPolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create NoticePeriodObject Details" class="button popup-content-icon-create" id="Create-NoticePeriodObject-SeperationPolicyFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit NoticePeriodObject Details" class="button popup-content-icon-edit" id="Edit-NoticePeriodObject-SeperationPolicyFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove NoticePeriodObject Details" class="button popup-content-icon-remove" id="Remove-NoticePeriodObject-SeperationPolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            @*</div>*@
+
+        }
+    </div>
+</body>
+</html>

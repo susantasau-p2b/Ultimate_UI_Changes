@@ -1,0 +1,412 @@
+﻿@{
+    ViewBag.Title = "Employee Salaray structure";
+}
+
+@model Payroll.EmpSalStruct
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 133px;
+    }
+
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        var btndisablenames = "#Edit-empdetails,#Remove-empdetails";
+        ColModel = ['EmpCode', 'EmpName', 'EffectiveDate', 'End Date', 'struct_Id', 'Id'];
+        ColNames = ['EmpCode', 'EmpName', 'Effective Date', 'End Date', 'struct_Id', 'Id'];
+
+        ColDisplayNames = ['EmpCode', 'EmpName', 'Id'];
+        ColDisplayModel = ['EmpCode', 'EmpName', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "EmpSalStruct",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 700;
+        heightD = 200;
+        // jQuery("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+        //$("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['SalaryHead', 'Amount', 'Frequency', 'Type', 'SalHeadOperationType', 'FormulaType', 'Salheadformula_Id', 'FormulaEditable', 'Editable', 'Id'];
+        inline_ColNames = ['SalaryHead', 'Amount', 'Frequency', 'Type', 'SalHeadOperationType', 'FormulaType', 'Salheadformula_Id', 'FormulaEditable', 'Editable', 'Id'];
+        inline_SortName = 'Id';
+        inline_Caption = 'List';
+        inline_url = 0;
+        inline_width = 1000;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+        $('#select_date').P2BDatePicker();
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption_one, url, width, height, '#pager2');
+        $('#inline_JqGrid-view').P2BGrid(inline_ColNames, inline_ColModel, SortName, inline_Caption, url, inline_width, inline_height, '#inline_JqGrid-view_pager');
+       // $("#JqGrid").jqGrid('hideCol', "PayScaleAgreement").trigger('reloadGrid');
+
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+        $('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+        $('#inline_JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#inline_JqGrid',
+            eddelurl: '@Url.Action("edit")',
+            width: inline_width,
+            height: inline_height,
+            //inlinePager: '#inline_JqGrid_pager',
+            CheckCol: ["Editable"],
+            EditableCol: ["Amount"],
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#select_date').val(dt.EffectiveDate).attr("readonly", "readonly");
+            $.get("@Url.Action("GetPayscaleagreement")", { data: dt.struct_Id }, function (data) {
+                $('#payscaleagreement_id').val(data.Id);
+                $('#payscaleagreement').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            $('#payscaleagreement').val(dt.PayScaleAgreement).attr("readonly", "readonly");
+            struct_id = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'struct_Id');
+            //$('#payscaleagreement_drop2').attr("disabled", "disabled");
+        };
+        function AssignDatav2() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#select_date-view').val(dt.EffectiveDate).attr("readonly", "readonly");
+            $.get("@Url.Action("GetPayscaleagreement")", { data: dt.struct_Id }, function (data) {
+                $('#payscaleagreement_id-view').val(data.Id);
+                $('#payscaleagreement-view').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            $('#payscaleagreement-view').val(dt.PayScaleAgreement).attr("readonly", "readonly");
+            struct_id = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'struct_Id');
+            //$('#payscaleagreement_drop2').attr("disabled", "disabled");
+        };
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmEmpList').trigger('reset');
+            $('#payscaleagreement_drop').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "EmpSalStruct")', "", ""); // To bind dropdown on page load
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create Dialog",
+                submiturl: "@Url.Action("create")",
+                form: "#frmEmpList",
+                height: 475,
+                width: 800,
+                state: "open",
+                gridname: "#JqGridNew",
+                editurl: urlD,
+                gridfunction: "GetGridSelctedvalue",
+                gridreloadname: "#JqGrid",
+                returnToGrid: "#JqGridNew",
+            });
+            event.preventDefault();
+        });
+
+        //$('#JqGrid').getGridParam()
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+        $('#Update_Struct').button().on("click", function (event) {
+            $.ajax({
+                url: "@Url.Action("Update_Struct")",
+                data: { PayScaleAgreementId: $('#payscaleagreement_dropview').val() },
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    if (data != null) {
+                        alert(data.responseText);
+                    }
+                },
+                complete: function () {
+                    $('.ajax_loder').remove();
+                }
+            });
+            @*$.get("@Url.Action("Update_Struct")", { PayScaleAgreementId: $('#payscaleagreement_dropview').val() }, function (data) {
+                if (data != null) {
+                    alert(data.responseText);
+                }
+            });*@
+            event.preventDefault();
+        });
+
+        // Main page edit
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 500,
+                width: 1100,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                filter: dt.struct_Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+        });
+        $('#View').on('click', function (e) {
+            AssignDatav2();
+            $('#view_model_dialog').P2BGridDialog({
+                maindialogtitle: "View Dialog",
+                @*submiturl: "@Url.Action("process")",*@
+                form: "#frmviewinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                filter: dt.struct_Id,
+                returnToGrid: "#inline_JqGrid-view",
+            });
+
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#payscaleagreement_dropview').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "EmpSalStruct")', "", ""); // To bind dropdown on page load
+        //  $('#payscaleagreement_drop2').P2BSelectMenuAppend("@Url.Action("Polulate_payscale_agreement")","","","");
+
+
+
+
+        $('#history_model_dialog').P2BCreateDialog();
+
+
+        $('#history').on('click', function (e) {
+            AssignData();
+            $('#history_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmhistorygrid",
+                height: 400,
+                width: 900,
+                gridname: "#history_grid",
+                state: "open",
+                editurl: "@Url.Action("P2BHistoryGrid")",
+                editdata: dt.Id,
+                returnToGrid: "",
+            });
+
+        });
+
+        $('#Btn-Upload-Data').on('click', function (e) {
+            ////debugger;
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+    });
+
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="history">History</button>
+            <button class="button" id="Btn-Upload-Data">Upload</button>
+            <div style="float:left">
+                <label id="lblAgrment" class="emplist_label">PayScaleAgreement:</label>
+                <select id="payscaleagreement_dropview" name="payscaleagreement_dropview" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                <button id="Update_Struct">Update Structure</button>
+            </div>
+
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    {
+
+        <div class="emplist_row">
+            <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+            @*<select id="payscaleagreement_drop" name="payscaleagreement_drop" style="width:120px;"><option></option></select>*@
+            <select id="payscaleagreement_drop" name="payscaleagreement_drop" class="drop" style="width:100px;"><option value="0">-Select-</option></select>
+        </div>
+        <div class="emplist_row">
+            <label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date" />
+        </div>
+        <div class="emplist_row">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew"></table>
+                    <div id="pager22"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+
+        <div class="emplist_row">
+            <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+            <input type="text" style="display:none" id="payscaleagreement_id" name="payscaleagreement_id" />
+            <input type="text" id="payscaleagreement" name="payscaleagreement" />
+
+        </div>
+        <div class="emplist_row">
+            <label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date" />
+            @*<button id="Update_Struct">Update Structure</button>*@
+        </div>
+        <div>
+            <table id="inline_JqGrid"></table>
+            <div id="inline_JqGrid_pager"></div>
+        </div>
+    }
+</div>
+<div id="view_model_dialog" style="display:none">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeviewinlinegrid", name = "frmeviewinlinegrid" }))
+    {
+
+        <div class="emplist_row">
+            <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+            <input type="text" style="display:none" id="payscaleagreement_id-view" name="payscaleagreement_id" />
+            <input type="text" id="payscaleagreement-view" name="payscaleagreement" />
+
+        </div>
+        <div class="emplist_row">
+            <label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date-view" />
+            @*<button id="Update_Struct">Update Structure</button>*@
+        </div>
+        <div>
+            <table id="inline_JqGrid-view"></table>
+            <div id="inline_JqGrid-view_pager"></div>
+        </div>
+    }
+</div>
+
+<div id="history_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmhistorygrid", name = "frmhistorygrid" }))
+    {
+
+        <div id="history_grid">
+            <div>
+                <div id="Container" class="container">
+                    <div id="Demo">
+                        <table id="MyTable" class="display" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                @*<table id="JqGrid"></table>
+                    <div id="pager2"></div>*@
+            </div>
+        </div>
+    }
+</div>

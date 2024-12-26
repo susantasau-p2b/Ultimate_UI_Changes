@@ -1,0 +1,989 @@
+﻿@{
+    ViewBag.Title = "Employee PF Trust";
+}
+@model P2B.PFTRUST.PFTEmployeeLedger
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 470px;
+        width: 480px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 80px;
+        width: 240px;
+        /*  margin: 2px auto;*/
+        position: absolute;
+        margin-left: 46em;
+        /*  padding-top: 5px;*/
+        /*left: 401px;*/
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 80px;
+        width: 240px;
+        margin: 2px auto;
+        position: absolute;
+        /*left: 600px;*/
+        margin-left: 70em;
+        /* padding-top: 10px;*/
+        /* top: 28px;*/
+        /* float: right;*/
+    }
+
+    .section4_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 80px;
+        width: 240px;
+        margin: 2px auto;
+        position: absolute;
+        /*left: 600px;*/
+        margin-left: 94em;
+        /*  padding-top: 10px;*/
+        /* top: 28px;*/
+        /* float: right;*/
+    }
+
+    .section5_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 250px;
+        width: 780px;
+        margin-top: 120px;
+        position: absolute;
+        margin-left: 46em;
+        /* margin-inline-end: 25em;*/
+        /* justify-content:flex-end;*/
+        /*left: 401px;*/
+    }
+
+    .popup-content-label {
+        display: block;
+       /* float: left;*/
+     /*   margin-right:50px;*/
+        width: 145px;
+        padding-top: 2px;
+    }
+
+    .content_margine {
+        /*   margin-right: 20px;*/
+  /**/  font-size: 12px;
+        padding-top: 2px;
+        /*  width: 650px;*/
+        display: inline-flex;
+        justify-content: center;
+    }
+
+    .content-textbox {
+       /* margin-right: 1px;*/
+        width: 100px;
+        float: right;
+    }
+
+    /* .emplist_row {
+            width: 300px;
+            padding: 2px;
+        }
+
+        .emplist_label {
+            display: block;
+            float: left;
+            width: 146px;
+        }*/
+
+    .addons {
+        height: 246px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 400px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 470px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 110px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 110%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+    #PfopenBalAmt {
+        margin-left: -12px;
+    }
+    #PfIntopenBalAmt {
+        margin-left: 60px;
+    }
+
+    #passbookactivitydrop {
+        margin-left: -35px;
+    }
+       
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        
+        $('button').button();
+        $('#Edit_PayableDays').ForceOnlyNumeric();
+        $('#Edit_PayableDays').MaxLength(10);
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        var btndisablenames = "#Edit-empdetails,#Remove-empdetails";
+        //ColModel = ['Id', 'Emp Code', 'Emp Name', 'Posting Date', 'OwnPF', 'Owner PF', 'VPF', 'OwnPF Int', 'OwnerPF Int', 'VPF Int', 'Total Int'];
+        //ColNames = ['Id', 'Emp Code', 'Emp Name', 'Posting Date', 'OwnPF', 'Owner PF', 'VPF', 'OwnPF Int', 'OwnerPF Int', 'VPF Int', 'Total Int'];
+
+        ColDisplayNames = ['Employee Code', 'Employee Name', 'Id'];
+        ColDisplayModel = ['Employee Code', 'Employee Name', 'Id'];
+        url = '@Url.Action("P2BInlineGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "PF Trust Opening Balance ",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 1000;
+        heightD = 150;
+        // jQuery("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+        //$("#JqGrid").jqGrid('hideCol', ["PayScaleAgreement"]);
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['Id', 'Emp Code', 'Emp Name', 'Posting Date', 'OwnPF', 'Owner PF', 'VPF', 'OwnPF Int', 'OwnerPF Int', 'VPF Int'];
+        inline_ColNames = ['Id', 'Emp Code', 'Emp Name', 'Posting Date', 'OwnPF', 'Owner PF', 'VPF', 'OwnPF Int', 'OwnerPF Int', 'VPF Int'];
+        inline_SortName = 'Id';
+        inline_Caption = 'PF Trust Opening Balance';
+        inline_url = '@Url.Action("P2BGrid")';
+        @*urlD = '@Url.Action("P2BGrid")';*@
+        inline_width = 1000;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#INTDIV').hide();
+        $('#INTDIVPF').hide();
+        $('#INTDIVTOT').hide();
+        //$('#JqGrid').InlineEditGrid({
+        //    ColNames: inline_ColNames,
+        //    ColModel: inline_ColModel,
+        //    SortName: inline_SortName,
+        //    Caption: inline_Caption,
+        //    url: inline_url,
+        //    tablename: '#JqGrid',
+        //    eddelurl: '',
+        //    width: inline_width,
+        //    height: inline_height,
+        //    CheckCol: "Editable",
+        //    EditableCol: ["TaxPaid"],
+        //});
+        //$("#JqGrid").jqGrid('hideCol', "Editable").trigger('reloadGrid');
+        //addded v
+        $('#Create').on('click', function (e) {
+            $('#JqGridNew').PostGridData({ url: urlD, filter: $('#txtPayMonth').val() });
+        });
+        //v
+        $('#formfilter').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h_PFT?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+        $('#JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#JqGrid',
+            eddelurl: '',
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            EditableCol: ["TaxPaid"],
+            LocalStorageId: "EditClickITaxTransT",
+            onEditClick: true,
+        });
+        // $("#JqGrid").jqGrid('hideCol', "PayProcessGroup_Id").trigger('reloadGrid');
+
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+        //v
+        $("#JqGrid").jqGrid('hideCol', "PayProcessGroup_Id").trigger('reloadGrid');
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+
+        $('#txtPayMonth').MonthYearPicker();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+
+        //  $("#JqGrid").jqGrid('hideCol', "Editable").trigger('reloadGrid');
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $.get("@Url.Action("GetPayprocessgroup")", { data: dt.PayProcessGroup_Id }, function (data) {
+                $('#payprocessgroup_id').val(data.Id);
+                $('#payprocessgroup').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            $('#PayMonth').val(dt.PayMonth);
+            $('#Edit_PaybleDays').val(dt.PaybleDays);
+            $('#LWPDays').val(dt.LWPDays);
+        };
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h_PFT?geo_id=' + forwarddata + '', "");
+
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+        $('#Create').on("click", function (event) {
+            $('frmPFTEmployeeLedger').trigger("reset");
+            //$.LoadEmpByDefault();
+            $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                if (data == true) {
+                    $('#INTDIV').fadeIn();
+                    $('#INTDIVPF').fadeIn();
+                    $('#INTDIVTOT').fadeIn();
+                }
+
+                else {
+                   
+                    $('#INTDIV').fadeOut();
+                    $('#INTDIVPF').fadeOut();
+                    $('#INTDIVTOT').fadeOut();
+                }
+            });
+
+
+            //$.LoadEmpByDefault(true, '#txtPayMonth');
+            $.LoadEmpByDefaultPFTRUST(false, "");
+            $('#list-employee').P2BCreateDialog('', '', '', '', 'Create PF Trust Opening Balance', 'open', '@Url.Action("Create")', '#frmPFTEmployeeLedger', 'Message :', 'Request Falied :', '#JqGrid', 590, 1300, '', '', function (data) { });
+            $('#PfopenBalAmt').attr("readonly", "readonly");
+            $('#PfIntopenBalAmt').attr("readonly", "readonly");
+            $('#TotalIntOpenBal').attr("readonly", "readonly");
+            
+            $('#PassbookActivity').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 512, "");           
+            event.preventDefault();
+        });
+
+        $("#OwnerOpenBal").keyup(function () {
+            
+            var v1 = $("#OwnOpenBal").val();
+            var v2 = $("#OwnerOpenBal").val();
+            var v3 = parseFloat(v1) + parseFloat(v2);
+            if (isNaN(v3))
+            {
+                $("#PfopenBalAmt").val(0)
+            }
+            else {
+                $("#PfopenBalAmt").val(v3)
+            }
+            
+        });
+
+
+        $("#OwnerIntOpenBal").keyup(function () {
+            var v4 = $("#OwnIntOpenBal").val();
+            var v5 = $("#OwnerIntOpenBal").val();
+            var v6 = parseFloat(v4) + parseFloat(v5);
+            if (isNaN(v6))
+            {
+                $("#PfIntopenBalAmt").val(0)
+            } else
+            {
+                $("#PfIntopenBalAmt").val(v6)
+            }
+           
+        });
+
+        $("#OwnerIntOpenBal").keyup(function () {
+            var v4 = $("#OwnIntOpenBal").val();
+            var v5 = $("#OwnerIntOpenBal").val();
+            var v7 = $("#VPFIntOpenBal").val();
+            var v6 = parseFloat(v4) + parseFloat(v5) + parseFloat(v7);
+            if (isNaN(v6))
+            {
+                $("#TotalIntOpenBal").val(0)
+
+            } else {
+                $("#TotalIntOpenBal").val(v6)
+
+            }
+            
+        });
+
+        $("#VPFIntOpenBal").keyup(function () {
+            var v4 = $("#OwnIntOpenBal").val();
+            var v5 = $("#OwnerIntOpenBal").val();
+            var v7 = $("#VPFIntOpenBal").val();
+            var v6 = parseFloat(v4) + parseFloat(v5) + parseFloat(v7);
+            if (isNaN(v6)) {
+                $("#TotalIntOpenBal").val(0)
+
+            } else {
+                $("#TotalIntOpenBal").val(v6)
+            }
+           
+        });
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        // Main page edit
+        $('#edit_model_dialog').P2BGridDialog();
+        $.LocalStorageHelper("EditClickITaxTransT", false);
+        $('#cancle,#Save').hide();
+        $('#OwnOpenBal').ForceOnlyNumeric();
+        $('#OwnerOpenBal').ForceOnlyNumeric();
+        $('#VPFOpenBal').ForceOnlyNumeric();
+        $('#OwnIntOpenBal').ForceOnlyNumeric();
+        $('#OwnerIntOpenBal').ForceOnlyNumeric();
+        $('#VPFIntOpenBal').ForceOnlyNumeric();
+        $('#TotalIntOpenBal').ForceOnlyNumeric();
+        $('#TrustPFNo').ForceOnlyNumeric();
+        
+        //$('#Edit').makeDisable('#Load,#Create,#Delete');
+
+        //////$('#Edit').on('click', function (e) {
+        //////    $("#PayMonthEdit").val($('#txtPayMonth').val());
+        //////    var aa = $('#JqGrid').jqGrid('getGridParam', 'selrow');
+        //////    if (aa != null) {
+        //////        $('#Load,#Create,#Delete,#Edit,#carryforward').button("disable").css("background-color", "rgba(241, 241, 241, 0.66)");
+        //////        $('#cancle,#Save').fadeIn();
+        //////        $.LocalStorageHelper("EditClickITaxTransT", true);
+        //////    } else {
+        //////        alert('Please Select Row..!');
+        //////    }
+        //////});
+
+        @*$('#Edit').on('click', function (e) {
+            $("#PayMonthEdit").val($('#txtPayMonth').val());
+            var aa = $('#JqGrid').jqGrid('getGridParam', 'selrow');
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            if (aa != null) {
+                $('#Edit').ProcessConfirmation1({
+                    confirmurl: "@Url.Action("ChkProcess")",
+                    month: "#txtPayMonth",
+                    EmpCode: dt.EmpCode,
+                    msg: "Salary will be deleted,Still You Want to edit..?Please Confirm..!",
+                    status: function (data) {
+                        if (data == true) {
+                            if (aa != null) {
+                                $('#Load,#Create,#Delete,#Edit').button("disable").css("background-color", "rgba(241, 241, 241, 0.66)");
+                                $('#cancle,#Save').fadeIn();
+                                $.LocalStorageHelper("EditClickITaxTransT", true);
+                            }
+                            //else {
+                            //    alert('Please Select Row..!');
+                            //}
+                            $('#PayMonth').val($('#txtPayMonth').val());
+                        }
+                        else {
+                            $('#cancle,#Save').fadeOut();
+                            $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                        }
+                    }
+                });
+            }
+            else {
+                $('#cancle,#Save').fadeOut();
+                $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                //alert('Please Select Row..!');
+            }
+        });*@
+
+        $(document).on('click', '#Save', function (e) {
+            var a = $('#JqGrid').InlineGridEdittedData.GetData();
+            if (a != null) {
+                var b = JSON.stringify(a);
+                $.post({
+                    url: '@Url.Action("EditSave", "ITaxTransT")',
+                    data: { PayMonth: $("#PayMonthEdit").val(), forwarddata: b },
+                    success: function (data) {
+                        if (data != null) {
+                            alert(data[2]);
+                            $('#JqGrid').InlineGridEdittedData.Empty();
+                            $('#JqGrid').trigger('reloadGrid');
+                            $.LocalStorageHelper("EditClickITaxTransT", false);
+                        }
+                    }
+                });
+            } else {
+                $('#JqGrid').trigger('reloadGrid');
+                $.LocalStorageHelper("EditClickITaxTransT", false);
+            }
+            //$(this).text("Edit");
+            $('#cancle,#Save').fadeOut();
+            $('#Load,#Create,#Delete,#Edit,#carryforward').button("enable");
+        });
+        $('#cancle').hide();
+        $('#cancle').on('click', function (e) {
+
+            location.reload();
+        });
+
+
+
+
+        @*$('#View').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+
+        });*@
+        @*$('.drop').selectmenu().selectmenu("menuWidget");
+         $('#payscaleagreement_drop2').P2BSelectMenuAppend("@Url.Action("Polulate_payscale_agreement")","","","");*@
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#list-employee').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Empl_list_h').fadeOut();
+            $('#filter-div').fadeOut();
+            $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                if (data == true) {
+                    $('#INTDIV').fadeIn();
+                    $('#INTDIVPF').fadeIn();
+                    $('#INTDIVTOT').fadeIn();
+                }
+
+                else {
+                   
+                    $('#INTDIV').fadeOut();
+                    $('#INTDIVPF').fadeOut();
+                    $('#INTDIVTOT').fadeOut();
+                }
+            });
+
+            // $.LoadEmpByDefault(true, '#txtPayMonth');
+            $('#list-employee').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PFTEmployeeLedger->" + JSON.stringify(dt) + "", '#frmPFTEmployeeLedger', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 590, 1300, '', btndisablenames, function (data) {
+                $('#PfopenBalAmt').attr("readonly", "readonly");
+                $('#PfIntopenBalAmt').attr("readonly", "readonly");
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    
+                    $('#frmPFTEmployeeLedger').trigger("reset");
+                  
+                    $('#Employee_Id').val(k.Employee);
+                    /* $('#TrustPFNo').val(k.TrustPFNo);*/
+                    $('#OwnOpenBal').val(k.OwnOpenBal);
+                    $('#OwnerOpenBal').val(k.OwnerOpenBal);
+                    $('#VPFOpenBal').val(k.VPFOpenBal);
+                    $('#OwnIntOpenBal ').val(k.OwnIntOpenBal);
+                    $('#OwnerIntOpenBal').val(k.OwnerIntOpenBal);
+                    $('#VPFIntOpenBal').val(k.VPFIntOpenBal);
+                    $('#TotalIntOpenBal').val(k.TotalIntOpenBal);                   
+                    $('#PostingDate').val(DateConvert(k.PostingDate));
+                    $('#CalcDate').val(DateConvert(k.CalcDate));
+                    $('#PfopenBalAmt').val(k.PfopenBal);
+                    $('#PfIntopenBalAmt').val(k.PfIntopenBal);
+                    
+                    $('[name="TDSAppl"]').val([k.TDSAppl]).button().button("refresh");
+                    /* alert(k.PassbookActivity);*/
+                    $('#PassbookActivity').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 512, k.PassbookActivity)
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#TrustPFNo').val(k.TrustPFNo);
+
+
+                    /*  $('#TrustPFNo').val(k.TrustPFNo);*/
+
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#PFNo').val(data[2].PFNo);
+                    $('#PensionNo').val(data[2].PensionNo);
+                    $('#EnrollementDate').val(data[2].PFJoingDate);
+                    $('#EnrollementDate1').val(data[2].PensionJoingDate);
+                    $('#PFNo').attr("readonly", "readonly");
+                    $('#PensionNo').attr("readonly", "readonly");
+                    $('#EnrollementDate').attr("readonly", "readonly");
+                    $('#EnrollementDate1').attr("readonly", "readonly");
+
+
+                });
+
+
+
+
+            });
+        });
+
+        @*$('#View').on('click', function () {
+            AssignData();
+            $('#Empl_list_h').fadeOut();
+           // $.LoadEmpByDefault(true, '#txtPayMonth');
+           //$('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View PFTEmployeeLedger", '', '', 590, 1300, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+            //$('#list-employee').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "View PFTEmployeeLedger", '#frmPFTEmployeeLedger', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 590, 1300, '', '', function (data) {
+            $('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View PFTEmployeeLedger->" + JSON.stringify(dt) + "", '#frmPFTEmployeeLedger', '', 590, 1300, '', '', '', '', '', '', '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmPFTEmployeeLedger').trigger("reset");
+                    $('#Employee_Id').val(k.Employee);
+                    $('#OwnOpenBal').val(k.OwnOpenBal);
+                    $('#OwnerOpenBal').val(k.OwnerOpenBal);
+                    $('#VPFOpenBal').val(k.VPFOpenBal);
+                    $('#OwnIntOpenBal ').val(k.OwnIntOpenBal);
+                    $('#OwnerIntOpenBal').val(k.OwnerIntOpenBal);
+                    $('#VPFIntOpenBal').val(k.VPFIntOpenBal);
+                    $('#TotalIntOpenBal').val(k.TotalIntOpenBal);
+                    $('#PostingDate').val(DateConvert(k.PostingDate));
+                    $('#CalcDate').val(DateConvert(k.CalcDate));
+                    $('#PassbookActivity').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 512, k.PassbookActivity)
+                    $('#OwnOpenBal').attr("readonly", "readonly");
+                    $('#OwnerOpenBal').attr("readonly", "readonly");
+                    $('#VPFOpenBal').attr("readonly", "readonly");
+                    $('#OwnIntOpenBal').attr("readonly", "readonly");
+                    $('#OwnerIntOpenBal').attr("readonly", "readonly");
+                    $('#VPFIntOpenBal').attr("readonly", "readonly");
+                    $('#TotalIntOpenBal').attr("readonly", "readonly");
+                    $('#PostingDate').attr("readonly", "readonly");
+                    $('#CalcDate').attr("readonly", "readonly");
+
+                });
+
+
+                $.each(data[1], function (i, k) {
+                    $('#TrustPFNo').val(k.TrustPFNo);
+                    $('#TrustPFNo').attr('readonly', 'readonly');
+
+
+                });
+
+
+                $.each(data[2], function (i, k) {
+                    alert(k.PFNo);
+                    $('#PFNo').val(data[2].PFNo);
+                    $('#PensionNo').val(data[2].PensionNo);
+                    $('#EnrollementDate').val(data[2].PFJoingDate);
+                    $('#EnrollementDate1').val(data[2].PensionJoingDate);
+                    $('#PFNo').attr("readonly", "readonly");
+                    $('#PensionNo').attr("readonly", "readonly");
+                    $('#EnrollementDate').attr("readonly", "readonly");
+                    $('#EnrollementDate1').attr("readonly", "readonly");
+
+
+                });
+
+
+
+
+
+
+
+            });
+        });*@
+
+        $('#Btn-Upload-Data').on('click', function (e) {
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+
+        $('#View').on('click', function () {
+            AssignData();
+            $('#Empl_list_h').fadeOut();
+            $('#filter-div').fadeOut();
+            $.get("@Url.Action("GetInterestcarry", "EmployeePFTrust")", { data: $(this).val() }, function (data) {
+                if (data == true) {
+                    $('#INTDIV').fadeIn();
+                    $('#INTDIVPF').fadeIn();
+                    $('#INTDIVTOT').fadeIn();
+                }
+
+                else {
+                   
+                    $('#INTDIV').fadeOut();
+                    $('#INTDIVPF').fadeOut();
+                    $('#INTDIVTOT').fadeOut();
+                }
+            });
+            // $.LoadEmpByDefault(true, '#txtPayMonth');
+            $('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View PFTEmployeeLedger->" + JSON.stringify(dt) + "", '#frmPFTEmployeeLedger', '', 590, 1300, '', '', '', '', '', '', '', '', function (data) {
+                //Compulsory for authorisatio               
+                var val = null;
+                $.each(data[0], function (i, k) {
+                   
+                    $('#frmPFTEmployeeLedger').trigger("reset");
+                    $('#Employee_Id').val(k.Employee);
+                    /* $('#TrustPFNo').val(k.TrustPFNo);*/
+                    $('#OwnOpenBal').val(k.OwnOpenBal);
+                    $('#OwnerOpenBal').val(k.OwnerOpenBal);
+                    $('#VPFOpenBal').val(k.VPFOpenBal);
+                    $('#OwnIntOpenBal ').val(k.OwnIntOpenBal);
+                    $('#OwnerIntOpenBal').val(k.OwnerIntOpenBal);
+                    $('#VPFIntOpenBal').val(k.VPFIntOpenBal);
+                    $('#TotalIntOpenBal').val(k.TotalIntOpenBal);
+                    $('#PostingDate').val(DateConvert(k.PostingDate));
+                    $('#CalcDate').val(DateConvert(k.CalcDate));
+                    $('#PfopenBalAmt').val(k.PfopenBal);
+                    $('#PfIntopenBalAmt').val(k.PfIntopenBal);
+                    $('[name="TDSAppl"]').val([k.TDSAppl]).button().button("refresh");
+                    /* alert(k.PassbookActivity);*/
+                    $('#PassbookActivity').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 512, k.PassbookActivity)
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#TrustPFNo').val(k.TrustPFNo);
+
+
+                    /*  $('#TrustPFNo').val(k.TrustPFNo);*/
+
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#PFNo').val(data[2].PFNo);
+                    $('#PensionNo').val(data[2].PensionNo);
+                    $('#EnrollementDate').val(data[2].PFJoingDate);
+                    $('#EnrollementDate1').val(data[2].PensionJoingDate);
+                    $('#PFNo').attr("readonly", "readonly");
+                    $('#PensionNo').attr("readonly", "readonly");
+                    $('#EnrollementDate').attr("readonly", "readonly");
+                    $('#EnrollementDate1').attr("readonly", "readonly");
+
+
+                });
+
+
+
+
+            });
+        });
+
+
+
+
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                // alert($(this).val());
+                var id = $(this).val();
+                $.get("@Url.Action("GetEmpLTCBlock")", { data: id }, function (data) {
+                    $('#PFNo').val(data.a);
+                    $('#PensionNo').val(data.b);
+                    $('#EnrollementDate').val(data.pfdateconvert);
+                    $('#EnrollementDate1').val(data.pensiondateconvert);
+                    $('#PFNo').attr("readonly", "readonly");
+                    $('#PensionNo').attr("readonly", "readonly");
+                    $('#EnrollementDate').attr("readonly", "readonly");
+                    $('#EnrollementDate1').attr("readonly", "readonly");
+
+
+                });
+            }
+        });
+
+        
+
+        $('#OwnOpenBal').val(0);
+        $('#OwnerOpenBal').val(0);
+        $('#VPFOpenBal').val(0);
+        $('#OwnIntOpenBal ').val(0);
+        $('#OwnerIntOpenBal').val(0);
+        $('#VPFIntOpenBal').val(0);
+        $('#TotalIntOpenBal').val(0);
+       
+        $('#PfopenBalAmt').val(0);
+        $('#PfIntopenBalAmt').val(0);
+
+        //$('#EnrollementDate').P2BDatePicker();
+        //$('#EnrollementDate1').P2BDatePicker();
+        $('#PostingDate').P2BDatePicker();
+        $('#CalcDate').P2BDatePicker();
+        $('.popup_radio_button').controlgroup();
+    });
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Btn-Upload-Data">Upload</button>
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="JqGrid_pager"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="loder_div"></div>
+<div id="list-employee">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPFTEmployeeLedger", name = "frmPFTEmployeeLedger" }))
+    {
+        <input id="geo_id" class="filter_structure_id" name="geo_id" />
+        <input id="pay_id" class="filter_structure_id" name="pay_id" />
+        <input id="fun_id" class="filter_structure_id" name="fun_id" />
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="filter_structure_id" />
+        <div class="filter-div" id="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave" id="Empl_list_h">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 380px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+
+                </div>
+                <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+            </div>
+        </div>
+
+        <div class="section2_Leave" style="margin-top:20px">
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:120px">PF No:</label><input type="text" id="PFNo" name="PFNo" class="content-textbox"  />
+            </div><br />
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:120px">PF Enrollement Date:</label>
+                <input type="text" id="EnrollementDate" name="EnrollementDate" class="content-textbox" style="width:100px;height:15px"  />
+            </div>
+        </div>
+        <div class="section3_Leave" style="margin-top:20px">
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:120px">Pension No:</label><input type="text" id="PensionNo" name="PensionNo" class="content-textbox" />
+            </div><br />
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:120px">Pension Enrollement Date:</label>
+                <input type="text" id="EnrollementDate1" name="EnrollementDate" class="content-textbox" style="width:100px; height:15px" />
+            </div>
+        </div>
+        <div class="section4_Leave" style="margin-top:20px">
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:80px">Staff Pf No:</label><input type="text" id="TrustPFNo" name="TrustPFNo" class="content-textbox" />
+            </div>
+        </div>
+        <div class="section5_Leave">
+            <div class="content_margine">
+                <label class="popup-content-label" style="width:200px; font-size:15px;text-decoration:underline">Opening Balance</label>
+            </div>
+            <div class="content_margine" >
+                <div  style="margin-right:25px" >
+                    @Html.LabelFor(m => m.OwnOpenBal, "Own PF :", new { @class = " must",@style= "margin-right:55px" })
+                    @Html.TextBoxFor(m => m.OwnOpenBal, new { @class = "content-textbox must" })
+                </div>
+                <div style="margin-right:40px">
+                    @Html.LabelFor(m => m.OwnerOpenBal, "Owner PF :", new { @class = " must", @style = "margin-right:35px" })
+                    @Html.TextBoxFor(m => m.OwnerOpenBal, new { @class = "content-textbox must" })
+                </div>
+                <div>
+                    @Html.LabelFor(m => m.VPFOpenBal, "VPF :", new { @class = " must", @style = "margin-right:50px" })
+                    @Html.TextBoxFor(m => m.VPFOpenBal, new { @class = "content-textbox must" })
+                </div>
+            </div>
+
+            <div class="content_margine" id="INTDIV">
+                <div style="margin-right:25px">
+                    @Html.LabelFor(m => m.OwnIntOpenBal, "Own Interest:", new { @class = "must", @style = "margin-right:25px" })
+                    @Html.TextBoxFor(m => m.OwnIntOpenBal, new { @class = "content-textbox must" })
+                </div>
+                <div style="margin-right:40px">
+                    @Html.LabelFor(m => m.OwnerIntOpenBal, "Owner Interest :", new { @class = " must", })
+                    @Html.TextBoxFor(m => m.OwnerIntOpenBal, new { @class = "content-textbox must" })
+                </div>
+                @Html.LabelFor(m => m.VPFIntOpenBal, "VPF Interest:", new { @class = " must" })
+                @Html.TextBoxFor(m => m.VPFIntOpenBal, new { @class = "content-textbox must" })
+
+            </div>
+            <div class="content_margine">
+                <div style="margin-right:25px">
+                    @Html.LabelFor(m => m.PFOpenBal, "Pf Contribution :", new { @class = "must", @style = "margin-right:25px" })
+                    @Html.TextBoxFor(m => m.PFOpenBal, new { @class = "content-textbox must", @id = "PfopenBalAmt" })
+                </div>
+                <div style="margin-right:40px" id="INTDIVPF">
+                    @Html.LabelFor(m => m.PFIntOpenBal, "Pf Int :", new { @class = " must", })
+                    @Html.TextBoxFor(m => m.PFIntOpenBal, new { @class = "content-textbox must", @id = "PfIntopenBalAmt" })
+                </div>
+                </div>
+
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.PassbookActivity, "PassbookActivity :", new { @class = " must" ,@id="passbookactivitydrop"})
+                    <select class="drop must" style="width:120px;" name="PassbookActivity" id="PassbookActivity">
+                        <option></option>
+                    </select>
+                </div><br />
+
+            <div class="content_margine" id="INTDIVTOT">
+                @Html.LabelFor(m => m.TotalIntOpenBal, "Total Interest:", new { @class = "must", @style = "margin-right:25px" })
+                @Html.TextBoxFor(m => m.TotalIntOpenBal, new { @class = "content-textbox must" })
+            </div><br />
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.PostingDate, "PostingDate :", new {@class = "content-textbox must", @style = "margin-right:25px" })<input type="text" id="PostingDate" name="PostingDate" class="content-textbox" />
+                </div><br />
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.CalcDate, "CalcDate :", new { @class = "content-textbox must",@style = "margin-right:25px" })<input type="text" id="CalcDate" name="CalcDate" class="content-textbox" />
+                </div><br/>
+
+            <div class=" content_margine">
+                @Html.LabelFor(m => m.IsTDSAppl, "TDSAppl :", new { @class = "popup-content-label must" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="TDSAppl" value="true" /><label for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="TDSAppl" value="false" checked="checked" /><label for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+            </div>
+
+    }
+</div>
+
+

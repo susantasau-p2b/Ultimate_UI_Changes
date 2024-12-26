@@ -1,0 +1,220 @@
+﻿@model Payroll.OtherSalaryHead
+@{
+    ViewBag.Title = "Other Salary Head";
+}
+
+<style>
+    .popup-content-textbox {
+        min-width: 129px;
+    }
+
+    .popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 114px;
+    }
+
+    .horizontal_row3, .radio_button_div_3 {
+        display: inline-block;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 292px;
+    }
+</style>
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog_address">
+        <div title="LookUp Data">
+            <div class="LookupDiv-address"></div>
+        </div>
+        <div id="PageNavPosition-address">
+        </div>
+    </div>
+
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmOtherSalHead" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine"> @Html.LabelFor(m => m.SalaryCode, "Code :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SalaryCode, new { @class = "popup-content-textbox", id = "SalaryCode", @maxlength = "10" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.SalaryDesc, "Name :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SalaryDesc, new { @class = "popup-content-textbox", id = "SalaryDesc", @maxlength = "50" })</div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.SalaryType, "Type :", new { @class = "popup-content-label must" })
+                <select id="SalaryTypelist" name="SalaryTypelist" style="width:161px;" class="drop must"></select>
+            </div>
+
+            <div class="row3 content_margine horizontal_row2 content_margine">
+                @Html.LabelFor(m => m.InPayslip, "Apper in Payslip :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <div id="radioset">
+                        <span><input type="radio" id="radio3" name="InPayslip" value="true" /> <label for="radio3">Yes</label></span>
+                        <span><input type="radio" id="radio4" name="InPayslip" value="false" /> <label for="radio4">No</label></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row3 content_margine horizontal_row3 content_margine">
+                @Html.LabelFor(m => m.InITax, "Include in Tax :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <div id="radioset">
+                        <span><input type="radio" id="radio5" name="InITax" value="true" /> <label for="radio5">Yes</label></span>
+                        <span><input type="radio" id="radio6" name="InITax" value="false" /> <label for="radio6">No</label></span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.RoundingMethod, "Rounding Method :", new { @class = "popup-content-label must" })
+                <select id="RoundingMethodlist" name="RoundingMethodlist" style="width:161px;" class="drop must"></select>
+            </div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.RoundDigit, "Rounding Digit :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.RoundDigit, new { @class = "popup-content-textbox", id = "RoundDigit" })</div>
+        }
+    </div>
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function (e) {
+        $('#SalaryCode').MaxLength(10);
+        $('#SalaryDesc').MaxLength(50);
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var dt;
+        var btndisablename = "";
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        // SalaryCode, SalaryDesc, SalaryType, RoundingMethod, RoundDigit
+
+        ColModel = ['Id', 'SalaryCode', 'SalaryDesc', 'SalaryType', 'RoundingMethod', 'RoundDigit'];
+        ColNames = ['Id', 'SalaryCode', 'SalaryDesc', 'SalaryType', 'RoundingMethod', 'RoundDigit'];
+        SortName = 'Id';
+        Caption = 'Other Salary Head';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#SalaryDesc').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#SalaryCode').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            $('#frmOtherSalHead').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Other Salary Head Master', 'open', '@Url.Action("create") ', '#frmOtherSalHead', 'Message :', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) { });
+            $('#RoundingMethodlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 422, "");
+            $('#SalaryTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 415, "");
+            e.preventDefault();
+
+        });
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmOtherSalHead').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Other Salary Head Master", '#frmOtherSalHead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#SalaryDesc').val(k.SalaryDesc);
+                    $('#SalaryCode').val(k.SalaryCode);
+                    $('#SalaryCode').attr('readonly', 'readonly');
+                    $('#RoundDigit').val(k.RoundDigit);
+                    $('[name="InPayslip"]').val([k.InPayslip]).button().button("refresh");
+                    $('[name="InITax"]').val([k.InITax]).button().button("refresh");
+                    $('#SalaryTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 415, k.SalaryType); // Dropdown bind
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod); // Dropdown bind
+
+                });
+              //  alert(data[3]);
+//$('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+
+            e.preventDefault();
+        });
+
+
+
+
+
+
+        // $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        //var Viewbtndisable = '#Lookup-SocialActivities-EmpSocialInfo,#Create-SocialActivities-EmpSocialInfo,#Edit-SocialActivities-EmpSocialInfo,#Remove-SocialActivities-EmpSocialInfo';
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 315, 543, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', Viewbtndisable, 356, 612, '#Autho', '', '', '', '', 'Message : ', 'Request Falied :', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#SalaryDesc').val(k.SalaryDesc);
+                    $('#SalaryCode').val(k.SalaryCode);
+                    $('#SalaryCode').attr('readonly', 'readonly');
+                    $('#RoundDigit').val(k.RoundDigit);
+                    //$('[name="InPayslip"]').val([k.InPayslip]).button().button("refresh");
+                    //$('[name="InITax"]').val([k.InITax]).button().button("refresh");
+                    $('#SalaryTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 2, k.SalaryType); // Dropdown bind
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 5, k.RoundingMethod); // Dropdown bind
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#SalaryDesc').oldVal(data[2].SalaryDesc);
+                    $('#SalaryCode').oldVal(data[2].SalaryCode);
+                    $('#RoundDigit').oldVal(data[2].RoundDigit);
+                    $('[name="InPayslip"]').oldVal(data[2].InPayslip).button().button("refresh");
+                    $('[name="InITax"]').oldVal(data[2].InITax).button().button("refresh");
+                    $('#RoundingMethodlist').oldDropval(data[2].RoundingMethod);
+                    $('#SalaryTypelist').oldDropval(data[2].SalaryType);
+                }
+            });
+        });
+
+
+
+        $('#SalaryCode').ForceOnlyAlphaNumeric();
+        $('#SalaryCode').MaxLength(10);
+        $('#SalaryDesc').ForceOnlyAlphaNumeric();
+        $('#SalaryDesc').MaxLength(25);
+        $('#RoundDigit').ForceOnlyNumeric();
+        $('#RoundDigit').MaxLength(3);
+
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

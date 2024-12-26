@@ -1,0 +1,94 @@
+﻿@model Payroll.StatutoryEffectiveMonths
+@{
+    Layout = null;
+}
+<script>
+    $(document).ready(function () {
+
+        $('button').button();
+        $('.drop').css({ "width": "182px" });
+        $('.drop').selectmenu().selectmenu('menuWidget').css({ "height": "200px" });
+        $('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 437, "");
+        $('#Gender_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 129, "");
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Range-StatutoryEffectiveMonths').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Range")', 'Create Range', 'open', '@Url.Action("Create", "Range")', '#frmRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmServiceDependRule', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', function (data) {
+                $('#StatutoryWageRangelist').P2BLookUpEncapsulate('#StatutoryWageRangelist', 'StatutoryWageRangelist', data[0], data[1], 'StatutoryWageRangelist', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-Range-StatutoryEffectiveMonths').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup_Range", "StatutoryEffectiveMonths")', '', 'LookupDiv', 'Statutory Effective', '#StatutoryWageRangelist', 'StatutoryWageRangelist', 5, 'StatutoryWageRangelist', '#frmPTaxMaster', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+       
+        $('#Remove-Range-StatutoryEffectiveMonths').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#StatutoryWageRangelist').P2BGetTableDataonSelectedRow('#StatutoryWageRangelist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#StatutoryWageRangelist').P2BGetTableDataonSelectedRow('#StatutoryWageRangelist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#StatutoryWageRangelist', $('#StatutoryWageRangelist').val(), 200, 200, '#frmStatutoryEffectiveMonths', '#StatutoryWageRangelist', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula');
+            event.preventDefault();
+        });
+
+    });
+</script>
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmStatutoryEffectiveMonths" }))
+{
+    <div class="sta_row1 content_margine1" id="dvGender">
+        @Html.LabelFor(m => m.Gender, "Gender :", new { @class = "popup-content-label must" })
+        <select class="drop" name="Gender_drop" style="width:120px;" id="Gender_drop">
+            <option value="0">-Select-</option>
+        </select>
+    </div>
+
+        <div class="sta_row1 content_margine1">
+            @Html.LabelFor(m => m.EffectiveMonth, "EffectiveMonth (LookupCode-437):", new { @class = "popup-content-label must" })
+            <select id="EffectiveMonthList" name="EffectiveMonthList" class="drop must">
+                <option value="0">-Select-</option>
+            </select>
+        </div>
+
+        <div class="sta_row1 content_margine1">
+            @Html.LabelFor(m => m.StatutoryWageRange, "StatutoryWageRange:", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <div id="StatutoryWageRangelist_old"></div>
+                <table class="lookuptableselected" id="StatutoryWageRangelist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select StatutoryWageRange Details" class="popup-content-icon-lookup" id="Lookup-Range-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create StatutoryWageRange Details" class="popup-content-icon-create" id="Create-Range-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit StatutoryEffectiveMonths Details" style="left: 227px" class="popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove StatutoryWageRange Details" class="popup-content-icon-remove" id="Remove-Range-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .popup-content-label {
+        display: block;
+        width: 128px;
+        float: left;
+    }
+
+    /*.sta_row1 {
+        width: 328px;
+    }*/
+    .content_margine1 {
+        margin: 0.5px;
+        padding: 0.5px;
+        width:500px;
+        height:30px;
+    }
+    .icon-row {
+        position: relative;
+        left: 86px;
+        top: -150px;
+    }
+</style>

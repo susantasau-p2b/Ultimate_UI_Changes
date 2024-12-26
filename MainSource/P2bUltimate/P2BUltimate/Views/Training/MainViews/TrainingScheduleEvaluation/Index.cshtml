@@ -1,0 +1,234 @@
+﻿@{
+    ViewBag.Title = "Training Schedule Evaluation";
+}
+
+@model Training.TrainingSchedule
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 180px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    #Lookup_BatchName {
+        left: 280px;
+        top: 20px;
+    }
+</style>
+
+
+
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        //"#StayFees","#TrainingFees",  "#TravelFees"
+        ColModel = ['OverallFacultyRating', 'FacultyFeedback', 'OverallTrainingRating', 'OverallTrainingFeedback', 'TrainingBatchName', 'Id'];
+        ColNames = ['Overall Training Rating', 'Overall Training Feedback', 'Overall Faculty Rating', 'Overall Faculty Feedback', 'TrainingBatchName', 'Id'];
+        SortName = 'Code';
+        Caption = 'Training Schedule Evaluation';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        // $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            if (!$("#txtPBatchName").val()) {
+
+                alert("Please Select Batch name.")
+                return false;
+            }
+            $('#frmTrainingScheduleEvaluation').trigger("reset");
+            var a = $("#txtPBatchName").val();
+           
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training Schedule Evaluation ', 'open', '@Url.Action("Create", "TrainingScheduleEvaluation")?batch=' +a, '#frmTrainingScheduleEvaluation', 'Message :', 'Request Falied :', '#JqGrid', 300, 595, '', btndisablenames, function (data) { });
+            var a = $("#txtPBatchName").val();
+            $('#txtPBatchName1').val(a);
+            $('#txtPBatchName1').attr("readonly", "readonly");
+
+            event.preventDefault();
+        });
+
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")?batch=' + $('#BatchName_id').val(), dt.Id, '@Url.Action("EditSave")', "Edit Training Schedule Evaluation Data", '#frmTrainingScheduleEvaluation', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 340, 595, '', btndisablenames, function (data) {
+                
+                $('#txtPBatchName1').attr("readonly", "readonly");
+                $.each(data[0], function (i, k) {
+                    $('#OverallFacultyRating').val(k.OverallFaultyRating);
+                   
+                    $('#OverallTrainingFeedback').val(k.OverallTrainingFeedback);
+                    
+                    $('#OverallTrainingRating').val(k.OverallTrainingRating);
+                    $('#FacultyFeedback').val(k.FacultyFeedback);
+                    $('#txtPBatchName1').val(k.TrainingBatchName);
+                    $('#batchname').val(k.Batchname);
+                  
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Training Schedule Evaluation Data', '', '', 370, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#txtPBatchName1').attr("readonly", "readonly");
+                $.each(data[0], function (i, k) {
+                    $('#OverallFacultyRating').val(k.OverallFaultyRating);
+
+                    $('#OverallTrainingFeedback').val(k.OverallTrainingFeedback);
+
+                    $('#OverallTrainingRating').val(k.OverallTrainingRating);
+                    $('#FacultyFeedback').val(k.FacultyFeedback);
+                    $('#txtPBatchName1').val(k.TrainingBatchName);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#FoodFees').oldVal(data[2].FoodFees);
+                    $('#MiscFees').oldVal(data[2].MiscFees);
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').oldVal(data[2].StayFees);
+                    $('#TrainingFees').oldVal(data[2].TrainingFees);
+                    $('#TravelFees').oldVal(data[2].TravelFees);
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('#Load').on('click', function (e) {
+
+            var v1 = $("#txtPBatchName").val();
+
+            $('#JqGrid').PostGridData({ url: url, filter: v1 });
+        });
+
+        $('#Lookup_BatchName').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPBatchName",
+                appendToId: "#BatchName_id",
+                lookupurl: "@Url.Action("GetBatchNameDetails", "TrainingPresenty")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $("#OverallFacultyRating").ForceOnlyNumeric().MaxLength(20);
+        $("#OverallTrainingRating ").ForceOnlyNumeric().MaxLength(20);
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left;width:290px">
+                    <label id="lblBatchName" class="popup-content-label must" style="width:90px">Batch Name:</label>
+                    <input name="txtPBatchName" type="text" id="txtPBatchName" class="date-picker" />
+                    <input type="text" id="BatchName_id" name="BatchName_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_BatchName"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                </div>
+                <span>
+                    <button class="button" id="Load">Load</button>
+                    <button class="button" id="Create">Create</button>
+                    <button class="button" id="View">View</button>
+                    <button class="button" id="Edit">Edit</button>
+                    <button class="button" id="Delete">Delete</button>
+                    <button class="button" id="Autho">Authorised</button>
+                </span>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <div id="Create_Dialog" title="Create Training  Expensess ">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingScheduleEvaluation" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+             <div class="row1 content_margine"> <label id="lblBatchName" class="popup-content-label must" >Batch Name:</label>
+                 <input name="txtPBatchName1" type="text" id="txtPBatchName1" class="popup-content-textbox must" /></div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.OverallTrainingRating, "Overall Training Rating:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OverallTrainingRating, new { @class = "popup-content-textbox must", @id = "OverallTrainingRating", @Value = "0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.OverallTrainingFeedback, "Overall Training Feedback:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OverallTrainingFeedback, new { @class = "popup-content-textbox must", @id = "OverallTrainingFeedback" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.OverallFaultyRating, "Overall Faculty Rating:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OverallFaultyRating, new { @class = "popup-content-textbox must", @id = "OverallFacultyRating", @Value = "0" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.FacultyFeedback, "Overall Faculty Feedback:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FacultyFeedback, new { @class = "popup-content-textbox must", @id = "FacultyFeedback"})</div>
+        }
+    </div>
+</body>

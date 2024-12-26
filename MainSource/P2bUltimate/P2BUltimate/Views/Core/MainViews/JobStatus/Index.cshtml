@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "JobStaus";
+}
+@model P2b.Global.JobStatus
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 124px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+</style>
+
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create JobStatus">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmJobStatus", name = "frmJobStatus" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">
+                <div id="EmpStatuslist_old"></div>
+                @Html.LabelFor(m => m.EmpStatus, "Status :", new { @class = "popup-content-label must" })
+                @*<select style="width:120px" id="EmpStatuslist" class="drop" name="EmpStatuslist"></select>*@
+                <select class="drop must" style="width:150px;" name="EmpStatuslist" id="EmpStatuslist">
+                    <option></option>
+                </select>
+            </div>
+            <div class="row1 content_margine">
+                <div id="EmpActingStatuslist_old"></div>
+                @Html.LabelFor(m => m.EmpActingStatus, "EmpActingStatus :", new { @class = "popup-content-label must" })
+                @*<select style="width:120px" id="EmpActingStatuslist" class="drop" name="EmpActingStatuslist"></select>*@
+                <select class="drop must" style="width:150px;" name="EmpActingStatuslist" id="EmpActingStatuslist">
+                    <option></option>
+                </select>
+            </div>
+        }
+    </div>
+</body>
+</html>
+
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#OpeningDate').P2BDatePicker();
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['EmpStatus', 'EmpActingStatus', 'Id'];
+        ColNames = ['EmpStatus', 'EmpActingStatus', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = 'Job Status';
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmJobStatus').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Jobstatus', 'open', '@Url.Action("Create")', '#frmJobStatus', 'Message :', 'Request Falied :', '#JqGrid', 242, 400, '#AddressList,#ContactDetailsList', "", function (data) { });
+            $('#EmpStatuslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")',101, ""); // To bind dropdown on page load
+                 $('#EmpActingStatuslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")',102, ""); // To bind dropdown on page load
+             event.preventDefault();
+         });
+
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmJobStatus', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 242, 400, '', btndisablenames, function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#EmpStatuslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 101, k.EmpStatus); // Dropdown bind
+                    $('#EmpActingStatuslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 102, k.EmpActingStatus); // Dropdown bind
+                });
+
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 242, 400, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#EmpStatuslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 101, k.EmpStatus);
+                    $('#EmpActingStatuslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 102, k.EmpActingStatus);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#EmpStatuslist').StickNote(data[2].EmpStatus);
+                    $('#EmpActingStatuslist').StickNote(data[2].EmpActingStatus);
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $("#Code").ForceOnlyNumeric();
+        $("#Name").ForceOnlyNumeric();
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+    });
+</script>

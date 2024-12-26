@@ -1,0 +1,643 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.HotelBookingRequest
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+
+    .hide_textbox {
+        display: none;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            @*var dataemp = $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+
+            $('button').button();
+
+            $('.popup_radio_button').buttonset();
+            $('#autho').makeDisable('#create,#edit,#delete');
+            $('.drop').selectmenu().selectmenu('menuWidget');
+            $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+            $('#Categorylist').selectmenu().selectmenu("menuWidget");
+            $('#CountryList').selectmenu().selectmenu("menuWidget");
+            $('#StateList').selectmenu().selectmenu("menuWidget");
+            $('#CityList').selectmenu().selectmenu("menuWidget");
+            $('#Type_Nomines').selectmenu().selectmenu("menuWidget");
+
+            $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+            $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+            // $('#NoOfRooms').ForceAmount().MaxLength(10);
+            //$('#NoOfRooms').attr("value", "0");
+            //$('#TotFamilyMembers').attr("value", "0");
+            //$('#TotalAdults').attr("value", "0");
+            //$('#TotalChild').attr("value", "0");
+            //$('#TotalInfant').attr("value", "0");
+            //$('#TotalSrCitizen').attr("value", "0");
+            //$('#RatePerDay').attr("value", "0");
+            //$('#StdDiscount').attr("value", "0");
+            //$('#Taxes').attr("value", "0");
+            //$('#BillAmount').attr("value", "0");
+
+            //$('#Eligible_BillAmount').attr("value", "0");
+
+
+
+            var btndisablenames = "#edit-Address-BenefitNominees,#remove-HotelEligibilityPolicy,#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees";
+            $("#handicapRemarkdiv").fadeOut();
+            $('#lvexcludeleavediv').fadeOut();
+
+
+
+
+            function AssignData() {
+                dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+
+            }
+
+            $('#DateofBirth').P2BDatePicker();
+            $('#StartDate').P2BDatePicker();
+            $('#EndDate').P2BDatePicker();
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            @*$('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", "", '#StateList');
+
+            $('#CountryList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "state")", '#StateList', "");
+            $('#StateList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "StateRegion")", "#StateRegionList", "");
+            $('#StateRegionList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "District")", "#Districtlist", "");
+            $('#Districtlist').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "Taluka")", "#TalukaList", "");
+            $('#TalukaList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "City")", "#CityList", "");
+            $('#CityList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "area")", "#AreaList", "");
+
+            $('.popup_radio_button').buttonset();
+
+            $('#CountryList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "Country")', "", "");
+            $('#StateList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListState")', "", "");
+            $('#CityList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCity")', "", "");*@
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#create_country').on("click", function (e) {
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_Country", "Country")', 'Create Country', 'open', '@Url.Action("Create", "Country")', '#frmCountry', 'Message :', 'Request Falied :', '#jqgrid', 217, 339, '', '#CountryList', 'change', '', '', function (data) {
+                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Country")", "", data[0], '#StateList');
+
+                });
+                e.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#create_state').on("click", function (e) {
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_State", "state") ', 'Create State', 'open', '@Url.Action("Create", "State")', '#frmState', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, $("#CountryList option:selected").val(), '#CountryList', 'change', '', '', function (data) {
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", data[0], '#StateRegionList');
+                });
+                e.preventDefault();
+
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#create_city').on("click", function (e) {
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_City", "city") ', 'Create City', 'open', '@Url.Action("Create","City")', '#frmCity', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, 1, '#TalukaList', 'change', '', '', function (data) {
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", data[0], '#AreaList');
+                });
+                e.preventDefault();
+
+            });
+
+            /*----------------------------------------------------------------------------------*/
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#create-NomineeName-BenefitNominees').button().on("click", function (event) {
+                // alert("hh...");
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+                if (a.val == "" || a.length == 0) {
+                    alert("Please select Employee");
+                    return false;
+                }
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("GridPartial", "EmployeeFamilyDetails")', 'Create Family Name', 'open', '@Url.Action("GridCreate", "EmployeeFamilyDetails")?Empid=' + a, '#frmBenefitNominees', 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '', '', '', '#frmHotelBookingReq', '', function (data) {
+                    //  alert("hhhhhhhhhhhh...");
+                    $('#NomineeNamelist').P2BLookUpEncapsulate('#NomineeNamelist', 'NomineeNamelist', data[0], data[1], 'NomineeNamelist', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees', 'N');
+                    $('#Categorylist1').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 107, "");
+
+                });
+
+                event.preventDefault();
+            });
+
+            $('#remove-NomineeName-BenefitNominees').button().on('click', function (event) {
+                var a = [], b;
+
+                a = $('#NomineeNamelist').P2BGetTableDataonSelectedRow('#NomineeNamelist', 0);
+                //      alert("remove lookup : "+a);
+                b = a[0];
+                //alert("remove lookup b val: " + b);
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NomineeNamelist', $('#NomineeNamelist').val(), 200, 200, '#frmHotelBookNewReqonSanction', '#NomineeNamelist', '#remove-NomineeName-BenefitNominees');
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+
+
+
+            $('#lookup-NomineeName-BenefitNominees').on('click', function (event) {
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+                if (a.val == "" || a.length == 0) {
+                    alert("Please select Employee");
+                    return false;
+                }
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupFamilyName", "EmployeeFamilyDetails")?Empid=' + a, '', 'lookupdiv', 'Family Look Up Data', '#NomineeNamelist', 'NomineeNamelist', 5, 'NomineeNamelist', '#frmHotelBookingReq', 'A', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees', 'lookup_table', 'pageNavPosition');
+                event.preventDefault();
+            });
+
+
+
+            $('#edit-NomineeName-BenefitNominees').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#NomineeNamelist').P2BGetTableDataonSelectedRow('#NomineeNamelist', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "NameSingle")', '@Url.Action("edit", "NameSingle")', b, '@Url.Action("EditSave", "NameSingle")', 'Edit  Details', '#frmNameSingle', b, 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '#frmHolidaybookingrequest', '#NomineeNamelist', 'NomineeNamelist', 'NomineeNamelist', 'N', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees', function (data) {
+                    // setTimeout(function () {
+                    var k = data;
+                    $('#frmnameSingle').trigger("reset");
+                    $('#FName').val(k.FName);
+                    $('#MName').val(k.MName);
+                    $('#LName').val(k.LName);
+
+                    $('#title').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 100, k.EmpTitle);
+
+
+                    // }, 3000);
+                });
+                event.preventDefault();
+            });
+
+
+            @*$('#remove-NomineeName-BenefitNominees').button().on('click', function (event) {
+                // dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+                var a = [], b;
+                a = $('#NomineeNamelist').P2BGetTableDataonSelectedRow('#NomineeNamelist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","EmployeeFamilyDetails")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NomineeNamelist', $('#NomineeNamelist').val(), 200, 200, '#frmHolidaybookingrequest', '#NomineeNamelist', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees');
+                event.preventDefault();
+            });*@
+
+
+
+            $('#lookup-CandidateDocuments-Candidate').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetCandDocsLKDetails", "EmployeeDocuments")', '', 'lookupdiv', 'Employee Document Look Up Data', '#CandidateDocumentslist', 'CandidateDocumentslist', 5, 'CandidateDocumentslist', '#frmCandidate', 'N', '#remove-CandidateDocuments-Candidate', 'CandidateDocumentslist_table', 'pageNavPosition');
+                e.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#create-CandidateDocuments-Candidate').on("click", function (event) {
+                @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "EmployeeDocuments")', 'Create Employee Documents', 'open', '@Url.Action("Create", "EmployeeDocuments")', '#frmCandidateDocs', 'Message :', 'Request Failed :', '#jqgrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+                $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data[0], data[1], 'CandidateDocumentslist', '', 'N');
+            });*@
+
+                var a = $('#EmpCode').val();
+
+                $('<div></div>').P2BConfidentialModelDialog({
+                    htmlurl: "@Url.Action("Partial__EmployeeDocuments", "EmployeeDocuments")",
+                    submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                    form: '#frmCandidateDocs',
+                    height: "400",
+                    type: "FILE",
+                    width: "500",
+                    title: "DocumentUpload",
+                    BeforeSendurl: "true",
+                    returnfun: function (data) {
+                        $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data.Id, data.Val, 'CandidateDocumentslist', '', 'A');
+                    },
+                });
+                event.preventDefault();
+            });
+
+
+
+            $('#edit-CandidateDocuments-Candidate').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+                b = a[0];
+
+
+
+                $.post("@Url.Action("CheckUploadFile", "EmployeeDocuments")?Id=" + b, function (data) {
+
+                    debugger;
+                    if (data.success == false) {
+
+                        alert("File Not Found");
+                        return false;
+                    } else if (data.fileextension == ".pdf") {
+                        window.location = "@Url.Action("GetCompImage", "EmployeeDocuments")?data=" + b;
+                    }
+                    else {
+                        $('<div></div>').PartialCreateDialog({
+                            height: '500',
+                            width: '500',
+                            form: "#frmImageviewer",
+                            title: "Image Viewer",
+                            htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                            state: "open",
+                            mode: "View",
+                            editurl: "@Url.Action("GetCompImage", "EmployeeDocuments")",
+                            editdata: b,
+                            forwarddata: b,
+                            returndatafunction: function (data) {
+                                debugger;
+                                console.log(data);
+
+                                if (data != null) {
+                                    $("#dashboard-Investment-viewer").attr('src', "data:image/png;base64," + data + "");
+                                } else {
+                                    alert("First Upload the File");
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+                event.preventDefault();
+            });
+
+
+            $('#Sanlookup_Incharge').on('click', function (e) {
+                var emp = $('#Employee').text().split(" ");
+
+                $('.dialog').AddDataToTextbox({
+                    appendTo: "#SantxtIncharge",
+                    appendToId: "#SanIncharge_id",
+                    lookupurl: "@Url.Action("GetLookupIncharge", "ELMS")?data=" + emp[0],
+                    NoOfRecordToShow: "10",
+                    setnameofthelookupbyppage: "txtIncharge_FName-lookup",
+                    lookupdiv: "lookupdiv",
+                    lookuppagename: "lookup",
+                    pagename: "pageNavPosition",
+                    readonly: true,
+                    height: 200,
+                });
+                e.preventDefault();
+            });
+
+
+
+            $('#remove-CandidateDocuments-Candidate').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#frmHotelBookingReq', '#CandidateDocumentslist', '#remove-CandidateDocuments-Candidate');
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "MySelf".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+            }
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Sanction".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').hide();
+                $('#Sanction-div').show();
+            }
+
+
+            var DropTest = $.LocalStorageHelper.Get("Whois").toUpperCase() == "Approval".toUpperCase();
+            console.log("DropTest: " + DropTest);
+
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Approval".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').show();
+                $('#Sanction-div').hide();
+               
+            }
+
+            $('button').button();
+
+
+
+
+
+
+
+
+
+        });
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    @*<div id="create_dialog" title="Create LvNewReq">*@
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmHotelBookNewReqonSanction", name = "frmHotelBookNewReqonSanction" }))
+    {
+        <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+        <input type="hidden" name="Lvnewreqid_User" id="Lvnewreqid_User" value="" />
+        <input type="hidden" name="Lvnewreqid_User_Empcode" id="Lvnewreqid_User_Empcode" value="" />
+        <input type="text" class="hide_textbox" name="authority" id="authority" />
+        <input type="text" class="hide_textbox" name="isClose" id="isClose" />
+        <input type="text" class="hide_textbox" name="TrClosed" id="TrClosed" />
+        <input type="text" class="hide_textbox" name="LvId" id="LvId" />
+        <div class="section2_Leave">
+
+            <div class="row3 content_margine">
+                <label class="popup-content-label must">Hotel Name:</label>
+                <input type="text" id="HotelName" class="popup-content-textbox must" name="HotelName">
+            </div>
+
+
+            <div class="row3 content_margine">
+                <label class="popup-content-label must">Hotel Desc:</label>
+                <input type="text" id="HotelDesc" class="popup-content-textbox must" name="HotelDesc">
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Country, "Country :", new { @class = "popup-content-label" })
+                <select id="CountryList" name="CountryList" class="drop" style="width:180px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row">
+                    <button data-p2btooltip="Create Country" class="popup-content-icon-create" id="create_country">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.State, "State :", new { @class = "popup-content-label" })
+                <select id="StateList" name="StateList" class="drop" style="width:180px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row">
+                    <button data-p2btooltip="Create State" class="popup-content-icon-create" id="create_state">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="add_row content_margine">
+                @Html.LabelFor(m => m.City, "City :", new { @class = "popup-content-label" })
+                <select id="CityList" name="CityList" class="drop" style="width:180px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row">
+                    <button data-p2btooltip="Create City" class="popup-content-icon-create" id="create_city">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+
+
+
+            <div class="row3 content_margine ">
+                @Html.LabelFor(m => m.IsFamilyIncl, " IsFamilyIncl:", new { @class = "popup-content-label" })
+                <span class="popup_radio_button">
+                    <span><input type="radio" id="radio3" name="IsFamilyIncl" value="true" /> <label for="radio3">Yes</label></span>
+                    <span><input type="radio" id="radio4" name="IsFamilyIncl" value="false" /> <label for="radio4">No</label></span>
+                </span>
+            </div>
+            <div id="FamilymemberDiv">
+                <div class="row3 content_margine">
+                    @*<div id="Nomineeslist_old"></div>*@
+                    <label class="popup-content-label ">Faimly Member Name :</label>
+                    @*@Html.LabelFor(m => m.FamilyDetails, "Faimly Member Name :", new { @class = "popup-content-label" })*@
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="NomineeNamelist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Nomineename" class="  popup-content-icon-lookup" id="lookup-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Nomineename" class="popup-content-icon-create" id="create-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Nomineename" class="popup-content-icon-edit" id="edit-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Nomineename" class="popup-content-icon-remove" id="remove-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="Empdoclist_old"></div>
+                @*@Html.LabelFor(m => m.EmployeeDocuments, "Document details :", new { @class = "popup-content-label add_label" })*@
+                <label class="popup-content-label">Reference Document :</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="CandidateDocumentslist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+
+                </div>
+
+                <div class="icon-Document icon-row">
+                    <button data-p2btooltip="Lookup Document Details" class=" popup-content-icon-lookup" id="lookup-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Document Details" class=" popup-content-icon-create" id="create-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Document Details" class=" popup-content-icon-edit" id="edit-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete Document Details" class=" popup-content-icon-remove" id="remove-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+
+
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.BillNo, "Bill No :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BillNo, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.StartDate, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.NoOfRooms, "No of Room :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.NoOfRooms, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TotFamilyMembers, "Total Family member :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotFamilyMembers, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TotalAdults, "Total Adults :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalAdults, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TotalChild, "Total Child :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalChild, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TotalInfant, "Total Infant :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalInfant, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TotalSrCitizen, "Total Sr. Citizen :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalSrCitizen, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.SpecialRemark, "SpecialRemark :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SpecialRemark, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.RatePerDay, "Rate per day :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.RatePerDay, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.StdDiscount, "Std. Discount :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.StdDiscount, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Taxes, "Taxes :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Taxes, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.BillAmount, "Bill Amount  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BillAmount, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Eligible_BillAmount, "Eligible Bill Amount  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Eligible_BillAmount, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Narration, "Narration  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+        </div>
+        <br>
+        
+    <div id="Sanction-div">
+        <div class="heading">Sanction Authority Views</div>
+        <div class="row3 content_margine " id="yes_no_div">
+            <label class="popup-content-label">
+                Sanction Status:
+            </label>
+            <span class="popup_radio_button">
+                <span><input type="radio" id="radio1" name="Sanction" value="true" /> <label for="radio1">Yes</label></span>
+                <span><input type="radio" id="radio2" name="Sanction" value="false" /> <label for="radio2">No</label></span>
+            </span>
+        </div>
+
+        <div class="row3 content_margine">
+            <label class="popup-content-label must">
+                Reason:
+            </label>
+            <input type="text" name="ReasonSanction" id="ReasonSanction" class="popup-content-textbox" />
+        </div>
+
+        @*<div class="row3 content_margine">
+                <label class="popup-content-label ">Incharge:</label>
+                <input name="SantxtIncharge" type="text" id="SantxtIncharge" class="date-picker" style="width: 243px" />
+                <input type="text" id="SanIncharge_id" name="SanIncharge_id" class="filter_structure_id" />
+                <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="Sanlookup_Incharge"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            </div>*@
+        </div>
+
+        <div class="section_Method hide-div" id="Approval-div">
+        <div id="ApprovalDiv" class="row1 content_margine">
+            <div class="heading">Approval Authority View</div>
+            <label class="popup-content-label">
+                Approval Status:
+            </label>
+            <div class="popup_radio_button">
+                <input type="radio" name="Approval" value="true" id="rdo3" /><label for="rdo3">Yes</label>
+                <input type="radio" name="Approval" id="rdo4" value="false" /><label for="rdo4">No</label>
+            </div>
+            <div class="row1 content_margine">
+                <label class="popup-content-label must">Reason :</label>
+                <input type="text" id="Grid-ReasonApproval" name="ReasonApproval" />
+            </div>
+            @*<div class="row1 content_margine">
+                <label class="popup-content-label ">Incharge:</label>
+                <input name="ApptxtIncharge" type="text" id="ApptxtIncharge" class="date-picker" style="width: 243px" />
+                <input type="text" id="AppIncharge_id" name="AppIncharge_id" class="filter_structure_id" />
+                <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="Applookup_Incharge"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+            </div>*@
+
+        </div>
+    </div>
+
+
+
+        }
+        @*</div>*@
+</body>
+</html>

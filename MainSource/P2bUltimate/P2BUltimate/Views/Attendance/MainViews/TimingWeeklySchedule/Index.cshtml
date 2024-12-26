@@ -1,0 +1,383 @@
+﻿@{
+    ViewBag.Title = "Timing Weekly Schedule ";
+}
+
+@model Attendance.TimingWeeklySchedule
+<style>
+    .icon-row {
+        position: relative;
+        left: 73px;
+        top: -147px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 115px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 612px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 612px;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        $('#Description').ValidateTextBox({ maxlength: 50, name: true, alphanum: true });
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Description', 'WeekDays', 'WeeklyOffType', 'IsFixedWeeklyOff', 'Id'];
+        ColNames = [ 'Description', 'WeekDays', 'WeeklyOffType', 'IsFixedWeeklyOff', 'Id'];
+        SortName = 'Id';
+        Caption = 'Weekly Timing Schedule';
+        var btndisablenames = "#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule";
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmWeeklySchedule').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Timing Weekly Schedule', 'open', '@Url.Action("Create")', '#frmWeeklySchedule', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#TimingGroupList', btndisablenames, function (data) { });
+            $('#WeekDayslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 200, ""); // To bind dropdown on page load
+            $('#WeeklyOffTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 612, ""); // Dropdown bind
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Timing Weekly Schedule Data", '#frmWeeklySchedule', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#TimingGroupList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmWeeklySchedule').trigger("reset");
+                    $('#Description').val(k.Description);
+                    // $('#Description').attr('readonly', 'readonly');
+                    $('[name="Is7x24WeeklyOff"]').val([k.Is7x24WeeklyOff]).button().button("refresh");
+                    $('[name="IsFixedWeeklyOff"]').val([k.IsFixedWeeklyOff]).button().button("refresh");
+                    $('#WeekDayslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 200, k.WeekDays_Id); // Dropdown bind
+                    $('#WeeklyOffTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 612, k.WeeklyOffType_Id); // Dropdown bind
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', k.TimingGroup_Id, k.TimingGroup_FullDetails, 'TimingGroupList', '#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', 'N');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Timing Weekly Schedule data', '#TimingGroupList', 'Lookup-TimingGroup-WeeklySchedule,#Create-TimingGroup-WeeklySchedule,#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWeeklySchedule').trigger("reset");
+                    $('#Autho_Action').val(k.Action);
+                    $('#Description').val(k.Description);
+                    $('[name="Is7x24WeeklyOff"]').val([k.Is7x24WeeklyOff]).button().button("refresh");
+                    $('[name="IsFixedWeeklyOff"]').val([k.IsFixedWeeklyOff]).button().button("refresh");
+                    $('#WeeklyOffTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 612, k.WeeklyOffType_Id); // Dropdown bind
+                    $('#WeekDayslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 200, k.WeekDays_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', k.TimingGroup_Id, k.TimingGroup_FullDetails, 'TimingGroupList', 'view', 'N');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Description').oldDropval(data[2].Description);
+                    $('#radio2').oldDropval([data[2].IsAutoShift]);
+                    $('#radio4').oldDropval([data[2].IsManualRotateShift]);
+                    $('#WeekDayslist').oldDropval(data[2].WeekDayslist_Val);
+                    $('#TimingGroupList_old').oldDropval(data[2].TimingGroupList_Val);
+                }
+            });
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+        //To get data in Lookup
+        $('#Lookup-TimingGroup-WeeklySchedule').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingGrpDetails", "TimingWeeklySchedule")', '', 'LookupDiv', 'Look Up Data', '#TimingGroupList', 'TimingGroupList', 5, 'TimingGroupList', '#frmWeeklySchedule', 'N', '#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+
+
+
+        // PArtial page create
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingGroup-WeeklySchedule').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TimingGroup")', 'Create TimingGroup', 'open', '@Url.Action("Create", "TimingGroup")', '#frmTimingGroup1', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWeeklySchedule', '', function (data) {
+                // to show data which is created in partial page
+                $('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', data[0], data[1], 'TimingGroupList', '#Edit-Address-TimingGroup,#Remove-Address-TimingGroup', 'N');
+            });
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingGroup-WeeklySchedule').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TimingGroup")', 'Create TimingGroup', 'open', '@Url.Action("Create", "TimingGroup")', '#frmTimingGroup', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWeeklySchedule', '', function (data) {
+                // to show data which is created in partial page
+                $('#TimingGrouplist').P2BLookUpEncapsulate('#TimingGrouplist', 'TimingGrouplist', data[0], data[1], 'TimingGrouplist', '#Edit-TimingGroup-WeeklySchedule,Remove-TimingGroup-WeeklySchedule', 'N');
+            });
+            event.preventDefault();
+        });*@
+
+
+
+
+        // PArtial page edit
+        $('#Edit-TimingGroup-WeeklySchedule').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TimingGroupList').P2BGetTableDataonSelectedRow('#TimingGroupList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TimingGroup")', '@Url.Action("edit", "TimingGroup")', b, '@Url.Action("Editsave","TimingGroup")', 'Edit timinggroup', '#frmTimingGroup1', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmWeeklySchedule', '#TimingGroupList', 'TimingGroupList', 'TimingGroupList', 'N', '#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmTimingGroup1').trigger('reset');
+                    $('#GroupName').val(k.GroupName);
+                    $('#GroupCode').val(k.GroupCode);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('[name="IsAutoShift"]').val([k.IsAutoShift]).button().button("refresh");
+                    $('[name="IsManualRotateShift"]').val([k.IsManualRotateShift]).button().button("refresh");
+                });
+                $.each(data[1], function (i, k) {
+                    // $('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', k.TimingGroup_Id, k.TimingGroup_FullDetails, 'TimingGroupList', '#Edit-TimingGroup-WeeklySchedule,#Remove-TimingGroup-WeeklySchedule', 'N');
+                    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.TimingPolicy_Id, k.TimingPolicy_FullDetails, 'TimingPolicylist', '', 'N');
+                });
+
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+        //partial page delete
+        $('#Remove-TimingGroup-WeeklySchedule').button().on('click', function (event) {
+            //  alert('xbxbb')
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //alert(dt.Id)
+            //var a = [], b;
+            //a = $('#TimingGroupList').P2BGetTableDataonSelectedRow('#TimingGroupList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TimingGroupList').P2BGetTableDataonSelectedRow('#TimingGroupList', 0);
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('',selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingGroupList', $('#TimingGroupList').val(), 200, 200, '#frmWeeklySchedule', '#TimingGroupList');
+            event.preventDefault();
+        });
+
+
+
+        //
+        @*$('#Lookup-TimingGroup-WeeklySchedule').button().on('click', function (event) {
+               @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+        @*  $('.dialog').P2BLookUpModal('@Url.Action("GetTimeGroupLKDetails", "TimingWeeklySchedule")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#TimingGroupList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmWeeklySchedule', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'Lookup_table', 'PageNavPosition');
+             $('.ContactDetLKDiv').P2BLookUpModal('@@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 10, 'ContactDetailsList', '#frmCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingGroup-WeeklySchedule').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "TimingGroup")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","TimngGroup")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#TimingGroupList').P2BLookUpEncapsulate('#TimingGroupList', 'TimingGroupList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+            });
+            event.preventDefault();
+        });*@
+
+        @*  $('#Edit-TimingGroup-WeeklySchedule').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TimingGroupList').P2BGetTableDataonSelectedRow('#TimingGroupList', 0);
+            b = a[0];
+            console.log(b);
+            url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "TimingWeeklySchedule")', '@Url.Action("Editcontactdetails_partial", "TimingWeeklySchedule")', b, '@Url.Action("EditSave", "TimingWeeklySchedule")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCorporate', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                 setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                 }, 3000);
+            });
+            event.preventDefault();
+        });*@
+
+        @*  $('#Remove-TimingGroup-WeeklySchedule').button().on('click', function (event) {
+             dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#TimingGroupList').P2BGetTableDataonSelectedRow('#TimingGroupList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails", "TimingWeeklySchedule")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingGroupList', $('#TimingGroupList').val(), 200, 200, '#frmCorporate', '#ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate');
+            event.preventDefault();
+        })*@
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#WeekDayslist').selectmenu().selectmenu("menuWidget");
+        $('#WeeklyOffTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+    });
+</script>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Timing Weekly Schedule">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmWeeklySchedule", name = "frmWeeklyScheduleEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.Description, "Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.Description, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="dropdown_row1 row3 content_margine">
+                @Html.LabelFor(m => m.WeekDays, "Week Day :", new { @class = "popup-content-label" })
+                <select id="WeekDayslist" name="WeekDayslist" style="width:120px;"><option></option></select>
+            </div>
+
+            <div class="dropdown_row1 row3 content_margine">
+                @Html.LabelFor(m => m.WeeklyOffType, "Weekly Off Type :", new { @class = "popup-content-label" })
+                <select id="WeeklyOffTypelist" name="WeeklyOffTypelist" style="width:120px;"><option></option></select>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="TimingGroupList_old"></div>
+                @Html.LabelFor(m => m.TimingGroup, "TimingGroup :", new { @class = "popup-content-label" })
+                <div class="popup-content-table" style="width: 420px;">
+                    <table class="lookuptableselected" id="TimingGroupList">
+                        <tr><th>Id</th><th>LookUp Selected TimingGroup</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select TimingGroup" class="  popup-content-icon-lookup" id="Lookup-TimingGroup-WeeklySchedule"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create TimingGroup" class="popup-content-icon-create" id="Create-TimingGroup-WeeklySchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit TimingGroup" class="popup-content-icon-edit" id="Edit-TimingGroup-WeeklySchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove TimingGroup" class="popup-content-icon-remove" id="Remove-TimingGroup-WeeklySchedule"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.Is7x24WeeklyOff, "7x24WeeklyOff :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio1" name="Is7x24WeeklyOff" value="true" /> <label class="ui-corner-left" for="radio1">Yes</label>
+                        <input type="radio" id="radio2" name="Is7x24WeeklyOff" value="false" /> <label class="ui-corner-right" for="radio2">No</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsFixedWeeklyOff, " FixedWeeklyOff :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="IsFixedWeeklyOff" value="true" /> <label class="ui-corner-left" for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="IsFixedWeeklyOff" value="false" /> <label class="ui-corner-right" for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>

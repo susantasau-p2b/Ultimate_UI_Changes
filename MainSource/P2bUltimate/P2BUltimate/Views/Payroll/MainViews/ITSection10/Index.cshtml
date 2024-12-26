@@ -1,0 +1,219 @@
+﻿@{
+    ViewBag.Title = "IT Section 10";
+}
+@model Payroll.ITSection10
+<html>
+
+<head>
+    <title></title>
+    @*<link href="~/Content/It%20Section%2010/it_section_10.css" rel="stylesheet" />*@
+    <style>
+        .itsec_icon-row {
+            left: 116px;
+            position: absolute;
+            top: 56px;
+        }
+
+        .row1 {
+            width: 500px;
+        }
+
+        .popup-content-label {
+            width: 150px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            min-width: 150px;
+        }
+    </style>
+    <script>
+        $(document).ready(function (e) {
+            $('#ExemptionCode').MaxLength(10);
+            //$('#DivisionName').MaxLength(50);
+            $('button').button();
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablename = "";
+
+            //$('#ExemptionCode').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['ExemptionCode', 'MaxAmount', 'Id'];
+            ColNames = ['Exemption Code', 'Max Amount', 'Id'];
+            SortName = 'Id';
+            Caption = 'IT Section 10';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmITSection10').trigger('reset');
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create It Section 10 ', 'open', '@Url.Action("create") ', '#frmITSection10', 'Message :', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) { });
+                $('#MaxAmount').val("0");
+                e.preventDefault();
+            });
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+            $('#Edit').on('click', function (e) {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit IT Section 10", '#frmITSection10', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Itsection10salheadlist', "", function (data) {
+                    $('#ExemptionCode').attr('readonly', 'readonly');
+                    $.each(data[0], function (i, k) {
+                        $('#ExemptionCode').val(k.ExemptionCode);
+                        $('#MaxAmount').val(k.MaxAmount);
+                    });
+                    $.each(data[1], function (i, k) {
+
+                        $('#Itsection10salheadlist').P2BLookUpEncapsulate('#Itsection10salheadlist', 'Itsection10salheadlist', k.ITSection10SalHead_Id, k.ITSection10SalHead_FullDetails, 'Itsection10salheadlist', '#Remove-ITSection10SalHead-ITSection10', 'A');
+                    });
+                });
+                e.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+
+            $('#Create-ITSection10SalHead-ITSection10').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("ITSection10SalHead_partial", "ITSection10")', 'Create IT Section 10 SalHead', 'open', '@Url.Action("Create", "ITSection10SalHeads")', '#frmITSection10SalHeads', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmITSection10', '', function (data) {
+
+                    // to show data which is created in partial page
+                    $('#Itsection10salheadlist').P2BLookUpEncapsulate('#Itsection10salheadlist', 'Itsection10salheadlist', data[0], data[1], 'Itsection10salheadlist', '#Remove-ITSection10SalHead-ITSection10', 'A');// data[0], data[1]
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-ITSection10SalHead-ITSection10').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#Itsection10salheadlist').P2BGetTableDataonSelectedRow('#Itsection10salheadlist', 0);
+                b = a[0];
+                console.log(b);
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("ITSection10SalHead_partial", "ITSection10")', '@Url.Action("Edit", "ITSection10SalHeads")', b, '@Url.Action("EditSave", "ITSection10SalHeads")', 'Edit IT Section 10 Sal Heads Details', '#frmITSection10SalHeads', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmITSection10', '#Itsection10salheadlist', 'Itsection10salheadlist', 'Itsection10salheadlist', 'A', '', function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        $('#frmITSection10SalHeads').trigger('reset');
+                        $('[name="AutoPick"]').val([k.AutoPick]).button().button("refresh");
+                        $('#Amount').val(k.Amount);
+                        $('#Percent').val(k.Percent);
+                        $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.Frequency_Id);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#SalHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateSalHeadDropdownList", "ITSection10SalHeads")', "", k.SalaryHead_Id);
+                    });
+                    // }, 3000);
+                });
+                event.preventDefault();
+            });
+
+            $('#Lookup-ITSection10SalHead-ITSection10').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetITSection10SalHeadLKDetails", "ITSection10")', '', 'LookupDiv', 'Look Up Data', '#Itsection10salheadlist', 'Itsection10salheadlist', 5, 'Itsection10salheadlist', '#frmITSection10', 'A', '#Remove-ITSection10SalHead-ITSection10', 'Lookup_table', 'PageNavPosition');
+                e.preventDefault();
+            });
+
+            // var Viewbtndisable = '#Lookup-ITSection10-itsection10salhead,#Create-ITSection10-itsection10salhead,#Edit-ITSection10-itsection10salhead,#Remove-ITSection10-itsection10salhead';
+            $('#View').button().click(function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View IT Section 10', '#Itsection10salheadlist', "", 356, 612, '#Autho', '', '', '', '', 'Message : ', 'Request Falied :', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#ExemptionCode').val(k.ExemptionCode);
+                        $('#MaxAmount').val(k.MaxAmount);
+                    });
+                    if ($("#Autho").hasClass('auto_active')) {
+                        $.each(data[2], function (i, k) {
+                            $('#ExemptionCode').oldVal(k.ExemptionCode);
+                            $('#MaxAmount').oldVal(k.MaxAmount);
+                            $('#Itsection10salheadlist_old').oldLookupVal(k.itsec10salhead_fulldetails);
+                        });
+                    }
+                    $.each(data[1], function (i, k) {
+
+                        $('#Itsection10salheadlist').P2BLookUpEncapsulate('#Itsection10salheadlist', 'Itsection10salheadlist', k.ITSection10SalHead_Id, k.ITSection10SalHead_FullDetails, 'Itsection10salheadlist', 'view', 'A');
+                    });
+                });
+                event.preventDefault();
+            });
+            $('#Remove-ITSection10SalHead-ITSection10').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#Itsection10salheadlist').P2BGetTableDataonSelectedRow('#Itsection10salheadlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#Itsection10salheadlist').P2BGetTableDataonSelectedRow('#Itsection10salheadlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Itsection10salheadlist', $('#Itsection10salheadlist').val(), 200, 200, '#frmITSection10', '#Itsection10salheadlist', '#Remove-ITSection10SalHead-ITSection10');
+                event.preventDefault();
+            });
+
+
+            $('#MaxAmount').ForceAmount().MaxLength(8);
+            $('#ExemptionCode').ForceOnlyAlphaNumeric();
+            $('#ExemptionCode').MaxLength(20);
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+    </script>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create ITSection10">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmITSection10" }))
+        {
+            <div class="row1 content_margine">@Html.LabelFor(m => m.ExemptionCode, "Exemption Code :", new { @class = "must popup-content-label" })@Html.TextBoxFor(m => m.ExemptionCode, new { @class = "must popup-content-textbox", @id = "ExemptionCode", @maxlength = "10" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MaxAmount, "Max Amount :", new { @class = "must popup-content-label" })@Html.TextBoxFor(m => m.MaxAmount, new { @class = "must popup-content-textbox" })</div>
+            <div class="row1 content_margine">
+                <div id="Itsection10salheadlist_old"></div>
+                @Html.LabelFor(m => m.Itsection10salhead, "IT Section 10 Salary Head:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="Itsection10salheadlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row itsec_icon-row">
+                    <button data-p2btooltip="LookUp ITSection10SalHead" class="popup-content-icon-lookup" id="Lookup-ITSection10SalHead-ITSection10"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ITSection10SalHead" class="popup-content-icon-create" id="Create-ITSection10SalHead-ITSection10"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Sal Head" class="popup-content-icon-edit" id="Edit-ITSection10SalHead-ITSection10"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ITSection10SalHead" class="popup-content-icon-remove" id="Remove-ITSection10SalHead-ITSection10"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>

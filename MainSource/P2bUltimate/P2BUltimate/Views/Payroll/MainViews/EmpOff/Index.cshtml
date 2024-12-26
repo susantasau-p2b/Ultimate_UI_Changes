@@ -1,0 +1,658 @@
+﻿@{
+    ViewBag.Title = "Emp_Official_Index";
+
+}
+@model P2b.Global.EmpOff
+
+<script>
+    $(document).ready(function () {
+        $('#NationalityID_PANNo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_PANNo').MaxLength(10);
+        $('#NationalityID_AdharNo').ForceOnlyNumeric();
+        $('#NationalityID_AdharNo').MaxLength(12);
+
+        $('#NationalityID_PFNo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_PFNo').MaxLength(30);
+
+        $('#NationalityID_UANNo').ForceOnlyNumeric();
+        $('#NationalityID_UANNo').MaxLength(12);
+
+        $('#NationalityID_PensionNo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_PensionNo').MaxLength(30);
+
+        $('#NationalityID_EDLINo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_EDLINo').MaxLength(30);
+
+        $('#NationalityID_LWFNo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_LWFNo').MaxLength(30);
+
+        $('#NationalityID_ESICNo').ForceOnlyAlphaNumeric();
+        $('#NationalityID_ESICNo').MaxLength(30);
+
+        $('#VPFAmt').ForceAmount();
+        $('#VPFPerc').ForceAmount();
+
+
+        $('input[name="PFAppl"]:radio').change(function () {
+            if (this.value == "false") { $('#NationalityID_PFNo').prop("disabled", true); $('#NationalityID_PFNo').val(""); }
+            else { $('#NationalityID_PFNo').prop("disabled", false); }
+        });
+
+        $('input[name="LWFAppl"]:radio').change(function () {
+            if (this.value == "false") { $('#NationalityID_LWFNo').prop("disabled", true); $('#NationalityID_LWFNo').val(""); }
+            else { $('#NationalityID_LWFNo').prop("disabled", false); }
+        });
+
+        $('input[name="ESICAppl"]:radio').change(function () {
+            if (this.value == "false") { $('#NationalityID_ESICNo').prop("disabled", true); $('#NationalityID_ESICNo').val(""); }
+            else { $('#NationalityID_ESICNo').prop("disabled", false); }
+        });
+
+        $('input[name="SelfHandicap"]:radio').change(function () {
+            if (this.value == "false") { $('#HandicapRemark').prop("disabled", true); $('#HandicapRemark').val(""); }
+            else { $('#HandicapRemark').prop("disabled", false); }
+        });
+
+        $('input[name="FamilyHandicap"]:radio').change(function () {
+            if (this.value == "false") { $('#HandicapRemark').prop("disabled", true); $('#HandicapRemark').val(""); }
+            else { $('#HandicapRemark').prop("disabled", false); }
+        });
+
+        $('input[name="VPFAppl"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#VPFAmt').prop("disabled", true);
+                $('#VPFPerc').prop("disabled", true);
+                $('#VPFAmt').val("");
+                $('#VPFPerc').val("");
+            }
+            else {
+                $('#VPFAmt').prop("disabled", false);
+                $('#VPFPerc').prop("disabled", false);
+            }
+        });
+
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Id', 'Code', 'Name', 'Acc_No', 'PANCARD'];
+        ColNames = ['Id', 'Code', 'Name', 'Acc_No', 'PANCARD'];
+        SortName = 'Id';
+        Caption = 'EmpOff Master';
+        url = '@Url.Action("P2BGrid","EmpOff")';
+        var urlnewgrid = '@Url.Action("P2BEmpGrid", "EmpOff")';
+        var ColEmpModel = ['Id', 'Emp Code', 'Emp Name'];
+        var ColEmpNames = ['Id', 'Emp Code', 'Emp Name'];
+        var CaptionEmp = 'Employee Details';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#JqGrid_popup').P2BGrid(ColEmpNames, ColEmpModel, SortName, CaptionEmp, urlnewgrid, width, height, '#pager2_popup');
+        $('#create_dialog_empofficial').P2BGridDialog();
+        $('#Createjqureygridopen').P2BCreateDialog();
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+
+        }
+
+
+        @*$('#Create').on("click", function (event) {
+            $('#NationalityID_PFNo').prop("disabled", true);
+            $('#NationalityID_LWFNo').prop("disabled", true);
+            $('#NationalityID_ESICNo').prop("disabled", true);
+            $('#VPFAmt').prop("disabled", true);
+            $('#VPFPerc').prop("disabled", true);
+            $('#HandicapRemark').prop("disabled", true);
+            $('#frmEmpOff').trigger("reset");
+            $('#create_dialog_empofficial').P2BCreateDialog('', '', '', '', 'Create Employe Official', 'open', '@Url.Action("Create")', '#frmEmpOff', 'Message :', 'Request Falied :', '#JqGrid', 580, 1008, '#PayProcessGrouplist,#PayScaleList', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+            $('#AccountType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 100, "");
+            $('#PayMode_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 101, "");
+            $('#Bank_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", "");
+            //$('#Branch_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", "");
+            event.preventDefault();
+        });*@
+
+        $('#Create').on("click", function (event) {
+            //$('#Createjqureygridopen').P2BCreateDialog('', '', '', '', 'Create Employe Official', 'open', '@Url.Action("Create")', '#frmEmpOff', 'Message :', 'Request Falied :', '#JqGrid', 580, 1008, '#PayProcessGrouplist,#PayScaleList', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+            $('#Createjqureygridopen').P2BGridDialog({
+                maindialogtitle: "Create Employee Official",
+                submiturl: "@Url.Action("Create")",
+                form: "#frmEmpOff",
+                height: 375,
+                width: 1080,
+                state: "open",
+                gridname: "#JqGrid_popup",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#JqGrid_popup').on("click", function (event) {
+            //$('#Createjqureygridopen').P2BCreateDialog('', '', '', '', 'Create Employe Official', 'open', '@Url.Action("Create")', '#frmEmpOff', 'Message :', 'Request Falied :', '#JqGrid', 580, 1008, '#PayProcessGrouplist,#PayScaleList', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+            $('#create_dialog_empofficial').P2BGridDialog({
+                maindialogtitle: "Create Employee Official",
+                submiturl: "@Url.Action("Create")",
+                form: "#frmEmpOff",
+            height: 375,
+            width: 1080,
+            state: "open",
+            gridname: "#JqGrid_popup",
+            gridfunction: "GetGridSelctedvalue",
+            });
+        event.preventDefault();
+    });*@
+
+        $('#JqGrid_popup').on("click", function (event) {
+            $('#NationalityID_PFNo').prop("disabled", true);
+            $('#NationalityID_LWFNo').prop("disabled", true);
+            $('#NationalityID_ESICNo').prop("disabled", true);
+            $('#VPFAmt').prop("disabled", true);
+            $('#VPFPerc').prop("disabled", true);
+            $('#HandicapRemark').prop("disabled", true);
+            $('#AccountType_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 405, "");
+            $('#PayMode_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 404, "");
+            //PopulateDropDownBranchList
+            $('#Bank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "EmpOff")', "", ""); // To bind dropdown on page load
+            $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownBranchList", "EmpOff")', "", "");
+            $('#PayScale_ddl').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "EmpOff")', "", "");// To bind dropdown on page load
+            var dtnew = $('#JqGrid_popup').P2BGrid.P2BEdDelV('#JqGrid_popup', 'Id');
+            $('#emp_Id').val(dtnew.Id);
+
+            $('#create_dialog_empofficial').P2BCreateDialog('', '', '', '', 'Create Employe Official', 'open', '@Url.Action("Create")', '#frmEmpOff', 'Message :', 'Request Falied :', '#JqGrid', 650, 1008, '#PayProcessGrouplist,#PayScaleList', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+
+
+        });
+
+        $('#hideDivdetails').hide();
+        $("#PayMode_drop").on("selectmenuchange", function () {
+            //alert($(this).val());
+            if ($(this).val() == "64") {
+                $('#hideDivdetails').fadeIn();
+
+            }
+            else
+            {
+                $('#hideDivdetails').fadeOut();
+            }
+
+
+        });
+
+        @*$('#JqGrid_popup').on("click", function (event) {
+
+            $('#NationalityID_PFNo').prop("disabled", true);
+            $('#NationalityID_LWFNo').prop("disabled", true);
+            $('#NationalityID_ESICNo').prop("disabled", true);
+            $('#VPFAmt').prop("disabled", true);
+            $('#VPFPerc').prop("disabled", true);
+            $('#HandicapRemark').prop("disabled", true);
+            $('#frmEmpOff').trigger("reset");
+            $('#create_dialog_empofficial').P2BCreateDialog('', '', '', '', 'Create Employe Official', 'open', '@Url.Action("Create")', '#frmEmpOff', 'Message :', 'Request Falied :', '#JqGrid', 650, 1008, '#PayProcessGrouplist,#PayScaleList', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+            $('#AccountType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 100, "");
+            $('#PayMode_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 101, "");
+            $('#Bank_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", "");
+            //$('#Branch_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", "");
+            event.preventDefault();
+        });*@
+
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            // $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Corporate Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+            $('#create_dialog_empofficial').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Emp Official Data", '#frmEmpOff', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 510, 1008, '#PayProcessGrouplist', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmfrmempoff').trigger("reset");
+                    $('#AccountNo').val(k.AccountNo);
+                    $('[name="ESICAppl"]').val([k.ESICAppl]).button().button("refresh");
+                    if (k.ESICAppl == false) { $('#NationalityID_ESICNo').prop("disabled", true); $('#NationalityID_ESICNo').val(""); }
+                    else { $('#NationalityID_ESICNo').prop("disabled", false); }
+                    $('[name="FamilyHandicap"]').val([k.FamilyHandicap]).button().button("refresh");
+
+                    $('#HandicapRemark').val(k.HandicapRemark);
+                    $('[name="LWFAppl"]').val([k.LWFAppl]).button().button("refresh");
+                    if (k.LWFAppl == false) { $('#NationalityID_LWFNo').prop("disabled", true); $('#NationalityID_LWFNo').val(""); }
+                    else { $('#NationalityID_LWFNo').prop("disabled", false); }
+                    $('#NationalityID_AdharNo').val(k.NationalityID.AdharNo);
+                    $('#NationalityID_EDLINo').val(k.NationalityID.EDLINo);
+                    $('#NationalityID_ESICNo').val(k.NationalityID.ESICNo);
+                    $('#NationalityID_PANNo').val(k.NationalityID.PANNo);    //AAAPL1234C pancard exmple
+                    $('#NationalityID_PFNo').val(k.NationalityID.PFNo);
+                    $('#NationalityID_PensionNo').val(k.NationalityID.PensionNo);
+                    $('#NationalityID_UANNo').val(k.NationalityID.UANNo);
+                    $('#NationalityID_LWFNo').val(k.NationalityID.LWFNo);
+                    $('[name="PFAppl"]').val([k.PFAppl]).button().button("refresh");
+
+                    if (k.PFAppl == false) {
+                        $('#NationalityID_PFNo').prop("disabled", true);
+                        $('#NationalityID_PFNo').val("");
+                    }
+                    else { $('#NationalityID_PFNo').prop("disabled", false); }
+                    $('[name="PTAppl"]').val([k.PTAppl]).button().button("refresh");
+                    $('[name="SelfHandicap"]').val([k.SelfHandicap]).button().button("refresh");
+
+                    if (k.SelfHandicap == false) {
+                        $('#HandicapRemark').prop("disabled", true);
+                        $('#HandicapRemark').val("");
+                    }
+                    else { $('#HandicapRemark').prop("disabled", false); }
+
+
+                    if (k.FamilyHandicap == false) { $('#HandicapRemark').prop("disabled", true); }
+                    else { $('#HandicapRemark').prop("disabled", false); }
+
+                    $('#VPFAmt').val(k.VPFAmt);
+                    $('[name="VPFAppl"]').val([k.VPFAppl]).button().button("refresh");
+
+                    if (k.VPFAppl == false) {
+                        $('#VPFAmt').prop("disabled", true);
+                        $('#VPFAmt').val(0);
+                        $('#VPFPerc').prop("disabled", true);
+                        $('#VPFPerc').val(0);
+                    }
+                    else {
+                        $('#VPFAmt').prop("disabled", false);
+                        $('#VPFPerc').prop("disabled", false);
+                    }
+                    $('#PayScale_ddl').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "EmpOff")', "", k.PayScale_Id);
+                    $('#VPFPerc').val(k.VPFPerc);
+                    $('#PayMode_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 404, k.PayMode_Id);
+                    $('#AccountType_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 405, k.AccountType_Id);
+                    $('#Bank_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", k.Bank_Id);
+                    $('#Branch_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownBranchList", "EmpOff")", "", k.Branch_Id);
+                    if (k.PayMode_Id == "64")
+                    {
+                        $('#hideDivdetails').fadeIn();
+
+                    }
+                    else
+                    {
+                        $('#hideDivdetails').fadeOut();
+                    }
+
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', k.PayProcessGroup_Id, k.PayProcessGroup_FullDetails, 'PayProcessGrouplist', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', 'N');
+                });
+
+                $('#Autho_Allow').val(data[3]);
+            });
+
+            e.preventDefault();
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#create_dialog_empofficial').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Employee Official Data', '#PayProcessGrouplist', '#Lookup-PayProcessGroup-EmpOff,#Create-PayProcessGroup-EmpOff,#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', 600, 1020, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmfrmempoff').trigger("reset");
+                    $('#Autho_Action').val(k.Action);
+                    $('#AccountNo').val(k.AccountNo);
+                    $('[name="ESICAppl"]').val([k.ESICAppl]).button().button("refresh");
+                    $('[name="FamilyHandicap"]').val([k.FamilyHandicap]).button().button("refresh");
+                    $('#HandicapRemark').val(k.HandicapRemark);
+                    $('[name="LWFAppl"]').val([k.LWFAppl]).button().button("refresh");
+                    $('#NationalityID_AdharNo').val(k.NationalityID.AdharNo);
+                    $('#NationalityID_EDLINo').val(k.NationalityID.EDLINo);
+                    $('#NationalityID_ESICNo').val(k.NationalityID.ESICNo);
+                    $('#NationalityID_PANNo').val(k.NationalityID.PANNo);
+                    $('#NationalityID_PFNo').val(k.NationalityID.PFNo);
+                    $('#NationalityID_PensionNo').val(k.NationalityID.PensionNo);
+                    $('#NationalityID_UANNo').val(k.NationalityID.UANNo);
+                    $('#NationalityID_LWFNo').val(k.NationalityID.LWFNo);
+                    $('[name="PFAppl"]').val([k.PFAppl]).button().button("refresh");
+                    $('[name="PTAppl"]').val([k.PTAppl]).button().button("refresh");
+                    $('[name="SelfHandicap"]').val([k.SelfHandicap]).button().button("refresh");
+                    $('#VPFAmt').val(k.VPFAmt);
+                    $('[name="VPFAppl"]').val([k.VPFAppl]).button().button("refresh");
+                    $('#VPFPerc').val(k.VPFPerc);
+                     $('#PayMode_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 404, k.PayMode_Id);
+                    $('#AccountType_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 405, k.AccountType_Id);
+                    $('#Bank_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "EmpOff")", "", k.Bank_Id);
+                    $('#Branch_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownBranchList", "EmpOff")", "", k.Branch_Id);
+                    if (k.PayMode_Id == "64") {
+                        $('#hideDivdetails').fadeIn();
+
+                    }
+                    else {
+                        $('#hideDivdetails').fadeOut();
+                    }
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', k.PayProcessGroup_Id, k.PayProcessGroup_FullDetails, 'PayProcessGrouplist', btndisablenames, 'N');
+                });
+
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#AccountNo').StickNote(data[2].AccountNo);
+                        $('#radio6').StickNote([data[2].ESICAppl]);
+                        // alert([data[2].FamilyHandicap]);
+                        //$('[name="FamilyHandicap"]').StickNote([data[2].FamilyHandicap]).button().button("refresh");
+                        $('#HandicapRemark').StickNote(data[2].HandicapRemark);
+                        $('#radio4').StickNote([data[2].LWFAppl]);
+                        //$('#NationalityID_AdharNo').StickNote(data[2].NationalityID.AdharNo);
+                        //$('#NationalityID_EDLINo').StickNote(data[2].NationalityID.EDLINo);
+                        //$('#NationalityID_ESICNo').StickNote(data[2].NationalityID.ESICNo);
+                        //$('#NationalityID_PANNo').StickNote(data[2].NationalityID.PANNo);
+                        //$('#NationalityID_PFNo').StickNote(data[2].NationalityID.PFNo);
+                        //$('#NationalityID_PensionNo').StickNote(data[2].NationalityID.PensionNo);
+                        //$('#NationalityID_UANNo').StickNote(data[2].NationalityID.UANNo);
+                        //$('#NationalityID_LWFNo').StickNote(data[2].NationalityID.LWFNo);
+                        $('#radio2').StickNote([data[2].PFAppl]);
+                        $('#radio12').StickNote([data[2].PTAppl]);
+                        $('#radio8').StickNote([data[2].SelfHandicap]);
+                        $('#VPFAmt').StickNote(data[2].VPFAmt);
+                        $('#radio14').StickNote([data[2].VPFAppl]);
+                        $('#VPFPerc').StickNote(data[2].VPFPerc);
+                        $('#PayMode_drop').oldDropval(data[2].PayMode_Val);
+                        $('#AccountType_drop').StickNote(data[2].AccountType_Val);
+                        $('#PayProcessGrouplist_old').oldLookupVal(data[2].PayProcessGroup_Val);
+                        @*$('#Bank_drop').oldDropval("@Url.Action("PopulateDropDownList", "EmpOff")", "", k.Bank_Id);
+                        $('#Branch_drop').oldDropval("@Url.Action("PopulateBranchList", "EmpOff")", "", k.Branch_Id);*@
+                    }
+                }
+            });
+        });
+
+        $('#Lookup-PayProcessGroup-EmpOff').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetProcessGrpLKDetails", "EmpOff")', '', 'LookupDiv', 'Payprocessgroup Look Up Data', '#PayProcessGrouplist', 'PayProcessGrouplist', 5, 'PayProcessGrouplist', '#frmempoff', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayProcessGroup-EmpOff').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("_PayProcessGroupPartial", "PayProcessGroup")', 'Create PayProcessGroup', 'open', '@Url.Action("Create", "PayProcessGroup")', '#frmPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPayProcessGroup', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+                // to show data which is created in partial page
+                $('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', data[0], data[1], 'PayProcessGrouplist', btndisablenames, 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#Lookup-EmpOff-PayProcessGroup').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetProcessGrpLKDetails", "Payprocessgroup")', '', 'lookupdiv_address', 'Look Up Data', '#PayProcessGrouplist', 'PayProcessGrouplist', 5, 'PayProcessGrouplist', '#frmempoff', 'N', '#Basic_Edit,#Basic_remove', 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });*@
+
+
+        $('#Edit-PayProcessGroup-EmpOff').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PayProcessGrouplist').P2BGetTableDataonSelectedRow('#PayProcessGrouplist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Payprocessgroup_partial", "Payprocessgroup")', '@Url.Action("Edit", "Payprocessgroup")', b, '@Url.Action("EditSave", "Payprocessgroup")', 'Edit Pay Processgroup Details', '#frmPayProcessGroup', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmempoff', '#Address_Edit,#Address_remove', '#PayProcessGrouplist', 'PayProcessGrouplist', 'PayProcessGrouplist', function (data) {
+                $.each(data, function (i, k) {
+
+                    $('#frmPayProcessGroup').trigger('reset');
+                    $('#PayFrequency_drop').P2BSelectMenuAppend("@Url.Action(" ", "Payprocessgroup")", "125", k.PayFrequency_id);
+                    $('#Name').val(k.Name);
+                    $('#PayDate_drop').val(k.PayDate);
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-EmpOff-PayProcessGroup').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payprocessgroup_partial", "Payprocessgroup")', 'Create Payprocess Group', 'open', '@Url.Action("Create", "Payprocessgroup")', '#frmPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 250, 355, '', '', '', '#frmPayProcessGroup', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+
+                $('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', data[0], data[1], 'PayProcessGrouplist');
+            });
+            e.preventDefault();
+        });
+        $('#Delete').button().click(function (event) {
+            AssignData();
+            $('#frmempoff').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#Basic_remove').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#PayProcessGrouplist').P2BGetTableDataonSelectedRow('#frmempoff', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "BasicScale")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayProcessGrouplist', $('#PayProcessGrouplist').val(), 200, 200, '#frmempoff', '#PayProcessGrouplist');
+            event.preventDefault();
+        });
+
+        $('#Lookup-PayScale-EmpOff').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPayScaleLKDetails", "EmpOff")', '', 'LookupDiv', 'PayScaleDetails Look Up Data', '#PayScalelist', 'PayScalelist', 5, 'PayScalelist', '#frmEmpOff', 'N', '##Remove-PayScale-EmpOff', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-PayScale-EmpOff').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#PayScalelist').P2BGetTableDataonSelectedRow('#PayScalelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#PayScalelist').val(), 200, 200, '#frmEmpOff', '#PayScalelist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#AccountType_drop,#Bank_drop,#PayMode_drop,#Branch_drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+<html>
+<head>
+    <title></title>
+    @*<link href="~/Content/Emp_Official/Emp_Official.css" rel="stylesheet" />*@
+    <style>
+        .icon-row {
+            position: relative;
+            left: 74px;
+            top: -150px;
+        }
+
+        .row14 {
+            width: 414px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="create_dialog_empofficial">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpOff", name = "frmEmpOff" }))
+        {
+            <input id="Autho_Action" class="filter_structure_id" name="Autho_Action" />
+            <input id="Autho_Allow" class="filter_structure_id" name="Autho_Allow" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+            <div class="section1_empoff" style="">
+                <div class="heading">Section 1:</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.PANNo, "PAN No :", new { @class = "popup-content-label_empoff must" })@Html.TextBoxFor(m => m.NationalityID.PANNo, new { @class = "popup-content-textbox_empoff must", @maxlength = "10" })</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.AdharNo, "Aadhar No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.AdharNo, new { @class = "popup-content-textbox_empoff", @maxlength = "12" })</div>
+                <div class="row1_empoff  horizontal_row7 content_margine ">
+                    @Html.LabelFor(m => m.PFAppl, "PF Applicable :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_7">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio1" name="PFAppl" value="true" /><label for="radio1">Yes</label>
+                            <input type="radio" id="radio2" name="PFAppl" value="false" checked="checked" /><label for="radio2">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.PFNo, "PF No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.PFNo, new { @class = "popup-content-textbox_empoff", @maxlength = "30", disabled = "disabled" })</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.UANNo, "UAN No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.UANNo, new { @class = "popup-content-textbox_empoff", @maxlength = "12" })</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.PensionNo, "Pension No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.PensionNo, new { @class = "popup-content-textbox_empoff", @maxlength = "30" })</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.NationalityID.EDLINo, "EDLI No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.EDLINo, new { @class = "popup-content-textbox_empoff", @maxlength = "30" })</div>
+                <div class="row1_empoff  horizontal_row1 content_margine ">
+                    @Html.LabelFor(m => m.LWFAppl, "LWF Applicable :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio3" name="LWFAppl" value="true" /><label for="radio3">Yes</label>
+                            <input type="radio" id="radio4" name="LWFAppl" value="false" checked="checked" /><label for="radio4">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff content_margine">
+                    @Html.LabelFor(m => m.NationalityID.LWFNo, "LWF No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.LWFNo, new { @class = "popup-content-textbox_empoff", @maxlength = "30", disabled = "disabled" })
+                </div>
+                <div class="row1_empoff  horizontal_row2 content_margine ">
+                    @Html.LabelFor(m => m.ESICAppl, "ESIC Applicable :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_2">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio5" name="ESICAppl" value="true" /><label for="radio5">Yes</label>
+                            <input type="radio" id="radio6" name="ESICAppl" value="false" checked="checked" /><label for="radio6">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff content_margine">
+                    @Html.LabelFor(m => m.NationalityID.ESICNo, "ESIC No :", new { @class = " popup-content-label_empoff" })@Html.TextBoxFor(m => m.NationalityID.ESICNo, new { @class = "popup-content-textbox_empoff", @maxlength = "30", disabled = "disabled" })
+                </div>
+                <div class="row1_empoff  horizontal_row3 content_margine ">
+                    @Html.LabelFor(m => m.SelfHandicap, "Self Handicap :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_3">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio7" name="SelfHandicap" value="true" /><label for="radio7">Yes</label>
+                            <input type="radio" id="radio8" name="SelfHandicap" value="false" checked="checked" /><label for="radio8">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff  horizontal_row4 content_margine ">
+                    @Html.LabelFor(m => m.FamilyHandicap, "Family Handicap :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_4">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio9" name="FamilyHandicap" value="true" /><label for="radio9">Yes</label>
+                            <input type="radio" id="radio10" name="FamilyHandicap" value="false" checked="checked" /><label for="radio10">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff content_margine">
+                    @Html.LabelFor(m => m.HandicapRemark, "Handicap Reason :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.HandicapRemark, new { @class = "popup-content-textbox_empoff", disabled = "disabled" })
+                </div>
+                <div class="row1_empoff  horizontal_row5 content_margine ">
+                    @Html.LabelFor(m => m.PTAppl, "PT Applicable :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_5">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio11" name="PTAppl" value="true" /><label for="radio11">Yes</label>
+                            <input type="radio" id="radio12" name="PTAppl" value="false" checked="checked" /><label for="radio12">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff horizontal_row6 content_margine ">
+                    @Html.LabelFor(m => m.VPFAppl, "VPF Applicable :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup_radio_button radio_button_div_6">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio13" name="VPFAppl" value="true" /><label for="radio13">Yes</label>
+                            <input type="radio" id="radio14" name="VPFAppl" value="false" checked="checked" /><label for="radio14">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.VPFAmt, "VPF Amt :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.VPFAmt, new { @class = "popup-content-textbox-short_empoff", disabled = "disabled" })</div>
+                <div class="row1_empoff content_margine">@Html.LabelFor(m => m.VPFPerc, "Percentage :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.VPFPerc, new { @class = "popup-content-textbox_empoff", disabled = "disabled" })</div>
+            </div>
+
+
+            <div class="section2_empoff" style="">
+                <div class="heading">Section 2:</div>
+                @*<div class=" row14 content_margine"> @Html.LabelFor(m => m.PayScale, "Payscale :", new { @class = "popup-content-label" })
+                        <select class="selectmenu" style="width:120px" name="PayScale_drop" id="PayScale_drop"><option></option></select>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="PayScalelist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select PayScale Details" class="popup-content-icon-lookup" id="Lookup-PayScale-EmpOff"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create PayScale Details" class="popup-content-icon-create" id="Create-PayScale-EmpOff"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit PayScale Details" class="popup-content-icon-edit" id="Edit-PayScale-EmpOff"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove PayScale Details" class="popup-content-icon-remove" id="Remove-PayScale-EmpOff"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>*@
+                <div class="row14_empoff content_margine">
+                    @Html.LabelFor(m => m.PayProcessGroup, "Pay Process Group :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup-content-table">
+                        <div id="PayProcessGrouplist_old"></div>
+                        <table class="lookuptableselected" id="PayProcessGrouplist" style="width: 271px">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select PayProcessGroup Details" class="popup-content-icon-lookup" id="Lookup-PayProcessGroup-EmpOff"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create PayProcessGroup Details" class="popup-content-icon-create" id="Create-PayProcessGroup-EmpOff"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit PayProcessGroup Details" class="popup-content-icon-edit" id="Edit-PayProcessGroup-EmpOff"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove PayProcessGroup Details" class="popup-content-icon-remove" id="Remove-PayProcessGroup-EmpOff"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row14_empoff content_margine">@Html.LabelFor(m => m.PayMode, "PayMode :", new { @class = "popup-content-label_empoff must" })<select class="selectmenu must" style="width:120px" id="PayMode_drop" name="PayMode_drop"><option>-Select-</option></select></div>
+                <div id="hideDivdetails">
+                    <div class="row14_empoff content_margine">@Html.LabelFor(m => m.Bank, "Bank :", new { @class = "popup-content-label_empoff" })<select class="selectmenu" style="width:120px" id="Bank_drop" name="Bank_drop"><option>-Select-</option></select></div>
+                    <div class="row14_empoff content_margine">@Html.LabelFor(m => m.Branch, "Branch : ", new { @class = "popup-content-label_empoff" })<select class="selectmenu" style="width:120px" id="Branch_drop" name="Branch_drop"><option>-Select-</option></select></div>
+                </div>
+                <div class="row14_empoff content_margine">@Html.LabelFor(m => m.AccountType, "Account Type :", new { @class = "popup-content-label_empoff must" })<select class="selectmenu must" style="width:120px" id="AccountType_drop" name="AccountType_drop"><option>-Select-</option></select></div>
+                <div class="row14_empoff content_margine">@Html.LabelFor(m => m.AccountNo, "Account No :", new { @class = "popup-content-label_empoff" })@Html.TextBoxFor(m => m.AccountNo, new { @class = "popup-content-textbox_empoff" })</div>
+                <div class="row14_empoff content_margine">
+                    <div id="PayScaleList_Old"></div>@Html.LabelFor(m => m.PayScale, "Pay Scale :", new { @class = "popup-content-label_empoff" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="PayScalelist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select PayScale Details" class="  popup-content-icon-lookup" id="Lookup-PayScale-EmpOff"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create PayScale Details" class="  popup-content-icon-create" id="Create-PayScale-PayScaleAgreement"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Edit PayScale Details" class="  popup-content-icon-edit" id="Edit-PayScale-PayScaleAgreement"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove PayScale Details" class="  popup-content-icon-remove" id="Remove-PayScale-EmpOff"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    </div>
+    <div id="Createjqureygridopen">
+        <div>
+            <div id="Grid_Formpop_up">
+                <div>
+                    <table id="JqGrid_popup"></table>
+                    <div id="pager2_popup"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

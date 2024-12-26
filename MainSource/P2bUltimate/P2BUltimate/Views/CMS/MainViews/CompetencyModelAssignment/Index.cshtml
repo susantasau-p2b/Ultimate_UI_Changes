@@ -1,0 +1,489 @@
+﻿@{
+    ViewBag.Title = "CompetencyModelAssignment";
+}
+@model CMS_SPS.CompetencyModelAssignment
+
+<script>
+    $(document).ready(function () {
+        var start = new Date();
+        start.setFullYear(start.getFullYear() - 70);
+        var end = new Date();
+        end.setFullYear(end.getFullYear() - 18);
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();          
+        var urlfilter = "@Url.Action("CompetencyModelAssignment_Grid", "CompetencyModelAssignment")";
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: urlfilter,          
+            columnname: ["BatchName", "BatchDescription", "CompetencyModel", "CreationDate", "Id"],
+            childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+            childurl: "@Url.Action("A_CompetencyModelAssignment_Grid", "CompetencyModelAssignment")",
+            tableheader: "competencymodelassignment",
+            childurlColumnNo: "5"
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frmSubCategoryP",
+                    htmlurl: "@Url.Action("GridPartial", "SubCategory")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "SubCategory")",
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data[0], function (i, k) {
+                            $('#Code').val(k.Code);
+                            $('#Code').attr('readonly', 'readonly');
+                            $('#Details').val(k.Details);
+
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                        });
+
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 500,
+                    width: 600,
+                    form: "#frmSubCategoryP",
+                    htmlurl: "@Url.Action("Partial", "SubCategory")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "SubCategory")",
+                    submiturl: "@Url.Action("EditSave", "SubCategory")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        console.log("dnfkjsndf");
+                        console.log(data);
+                        console.log("dnfkjsndf");
+                        console.log(data.data);
+                        $.each(data[0], function (i, k) {
+                            $('#Code').val(k.Code);
+                            $('#Code').attr('readonly', 'readonly');
+                            $('#Details').val(k.Details);
+
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete", "SubCategory")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+    
+      
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                  
+                },
+            renderat: "#FormFilter",
+            hierarchy: false,
+            });
+    });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {       
+            $.FormReset('#frmCompetencyModelAssignment');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'CompetencyModelAssignment', 'open', '@Url.Action("Create")', '#frmCompetencyModelAssignment', 'Message :', 'Request Falied :', '#JqGrid', 500, 1126, '#AddressList,#ContactDetailsList', '', function (data) { }, { datatablename: "#MyTable" });
+            $('#CreationDate').TodayDate();
+            $('#CreationDate').attr("readonly", "readonly");           
+            event.preventDefault();
+        });
+        
+        $('#close').button().click(function (event) {
+            $.FormReset('#frmCompetencyModelAssignment');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to close a batch???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#LookUp_CompetencyModel').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCompetencyModel", "CompetencyModelAssignment")', '', 'LookupDiv', 'Look Up Data', '#CompetencyModelList', 'CompetencyModelList', 5, 'CompetencyModelList', '#frmCompetencyModelAssignment', 'A', '#Edit_Session_TrnSchedule,#Remove_Session_TrnSchedule', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove_CompetencyModel').button().on('click', function (event) {         
+            //var a = [], b;
+            //a = $('#CompetencyModelList').P2BGetTableDataonSelectedRow('#CompetencyModelList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CompetencyModelList').P2BGetTableDataonSelectedRow('#CompetencyModelList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CompetencyModelList', $('#CompetencyModelList').val(), 200, 200, '#frmCompetencyModelAssignment', '#CompetencyModelList', '#Edit_TrainingSchedule_TrainingAssignment,#Remove_TrainingSchedule_TrainingAssignment');
+            event.preventDefault();
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        $('#PayProcessGroupList').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+    @*<link href="~/Content/SalaryT/SalaryT.css" rel="stylesheet" />*@
+
+    <style>
+        #Lookup_TrainingSchedule {
+            left: 290px;
+            top: 16px;
+        }
+
+        .section2_Leave {
+            padding-left: 6px;
+            width: 513px;
+            right: 558.8px;
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 719px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section1_Leave {
+            padding-top: 10px;
+            display: block;
+            border: 2px solid #ddd;
+            height: 707px;
+            width: 510px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+            padding-left: 11px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 69px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 115px;
+        }
+
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            width: 115px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 430px;
+        }
+
+        .row9 {
+            width: 386px;
+            display: inline-flex;
+            float: right;
+            margin-top: -32px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .date-picker {
+            z-index: 999;
+        }
+
+        .employeeselectiondiv {
+            float: left;
+        }
+
+        .addons {
+            height: 246px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 616px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .test {
+        }
+
+        #Lookup_BatchName {
+            left: 300px;
+            top: 20px;
+        }
+
+        #Lookup_progassign {
+            left: 428px;
+            top: 34px;
+        }
+
+        #Create-load1 {
+            left: 7%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">          
+                @*<button class="button" id="Load">Load</button>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="close">Batch Close</button>
+                @*<button class="button" id="Edit">Edit</button>*@
+                @*<button class="button" id="View">View</button>*@
+                @*<button class="button" data-typeofbtn="delete" id="Delete">Delete</button>*@
+
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>BatchName</th>
+                                            <th>BatchDescription</th>
+                                            <th>CompetencyModel</th>
+                                            <th>CreationDate</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>                                   
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    @*<div class="Lookup_Increment">
+            <div title="LookUp Data">
+                <div class="LookupDiv " id="Lookup"></div>
+            </div>
+            <div id="PageNavPosition">
+
+            </div>
+        </div>*@
+
+
+
+    <div id="Create_Dialog" title="Create Training Assignment">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmCompetencyModelAssignment", name = "frmCompetencyModelAssignment" }))
+        {
+           <div class="section2_Leave">
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+                <input name="geo_id" id="geo_id" class="filter_structure_id" />
+                <input name="pay_id" id="pay_id" class="filter_structure_id" />
+                <input name="fun_id" id="fun_id" class="filter_structure_id" />             
+            </div>
+           <div class="section1_Leave" id="section_emp">
+                <input id="Autho_Action" type="hidden" name="Autho_Action" />
+                <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+                <br>
+                <div class="row1 content_margine">
+                    <label for="BatchName" class="popup-content-label must">BatchName:</label>
+                    <input name="BatchName" type="text" id="BatchName" />                 
+                </div>
+                <div class="row1 content_margine">
+                    <label for="BatchDescription" class="popup-content-label must">BatchDescription:</label>
+                    <input name="BatchDescription" type="text" id="BatchDescription" />
+                </div>           
+                <div class="row1 content_margine">
+                    <label for="CreationDate" class="popup-content-label">CreationDate:</label>
+                    <input name="CreationDate" type="text" id="CreationDate" />
+                </div>
+                <br>
+                <div class="row1 content_margine">
+                    <div id="SessionList_old"></div>
+                    <label class="popup-content-label must">CompetencyModel :</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="CompetencyModelList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="LookUp Session" class="popup-content-icon-lookup" id="LookUp_CompetencyModel"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Session" class="popup-content-icon-create" id="Create_Session_TrnSchedule"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Sessions" class="popup-content-icon-edit" id="Edit_Session_TrnSchedule"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove Session" class="popup-content-icon-remove" id="Remove_CompetencyModel"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+
+            </div>
+        }
+    </div>
+
+
+
+</body>
+</html>

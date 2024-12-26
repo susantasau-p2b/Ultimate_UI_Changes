@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "TrainingPeriod";
+}
+@model Training.TrainingPeriod
+
+<style>
+    .popup-content-label {
+        width: 100px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 108px;
+    }
+</style>
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Calendar">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingPeriod", name = "frmTrainingPeriod" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+          
+            <div class="row1 content_margine">@Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.StartDate, new { @class = "popup-content-textbox must", @id = "StartDate" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox", @id = "EndDate" })</div>
+           
+        }
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+        $('#StartDate,#EndDate').P2BDatePicker();
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Id', 'StartDate', 'EndDate'];
+        ColNames = ['Id', 'StartDate', 'EndDate'];
+        SortName = 'Id';
+        Caption = 'TrainingPeriod';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmTrainingPeriod').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create training period', 'open', '@Url.Action("Create")', '#frmTrainingPeriod', 'Message :', 'Request Falied :', '#JqGrid', 250, 300, '', btndisablenames, function (data) { });
+            
+            event.preventDefault();
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmTrainingPeriod', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 300, 385, '', btndisablenames, function (data) {
+                $.each(data[0], function (i, k) {
+
+                   
+                    if (k.StartDate != null) {
+                        $('#StartDate').val(DateConvert(k.StartDate));
+                    }
+                    if (k.EndDate != null) {
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    }
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 300, 385, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+
+                
+
+                    if (k.StartDate != null) {
+                        $('#StartDate').val(DateConvert(k.StartDate));
+                    }
+                    if (k.EndDate != null) {
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    }
+                });
+
+                //To bind old data if authorisation is true
+                //if ($("#Autho").hasClass('auto_active')) {
+                //    $('#Name').StickNote([data[2].Name]);
+                //    $('#radio2').StickNote([data[2].Default]);
+                //    //$('#IssuePlace').StickNote([data[2].IssuePlace]);
+                //    if (data[2].StartDate != null) { $('#StartDate').StickNote(DateConvert(data[2].StartDate)); }
+                //    if (data[2].EndDate != null) { $('#EndDate').StickNote(DateConvert(data[2].EndDate)); }
+
+                //}
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+       
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+
+

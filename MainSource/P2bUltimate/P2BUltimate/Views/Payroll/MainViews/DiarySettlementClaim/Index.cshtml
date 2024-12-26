@@ -1,0 +1,679 @@
+﻿@{
+    ViewBag.Title = "DIARY Settlement Claim";
+}
+@model Payroll.DIARYSettlementClaim
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 146px;
+            top: -149px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 186px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .popup-content-textbox1 {
+            margin-left: 3px;
+            margin-top: 2px;
+            position: absolute;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 450px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+
+        .form-of-element {
+            display: block;
+            border: #DEDEDE solid 0.1px;
+            width: auto;
+            height: 800px;
+            padding: 5px 2px;
+            margin-top: 3px;
+        }
+
+         
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                        <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                        <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                    </div>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="add">Add</button>
+                @*<button class="button" id="Btn-Upload-Data">Upload</button>*@
+                @*<button class="button" id="Delete">Delete</button>*@
+                @*<button class="button" id="release">Release</button>*@
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmDIARYSettlementClaim", name = "frmDIARYSettlementClaim" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="BlockId" type="hidden" name="BlockId" />
+            <input id="geo_id" name="geo_id" class="filter_structure_id" />
+            <input id="pay_id" name="pay_id" class="filter_structure_id" />
+            <input id="fun_id" name="fun_id" class="filter_structure_id" />
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <div class="form-of-element">
+
+                <div class="fileremployee">
+                    <div class="employee-transcationdiv" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                        <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="add-dialog-content">
+                    <div class="row2 select_div content_margine"><label class="popup-content-label must">Policy</label><select id="TADATypelist" name="TADATypelist" class="drop must" style="width:159px;"><option value="0">DIARY</option></select></div>
+                    <div class="row2 select_div content_margine">@Html.LabelFor(m => m.DIARYType, "DIARY Type:", new { @class = "popup-content-label must" })<select id="DIARYTypelist" name="DIARYTypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>
+ 
+                    <div class="row2 select_div content_margine">
+                        @Html.LabelFor(m => m.DateOfAppl, "Date Of Appl   :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DateOfAppl, new { @class = "popup-content-textbox must" })
+
+                    </div>
+                    <br />
+
+                    <div class="row3 content_margine">
+                        <label id="lblPayMonth" class="popup-content-label must">Diary Month:</label>
+                        <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" style="width: 100px;" required />
+                        <input name="txtMonthStart" type="text" id="txtMonthStart" style="width: 100px;"/>
+                        <input name="txtMonthEnd" type="text" id="txtMonthEnd" style="width: 100px;" />
+                    </div>
+
+                    <div class="row6 content_margine addons" id="dvAdvClaim">
+                        <div id="LTCAdvanceClaimList_old"></div>
+                        @Html.LabelFor(m => m.DIARYAdvanceClaim, "DIARY Advance Claim:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="DIARYAdvanceClaimList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup DIARYAdvanceClaim" class="button popup-content-icon-lookup" id="Lookup-DIARYAdvanceClaim-DIARYSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                         
+                            <button data-p2btooltip="Remove DIARYAdvanceClaim" class="button popup-content-icon-remove" id="Remove-DIARYAdvanceClaim-DIARYSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="row6 content_margine addons" id="dvJourneyDetails">
+                        <div id="JourneyDetailsList_old"></div>
+                        @Html.LabelFor(m => m.JourneyDetails, "Journey Details:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="JourneyDetailsList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            @*<button data-p2btooltip="Lookup Journey Details" class="button popup-content-icon-lookup" id="Lookup-JourneyDetails-DIARYSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Create Journey Details" class="button popup-content-icon-create" id="Create-JourneyDetails-DIARYSettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Journey Details" class="button popup-content-icon-edit" id="Edit-JourneyDetails-DIARYSettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Journey Details" class="button popup-content-icon-remove" id="Remove-JourneyDetails-DIARYSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row6 content_margine addons" id="dvHotelBooking">
+                        <div id="HotelBookingDetailsList_old"></div>
+                        @Html.LabelFor(m => m.Travel_Hotel_Booking, "Travel Hotel Booking  :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Travel_Hotel_BookingList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Travel Hotel Booking " class="button popup-content-icon-lookup" id="Lookup-Travel_Hotel_Booking-DIARYSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Travel Hotel Booking " class="button popup-content-icon-create" id="Create-Travel_Hotel_Booking-DIARYSettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Travel Hotel Booking " class="button popup-content-icon-edit" id="Edit-Travel_Hotel_Booking-DIARYSettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove TravelHotel Booking " class="button popup-content-icon-remove" id="Remove-Travel_Hotel_Booking-DIARYSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div id="dvFinalAmt">
+                        <div class="row2 content_margine">
+                            <button id="calculate" class="button" name="calculate">Calculate</button>
+                        </div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.NoOfDays, "No Of Days :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.NoOfDays, new { @class = "popup-content-textbox must" })</div>
+                        <br />
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.TotalHrs, "Total Hrs :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TotalHrs, new { @class = "popup-content-textbox must", @readonly = "readonly" })</div>
+                        <br />
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.TotalDistance, "Total Distance :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TotalDistance, new { @class = "popup-content-textbox must", @readonly = "readonly" })</div>
+                        <br />
+ 
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.Eligible_Amt, " Eligible Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Eligible_Amt, new { @class = "popup-content-textbox must" })</div>
+                        <br />
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.Claim_Amt, " Claim Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Claim_Amt, new { @class = "popup-content-textbox must" })</div>
+                        <br />
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.AdvAmt, "Advance Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.AdvAmt, new { @class = "popup-content-textbox must" })</div>
+                        <br />  
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.SanctionAmt, "Sanction Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SanctionAmt, new { @class = "popup-content-textbox must" })</div>
+                        <br />
+
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.SettlementAmt, "Settlement Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SettlementAmt, new { @class = "popup-content-textbox must" })</div>
+                        <br /> 
+                    </div>
+
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.Remark, "Reason :", new { @class = "popup-content-label must" })<select id="DIARYReasonlist" name="DIARYReasonlist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select>@Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox1 must" })</div>
+                    <br />
+                </div>
+            </div>
+
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+      
+        $('#TADATypelist').attr("disabled", "disabled")
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "LTCSettlementClaim")",
+            htmurl: "@Url.Action("partial", "LTCSettlementClaim")",
+            submiturl: "@Url.Action("GridEditSave", "LTCSettlementClaim")",
+            columnname: ["Code", "Name", "Location", "Id"],
+            childheader: ["ReqDate", "DIARYType", "EligibleAmt", "AdvanceAmt", "Remark", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            childurl: "@Url.Action("Get_DIARYSettlementClaim", "DIARYSettlementClaim")",
+            tableheader: "DIARY Settlement Claim",
+            childurlColumnNo: "4"
+        });
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            var chhassa = $(parent_element).find('td:eq(1)').html();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-LTCAdvanceClaim",
+                    htmlurl: "@Url.Action("GridPartial", "LTCAdvanceClaim")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LTCAdvanceClaim")",
+                    submiturl: "@Url.Action("GridEditSave", "LTCAdvanceClaim")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-ProposedPlace').val(k.ProposedPlace);
+                            $('#Edit-LTCEligibleAmount').val(k.EligibleAmount);
+                            $('#Edit-LTCAdvanceAmount').val(k.AdvanceAmount);
+                            $('#Edit-Remark').val(k.Remark);
+
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '40%',
+                    form: "#frmDIARYSettlmentClaimPartial",
+                    htmlurl: "@Url.Action("GridPartial", "DIARYSettlementClaim")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "DIARYSettlementClaim")",
+                    submiturl: "@Url.Action("GridEditSave", "DIARYSettlementClaim")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            console.log("employeeids");
+                            console.log(chhassa);
+                            $('#EmployeeSettleId').val(chhassa);
+                            $('#DIARYTypelistPartial').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 3009, k.DIARYType); // Dropdown bind
+
+                            $('#DIARYclaimamtaprtial').val(k.Claim_Amt);
+                            $('#DIARYeligibleamtpartial').val(k.Eligible_Amt);
+                            if (k.ReqDate != null) { $('#DateApplPartial').val(DateConvert(k.ReqDate)); }
+                            $('#ltcnoofdayspartial').val(k.Noofdays)
+                            $('#DIARYEncashamtprtial').val(k.EncashmentAmount);
+                            $('#DIARYadvamtpartial').val(k.AdvAmt);
+                            $('#DIARYsettleamtpartial').val(k.SettlementAmt);
+                            $('#DIARYremarkpartial').val(k.Remark);
+                            $('#DIARYAdvanceClaimListPartial').P2BLookUpEncapsulate('#DIARYAdvanceClaimListPartial', 'DIARYAdvanceClaimListPartial', k.DIARYAdvanceClaimid, k.LTCAdvanceClaimfulldetails, 'DIARYAdvanceClaimListPartial', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', 'A');
+                            $('#JourneyDetailsListPartial').P2BLookUpEncapsulate('#JourneyDetailsListPartial', 'JourneyDetailsListPartial', k.JourneydetailsId, k.JourneydetailsFulldetails, 'JourneyDetailsListPartial', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', 'A');
+                            $.each(k.travelhoteldetails, function (l, m) {
+                                $('#HotelBookingDetailsListPartial').P2BLookUpEncapsulate('#HotelBookingDetailsListPartial', 'HotelBookingDetailsListPartial', m.id, m.fulldetails, 'HotelBookingDetailsListPartial', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', 'N');
+
+                            });
+                            //$('#Edit-ProposedPlace').val(k.ProposedPlace);
+                            //$('#Edit-LTCEligibleAmount').val(k.EligibleAmount);
+                            //$('#Edit-LTCAdvanceAmount').val(k.AdvanceAmount);
+                            //$('#Edit-Remark').val(k.Remark);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                // alert(chhassa);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    editdata: chhassa,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    //console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#CreateRelease_dialog').P2BCreateDialog();
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#DIARYTypelist').on('selectmenuchange', function () {
+            var type = $("#DIARYTypelist option:selected").text();
+            $.get('@Url.Action("hidebutton", "DiarySettlementClaim")?DiaryType=' + type, function (data) {
+                if (data != null) {
+                    data.values.forEach(function (item) {
+                        $("#" + item).hide();
+                    });
+                    data.enValues.forEach(function (item) {
+                        $("#" + item).attr('disabled', 'disabled');
+                    });
+                    data.visValues.forEach(function (item) {
+                        $("#" + item).show();
+                    });
+                }
+                 
+            });
+ 
+            $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt,#NoOfDays,#TotalHrs,#TotalDistance').addClass('p2bdisabled');
+            $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt,#NoOfDays,#TotalHrs,#TotalDistance').val(0);
+
+        });
+        //Create Function
+        $('#add').on("click", function (event) {
+
+            $('#frmDIARYSettlementClaim').trigger("reset");
+            $.LoadEmpByDefault(true, '#txtPayMonth');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create DIARY Settlement Claim', 'open', '@Url.Action("Create")', '#frmDIARYSettlementClaim', 'Message :', 'Request Falied :', '#JqGrid', 670, 1055, '', '', function (data) { }, '');
+
+            $('#DateOfAppl').attr('readonly', 'readonly');
+            $('#DateOfAppl').TodayDate();
+            $('#DIARYTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "Lookup")', 3009, "");
+
+            $('#TADATypelist').P2BSelectMenuAppend("@Url.Action("GetLookupPolicyname", "DIARYSettlementClaim")", "1", "1");
+
+            $('#DIARYReasonlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "Lookup")', 3013, "");
+            event.preventDefault();
+
+        });
+
+
+
+        $('#DIARYReasonlist').on('selectmenuchange', function () {
+            var value = $("#DIARYReasonlist option:selected").text();
+            $('#Remark').val(value);
+            $('#Remark').attr("readonly", "readonly");
+        });
+
+
+
+        $("#LTCAdvAmt").on('focusout', function () {
+            // alert('r');
+            var a = $("#LTC_Eligible_Amt").val();
+            var b = $("#LTCAdvAmt").val();
+
+            if (parseInt(b) > parseInt(a)) {
+                $("#LTCAdvAmt").val("");
+                alert("Advance amount should not be greater than Eligible amount");
+            }
+
+        });
+
+        $('#Lookup-DIARYAdvanceClaim-DIARYSettlementClaim').on('click', function (event) {
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDIARYAdv", "DIARYSettlementClaim")?Empid=' + a, '', 'LookupDiv', 'DIARY ADV Look Up Data', '#DIARYAdvanceClaimList', 'DIARYAdvanceClaimList', 5, 'DIARYAdvanceClaimList', '#frmDIARYSettlementClaim', 'A', '#Edit-DIARYAdvanceClaim-DIARYSettlementClaim,#Remove-DIARYAdvanceClaim-DIARYSettlementClaim', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetDIARYAdvanceClaim", "DIARYSettlementClaim")', '', 'LookupDiv', ' Look Up Data', '#DIARYAdvanceClaimList', 'DIARYAdvanceClaimList', 5, 'DIARYAdvanceClaimList', '#frmDIARYSettlementClaim', 'N', '#Remove-DIARYAdvanceClaim-DIARYSettlementClaim', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();*@
+        });
+
+
+        $('#Create-DIARYAdvanceClaim-DIARYSettlementClaim').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_DIARYAdvanceClaim", "DIARYSettlementClaim")', 'Create DIARYAdvanceClaimList Master', 'open', '@Url.Action("CreateSave", "DIARYAdvanceClaim")', '#frmDIARYSettlementClaim', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '#Edit-DIARYAdvanceClaim-DIARYSettlementClaim', '#frmDIARYSettlementClaim', '', function (data) {
+                $('#DIARYAdvanceClaimList').P2BLookUpEncapsulate('#DIARYAdvanceClaimList', 'DIARYAdvanceClaimList', data[0], data[1], 'DIARYAdvanceClaimList', '#Remove-DIARYAdvanceClaimList-DIARYSettlementClaim', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-JourneyDetails-DIARYSettlementClaim').button().on("click", function (event) {
+            var c = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            if (c == "" || c.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+
+            var a = [], b;
+            a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial_JourneyDetails", "LTCSettlementClaim")', '@Url.Action("Edit", "DiarySettlementClaim")', b, '@Url.Action("EditSave", "JourneyDetails")', 'Edit JourneyDetails Details', '#frmJourneyDetailsPartial', b, 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '#frmDIARYSettlementClaim', '#JourneyDetailsList', 'JourneyDetailsList', 'JourneyDetailsList', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+
+                $('#txtPayMonth').val(data[0].PayMonth);
+                $('#txtMonthStart').val(data[3]);
+                $('#txtMonthEnd').val(data[4]);
+                $('#JourneyStart').val(DateConvert(data[0].JourneyStart));
+                $('#JourneyEnd').val(DateConvert(data[0].JourneyEnd));
+                $('#NoOfDays-edit').val((data[0].NoOfDays));
+                $('#DAElligibleAmt').val((data[0].DAElligibleAmt));
+                $('#DAClaimAmt').val((data[0].DAClaimAmt));
+                $('#DASettleAmt').val((data[0].DASettleAmt));
+                $('#TAElligibleAmt').val((data[0].TAElligibleAmt));
+                $('#TAClaimAmt').val((data[0].TAClaimAmt));
+                $('#TASettleAmt').val((data[0].TASettleAmt));
+                $('#MisExpenseElligibleAmt').val((data[0].MisExpenseElligibleAmt));
+                $('#MisExpenseClaimAmt').val((data[0].MisExpenseClaimAmt));
+                $('#MisExpenseSettleAmt').val((data[0].MisExpenseSettleAmt));
+                $('#HotelElligibleAmt').val((data[0].HotelElligibleAmt));
+                $('#HotelClaimAmt').val((data[0].HotelClaimAmt));
+                $('#HotelSettleAmt').val((data[0].HotelSettleAmt));
+                $('#TotFamilyMembers-edit').val((data[0].TotFamilyMembers));
+                $('#txtTotalAmt').val((data[0].DAClaimAmt + data[0].MisExpenseClaimAmt + data[0].HotelClaimAmt + data[0].TAClaimAmt));
+                $('#TravelModeEligibilityPolicylist').P2BSelectMenuAppend("@Url.Action("TravelModeEligibilityPolicylistd", "LTCSettlementClaim")", c.toString(), data[0].TravelModeEligibilityPolicy);
+                @*$('#TravelModeEligibilityPolicylist').P2BSelectMenuAppend("@Url.Action("TravelModeEligibilityPolicylist", "LTCSettlementClaim")", c, data[0].TravelModeEligibilityPolicy, '');*@
+                $.each(data[1], function (i, k) {
+                    $('#JourneyObjectlist-edit').P2BLookUpEncapsulate('#JourneyObjectlist-edit', 'JourneyObjectlist-edit', k.JourneyObject_Id, k.JourneyObjectFullDetails, 'JourneyObjectlist-edit', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                    $('#FamilyDetailslist-edit').P2BLookUpEncapsulate('#FamilyDetailslist-edit', 'FamilyDetailslist-edit', k.Family_Id, k.FamilyFullDetails, 'FamilyDetailslist-edit', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                    $('#MisExpenseObjectlist-edit').P2BLookUpEncapsulate('#MisExpenseObjectlist-edit', 'MisExpenseObjectlist-edit', k.MisExpenseObject_Id, k.MisExpenseObjectFullDetails, 'MisExpenseObjectlist-edit', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                    $('#Travel_Hotel_BookingList').P2BLookUpEncapsulate('#Travel_Hotel_BookingList', 'Travel_Hotel_BookingList', k.TravelHotelBooking_Id, k.TravelHotelBookingFullDetails, 'Travel_Hotel_BookingList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                });
+
+                $.each(data[3], function (i, k) {
+                    $('#EmpDocumentslist-edit').P2BLookUpEncapsulate('#EmpDocumentslist-edit', 'EmpDocumentslist-edit', k.JourneyObject_Id, k.JourneyObjectFullDetails, 'JourneyObjectlist-edit', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-DIARYAdvanceClaim-DIARYSettlementClaim').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#DIARYAdvanceClaimList').P2BGetTableDataonSelectedRow('#DIARYAdvanceClaimList', 0);
+            //b = a[0];
+            //$('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DIARYAdvanceClaimlist', $('#DIARYAdvanceClaimlist').val(), 200, 200, '#frmDIARYSettlementClaim', '#DIARYAdvanceClaimlist');
+            var selecetdRows = [];
+            selecetdRows = $('#DIARYAdvanceClaimList').P2BGetTableDataonSelectedRow('#DIARYAdvanceClaimList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selecetdRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DIARYAdvanceClaimList', $('#DIARYAdvanceClaimList').val(), 200, 200, '#frmDIARYSettlementClaim', '#DIARYAdvanceClaimList', '#Edit-DIARYAdvanceClaim-DIARYSettlementClaim,#Remove-DIARYAdvanceClaim-DIARYSettlementClaim');
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-JourneyDetails-DIARYSettlementClaim').on('click', function (event) {
+            var c = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            if (c == "" || c.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupJourneyDetails", "DIARYSettlementClaim")?EmpId=' + c, '', 'LookupDiv', ' Look Up Data', '#JourneyDetailsList', 'JourneyDetailsList', 5, 'JourneyDetailsList', '#frmDIARYSettlementClaim', 'N', '#Remove-JourneyDetails-DIARYSettlementClaim', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-JourneyDetails-DIARYSettlementClaim').on("click", function (event) {
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            var T = $("#TADATypelist option:selected").text();
+            if (T == "-Select-") {
+                alert("Please select Journey Type");
+                return false;
+            }
+            var C = $("#DIARYTypelist option:selected").val();
+            if (C == "-Select-") {
+                alert("Please select Journey Type");
+                return false;
+            }
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_JourneyDetails", "LTCSettlementClaim")', 'Create JourneyDetails Master', 'open', '@Url.Action("Create", "JourneyDetails")?EmpId=' + a + '&data1=' + T + '&data2=' + C, '#frmJourneyDetailsPartial', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '#Edit-JourneyObject1-JourneyDetails,#Edit-JourneyObject-JourneyDetails,#Edit-FamilyDetails-JourneyDetails,#Remove-FamilyDetails-JourneyDetails', '#frmTADASettlementClaim', '', function (data) {
+                $('#JourneyDetailsList').P2BLookUpEncapsulate('#JourneyDetailsList', 'JourneyDetailsList', data[0], data[1], 'JourneyDetailsList', '#Remove-JourneyDetails-LTCSettlementClaim', 'N');
+
+                $('#TravelModeEligibilityPolicylist').P2BSelectMenuAppend("@Url.Action("TravelModeEligibilityPolicylistd", "DiarySettlementClaim")?DiaryType=" + C, a.toString(), "");
+            });
+            event.preventDefault();
+
+        });
+
+        $('#Remove-JourneyDetails-DIARYSettlementClaim').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+            //b = a[0];
+            //$('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmDIARYSettlementClaim', '#JourneyDetailsList');
+            var selectedRows = [];
+            selectedRows = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmDIARYSettlementClaim', '#JourneyDetailsList', '#Edit-JourneyDetails-DIARYSettlementClaim,#Remove-JourneyDetails-DIARYSettlementClaim');
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-Travel_Hotel_Booking-DIARYSettlementClaim').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTravel_Hotel_Booking", "DIARYSettlementClaim")', '', 'LookupDiv', ' Look Up Data', '#Travel_Hotel_BookingList', 'Travel_Hotel_BookingList', 5, 'Travel_Hotel_BookingList', '#frmDIARYSettlementClaim', 'N', '#Remove-Travel_Hotel_Booking-DIARYSettlementClaim', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Travel_Hotel_Booking-DIARYSettlementClaim').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_TravelHotelBooking", "LTCSettlementClaim")', 'Create HotelBookingDetails Master', 'open', '@Url.Action("Create", "TravelHotelBooking")', '#frmTravelHotelBookingDetails', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '#Edit-HotelBookingDetails-LTCSettlementClaim', '#frmLTCSettlementClaim', '', function (data) {
+                $('#HotelBookingDetailsList').P2BLookUpEncapsulate('#HotelBookingDetailsList', 'HotelBookingDetailsList', data[0], data[1], 'HotelBookingDetailsList', '#Remove-HotelBookingDetails-LTCSettlementClaim', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-Travel_Hotel_Booking-DIARYSettlementClaim').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#Travel_Hotel_BookingList').P2BGetTableDataonSelectedRow('#Travel_Hotel_BookingList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Travel_Hotel_BookingList').P2BGetTableDataonSelectedRow('#Travel_Hotel_BookingList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Travel_Hotel_BookingList', $('#Travel_Hotel_BookingList').val(), 200, 200, '#frmDIARYSettlementClaim', '#Travel_Hotel_BookingList', '#Edit-Travel_Hotel_Booking-DIARYSettlementClaim,#Remove-Travel_Hotel_Booking-DIARYSettlementClaim');
+            //$('<div></div>').P2BPartialDeleteModalDialog('', b, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Travel_Hotel_BookingList', $('#Travel_Hotel_BookingList').val(), 200, 200, '#frmDIARYSettlementClaim', '#Travel_Hotel_BookingList');
+            event.preventDefault();
+        });
+
+        
+      
+        $('.p2bdisabled').css('background-color', 'rgb(231, 231, 231)');
+
+        $('#calculate').on("click", function (event) {
+            var b = $("#TADATypelist option:selected").text();
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+
+            $.ajax({
+                url: '@Url.Action("GetDIARYAmount", "DiarySettlementClaim")',
+                method: "POST",
+                data: $('#frmDIARYSettlementClaim').serialize() + '&data=' + a + '&data1=' + b,
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    $.each(data, function (i, k) {
+
+                        $('#NoOfDays').val(k.NoOfDays);
+                        $("#AdvAmt").val(k.AdvanceAmt);
+                        $("#Claim_Amt").val(k.DIARYClaimamt);
+                        $("#Eligible_Amt").val(k.DIARYElgmamt);
+                        $("#SanctionAmt").val(k.SanctionAmt);
+                        $("#SettlementAmt").val(k.SettlementAmt);
+                        $("#TotalHrs").val(k.TotalHrs);
+                        $("#TotalDistance").val(k.TotalDistance);
+                    });
+
+                },
+                complete: function () {
+                    $('.ajax_loder').remove();
+                }
+            });
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').ForceAmount();
+        $('#Eligible_Amt,#Claim_Amt,#AdvAmt,#EncashmentAmount,#SanctionAmt,#SettlementAmt').val(0);
+        $('#DateOfAppl').P2BDatePicker();
+
+        $('#txtPayMonth').MonthYearPicker();
+        $("#txtPayMonth").on("change", function () {
+            $.ajax(
+                {
+                    type: "Post",
+                    data: { 'PayMonth': $("#txtPayMonth").val() },
+
+                    url: "@Url.Action("getStartDays", "JourneyDetails")",
+                    success: function (data) {
+                        $("#txtMonthStart").val(DateConvert(data.firstDay));
+                        $("#txtMonthEnd").val(DateConvert(data.lastDay));
+                        $("#txtMonthStart").prop("readonly", true);
+                        $("#txtMonthEnd").prop("readonly", true);
+                    }
+                });
+        });
+ 
+
+    });
+</script>

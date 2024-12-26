@@ -1,0 +1,402 @@
+﻿@{
+    ViewBag.Title = "Vda Arrear CPI Entry Form";
+}
+@model Payroll.CPIEntryT
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .addons {
+        height: 246px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 400px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 425px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 460px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 280px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+
+    /*.search { 
+        width: 425px;
+    }*/
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['Actual Index Point', 'Pay Month', 'Id'];
+        ColNames = ['Actual Index Point', 'Pay Month', 'Id'];
+        SortName = 'Id';
+        Caption = 'Vda Arrear CPI Entry Form';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        };
+
+        //DaArrear Grid Show start
+        var ColNamesDa = [];
+        var ColModelDa = [];
+        var SortNameDa, CaptionDa, urlDa, widthDa, heightDa;
+        ColModelDa = ['Code', 'Name', 'PayMonth', 'FromDate', 'ToDate', 'TotalDays', 'ArrearType', 'Id'];
+        ColNamesDa = ['Code', 'Name', 'Pay Month', 'From Date', 'To Date', 'Total Days', 'Arrear Type', 'Id'];
+        urlDa = '@Url.Action("P2BGridDa")';
+        widthDa = 1000;
+        heightDa = 150;
+        CaptionDa = "Salary Vda Arrear Transaction"
+        $('#JqGridDaArrear').P2BGrid(ColNamesDa, ColModelDa, SortNameDa, CaptionDa, urlDa, widthDa, heightDa);
+        $('#Load').on('click', function (e) {
+            $('#JqGridDaArrear').PostGridData({ urlDa: urlDa, filter: $('#txtPayMonth').val() });
+        });
+        function AssignDataDa() {
+            dtDa = $('#JqGridDaArrear').P2BGrid.P2BEdDelV('#JqGridDaArrear', 'Id');
+        }
+
+        //DaArrear Grid Show End
+
+        $('#ActualIndexPoint').keyup(function () {
+            $.post("@Url.Action("GetCode")", { id: 0 }, function (data) {
+                if (data != null && data != "") {
+                    //alert(data[0]);
+                    if (data[0] == "SDCC") {
+                        $('#CalIndexPoint').attr("readonly", "readonly");
+                        var a = 342.66968064;
+                        var b = parseInt($('#ActualIndexPoint').val());
+                        var d = Math.round((a * b));
+                        $('#CalIndexPoint').val(d);
+
+                    }
+                }
+                else {
+                    alert("Data Null");
+                }
+            });
+
+            $.ajax({
+                method: "Get",
+                url: "@Url.Action("GetCode")",
+                // data: { data: $('#Code').val() },
+                success: function (d) {
+                    alert(d);
+                    if (d == "SDCC") {
+                        var a = 342.66968064;
+                        var b = parseInt($('#ActualIndexPoint').val());
+                        var d = (a * b);
+                        if (isNaN(d)) {
+                            $('#CalIndexPoint').val(0);
+                        }
+
+                    } else {
+                        $('.error').remove();
+                    }
+                }
+            });
+        });
+
+
+        $('#txtPayMonth').MonthYearPicker();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        $('#DapayMonth').MonthYearPicker();
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+        $('#Create').on("click", function (event) {
+            $('#VdaArrearfrmCpiEntryForm').trigger("reset");
+            //$.LoadEmpByDefault();
+
+            $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+            @*$('#list-employee').P2BCreateDialog('', '', '', '', 'Vda Arrear Create CPI Entry Form', 'open', '@Url.Action("EditSave","VdaArrearCPIEntryForm")', '#VdaArrearfrmCpiEntryForm', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '#PayScalelist', '', function (data) { });*@
+
+
+            $('#list-employee').P2BEditModalDialog('', 0, '@Url.Action("EditSave")', "Edit CPI Entry Form Data", '#VdaArrearfrmCpiEntryForm', 0, 'Message : ', 'Request Falied :', '#JqGrid', 600, 1200, '#PayScalelist', '', function (data) {
+
+            });
+
+
+            //  $('#Create_Paymonth').val("");
+            //$('#Create_Paymonth').attr('readonly', 'readonly');
+            @*$('#arrears_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 425, "");*@
+            $('#payscaleagreement_drop').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "VdaArrearCPIEntryForm")', "", ""); // To bind dropdown on page load
+            $('#PayMonth').MonthYearPicker();
+            //$('#Create_Paymonth').val($("#txtPayMonth").val());
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (e) {
+            $('#VdaArrearfrmCpiEntryForm').trigger("reset");
+            AssignData();
+           
+            $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+
+            @*$('#list-employee').P2BCreateDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', '', 'Edit CPI Entry Form', 'open', '', '#VdaArrearfrmCpiEntryForm', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '#PayScalelist', '', function (data) {*@
+            $('#list-employee').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")?damonth=' + $('#DapayMonth').val(), "Edit CPI Entry Form Data", '#VdaArrearfrmCpiEntryForm', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 1200, '#PayScalelist', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#ActualIndexPoint').val(k.ActualIndexPoint);
+                    $('#CalIndexPoint').val(k.CalIndexPoint);
+                    $('#PayMonth').val(k.PayMonth);
+                    $('#PayMonth').MonthYearPicker();
+                    //$("#PayMonth").datepicker("option", "disabled", true);
+                    $('#payscaleagreement_drop').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "VdaArrearCPIEntryForm")', "", k.PayscaleAgr_Id);
+                });
+
+                $('#Autho_Allow').val(data[3]);
+
+            });
+
+        });
+
+        $('#View').on('click', function (e) {
+            $('#VdaArrearfrmCpiEntryForm').trigger("reset");
+            AssignData();
+            $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+            $('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Vda Arrear CPI Entry Form Data', '#PayScalelist', '', 600, 1200, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#ActualIndexPoint').val(k.ActualIndexPoint);
+                    $('#CalIndexPoint').val(k.CalIndexPoint);
+                    $('#PayMonth').val(k.PayMonth);
+                    $('#PayMonth').MonthYearPicker();
+                    //$("#PayMonth").datepicker("option", "disabled", true);
+                    $('#payscaleagreement_drop').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "VdaArrearCPIEntryForm")', "", k.PayscaleAgr_Id);
+                });
+
+
+
+                //To bind old data if authorisation is true
+
+                //}, 2000);
+            });
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget");
+    });
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+
+            <div style="float:left">
+                <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="View">View</button>
+
+        
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="JqGrid_pager"></div>
+                </div>
+            </div>
+
+            <div id="Grid_FormDaArrear">
+                <div>
+
+                    <table id="JqGridDaArrear"></table>
+                    <div id="JqGrid_pagerDaArrear"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="loder_div"></div>
+<div id="list-employee">
+    @*<button id="formfilter">ShowFilter</button>
+        <div id="FormFilter"></div>*@
+    @*@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmITAXTRANST", name = "frmITAXTRANST" }))
+    {*@
+         @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "VdaArrearfrmCpiEntryForm", name = "VdaArrearfrmCpiEntryForm" }))
+       {
+        <input id="geo_id" class="filter_structure_id" name="geo_id" />
+        <input id="pay_id" class="filter_structure_id" name="pay_id" />
+        <input id="fun_id" class="filter_structure_id" name="fun_id" />
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="filter_structure_id" />
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search"  /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table> 
+                </div> 
+            </div>
+        </div>
+
+        <div class="section2_Leave">
+            <div class="heading">CPIENTRYFORM Details</div>
+            <div class="emplist_row">
+ 
+                <div class="row3 content_margine">
+                    <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+
+                    <select id="payscaleagreement_drop" name="payscaleagreement_drop" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ActualIndexPoint, "ActualIndexPoint:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ActualIndexPoint, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.CalIndexPoint, "CalIndexPoint:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CalIndexPoint, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PayMonth, "CPI Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })</div>
+
+                <label class="popup-content-label">DA Arrear Paymonth :</label>
+                <input class="popup-content-textbox" type="text" id="DapayMonth" name="DapayMonth" />
+
+            </div>
+
+            
+        </div>
+
+
+    }
+</div>

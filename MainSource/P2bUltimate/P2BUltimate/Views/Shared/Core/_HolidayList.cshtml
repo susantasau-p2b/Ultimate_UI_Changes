@@ -1,0 +1,99 @@
+﻿@{
+    Layout = null;
+}
+@model P2b.Global.HolidayList
+@*<link href="~/Content/Hollyday_list/Hollyday_list.css" rel="stylesheet" />*@
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormHolidayList", name = "FormHolidayList" }))
+    {
+
+        <div class="row3 content_margine">
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Holiday, "Holiday :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="HolidayList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup HolidayList" id="Lookup-Holiday-HolidayList" class="popup-content-icon-lookup"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create HolidayList" id="Create-Holiday-HolidayList" class=" popup-content-icon-create"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit HolidayList" id="Edit-Holiday-HolidayList" class=" popup-content-icon-edit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove HolidayList" id="Remove-Holiday-HolidayList" class=" popup-content-icon-remove"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.HolidayDate, "Date :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(e => e.HolidayDate, new { @class = "popup-content-textbox date must" })
+        </div>
+    }
+
+</div>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('#create_hollyday').P2BCreateDialog();
+        $('.date').P2BDatePicker();
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //To get data in Lookup
+        $('#Lookup-Holiday-HolidayList').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "Holiday")', '', 'LookupDiv', 'Holiday Look Up Data', '#HolidayList', 'HolidayList', 5, 'HolidayList', '#FormHolidayList', 'N', '#Edit-Holiday-HolidayList,#Remove-Holiday-HolidayList', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Holiday-HolidayList').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Holiday")', 'Create Holiday', 'open', '@Url.Action("Create","Holiday")', '#FormHoliday', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormHoliday', '', function (data) {
+                // to show data which is created in partial page
+                $('#HolidayList').P2BLookUpEncapsulate('#HolidayList', 'HolidayList', data[0], data[1], 'HolidayList', '#Edit-Holiday-HolidayList,#Remove-Holiday-HolidayList', 'N');
+            },{ validurl: "@Url.Action("ValidateForm", "Holiday")" });
+            event.preventDefault();
+        });
+
+        // Partial page edit
+        $('#Edit-Holiday-HolidayList').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#HolidayList').P2BGetTableDataonSelectedRow('#HolidayList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Holiday")', '@Url.Action("edit", "Holiday")', b, '@Url.Action("Editsave","Holiday")', 'Edit Holiday', '#FormHoliday', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormHolidayList', '#HolidayList', 'HolidayList', 'HolidayList', 'A', '#Edit-Holiday-HolidayList,#Remove-Holiday-HolidayList', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#FormHoliday').trigger("reset");
+                    //console.log(k.HolidayName);
+                    $('#hollydayname').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 202, k.HolidayName);
+                    $('#hollydaytype').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 203, k.HolidayType);
+                });
+            });
+            event.preventDefault();
+        });
+
+        //partial page delete
+        //$('#Remove-Holiday-HolidayList').button().on('click', function (event) {
+        //    var a = [], b;
+        //    a = $('#HolidayList').P2BGetTableDataonSelectedRow('#HolidayList', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HolidayList', $('#HolidayList').val(), 200, 200, '#FormHoliday', '#HolidayList', '#Edit-Holiday-HolidayList,#Remove-Holiday-HolidayList');
+        //    event.preventDefault();
+        //});
+        $('#Remove-Holiday-HolidayList').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#HolidayList').P2BGetTableDataonSelectedRow('#HolidayList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#HolidayList').P2BGetTableDataonSelectedRow('#HolidayList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HolidayList', $('#HolidayList').val(), 200, 200, '#FormHolidayList', '#HolidayList', '');
+            event.preventDefault();
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, '');
+    });
+</script>
+<style>
+    .hollylist_icon-row {
+        position: absolute;
+        left: -147px;
+        top: -13px;
+    }
+</style>
+

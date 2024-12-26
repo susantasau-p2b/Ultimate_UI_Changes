@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "Job";
+}
+@model P2b.Global.Job
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/popup_form.css" rel="stylesheet" />
+    <link href="~/Content/job/job.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/Content/mb-ui.css" />
+
+    <script>
+    $(document).ready(function (e) {
+        $('button').button().on('click', function () {
+        });
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['ID', 'Code', 'Name'];
+        ColNames = ['Id', 'Code', 'Name'];
+        SortName = 'ID';
+        Caption = 'Job';
+        url = '/Job/Grid_Job';
+        width = 1000;
+        height = 150;
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+        @*$('#frmJob').P2BCreateDialog();
+            $('#create').button().on("click", function () {
+                $('#frmJob').P2BCreateDialog('', '', 'Create Dialog', 'open', '@Url.Action("Create")', '#frmJob', 'Message :', 'Request Falied :', '#jqgrid');
+            });*@
+
+
+        $('#frmJob').P2BCreateDialog();
+        $('#create').button().on("click", function () {
+        $('#frmJob').P2BCreateDialog('', '', '', '', 'Create Dialog', 'open', '@Url.Action("Create")', '#frmJob', 'Message :', 'Request Falied :', '#jqgrid', 324, 530, function () { });
+        });
+
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'ID');
+            $('#Code').prop('readonly', 'readonly');
+            $('#Code').val(dt.Code);
+            $('#DesigSequenceNo').val(dt.DesigSequenceNo);
+            $('#Position').val(dt.Position);
+            //$('#Default').val(dt.Default);
+        }
+        var dt;
+        $('#edit').button().click(function (event) {
+            AssignData();
+            //   alert(dt.ID);
+            $('#frmJob').P2BEditModalDialog('@Url.Action("Edit")', "Edit Data", '#frmJob', dt.ID, 'Message : ', 'Request Falied :', '#jqgrid');
+
+        });
+
+        $('#view').button().click(function (event) {
+            AssignData();
+            $('#frmJob').P2BViewModalDialog('View');
+        });
+
+        $('#delete').button().click(function (event) {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'ID');
+            $('#frmJob').P2BDeleteModalDialog('@Url.Action("Delete")', dt.ID, 'R u sure u want to delete', 'Message : ', 'Request failed', '#jqgrid');
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+            $('#create_postion').on("click", function () {
+            $('<div></div>').P2BPartialCreateModalDialog('/Job/Job_Parsal', 'Create insurance Product', 'open', '@Url.Action("Create","InsuranceProducts")', '#frmInsuranceProduct', 'Message :', 'Request Falied :', '#jqgrid', 152, 260, '', '', '', function (data) {
+                    $.each(data, function (i, k) {
+                        $('#Job').append($('<option>', {
+                            value: k.Id,
+                            text: k.Name
+                        }));
+                    });
+                });
+            });*@
+
+            $('#Lookup_Contact').button().on('click', function (event) {
+                $('.dialog').P2BLookUpModal('/Job/GetLookupDetails', '', 'lookupdiv', 'Look Up Data', 'selected_value','');
+                event.preventDefault();
+            });
+
+            $('#Job_create_position').button().on('click', function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('/JobPosition/JobPostionPartial', 'Create Position', 'open', '@Url.Action("Create", "InsuranceProducts")', '#frmPosition', 'Message :', 'Request Falied :', '#jqgrid', 400, 500,'','','', function (data) {
+                $.each(data, function (i, k) {
+                    $('.selected_value').append($('<option>', {
+                        value: k.Id,
+                        text: k.Name
+                    }));
+                });
+                });
+                event.preventDefault();
+        });
+             
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create_insuranceproduct').on("click", function () {
+            $('<div></div>').P2BPartialCreateModalDialog('/InsuranceProducts/Insuranceproducts_View', 'Create insurance Product', 'open', '@Url.Action("Create","InsuranceProducts")', '#frmInsuranceProduct', 'Message :', 'Request Falied :', '#jqgrid', 152, 260, '', '', '', function (data) {
+                $.each(data, function (i, k) {
+                    $('#Product').append($('<option>', {
+                        value: k.Id,
+                        text: k.Name,
+                        text: k.StartDate
+                    }));
+                });
+            });
+        });
+
+
+            //  $.fn.P2BLookUpModal = function (lookupurl, lookupdata, lookupdiv, lookuptitle, htmlconstantvalue, dataontable)
+            //   $("#TaxAmt").ForceOnlyAlpha();
+            $("#Code").ForceOnlyNumeric();
+           //    $("#DesigSequenceNo").ForceOnlyNumeric();
+
+            //$("#txtDemoField1").ForceOnlyNumeric();
+            //$("#txtDemoField2").ForceOnlyAlpha();
+            //$("#txtDemoField3").ForceOnlyAlphaNumeric();
+            //$("#txtDemoField4").MaxLength(8);
+            //$("#txtDemoField5").ForceAmount();
+            //$("#txtDemoField6").ForceEmail();
+            //$("#txtDemoField7").ForceContactNumber();
+            //$("#txtDemoField9").MinLength(3);
+            //$("#txtDemoField10").ForceURL();
+
+        });
+    </script>
+</head>
+<body>
+    <div class="form_bg">
+        <div class="form_input">
+            <div class="button_container">
+                <button class="button" id="create">Create</button>
+                <button class="button" id="delete">Delete</button>
+                <button class="button" id="view">View</button>
+                <button class="button" id="edit">Edit</button>
+                <div id="grid_form">
+                    <div>
+                        <table id="jqgrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+        </div>
+    </div>
+
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmJob" }))
+   {
+    <div class="row1 content_margine"> @Html.LabelFor(m => m.Code, "Code:", new { @class = "popup-content-label" }) @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox" })</div>
+    <div class="row1 content_margine">
+        @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label" }) @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox" })
+    </div>
+    <div class="row1 content_margine">
+        @Html.LabelFor(m => m.Position, "Postion :", new { @class = "popup-content-label" }) 
+
+        <select size="10" class="selected_value" style="width:200px" id="Job" name="Job"></select>
+
+        <div class="icon-row">
+            @*<a href="#" data-p2btooltip="Create Contact Details" class="button popup-content-icon-lookup" id="Lookup_Contact"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></a>
+                <a href="#" data-p2btooltip="Create Contact Details" class="button popup-content-icon-create" id="Jobcontent_create"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></a>
+                <a href="#" data-p2btooltip="Create Contact Details" class="button popup-content-icon-edit" id="Jobcontent_edit "><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></a>
+                <a href="#" data-p2btooltip="Create Contact Details" class="button popup-content-icon-remove" id=" Jobcontent_remove"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></a>
+            </div>*@
+
+            <button data-p2btooltip="Create Contact Details" class="button popup-content-icon-lookup" id="Lookup_Contact"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create Contact Details" class="button popup-content-icon-create" id="Job_create_position"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create Contact Details" class="button popup-content-icon-edit" id="Jobcontent_edit_position"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create Contact Details" class="button popup-content-icon-remove" id="Jobcontent_remove_postion"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+        </div>
+
+
+       <a href="#" data-p2btooltip="LookUp Postion"><span id="create_insuranceproduct" class="ui-icon ui-icon-folder-open"></span></a>
+        @* <a href="#" data-p2btooltip="Create Postion"><span id="create_postion" class="ui-icon ui-icon-newwin"></span></a>*@
+    </div>   
+  }
+ 
+</body>
+</html>

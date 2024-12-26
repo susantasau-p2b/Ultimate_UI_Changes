@@ -1,0 +1,130 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.ITSubInvestmentPayment
+
+<script>
+    $(document).ready(function () {
+        $('#SubNarration').MaxLength(30);
+        $('#SubActualInvestment').ForceAmount().MaxLength(10);
+        $('#SubDeclaredInvestment').ForceAmount().MaxLength(10);
+        $('#SubInvestmentDate').attr('readonly', 'readonly');
+    });
+
+</script>
+<style>
+
+
+
+</style>
+@*<link href="~/Content/Wages/wages.css" rel="stylesheet" />*@
+<div class="dialog_RateMaster1">
+    <div title="LookUp Data">
+        <div class="lookupdiv_RateMaster1"></div>
+    </div>
+    <div id="pageNavPosition_RateMaster1">
+
+    </div>
+</div>
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmITSubInvestmentPayment", name = "frmITSubInvestmentPayment" }))
+    {
+        <div class="row3 content_margine">
+
+            @Html.LabelFor(m => m.ActualInvestment, "ActualInvestment :", new { @class = "weg_popup-content-label must" })@Html.TextBoxFor(m => m.ActualInvestment, new { @class = "weg_popup-content-textbox must", id = "SubActualInvestment" })
+        </div>
+
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.DeclaredInvestment, "DeclaredInvestment :", new { @class = "weg_popup-content-label must" })@Html.TextBoxFor(m => m.DeclaredInvestment, new { @class = "weg_popup-content-textbox must", id = "SubDeclaredInvestment" })@*<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" />*@
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.InvestmentDate, "InvestmentDate :", new { @class = "weg_popup-content-label must" })@Html.TextBoxFor(m => m.InvestmentDate, new { @class = "weg_popup-content-textbox must", id = "SubInvestmentDate" })
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "weg_popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "weg_popup-content-textbox must", id = "SubNarration" })
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.ITSubInvestment, "IT Sub Investment :", new { @class = "weg_popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="ITSubInvestmentlist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="weg_icon-row icon-row">
+                <button data-p2btooltip="Select IT Sub Investment" class="popup-content-icon-lookup" id="Lookup-ITSubInvestment-ITSubInvestmentPayment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @* <button data-p2btooltip="Create IT Sub Investment" class="popup-content-icon-create" id="Create-ITSubInvestment-ITSubInvestmentPayment"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit RateMaster" class="popup-content-icon-edit" id="Edit-RateMaster-Wages"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove IT Sub Investment" class="popup-content-icon-remove" id="Remove-ITSubInvestment-ITSubInvestmentPayment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .weg_icon-row {
+        position: absolute;
+        left: 107px;
+        top: 105px;
+    }
+
+    .weg_popup-content-label {
+        width: 140px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }
+
+    .weg_popup-content-textbox {
+        min-width: 100px;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu().css({ "height": "auto" });
+        $('#SubInvestmentDate').P2BDatePicker();
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $('#Lookup-ITSubInvestment-ITSubInvestmentPayment').on('click', function (event) {
+            // alert($("#ITInvestmentlist tr input").val());
+            var itinvestmentid = $("#ITInvestmentlist tr input").val();
+            if (itinvestmentid == undefined) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please select ItInvestment!");
+                return false;
+            }
+            $('.dialog_RateMaster1').P2BLookUpModal('@Url.Action("GetITSubInvLKDetails", "ITInvestment")?ItInvestMentid=' + itinvestmentid, '', 'lookupdiv_RateMaster1', 'Look Up Data', '#ITSubInvestmentlist', 'ITSubInvestmentlist', 5, 'ITSubInvestmentlist', '#frmITSubInvestmentPayment', 'N', '', 'Lookup_table', 'pageNavPosition_RateMaster1');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ITSubInvestment-ITSubInvestmentPayment').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("itsubinvestment_partial", "ITSubInvestment")', 'Create ITSubInvestment', 'open', '@Url.Action("Create", "ITSubInvestment")', '#frmsubinvestment', 'Message :', 'Request Falied :', '#JqGrid', 150, 500, '', '', '', '#frmITSubInvestmentPayment', '', function (data) {
+                // to show data which is created in partial page
+                $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', data[0], data[1], 'ITSubInvestmentlist', '#Remove-ITSubInvestment-ITSubInvestmentPayment', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ITSubInvestment-ITSubInvestmentPayment').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITSubInvestmentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ITSubInvestmentlist').P2BGetTableDataonSelectedRow('#ITSubInvestmentlist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSubInvestmentlist', $('#ITSubInvestmentlist').val(), 200, 200, '#frmITSubInvestmentPayment', '#ITSubInvestmentlist', '#Remove-RateMaster-Wages');
+            event.preventDefault();
+        });
+
+    });
+</script>

@@ -1,0 +1,184 @@
+﻿@{
+    Layout = null;
+}
+@model P2b.Global.ReportingStructRights
+<style> 
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 110px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+</style>
+
+
+<html>
+<body>
+
+    <div id="Create_Dialog" title="Create JobStatus">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmReportingStructRights", name = "frmReportingStructRights" }))
+        {
+            <div class="row1 content_margine">
+                <div id="EmpActingStatuslist_old"></div>
+                @Html.LabelFor(m => m.FuncModules, "FuncModules :", new { @class = "popup-content-label" })
+                <select class="drop" style="width:120px;" name="FuncModuleslist" id="FuncModuleslist">
+                    <option></option>
+                </select>
+            </div>
+            <div class="row1 content_margine">
+                <div id="EmpActingStatuslist_old"></div>
+                @Html.LabelFor(m => m.FuncSubModules, "FuncSubModules :", new { @class = "popup-content-label" })
+                <select class="drop" style="width:120px;" name="FuncSubModuleslist" id="FuncSubModuleslist">
+                    <option></option>
+                </select>
+            </div>
+
+            <div class="row1 content_margine">
+                <div id="EmpActingStatuslist_old"></div>
+
+                <label class="popup-content-label">AccessRights :</label>
+                <div class="popup-content-table" style="margin-left:108px">
+                    <table class="lookuptableselected" id="AccessRightslist" style="height:175px ;width:493px">
+                        <tr><th>ID</th><th style="width:682px">LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row icon-rowreporting" style="margin-left:203px">
+                    <button data-p2btooltip="lookup AccessRights" class="popup-content-icon-lookup" id="Lookup-AccessRights-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create AccessRights" class="popup-content-icon-create" id="Create-AccessRights-Employee"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit AccessRights" class="popup-content-icon-edit" id="Edit-AccessRights-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove AccessRights" class="popup-content-icon-remove" id="Remove-AccessRights-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+                             
+            <div class="row1 content_margine">
+                <label class="popup-content-label">ReportingStruct :</label>
+                <div class="popup-content-table" style="margin-left:108px">
+                    <table class="lookuptableselected" id="ReportingStructlist" style="height:175px ;width:493px">
+                        <tr><th>ID</th><th style="width:682px">LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row icon-rowreporting" style="margin-left:203px">
+                    <button data-p2btooltip="Lookup ReportingStruct" class="popup-content-icon-lookup" id="Lookup-ReportingStruct-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ReportingStruct" class="popup-content-icon-create" id="Create-ReportingStruct-Employee"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit ReportingStruct" class="popup-content-icon-edit" id="Edit-ReportingStruct-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ReportingStruct" class="popup-content-icon-remove" id="Remove-ReportingStruct-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+      
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        @*$('#ReportingLevellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 600, "");*@
+
+        $('#FuncModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 601, "");
+        $("#FuncModuleslist").on('selectmenuchange', function () {
+          var submoduledata=  $('#FuncModuleslist option:selected').val();
+       //   alert(submoduledata);
+          $('#FuncSubModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "ReportingStructRights")", submoduledata, "");
+        });
+     
+        $('#Lookup-ReportingStruct-Employee').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "ReportingStruct")', '', 'LookupDiv', 'ReportingStruct Look Up Data', '#ReportingStructlist', 'ReportingStructlist', 5, 'ReportingStructlist', '#frmReportingStructRights', 'N', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
+            e.preventDefault();
+        });
+
+        $('#Create-ReportingStruct-Employee').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ReportingStruct")', 'Create ReportingStruct', 'open', '@Url.Action("Create","ReportingStruct")', '#frmReportingStruct', 'Message :', 'Request Falied :', '#JqGrid', 600, 550, '', '', '', '#frmReportingStructRights', '', function (data) {
+                $('#ReportingStructlist').P2BLookUpEncapsulate('#ReportingStructlist', 'ReportingStructlist', data[0], data[1], 'ReportingStructlist', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ReportingStruct-Employee').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ReportingStructlist').P2BGetTableDataonSelectedRow('#ReportingStructlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "ReportingStruct")', '@Url.Action("edit", "ReportingStruct")', b, '@Url.Action("Editsave","ReportingStruct")', 'Edit ReportingStruct', '#frmReportingStruct', b, 'Message :', 'Request Falied :', '#JqGrid', 600, 550, '#frmReportingStructRights', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#ReportingStructlist', 'ReportingStructlist', 'ReportingStructlist', 'N', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#RSName').val(k.RSName);
+                    $('[name="FunctionalAppl"]').val([k.FunctionalAppl]).button().button("refresh");
+                    $('[name="GeographicalAppl"]').val([k.GeographicalAppl]).button().button("refresh");
+                    $('[name="RoleBasedAppl"]').val([k.RoleBasedAppl]).button().button("refresh");
+                    $('#GeoGraphList-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 604, k.GeoGraphList);
+                    $('#GeoFuncList-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 605, k.GeoFuncList);
+                    $('#FuncStructlist').P2BLookUpEncapsulate('#FuncStructlist', 'FuncStructlist', k.FuncStruct_Id, k.FuncStruct_Val, 'FuncStructlist', '', 'A');
+                    $('[name="IndividualAppl"]').val([k.IndividualAppl]).button().button("refresh");
+                    $('#BossEmplist').P2BLookUpEncapsulate('#BossEmplist', 'BossEmplist', k.BossEmp_Id, k.BossEmp_Val, 'BossEmplist', '', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ReportingStruct-Employee').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#ReportingStructlist').P2BGetTableDataonSelectedRow('#ReportingStructlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+
+            selectedRows = $('#ReportingStructlist').P2BGetTableDataonSelectedRow('#ReportingStructlist', 0);
+
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ReportingStructlist', $('#ReportingStructlist').val(), 200, 200, '#frmReportingStructRights', '#ReportingStructlist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
+            event.preventDefault();
+        });
+
+        $('#Lookup-AccessRights-Employee').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "AccessRights")', '', 'LookupDiv', 'AccessRights Look Up Data', '#AccessRightslist', 'AccessRightslist', 5, 'AccessRightslist', '#frmReportingStructRights', 'N', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
+            e.preventDefault();
+        });
+
+        $('#Create-AccessRights-Employee').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "AccessRights")', 'Create AccessRights', 'open', '@Url.Action("Create","AccessRights")', '#frmAccessRights', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmReportingStructRights', '', function (data) {
+                $('#AccessRightslist').P2BLookUpEncapsulate('#AccessRightslist', 'AccessRightslist', data[0], data[1], 'AccessRightslist', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-AccessRights-Employee').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AccessRightslist').P2BGetTableDataonSelectedRow('#AccessRightslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "AccessRights")', '@Url.Action("edit", "AccessRights")', b, '@Url.Action("Editsave","AccessRights")', 'Edit AccessRights', '#frmAccessRights', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmReportingStructRights', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#AccessRightslist', 'AccessRightslist', 'AccessRightslist', 'N', function (data) {
+                //  $.each(data[0], function (i, k) {
+                $('#ActionName-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 603, data[0].ActionName.Id);
+                $('[name="IsApproveRejectAppl"]').val([data[0].IsApproveRejectAppl]).button().button("refresh");
+                $('[name="IsClose"]').val([data[0].IsClose]).button().button("refresh");
+                $('[name="IsComments"]').val([data[0].IsComments]).button().button("refresh");
+                $('#LvNoOfDaysFrom').val(data[0].LvNoOfDaysFrom);
+                $('#LvNoOfDaysTo').val(data[0].LvNoOfDaysTo);
+                //});
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-AccessRights-Employee').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#AccessRightslist').P2BGetTableDataonSelectedRow('#AccessRightslist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+
+            selectedRows = $('#AccessRightslist').P2BGetTableDataonSelectedRow('#AccessRightslist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AccessRightslist', $('#AccessRightslist').val(), 200, 200, '#frmReportingStructRights', '#AccessRightslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
+            event.preventDefault();
+        });
+    });
+</script>

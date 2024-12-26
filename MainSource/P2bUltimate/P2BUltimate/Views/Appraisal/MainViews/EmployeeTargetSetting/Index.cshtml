@@ -1,0 +1,731 @@
+﻿@{
+    ViewBag.Title = "Employee Target Setting";
+}
+@model Appraisal.BA_EmpTarget
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 59px;
+            top: -126px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 102px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            width: 100px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .section1_Leave {
+            float: left;
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 377px;
+            width: 450px; 
+            margin: 4px auto;
+            position: relative;
+            bottom: -25em;
+            margin-left: -300px;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 350px;
+            width: 507px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 43em;
+            /*left: 401px;*/
+        }
+
+        .section3_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            /*! height: 502px; */
+            width: 250px;
+            margin: 2px 2px;
+            position: absolute;
+            left: 990px;
+            top: 28px;
+            /*float: right;*/
+        }
+
+        #monthTable {
+            /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #monthTable td, #monthTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        .monthTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+        /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+        #monthTable tr:hover {
+            background-color: #ddd;
+        }
+
+        #monthTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+        .without-btn {
+            height: 216px;
+        }
+        .transactiondiv1 {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 314px;
+            border-radius: 5px;
+            height: 100px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>*@
+                @*<button class="button" id="Delete">Delete</button>*@
+                @*<button class="button" id="release">Release</button>*@
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>StartPeriod</th>
+                                <th>EndPeriod</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpTargetSetting", name = "frmEmpTargetSetting" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="Employee_id" type="hidden" name="Employee_id" />
+            <input id="Subcategory_id" type="hidden" name="Subcategory_id" />
+            <div class="section_Method">
+                    <div class="heading">Filter View</div>
+                    <div class="filter-div" style="width:72%">
+                        <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                        <div id="FormFilter"></div>
+                    </div>
+                </div>
+            <div class="emplist" style="position:relative">
+                    <div class="row3 content_margine">
+                        <label class="popup-content-label">
+                            Employee List :
+                        </label>
+                        <div class="newstruct-div">
+                            <div class="transactiondiv1 without-btn">
+                                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="Employee-Table">
+                                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee List</th></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            
+            <div class="section1_Leave">
+                
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TargetFrequency, "Frequency :", new { @class = "popup-content-label must" })
+                        <select class="drop must" style="width:180px;" name="Frequencylist" id="Frequencylist">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="row3 content_margine">
+                        <label>
+                            Start Period :
+                        </label>
+
+                        <input type="text" id="StartPeriod" style="width:70px" />
+
+                        <label>
+                            End Period :
+                        </label>
+
+                        <input type="text" id="EndPeriod" style="width:70px" />
+
+                        <button id="btnLoad">Load Last Period</button>
+                    </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BA_Category, "Category :", new { @class = "popup-content-label must" })
+                    <select class="drop must" style="width:180px;" name="Categorylist" id="Categorylist">
+                        <option></option>
+                    </select>
+                    <button id="btnLoadSubCat">Load Category</button>
+                </div>
+                <div class="SubCatlist" style="position:relative">
+                    <div class="row3 content_margine">
+                        <label class="popup-content-label">
+                            SubCategory List :
+                        </label>
+                        <div class="newstruct-div">
+                            <div class="transactiondiv1 without-btn">
+                                <div><label>Search : </label><input type="text" id="subcategory-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="subcategory-table">
+                                    <tr><th><input type="checkbox" id="case-subcategory" /></th><th>SubCategory List</th></tr>
+                                </table>
+                                <br><br>
+                                <button id="Generate" @*style="bottom: -56em; margin-left: -432px;"*@>Generate</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                    @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.BA_SubCategory, "SubCategory :", new { @class = "popup-content-label must" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="SubCategorylist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup SubCategory" class="popup-content-icon-lookup" id="Lookup-SubCategory-EmployeeTargetSetting"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove SubCategory" class="popup-content-icon-remove" id="Remove-SubCategory-EmployeeTargetSetting"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                        <div style="float:initial">
+                            <button id="Generate">Generate</button>
+                        </div>
+                    </div>*@
+                <input id="geo_id" class="filter_structure_id" name="geo_id" />
+                <input id="pay_id" class="filter_structure_id" name="pay_id" />
+                <input id="fun_id" class="filter_structure_id" name="fun_id" />
+                <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+                
+
+                </div>  
+                    
+              
+            <div class="section2_Leave">
+                <label class="heading">Category Data</label>
+                <table id="monthTable">
+                    <tr><th>Sr.No</th><th>Category</th><th>SubCategory</th><th>Accounts</th><th>Amount</th><th>Compliance</th></tr>
+                </table>
+            </div>
+            
+            <div class="section3_Leave">
+                <form id="frm_edit_form" name="frm_edit_form">
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Sr.No :</label>
+                        <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Category :</label>
+                        <input type="text" id="Category" name="Category" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">SubCategory :</label>
+                        <input type="text" id="SubCategory" name="SubCategory" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Accounts :</label>
+                        <input type="text" id="Accounts" name="Accounts" class="popup-content-textbox" />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Amount :</label>
+                        <input type="text" id="Amount" name="Amount" class="popup-content-textbox" />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Compliance :</label>
+                        <input type="text" id="Compliance" name="Compliance" class="popup-content-textbox" />
+                    </div>
+                    <div style="float:left">
+                        <button type="button" id="sub_form">Modify in grid</button>
+                    </div>
+                        <div style="float:right">
+                            <button id="Create-data">Submit</button>
+                        </div>
+</form>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+       // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        @*$('#Lookup-SubCategory-EmployeeTargetSetting').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("PopulateDropDownSubCategoryList", "EmployeeTargetSetting")', 'LookupDiv', 'Look Up Data', '#SubCategorylist', 'SubCategorylist', 5, 'SubCategorylist', '#frmEmpTargetSetting', 'A', '#Remove-SubCategory-EmployeeTargetSetting', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        //$('#StartPeriod').datepicker({
+        //    changeMonth: true,
+        //    changeYear: true,
+        //    stepMonths: true,
+        //    dateFormat: 'dd/mm/yy'
+        //});
+        //$('#EndPeriod').datepicker({
+        //    dateFormat: 'dd/mm/yy'
+        //});
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "EmployeeTargetSetting")",
+            htmurl: "@Url.Action("partial", "EmployeeTargetSetting")",
+            submiturl: "@Url.Action("GridEditSave", "EmployeeTargetSetting")",
+            columnname: ["Code", "Name", "StartPeriod", "EndPeriod", "Id", ],
+            childheader: ["Category", "SubCategory", "Accounts", "Amount", "Compliance", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            childurl: "@Url.Action("Get_TargetSettingRequest")",
+            tableheader: "Employee Target Setting",
+            childurlColumnNo: "5"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "EmployeeTargetSetting")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "EmployeeTargetSetting")",
+                    submiturl: "@Url.Action("GridEditSave", "EmployeeTargetSetting")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#Edit-Category').P2BSelectMenuAppend("@Url.Action("CategoryDrop")", "", k.Category);
+                            $('#Edit-SubCategory').P2BSelectMenuAppend("@Url.Action("SubCategoryDrop")", "", k.SubCategory);
+                            $('#Edit-TargetAccounts').val(k.TargetAccounts);
+                            $('#Edit-TargetAmount').val(k.TargetAmount);
+                            $('#Edit-TargetCompliance').val(k.TargetCompliance);
+                           
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Amount').ForceAmount();
+        $('#Accounts').ForceOnlyNumeric();
+        $('#Compliance').ForceOnlyNumeric();
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmEmpTargetSetting').trigger("reset");
+
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Employee Target Setting', 'open', '@Url.Action("Create")', '#frmEmpTargetSetting', 'Message :', 'Request Falied :', '#JqGrid', 800, 1260, '', '', function (data) { }, {});
+            $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, "");
+            $('#Categorylist').P2BSelectMenuAppend('@Url.Action("PopulateCategoryList", "EmployeeTargetSetting")', "", "");
+            @*$('#DivisionT-table').P2BTransactionTable('#DivisionT-search', '#case-Divisiont', '@Url.Action("GetDivisionDetails")', "");*@
+
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            event.preventDefault();
+        });
+
+        $('#btnLoadSubCat').on('click', function () {
+            $('#-table').find('td').remove();
+            $('#subcategory-table').P2BTransactionTableDynamic('#subcategory-search', '#case-subcategory', './EmployeeTargetSetting/Get_SubCategory?cat_id=' + $("#Categorylist option:selected").val() + '', "");
+        });
+
+        $('#Generate').on('click', function (event) {
+           // alert("Generate bt");
+            var CatVal = $("#Categorylist option:selected").val();
+            var SubCatVal = $('#Subcategory_id').val();
+           
+            $.ajax({
+                url: "@Url.Action("GetCategoryData", "EmployeeTargetSetting")",
+                data: { Categoryids: CatVal, SubCategoryids: SubCatVal },
+                success: function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "weeklyoffclass";
+                    $('#monthTable tr:gt(0)').remove();
+
+                    $.each(data, function (i, k) {
+                        $.each(k, function (l, j) {
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + j.Category + "</td><td>" + j.SubCategory + "</td><td>" + 0 + "</td><td>" + 0 + "</td><td>" + 0 + "</td></tr>";
+                            index++;
+                        });
+                    });
+                    $('#monthTable tr:last').after(tr);
+                    $('#Subcategory_id').val('');
+                }
+            });
+            event.preventDefault();
+        });
+
+        //$('#StartPeriod').on('change', function () {
+            
+        //    var SelectedValue = $("#Frequencylist option:selected").text();
+        //    //alert(SelectedValue);
+           
+        //    if (SelectedValue == "Monthly") {
+        //       // alert('hh');
+        //        var from = $("#StartPeriod").val().split("/");
+        //        // alert(from);
+        //        var convertedStartDate = new Date(from[2], from[1] - 1, from[0]);
+        //        // alert(convertedStartDate);
+        //        var newdate = new Date(convertedStartDate);
+
+        //        newdate.setDate(newdate.getDate() + 1);
+        //        // alert(newdate);
+        //        var dd = newdate.getDate();
+        //        // alert("date" + dd);
+        //        var mm = newdate.getMonth() + 1;
+        //        var yyyy = newdate.getFullYear();
+        //        if (dd < 10) {
+        //            dd = '0' + dd;
+        //        }
+
+        //        if (mm < 10) {
+        //            mm = '0' + mm;
+        //        }
+        //        today = dd + '/' + mm + '/' + yyyy;
+        //        document.getElementById("EndPeriod").value = today;
+        //        return false;
+        //        //$('#EndPeriod').val($('#StartPeriod').val());
+        //    }
+        //});
+
+        $('#month').on('change', function () {
+            $.ajax({
+                url: "@Url.Action("EmpTimingRoasterDatesprv", "EmpTimingRoasterTimingCode")",
+                data: {
+                    employeeids: $('#Emp_id').val(), paymonth: $('#month').val()
+                },
+                success: function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "";
+                    $('#monthTable tr:gt(0)').remove();
+
+                    $.each(data, function (i, k) {
+                        $.each(k, function (l, j) {
+                            if (j._Remark == "weeklyoff") {
+                                tempclass = "weeklyoffclass";
+                            } else if (j._Remark == "Holiday") {
+                                tempclass = "holidayclass";
+                            }
+
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + j._dater + "</td><td>" + j._Remark + "</td><td>" + j._Pcode + "</td></tr>";
+                            index++;
+                            tempclass = "";
+                        });
+
+                    });
+
+                    $('#monthTable tr:last').after(tr);
+                }
+            });
+        });
+
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+            //  var sno = target.attr('id');
+            $('#sr_no').focus();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.children().each(function (i, k) {
+                if (i == 0) {
+                    $('#sr_no').val($(k).text());
+                }
+                if (i == 1) {
+                    $('#Category').val($(k).text());
+                    $.post("@Url.Action("ChkApplCategory")", { CatName: $(k).text() }, function (data) {
+                        if (data != null && data != "") {
+                            if (data[0] == false)
+                                $('#Accounts').attr('readonly', true);
+                            else
+                                $('#Accounts').attr('readonly', false);
+                            if (data[1] == false)
+                                $('#Amount').attr('readonly', true);
+                            else
+                                $('#Amount').attr('readonly', false);
+                            if (data[2] == false)
+                                $('#Compliance').attr('readonly', true);
+                            else
+                                $('#Compliance').attr('readonly', false);
+                        }
+
+                    });
+                }
+                if (i == 2) {
+                    $('#SubCategory').val($(k).text());
+                }
+                if (i == 3) {
+                    $('#Accounts').val($(k).text());
+                }
+                if (i == 4) {
+                    $('#Amount').val($(k).text());
+                }
+                if (i == 5) {
+                    $('#Compliance').val($(k).text());
+                }
+
+                // $(input[i]).val($(k).text());
+            });
+            e.preventDefault();
+        });
+
+        $('#sub_form').on('click', function (e) {
+            var table_sr_no = $('#sr_no').val();
+            var target = $('#monthTable tr#' + table_sr_no).children();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.each(function (i, k) {
+                if (i == 0) {
+                    $(k).text($('#sr_no').val());
+                }
+                if (i == 1) {
+                    $(k).text($('#Category').val());
+                }
+                if (i == 2) {
+                    $(k).text($('#SubCategory').val());
+                }
+                if (i == 3) {
+                    $(k).text($('#Accounts').val());
+                }
+                if (i == 4) {
+                    $(k).text($('#Amount').val());
+                }
+                if (i == 5) {
+                    $(k).text($('#Compliance').val());
+                }
+                // $(k).text($(input[i]).val());
+            });
+        });
+
+        $('#Create-data').on('click', function (e) {
+            var formjson = [];
+            var tr = [];
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+
+            $.each(tr, function (i, k) {
+                var childs = $(k).children().toArray();
+                formjson.push({
+                    "SNo": $(childs[0]).text(),
+                    "Category": $(childs[1]).text(),
+                    "SubCategory": $(childs[2]).text(),
+                    "Accounts": $(childs[3]).text(),
+                    "Amount": $(childs[4]).text(),
+                    "Compliance": $(childs[5]).text()
+                });
+            });
+            $.ajax({
+                url: "@Url.Action("createdata", "EmployeeTargetSetting")",
+                method: "POST",
+                cache: false,
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({
+                    data: formjson, FrequencyList: $("#Frequencylist option:selected").val()
+            , Division: $("#Employee_id").val(), StartDate: $('#StartPeriod').val(), EndDate: $('#EndPeriod').val()
+                }),
+                success: function (data) {
+                    alert(data.MSG);
+                }
+            });
+        });
+
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            if (this.checked) {
+                var a = $('#Employee_id').val();
+                if (a != "") {
+                    a = a + "," + $(this).val();
+                    $('#Employee_id').val(a);
+                }
+                else { $('#Employee_id').val($(this).val()); }
+
+            }
+        });
+
+        $('#subcategory-table').on('click', 'input:checkbox:gt(0)', function (e) {
+            if (this.checked) {
+                var a = $('#Subcategory_id').val();
+                if (a != "") {
+                    a = a + "," + $(this).val();
+                    $('#Subcategory_id').val(a);
+                }
+                else { $('#Subcategory_id').val($(this).val()); }
+
+            }
+        });
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter",
+                hierarchy: true,
+            });
+        });
+        
+        $('.popup_radio_button').controlgroup();
+        $('#Frequencylist').selectmenu().selectmenu("menuWidget");
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#StartPeriod').P2BDatePicker();
+        $('#EndPeriod').P2BDatePicker();
+        $('#Amount').ForceAmount();
+        $('#Accounts').ForceOnlyNumeric();
+        $('#Compliance').ForceOnlyNumeric();
+    });
+  
+</script>

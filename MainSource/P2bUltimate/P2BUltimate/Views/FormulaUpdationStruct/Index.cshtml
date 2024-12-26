@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "Formula Update Structure";
+}
+ 
+<style>
+    .icon-row {
+        left: 58px;
+        position: relative;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 88px;
+    }
+
+    .popup-content-label-short {
+        display: block;
+        float: left;
+        width: 87px;
+    }
+
+    .popup-content-textbox {
+        width: 87px;
+    }
+
+    .row1 {
+        width: 431px;
+    }
+
+    .row2, .row3 {
+        display: inline-block;
+    }
+
+    .row2 {
+        width: 198px;
+    }
+
+    .popup-row {
+        width: 446px;
+        margin: 1px 0px 0px 69px;
+    }
+
+    .name {
+        width: 293px;
+    }
+
+    .radio_btn_width {
+        margin: 10px 0px 0px -73px;
+        width: 495px;
+    }
+</style>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmgeostruct", name = "frmgeostruct" }))
+    {
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        <input name="geo_id" id="geo_id" class="filter_structure_id" />
+        <input name="pay_id" id="pay_id" class="filter_structure_id" />
+        <input name="fun_id" id="fun_id" class="filter_structure_id" />
+    }
+    </div>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dia = $('#Create_Dialog').dialog({
+            title: 'Object Mapping',
+            height: "500",
+            width: "1000",
+            buttons: {
+                Submit: function () {
+
+                    $.ajax({
+                        method: "post",
+                        url: '@Url.Action("Create","FormulaUpdationStruct")',
+                        data: $('#frmgeostruct').serialize(),
+                        success: function (data) {
+                            alert(data.responseText);
+                        }, error: function (data) {
+
+                        }
+                    });
+                },
+                Cancel: function () {
+                    $(dia).dialog('close');
+                }
+            }
+        });
+        $(dia).dialog('open');
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                PayUrl: "Transcation/Get_Payid_Single",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                },
+                renderat: "#FormFilter",
+            });
+        });
+    });
+</script>

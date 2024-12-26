@@ -1,0 +1,619 @@
+﻿@{
+    ViewBag.Title = " Location wise Target";
+}
+@model Appraisal.BA_GeoStructTarget
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 59px;
+            top: -126px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 102px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            width: 100px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 450px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 350px;
+            width: 437px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 43em;
+        }
+
+        .section3_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            width: 250px;
+            margin: 2px 2px;
+            position: absolute;
+            left: 920px;
+            top: 28px;
+        }
+
+        #monthTable {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #monthTable td, #monthTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        .monthTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+
+
+        #monthTable tr:hover {
+            background-color: #ddd;
+        }
+
+        #monthTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+
+        .without-btn {
+            height: 216px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>StartPeriod</th>
+                                <th>EndPeriod</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLocationwiseTarget", name = "frmLocationwiseTarget" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="Location_id" type="hidden" name="Location_id" />
+
+            <div class="section1_Leave">
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TargetFrequency, "Frequency :", new { @class = "popup-content-label must" })
+                    <select class="drop must" style="width:180px;" name="Frequencylist" id="Frequencylist">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="row3 content_margine">
+                    <label>
+                        Start Period :
+                    </label>
+
+                    <input type="text" id="StartPeriod" style="width:70px" />
+
+                    <label>
+                        End Period :
+                    </label>
+
+                    <input type="text" id="EndPeriod" style="width:70px" />
+
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BA_Category, "Category :", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="Categorylist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Category" class="popup-content-icon-lookup" id="Lookup-Category-DivisionTargetSetting"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Category" class="popup-content-icon-remove" id="Remove-Category-DivisionTargetSetting"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                    <div style="float:initial">
+                        <button id="Generate">Generate</button>
+                    </div>
+                </div>
+
+                <label id="lbldivision" class="popup-content-label">Division :</label>
+                <input name="txtdivision" type="text" id="txtdivision" style="width: 243px" />
+                <input type="text" id="division_id" name="division_id" class="filter_structure_id" />
+
+                <button data-p2btooltip="Lookup Division " style="width: 25px;height: 22px;" class="popup-content-drop-icon-lookup" id="Lookup_Division"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                <button class="button" id="Loadlocation" style="margin-top: 36px;">Loadlocation</button>
+
+                <div class="row3 content_margine" style=" margin-top: 77px; ">
+                     <label class="popup-content-label">
+                        Location List :
+                    </label>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv without-btn">
+                            <div><label>Search : </label><input type="text" id="LocationT-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="Location-table">
+                                <tr><th><input type="checkbox" id="case-Locationt" /></th><th>Location List</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section2_Leave">
+                <label class="heading">Category Data</label>
+                <table id="monthTable">
+                    <tr><th>Sr.No</th><th>Category</th><th>SubCategory</th><th>Accounts</th><th>Amount</th><th>Compliance</th></tr>
+                </table>
+            </div>
+
+            <div class="section3_Leave">
+                <form id="frm_edit_form" name="frm_edit_form">
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Sr.No :</label>
+                        <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Category :</label>
+                        <input type="text" id="Category" name="Category" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">SubCategory :</label>
+                        <input type="text" id="SubCategory" name="SubCategory" class="popup-content-textbox" readonly />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Accounts :</label>
+                        <input type="text" id="Accounts" name="Accounts" class="popup-content-textbox" />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Amount :</label>
+                        <input type="text" id="Amount" name="Amount" class="popup-content-textbox" />
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="popup-content-label">Compliance :</label>
+                        <input type="text" id="Compliance" name="Compliance" class="popup-content-textbox" />
+                    </div>
+                    <button type="button" id="sub_form">Submit</button>
+                    <div style="float:right">
+                        <button id="Create-data">Create Data</button>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();    
+        $('#Lookup-Category-DivisionTargetSetting').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("PopulateDropDownCategoryList", "DivisionTargetSetting")', '', 'LookupDiv', 'Look Up Data', '#Categorylist', 'Categorylist', 5, 'Categorylist', '#frmDivTargetSetting', 'A', '#Remove-Category-DivisionTargetSetting', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "DivisionTargetSetting")",
+            htmurl: "@Url.Action("partial", "DivisionTargetSetting")",
+            submiturl: "@Url.Action("GridEditSave", "DivisionTargetSetting")",
+            columnname: ["Code", "Name", "StartPeriod", "EndPeriod", "Id", ],
+            childheader: ["Category", "SubCategory", "Accounts", "Amount", "Compliance", "Id"],
+            childurl: "@Url.Action("Get_TargetSettingRequest")",
+            tableheader: "Location wise Target",
+            childurlColumnNo: "5"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {           
+            $('#frmLocationwiseTarget').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Location wise Target', 'open', '@Url.Action("Create")', '#frmLocationwiseTarget', 'Message :', 'Request Falied :', '#JqGrid', 570, 1140, '', '', function (data) { }, {});
+            $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, "");
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            event.preventDefault();
+        });
+
+        $('#Generate').on('click', function () {
+            var CatVal = "";
+            $.each($("#Categorylist tr"), function () {
+                if ($(this).find('td').eq(0).text() != "") {
+                    if (CatVal != "") {
+                        CatVal = CatVal + "," + $(this).find('td').eq(0).text();
+                    }
+                    else {
+                        CatVal = $(this).find('td').eq(0).text();
+                    }
+
+                }
+            });
+            $.ajax({
+                url: "@Url.Action("GetCategoryData", "DivisionTargetSetting")",
+                data: { Categoryids: CatVal },
+                success: function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "weeklyoffclass";
+                    $('#monthTable tr:gt(0)').remove();
+
+                    $.each(data, function (i, k) {
+                        $.each(k, function (l, j) {
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + l + "</td><td>" + j + "</td><td>" + 0 + "</td><td>" + 0 + "</td><td>" + 0 + "</td></tr>";
+                            index++;
+                        });
+                    });
+                    $('#monthTable tr:last').after(tr);
+                }
+            });
+        });
+
+        var divid = "0";
+        $('#Lookup_Division').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtdivision",
+                appendToId: "#division_id",
+                lookupurl: "@Url.Action("Findivisionlist", "LocationwiseTarget")",
+                NoOfRecordToShow: null,
+                setnameofthelookupbyppage: null,
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+
+        $('#Loadlocation').on('click', function () {
+            divid = $('#division_id').val();
+            $('#Location-table').P2BTransactionTable('#LocationT-search', '#case-Locationt', '@Url.Action("GetLocationDetails")?divids=' + divid, "");
+        });
+
+
+        $('#month').on('change', function () {
+            $.ajax({
+                url: "@Url.Action("EmpTimingRoasterDatesprv", "EmpTimingRoasterTimingCode")",
+                data: {
+                    employeeids: $('#Emp_id').val(), paymonth: $('#month').val()
+                },
+                success: function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "";
+                    $('#monthTable tr:gt(0)').remove();
+
+                    $.each(data, function (i, k) {
+                        $.each(k, function (l, j) {
+                            if (j._Remark == "weeklyoff") {
+                                tempclass = "weeklyoffclass";
+                            } else if (j._Remark == "Holiday") {
+                                tempclass = "holidayclass";
+                            }
+
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + j._dater + "</td><td>" + j._Remark + "</td><td>" + j._Pcode + "</td></tr>";
+                            index++;
+                            tempclass = "";
+                        });
+
+                    });
+
+                    $('#monthTable tr:last').after(tr);
+                }
+            });
+        });
+
+        $('#Remove-Category-DivisionTargetSetting').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#Categorylist').P2BGetTableDataonSelectedRow('#Categorylist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Categorylist').P2BGetTableDataonSelectedRow('#Categorylist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#Categorylist', $('#Categorylist').val(), 200, 200, '#frmDivTargetSetting', '#Categorylist', '#Edit-Category-DivisionTargetSetting,#Remove-Category-DivisionTargetSetting');
+            event.preventDefault();
+        });
+
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+            //  var sno = target.attr('id');
+            $('#sr_no').focus();
+
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+
+            target.children().each(function (i, k) {
+                if (i == 0) {
+                    $('#sr_no').val($(k).text());
+                }
+                if (i == 1) {
+                    $('#Category').val($(k).text());
+                    $.post("@Url.Action("ChkApplCategory")", { CatName: $(k).text() }, function (data) {
+                        if (data != null && data != "") {
+                            if (data[0] == false)
+                                $('#Accounts').attr('readonly', true);
+                            else
+                                $('#Accounts').attr('readonly', false);
+                            if (data[1] == false)
+                                $('#Amount').attr('readonly', true);
+                            else
+                                $('#Amount').attr('readonly', false);
+                            if (data[2] == false)
+                                $('#Compliance').attr('readonly', true);
+                            else
+                                $('#Compliance').attr('readonly', false);
+                        }
+
+                    });
+                }
+                if (i == 2) {
+                    $('#SubCategory').val($(k).text());
+                }
+                if (i == 3) {
+                    $('#Accounts').val($(k).text());
+                }
+                if (i == 4) {
+                    $('#Amount').val($(k).text());
+                }
+                if (i == 5) {
+                    $('#Compliance').val($(k).text());
+                }
+
+                // $(input[i]).val($(k).text());
+            });
+            e.preventDefault();
+        });
+
+        $('#sub_form').on('click', function (e) {
+            var table_sr_no = $('#sr_no').val();
+            var target = $('#monthTable tr#' + table_sr_no).children();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.each(function (i, k) {
+                if (i == 0) {
+                    $(k).text($('#sr_no').val());
+                }
+                if (i == 1) {
+                    $(k).text($('#Category').val());
+                }
+                if (i == 2) {
+                    $(k).text($('#SubCategory').val());
+                }
+                if (i == 3) {
+                    $(k).text($('#Accounts').val());
+                }
+                if (i == 4) {
+                    $(k).text($('#Amount').val());
+                }
+                if (i == 5) {
+                    $(k).text($('#Compliance').val());
+                }
+                // $(k).text($(input[i]).val());
+            });
+        });
+
+        $('#Create-data').on('click', function (e) {
+            var formjson = [];
+            var tr = [];
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+
+            $.each(tr, function (i, k) {
+                var childs = $(k).children().toArray();
+                formjson.push({
+                    "SNo": $(childs[0]).text(),
+                    "Category": $(childs[1]).text(),
+                    "SubCategory": $(childs[2]).text(),
+                    "Accounts": $(childs[3]).text(),
+                    "Amount": $(childs[4]).text(),
+                    "Compliance": $(childs[5]).text()
+                });
+            });
+            $.ajax({
+                url: "@Url.Action("createdata", "LocationwiseTarget")",
+                method: "POST",
+                cache: false,
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({
+                    data: formjson, FrequencyList: $("#Frequencylist option:selected").val()
+            , Location: $('#Location_id').val(), StartDate: $('#StartPeriod').val(), EndDate: $('#EndPeriod').val()
+                }),
+                success: function (data) {
+                    alert(data.MSG);
+                    window.location.reload();
+                },
+            });
+        });
+
+        $('#Location-table').on('click', 'input:checkbox:gt(0)', function (e) {         
+            if (this.checked) {            
+                var a = $('#Location_id').val();      
+                if (a != "") {
+                    a = a + "," + $(this).val();
+                    $('#Location_id').val(a);
+                }
+                else {
+                    $('#Location_id').val($(this).val());
+                }
+            }
+        });
+        $('.popup_radio_button').controlgroup();
+        $('#Frequencylist').selectmenu().selectmenu("menuWidget");
+        $('#StartPeriod,#EndPeriod').P2BDatePicker();
+    });
+</script>

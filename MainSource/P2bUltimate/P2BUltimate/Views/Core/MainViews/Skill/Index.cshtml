@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title = "Skill";
+}
+@model P2b.Global.Skill
+
+
+
+
+
+<html>
+
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+        .sk_popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 140px;
+        }
+
+        .sk_popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 76px;
+        }
+
+        skill_row1 {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Skill">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmSkill", name = "frmSkillCreate" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "sk_popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "sk_popup-content-label must" })</div>
+        }
+    </div>
+
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name'];
+        ColNames = ['Id', 'Name'];
+        SortName = 'Id';
+        Caption = 'Skill';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Name').ValidateTextBox({ maxlength: 25, alphanum: true });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+          
+
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmSkill').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Skill', 'open', '@Url.Action("Create")', '#frmSkill', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', function (data) { });
+            event.preventDefault();
+        });
+
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            //alert('bhbh');
+            //(openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returndatafunction) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmSkill', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    //alert(k.HobbyName);
+                    console.log(k.Name);
+                    $('#Name').val(k.Name);
+
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            //alert('b');
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Name').val(k.Name);
+
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    alert(data[2].Name);
+                    $('#Name').oldVal(data[2].Name);
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

@@ -1,0 +1,327 @@
+﻿
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.PostEnquiryPrerquisite
+<style>
+    .popup-content-label {
+        width: 240px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row3, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+       
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'EmpAdjudicationDetails', 'EmpPastRecordDetails', 'IndustrailDisputesActDetails', 'PastOffenseCount', 'ProtectedWorkmanDetails', 'IsCheckedIndustrialDisputesAct', 'IsChkeckedEmpAdjusdication', 'IsChkeckedEmpPastRecord', 'IsProtectedWorkman', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'EmpAdjudicationDetails', 'EmpPastRecordDetails', 'IndustrailDisputesActDetails', 'PastOffenseCount', 'ProtectedWorkmanDetails', 'IsCheckedIndustrialDisputesAct', 'IsChkeckedEmpAdjusdication', 'IsChkeckedEmpPastRecord', 'IsProtectedWorkman', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Post Enquiry Prerequisite';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Lookup-EmpIRHistoryDoc-PostEnquiryPrerquisite').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "PostEnquiryPrerquisite")', '', 'LookupDiv', 'PostEnquiryPrerquisite Look Up Data', '#EmpIRHistoryDocList', 'EmpIRHistoryDocList', 4, 'EmpIRHistoryDocList', '#frmPostEnquiryPrerquisite', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-EmpIRHistoryDoc-PostEnquiryPrerquisite').button().on('click', function (event) {
+
+            //a = $('#EmpIRHistoryDocList').P2BGetTableDataonSelectedRow('#EmpIRHistoryDocList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EmpIRHistoryDocList').P2BGetTableDataonSelectedRow('#EmpIRHistoryDocList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmpIRHistoryDocList', $('#EmpIRHistoryDocList').val(), 200, 200, '#frmPostEnquiryPrerquisite', '#EmpIRHistoryDocList');
+            event.preventDefault();
+        });
+        $('#Create').button().on("click", function () {
+            $('#frmPostEnquiryPrerquisite').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Post Enquiry Prerequisite ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmPostEnquiryPrerquisite', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });
+
+            // =============== Get Chargesheet Details from ChargeSheetServing ========================= //
+            $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: empirid }, function (data) {
+
+                if (data != null) {
+                    //alert(data);
+                    $("#chargesheetDetails").val(data);
+                    $('#chargesheetDetails').attr('readonly', 'readonly');
+                    return false;
+                }
+            });
+
+        });
+        $('#Delete').on('click', function () {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PostEnquiryPrerequisite', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id,  "view PostEnquiryPrerquisite", '#frmPostEnquiryPrerquisite', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('#Narration').val(k.Narration);
+                    $('#EmpAdjudicationDetails').val(k.EmpAdjudicationDetails);
+                    $('#EmpPastRecordDetails').val(k.EmpPastRecordDetails);
+                    $('#IndustrailDisputesActDetails').val(k.IndustrailDisputesActDetails);
+                    $('#PastOffenseCount').val(k.PastOffenseCount);
+                    $('#ProtectedWorkmanDetails').val(k.ProtectedWorkmanDetails);
+                    $('[name="IsCheckedIndustrialDisputesAct"]').val([k.IsCheckedIndustrialDisputesAct]).button().button("refresh");
+                    $('[name="IsChkeckedEmpAdjusdication"]').val([k.IsChkeckedEmpAdjusdication]).button().button("refresh");
+                    $('[name="IsChkeckedEmpPastRecord"]').val([k.IsChkeckedEmpPastRecord]).button().button("refresh");
+                    $('[name="IsProtectedWorkman"]').val([k.IsProtectedWorkman]).button().button("refresh");
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmpIRHistoryDocList').P2BLookUpEncapsulate('#EmpIRHistoryDocList', 'EmpIRHistoryDocList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'EmpIRHistoryDocList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PostEnquiryPrerequisite", '#frmPostEnquiryPrerquisite', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('#Narration').val(k.Narration);
+                    $('#EmpAdjudicationDetails').val(k.EmpAdjudicationDetails);
+                    $('#EmpPastRecordDetails').val(k.EmpPastRecordDetails);
+                    $('#IndustrailDisputesActDetails').val(k.IndustrailDisputesActDetails);
+                    $('#PastOffenseCount').val(k.PastOffenseCount);
+                    $('#ProtectedWorkmanDetails').val(k.ProtectedWorkmanDetails);
+                    $('[name="IsCheckedIndustrialDisputesAct"]').val([k.IsCheckedIndustrialDisputesAct]).button().button("refresh");
+                    $('[name="IsChkeckedEmpAdjusdication"]').val([k.IsChkeckedEmpAdjusdication]).button().button("refresh");
+                    $('[name="IsChkeckedEmpPastRecord"]').val([k.IsChkeckedEmpPastRecord]).button().button("refresh");
+                    $('[name="IsProtectedWorkman"]').val([k.IsProtectedWorkman]).button().button("refresh");
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmpIRHistoryDocList').P2BLookUpEncapsulate('#EmpIRHistoryDocList', 'EmpIRHistoryDocList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'EmpIRHistoryDocList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-EmpIRHistoryDoc-PostEnquiryPrerquisite').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#EmpIRHistoryDocList').P2BLookUpEncapsulate('#EmpIRHistoryDocList', 'EmpIRHistoryDocList', data.Id, data.Val, 'EmpIRHistoryDocList', '', 'A');
+                },
+            });
+            event.preventDefault();
+
+        });
+        //$('.popup-radio-button').controlgroup();
+    });
+</script>
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>index</title>
+</head>
+<body>
+    <div class="form-bg">
+        <div class="form-input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPostEnquiryPrerquisite", name = "frmPostEnquiryPrerquisite" }))
+        {
+            <div class="row3 content_margine">
+                <label for="chargesheetDetails" style="width:239px;" class="popup-content-label must">Charge Sheet Details</label>
+                <textarea cols="30" style="margin-right: -2.5em;" id="chargesheetDetails" name="chargesheetDetails" rows="2"></textarea>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmpAdjudicationDetails, "Emp Adjudication Details:", new { @class = "popup-content-label must" })
+                @Html.TextAreaFor(m => m.EmpAdjudicationDetails, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EmpPastRecordDetails, "Emp Past Record Details:", new { @class = "popup-content-label must" })
+                @Html.TextAreaFor(m => m.EmpPastRecordDetails, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IndustrailDisputesActDetails, "Ind Disputes Act Details:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.IndustrailDisputesActDetails, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsCheckedIndustrialDisputesAct, "Is Checked Industrial Disputes Act:", new { @class = "popup-content-label must" })
+                <div class="popup-radio-button radio-button-div1">
+                    <span class="popup-radio-button rdaio-button-div1">
+                        <input type="radio" id="radio1" name="IsCheckedIndustrialDisputesAct" value="true" /><label for="radio1">YES</label>
+                        <input type="radio" id="radio2" name="IsCheckedIndustrialDisputesAct" value="false" /><label for="radio2">NO</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsChkeckedEmpAdjusdication, "Is Chkecked Emp Adjusdication:", new { @class = "popup-content-label must" })
+                <div class="popup-radio-button radio-button-div1">
+                    <span class="popup-radio-button rdaio-button-div1">
+                        <input type="radio" id="radio3" name="IsChkeckedEmpAdjusdication" value="true" /><label for="radio3">YES</label>
+                        <input type="radio" id="radio4" name="IsChkeckedEmpAdjusdication" value="false" /><label for="radio4">NO</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsChkeckedEmpPastRecord, "Is Chkecked Emp Past Record:", new { @class = "popup-content-label must" })
+                <div class="popup-radio-button radio-button-div1">
+                    <span class="popup-radio-button rdaio-button-div1">
+                        <input type="radio" id="radio5" name="IsChkeckedEmpPastRecord" value="true" /><label for="radio5">YES</label>
+                        <input type="radio" id="radio6" name="IsChkeckedEmpPastRecord" value="false" /><label for="radio6">NO</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsProtectedWorkman, "Is Protected Workman:", new { @class = "popup-content-label must" })
+                <div class="popup-radio-button radio-button-div1">
+                    <span class="popup-radio-button rdaio-button-div1">
+                        <input type="radio" id="radio7" name="IsProtectedWorkman" value="true" /><label for="radio7">YES</label>
+                        <input type="radio" id="radio8" name="IsProtectedWorkman" value="false" /><label for="radio8">NO</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.PastOffenseCount, "Past Offense Count:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PastOffenseCount, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ProtectedWorkmanDetails, "Protected Workman Details:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ProtectedWorkmanDetails, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label " })
+                @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.EmpIRHistoryDoc, "Emp IR History Doc :", new { @class = "popup-content-label must", @Style= "width:160px;" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="EmpIRHistoryDocList" style="margin-left:15.5em;">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup corresponding EmpIRHistoryDoc" class=" popup-content-icon-lookup" id="Lookup-EmpIRHistoryDoc-PostEnquiryPrerquisite"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create EmpIRHistoryDoc " class=" popup-content-icon-create" id="Create-EmpIRHistoryDoc-PostEnquiryPrerquisite"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Delete EmpIRHistoryDoc" class=" popup-content-icon-remove" id="Remove-EmpIRHistoryDoc-PostEnquiryPrerquisite"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

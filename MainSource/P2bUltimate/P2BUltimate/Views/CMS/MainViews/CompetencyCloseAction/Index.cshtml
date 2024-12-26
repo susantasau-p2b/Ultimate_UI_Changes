@@ -1,0 +1,653 @@
+﻿<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model CMS_SPS.CompetencyPostAction
+<style>
+    .date-picker {
+        z-index: 999;
+    }
+
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .lookup {
+        margin-left: 155px;
+    }
+
+    .Daterecord {
+        margin-left: 315px;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        width: 500px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 350px;
+        width: 614px;
+        margin: 2px 2px;
+        position: absolute;
+        margin-left: 47em;
+        /*left: 401px;*/
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        /*! height: 502px; */
+        width: 250px;
+        margin: 2px 2px;
+        position: absolute;
+        left: 920px;
+        top: 28px;
+        /*float: right;*/
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+
+        $('#Load').click(function () {
+
+            var selectedtext = $("#BatchNamelistG option:selected").text();
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("CompetencyEmployeeDataT_Grid")?selectedtextcmn=" + selectedtext,
+                editurl: "",
+                htmurl: "",
+                submiturl: "",
+                columnname: ["EmpCode", "EmpName", "Id"],
+                childheader: ["IsOfficiatingComplete", "OfficiatingCompleteDate", "IsPromotionComplete", "PromotionCompleteDate", "IsTrainingComplete", "TrainingCompleteDate", "IsTransferComplete", "TransferCompleteDate", "Id"],
+                childurl: "@Url.Action("A_CompetencyModel_Grid", "CompetencyCloseAction")",
+                tableheader: "Competency Close Action",
+                childurlColumnNo: "3"
+            });
+        });
+
+        $('#BatchNameList').on('selectmenuchange', function () {
+            var BatchName = $("#BatchNameList option:selected").val();
+
+            $.ajax(
+                {
+                    type: "Post",
+                    data: { 'data': BatchName, 'data2': '' },
+                    url: "@Url.Action("GetProcessDate", "CompetencyPostAction")",
+                    success: function (data) {
+                        $('#ProcessDateList').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                        $.each(data, function (i, k) {
+                            $('#ProcessDateList').append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: k.Selected
+                            }));
+                            $('#ProcessDateList').selectmenu().selectmenu("refresh").selectmenu("menuWidget").css({ "height": "auto" });
+                        });
+                    }
+                });
+
+            $.ajax(
+               {
+                   type: "Post",
+                   data: { 'data': BatchName, 'data2': '' },
+                   url: "@Url.Action("GetProcessBatch", "CompetencyPostAction")",
+                   success: function (data) {
+                       $('#ProcessBatchList').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                       $.each(data, function (i, k) {
+                           $('#ProcessBatchList').append($('<option>', {
+                               value: k.Value,
+                               text: k.Text,
+                               selected: k.Selected
+                           }));
+                           $('#ProcessBatchList').selectmenu().selectmenu("refresh").selectmenu("menuWidget").css({ "height": "auto" });
+                       });
+                   }
+               });
+        });
+      
+
+        $('#BatchNamelistG').selectmenu().selectmenu("menuWidget");
+        $('#BatchNamelistG').P2BSelectMenuAppend('@Url.Action("GetBatchName", "CompetencyEmployeeDataT")');
+        //$('#BatchNameList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("GetProcessDate", "CompetencyPostAction")", '#ProcessDateList', "");
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("CompetencyEmployeeDataT_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "DivisionTargetSetting")",
+            htmurl: "@Url.Action("partial", "DivisionTargetSetting")",
+            submiturl: "@Url.Action("GridEditSave", "DivisionTargetSetting")",
+            columnname: ["EmpCode", "EmpName", "Id", ],
+            childheader: ["Category", "SubCategory", "Accounts", "Amount", "Compliance", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            childurl: "@Url.Action("Get_TargetSettingRequest")",
+            tableheader: "CompetencyEmployeeDataT",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmcompetencypostaction').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create competencypostaction', 'open', '@Url.Action("create")', '#frmcompetencypostaction', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '', '', function (data) { });
+            $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            $('#TrainingCloseDate').prop('disabled', true);
+            $('#TransferCloseDate').prop('disabled', true);
+            $('#OfficiatingCloseDate').prop('disabled', true);
+            $('#PromotionCloseDate').prop('disabled', true);
+            $('#BatchNameList').P2BSelectMenuAppend('@Url.Action("GetBatchName", "CompetencyEmployeeDataT")');
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        });
+
+        // $('#txtProcessDate').P2BDatePicker();
+
+        $('#Load_Emp').click(function () {
+            var BatchName = $('#BatchNameList :selected').val();
+            var ProcessDate = $('#ProcessDateList :selected').text();
+            var ProcessBatch = $('#ProcessBatchList :selected').text();
+            $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './CompetencyCloseAction/Get_Employelist?BatchName=' + BatchName + '&ProcessDate=' + ProcessDate+ '&ProcessBatch=' + ProcessBatch, "", false);
+        });
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Employee-Table').OnClickFormReset('#frmLvNewReq', '#Emp', function () {
+            $('#Emp').val();
+
+            //alert($("#Emp").val());
+            var Id = $("#Emp").val();
+            var BatchName = $('#BatchNameList :selected').val();
+            var ProcessDate = $('#ProcessDateList :selected').text();
+
+
+            $.getJSON("@Url.Action("GetPostActionInfo", "CompetencyCloseAction")", { EmpId: Id.toString(), BatchName: BatchName, ProcessDate: ProcessDate }, function (data) {
+                if (data != null) {
+                    if (data.IsTrainingRecommend == true) {
+                        $('#Training').show();
+                    }
+                    else { $('#Training').hide(); }
+                    if (data.IsTransferRecomment == true) {
+                        $('#Transfer').show();
+                    }
+                    else { $('#Transfer').hide(); }
+                    if (data.IsOfficiatingRecomment == true) {
+                        $('#Officiating').show();
+                    }
+                    else { $('#Officiating').hide(); }
+                    if (data.IsPromotionRecomment == true) {
+                        $('#Promotion').show();
+                    }
+                    else { $('#Promotion').hide(); }
+                }
+                else {
+                    alert('No Record Found..')
+                }
+            });
+        });
+
+        $('input[name="IsTrainingComplete"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#TrainingCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#TrainingCloseDate').prop('disabled', false);
+            }
+        });
+        $('input[name="IsTransferComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#TransferCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#TransferCloseDate').prop('disabled', false);
+            }
+        });
+        $('input[name="IsOfficiatingComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#OfficiatingCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#OfficiatingCloseDate').prop('disabled', false);
+            }
+        });
+
+        $('input[name="IsPromotionComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#PromotionCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#PromotionCloseDate').prop('disabled', false);
+            }
+        });
+
+        $('#Lookup-TrainingLookuplist').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTrainingCategory", "CompetencyPostAction")', '', 'LookupDiv', 'LvDependPolicy Look Up Data', '#TrainingLookuplist', 'TrainingLookuplist', 5, 'TrainingLookuplist', '#frmcompetencypostaction', 'A', '#Edit-LvDependPolicy-SalaryHead,#Remove-LvDependPolicy-SalaryHead', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-TrainingLookuplist').button().on('click', function (event) {
+
+            //var a = [], b;
+            //a = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingLookuplist', $('#TrainingLookuplist').val(), 200, 200, '#frmcompetencypostaction', '#TrainingLookuplist', '');
+            event.preventDefault();
+        });
+
+        $('#save').on("click", function (e) {
+            var Id = $("#Emp").val();
+            var BatchName = $('#BatchNameList :selected').val();
+            var ProcessDate = $('#ProcessDateList :selected').text();
+
+
+            var formjson = [];
+            
+
+            formjson.push({
+                "EmpId": Id,
+                "BatchName": BatchName,
+                "ProcessDate": ProcessDate,
+                "IsTraining": $('input[name="IsTrainingComplete"]:checked').val(),
+                "IsPromotion": $('input[name="IsPromotionComplete"]:checked').val(),
+                "IsTransfer": $('input[name="IsTransferComplete"]:checked').val(),
+                "IsOfficiating": $('input[name="IsOfficiatingComplete"]:checked').val(),
+                "TrainingCloseDate": $('#TrainingCloseDate').val(),
+                "PromotionCloseDate": $('#PromotionCloseDate').val(),
+                "TransferCloseDate": $('#TransferCloseDate').val(),
+                "OfficiatingCloseDate": $('#OfficiatingCloseDate').val(),
+            });
+
+
+            $.ajax({
+                url: "@Url.Action("Create", "CompetencyCloseAction")",
+                method: "POST",
+                cache: false,
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({
+                    data: formjson
+                }),
+                success: function (data) {
+                    alert(data.responseText);
+                }
+            });
+            e.preventDefault();
+        });
+
+        $('#TrainingCloseDate').P2BDatePicker();
+        $('#TransferCloseDate').P2BDatePicker();
+        $('#OfficiatingCloseDate').P2BDatePicker();
+        $('#PromotionCloseDate').P2BDatePicker();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left;margin-left:25px"><label>Batch Name:</label></div>
+
+            <div style="float:left;margin-left:25px">
+                <select class="drop must" style="width:180px;" name="BatchNamelistG" id="BatchNamelistG">
+                    <option value="0">--Select--</option>
+                </select>
+            </div>
+            <button class="button" id="Load">Load</button> 
+            <button class="button" id="Create">Create</button>
+            @*<button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>*@
+            @*<button class="button" id="Delete">Delete</button>*@
+            @*<button class="button" id="release">Release</button>*@
+
+        </div>
+    </div>
+</div>
+
+<div id="Grid_Form">
+    <div>
+        <div id="Container" class="container">
+            <div id="Demo">
+                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>DD</th>
+                            <th>EmpCode</th>
+                            <th>EmpName</th>
+                            <th>ID</th>
+                        </tr>
+                    </thead>
+                    @*<tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                            </tr>
+                        </tfoot>*@
+                </table>
+            </div>
+        </div>
+        <table id="JqGrid"></table>
+        <div id="pager2"></div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmcompetencycloseaction", name = "frmcompetencycloseaction" }))
+    {
+
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+        <div class="section1_Leave">
+            <div class="heading">Competency Batch Details</div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblBatchName" class="popup-content-labelT">BatchName:</label>
+                <select id="BatchNameList" name="BatchNameList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+
+            </div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblProcessDate" class="popup-content-labelT">Process Date:</label>
+                @*<input name="txtProcessDate" type="text" id="txtProcessDate" class="date-picker" />*@
+                <select id="ProcessDateList" name="ProcessDateList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+                
+            </div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblProcessBatch" class="popup-content-labelT">Process Batch:</label>
+                <select id="ProcessBatchList" name="ProcessBatchList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+                <button id="Load_Emp" style="left:10px;">Load Employee</button>
+            </div>
+
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="section2_Leave">
+            <div class="heading">Competency PostAction Details</div>
+            @*<div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })
+            </div>*@
+            
+            <div id="Training" style="display:none">
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsTrainingComplete, "IsTrainingComplete :", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio3" name="IsTrainingComplete" value="true" /><label for="radio3">Yes</label>
+                            <input type="radio" id="radio4" name="IsTrainingComplete" value="false" checked="checked" /><label for="radio4">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">TrainingCloseDate :</label>
+                    <input type="text" id="TrainingCloseDate" name="TrainingCloseDate" class="popup-content-textbox" />
+                </div>
+            </div>
+
+            <div id="Transfer" style="display:none">
+                <div class="row3  content_margine">
+                    @Html.LabelFor(m => m.IsTransferComplete, "IsTransferComplete :", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio5" name="IsTransferComplete" value="true" /><label for="radio5">Yes</label>
+                            <input type="radio" id="radio6" name="IsTransferComplete" value="false" checked="checked" /><label for="radio6">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">TransferCloseDate :</label>
+                    <input type="text" id="TransferCloseDate" name="TransferCloseDate" class="popup-content-textbox ex" />
+                </div>
+            </div>
+
+            <div id="Officiating" style="display:none">
+                <div class="row3  content_margine">
+                    @Html.LabelFor(m => m.IsOfficiatingComplete, "IsOfficiatingComplete :", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio7" name="IsOfficiatingComplete" value="true" /><label for="radio7">Yes</label>
+                            <input type="radio" id="radio8" name="IsOfficiatingComplete" value="false" checked="checked" /><label for="radio8">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row3 content_ma9+rgine">
+                    <label class="popup-content-label">OfficiatingCloseDate :</label>
+                    <input type="text" id="OfficiatingCloseDate" name="OfficiatingCloseDate" class="popup-content-textbox ex" />
+                </div>
+            </div>
+            <div id="Promotion" style="display:none">
+                <div class="row3  content_margine">
+                    @Html.LabelFor(m => m.IsPromotionComplete, "IsPromotionComplete:", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="radio9" name="IsPromotionComplete" value="true" /><label for="radio9">Yes</label>
+                            <input type="radio" id="radio10" name="IsPromotionComplete" value="false" checked="checked" /><label for="radio10">No</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">PromotionCloseDate :</label>
+                    <input type="text" id="PromotionCloseDate" name="PromotionCloseDate" class="popup-content-textbox ex" />
+                </div>
+            </div>
+            <div>
+                <button class="ui-button-text" data-typeofbtn="save" id="save">Save</button>
+            </div>
+
+            </div>
+    }
+</div>

@@ -1,0 +1,486 @@
+﻿@model Payroll.GratuityAct
+@{
+    ViewBag.Title = "Gratuity Act";
+}
+<html>
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablenames = "#Edit-PayScaleArea-GratuityAct,Remove-PayScaleArea-GratuityAct";
+
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = [ 'GratuityActName', 'ITExemptionAmount', 'MaxGratuityAmount','Id',];
+            ColNames = [ 'GratuityActName', 'ITExemptionAmount', 'MaxGratuityAmount','Id',];
+            SortName = 'Id';
+            Caption = 'Gratuity Act';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#MaxGratuityAmount').ForceOnlyNumeric().MaxLength(10);
+            $('#MonthDays').ForceOnlyNumeric().MaxLength(10);
+            $('#ServiceFrom').ForceOnlyNumeric().MaxLength(10);
+            $('#PayableDays').ForceOnlyNumeric().MaxLength(10);
+            $('#ITExemptionAmount').ForceOnlyNumeric().MaxLength(10);
+            $('#ServiceTo').ForceOnlyNumeric().MaxLength(10);
+
+            $('#GratuityActName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#EffectiveDate').P2BDatePicker();
+            $('#Create').button().on("click", function (e) {
+                $('#frmGratuityAct').trigger('reset');
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create GratuityAct ', 'open', '@Url.Action("create") ', '#frmGratuityAct', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '#GratuityWageslist,#LvHeadlist', btndisablenames, function (data) { });
+                $('#EffectiveDate').attr('readonly', true);
+                $('#ServiceTo').on('focusout', function (e) {
+                    if (!$('#ServiceFrom').val()) {
+                        alert('Enter Range From value...!');
+                        $('#ServiceTo').val('');
+                        return false;               
+                    }
+                    if (parseFloat($("#ServiceTo").val()) < parseFloat($("#ServiceFrom").val())) {
+                        alert(" Ending Range To value Should Be Grater Than Starting Range Value ..!");
+                        $('#ServiceTo').val('');
+                    }
+
+                    //$('#MaxGratuityAmount').val("0");
+                    //$('#MonthDays').val("0");
+                    //$('#ServiceFrom').val("0");
+                    //$('#PayableDays').val("0");
+                    //$('#ITExemptionAmount').val("0");
+                    //$('#ServiceTo').val("0");
+
+                });
+          
+
+                e.preventDefault();
+            });
+
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+            
+            $('#Edit').on('click', function (event) {
+                $('#frmGratuityAct').trigger('reset');
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit GratuityAct", '#frmGratuityAct', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 750, '#GratuityWageslist', '', function (data) {
+                    $.each(data[1], function (i, k) {
+                        $('#GratuityWageslist').P2BLookUpEncapsulate('#GratuityWageslist', 'GratuityWageslist', k.GratuityWages_id, k.GratuityWages_val, 'GratuityWageslist', '#Remove-GratuityWages-GratuityAct', 'N');
+                        $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', k.LvHead_id, k.LvHead_val, 'LvHeadlist', '#Remove-LvHead-GratuityAct', 'A');
+                    });
+                    $.each(data[0], function (i, k) {
+                        $('#frmGratuityAct').trigger('reset');
+                        $('[name="IsDateOfConfirm"]').val([k.IsDateOfConfirm]).button().button("refresh");
+                        $('[name="IsDateOfJoin"]').val([k.IsDateOfJoin]).button().button("refresh");
+                        $('[name="IsLVInclude"]').val([k.IsLVInclude]).button().button("refresh");
+                        $('[name="IsLWPInclude"]').val([k.IsLWPInclude]).button().button("refresh");
+                        $('#EffectiveDate').val(k.EffectiveDate);
+                        $('#GratuityActName').val(k.GratuityActName);
+                        $('#MaxGratuityAmount').val(k.MaxGratuityAmount);
+                        $('#MonthDays').val(k.MonthDays);
+                        $('#ServiceFrom').val(k.ServiceFrom);
+                        $('#PayableDays').val(k.PayableDays);
+                        $('#ITExemptionAmount').val(k.ITExemptionAmount);
+                        
+                        $('#ServiceTo').val(k.ServiceTo);
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                $('#frmGratuityAct').trigger('reset');
+                AssignData();
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View GratuityAct', '#GratuityWageslist', '#Lookup-GratuityWages-GratuityAct,#Create-PayScaleArea-GratuityAct,#Edit-PayScaleArea-GratuityAct,#Remove-PayScaleArea-GratuityAct', 500, 750, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        //$('#Autho_Action').val(k.Action);
+                        $('#frmGratuityAct').trigger('reset');
+                        $('[name="IsDateOfConfirm"]').val([k.IsDateOfConfirm]).button().button("refresh");
+                        $('[name="IsDateOfJoin"]').val([k.IsDateOfJoin]).button().button("refresh");
+                        $('[name="IsLVInclude"]').val([k.IsLVInclude]).button().button("refresh");
+                        $('[name="IsLWPInclude"]').val([k.IsLWPInclude]).button().button("refresh");
+                        $('#EffectiveDate').val(k.EffectiveDate);
+                        //$('#EndDate').val(k.EndDate);
+                        $('#GratuityActName').val(k.GratuityActName);
+                        $('#MaxGratuityAmount').val(k.MaxGratuityAmount);
+                        $('#MonthDays').val(k.MonthDays);
+                        $('#ServiceFrom').val(k.ServiceFrom);
+                        $('#PayableDays').val(k.PayableDays);
+                        $('#ITExemptionAmount').val(k.ITExemptionAmount);
+                        $('#ServiceTo').val(k.ServiceTo);
+                    });
+                    console.log(data[1]);
+                    $.each(data[1], function (i, k) {
+
+                        $('#GratuityWageslist').P2BLookUpEncapsulate('#GratuityWageslist', 'GratuityWageslist', k.GratuityWages_id, k.GratuityWages_val, 'GratuityWageslist', 'view', 'N');
+                        $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', k.LvHead_id, k.LvHead_val, 'LvHeadlist', 'view', 'A');
+                        
+                    });
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        //$('[name="BasicScaleAppl"]').StickNote([data[2].BasicScaleAppl]);
+                        //$('[name="CPIAppl"]').StickNote([data[2].CPIAppl]);
+                        //$('#PayScaleTypeList').StickNote(data[2].PayScaleType_Val);
+                        //$('#BonusWageslist_old').StickNote(data[2].PayScaleDetails_Val);
+                    }
+                });
+            });
+
+
+            $('#Lookup-GratuityWages-GratuityAct').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "Wages")', '', 'LookupDiv', 'Look Up Data', '#GratuityWageslist', 'GratuityWageslist', 10, 'GratuityWageslist', '#frmGratuityAct', 'N', '#Remove-GratuityWages-GratuityAct', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });
+
+
+            $('#Create-GratuityWages-GratuityAct').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWages', '#Edit-RateMaster-Wages,#Remove-RateMaster-Wages', function (data) {
+                    $('#GratuityWageslist').P2BLookUpEncapsulate('#GratuityWageslist', 'GratuityWageslist', data[0], data[1], 'GratuityWageslist', '#Edit-GratuityWages-GratuityAct,#Remove-GratuityWages-GratuityAct', 'N');
+                });
+                event.preventDefault();
+            });
+
+
+            $('#Edit-GratuityWages-GratuityAct').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#WagesList').P2BGetTableDataonSelectedRow('#WagesList', 0);
+                b = a[0];
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', '@Url.Action("EditWages_partial", "SalHeadFormula")', b, '@Url.Action("EditSave", "Wages")', 'Edit Wages', '#frmWages', b, 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#frmGratuityAct', '', '#WagesList', 'WagesList', 'WagesList', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmWages').trigger('reset');
+                        $('#WagesName').val(k.WagesName);
+                        $('#Percentage').val(k.Percentage);
+                        $('#txtCelMin').val(k.CeilingMin);
+                        $('#txtCelMax').val(k.CeilingMax);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#Rate_List').P2BLookUpEncapsulate('#Rate_List', 'RateList', k.Id, k.FullDetails, 'Rate_List');
+                    });
+                });
+            });
+
+
+            $('#Remove-GratuityWages-GratuityAct').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                //var a = [], b;
+                //a = $('#GratuityWageslist').P2BGetTableDataonSelectedRow('#GratuityWageslist', 0);
+                //b = a[0];
+                //console.log(b);
+         
+                var selectedRows = [];
+                selectedRows = $('#GratuityWageslist').P2BGetTableDataonSelectedRow('#GratuityWageslist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#GratuityWageslist', $('#GratuityWageslist').val(), 200, 200, '#frmGratuityAct', '#GratuityWageslist');
+                event.preventDefault();
+            });
+
+
+            $('#Lookup-LvHead-GratuityAct').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "LvHead")', '', 'LookupDiv', 'Look Up Data', '#LvHeadlist', 'LvHeadlist', 10, 'LvHeadlist', '#frmGratuityAct', 'N', '#Remove-LvHead-GratuityAct', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });
+
+
+            $('#Create-LvHead-GratuityAct').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWages', '#Edit-RateMaster-Wages,#Remove-RateMaster-Wages', function (data) {
+                    $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', data[0], data[1], 'LvHeadlist', '#Edit-LvHead-GratuityAct,#Remove-LvHead-GratuityAct', 'N');
+                });
+                event.preventDefault();
+            });
+
+
+            $('#Edit-LvHead-GratuityAct').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "LvHead")', '@Url.Action("edit", "LvHead")', b, '@Url.Action("EditSave", "LvHead")', 'Edit Wages', '#frmLvHead', b, 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#frmGratuityAct', '', '#WagesList', 'WagesList', 'WagesList', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#frmWages').trigger('reset');
+                        $('#WagesName').val(k.WagesName);
+                        $('#Percentage').val(k.Percentage);
+                        $('#txtCelMin').val(k.CeilingMin);
+                        $('#txtCelMax').val(k.CeilingMax);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#Rate_List').P2BLookUpEncapsulate('#Rate_List', 'RateList', k.Id, k.FullDetails, 'Rate_List');
+                    });
+                });
+            });
+
+
+            $('#Remove-LvHead-GratuityAct').button().on('click', function (event) {
+                //var a = [], b;
+                //a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                //b = a[0];
+                //console.log(b);
+                
+                var selectedRows = [];
+                selectedRows = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmGratuityAct', '#LvHeadlist');
+                event.preventDefault();
+            });
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+    </script>
+
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 124px;
+            top: 265px;
+        }
+
+        .iconrownew {
+            top: 421px;
+            left: 469px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            width: 750px;
+            display: inline-flex;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .section1 {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 318px;
+            width: 432px;
+            margin: 4px auto;
+            position: absolute;
+            left: 4px;
+            top: -2px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .namepush {
+            margin-right: 30px;
+        }
+
+        .lblwidth {
+            width: 110px;
+        }
+
+        .Clblwidth {
+            width: 111px;
+        }
+
+        .Cnamepush {
+            margin-right: 127px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 116px;
+            top: -148px;
+        }
+    </style>
+
+</head>
+<body>
+    <style>
+    </style>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create GratuityAct">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmGratuityAct" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+               <div class="row3 content_margine">
+                @Html.LabelFor(m => m.GratuityActName, "Gratuity Act Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.GratuityActName, new { @class = ".popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EffectiveDate, "Effective Date:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.EffectiveDate, "Effective Date:", new { @class = ".popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine ">
+                @Html.LabelFor(m => m.IsDateOfConfirm, "Date Of Confirmation:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                    <span class="popup_radio_button">
+                        <input type="radio" id="radio3" name="IsDateOfConfirm" value="true" /><label for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="IsDateOfConfirm" value="false" /><label for="radio4">No</label>
+                    </span>
+                </div>
+            </div>  
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsDateOfJoin, "Date Of Joining:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="IsDateOfJoin" value="true" /><label for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="IsDateOfJoin" value="false" /><label for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="payscale_row3 content_margine horizontal_row2">
+                @Html.LabelFor(m => m.IsLVInclude, "Is LV Include:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio7" name="IsLVInclude" value="true" /><label for="radio7">Yes</label>
+                        <input type="radio" id="radio8" name="IsLVInclude" value="false" /><label for="radio8">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine ">
+                @Html.LabelFor(m => m.IsLWPInclude, "Is LWP Include :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio9" name="IsLWPInclude" value="true" /><label for="radio9">Yes</label>
+                        <input type="radio" id="radio10" name="IsLWPInclude" value="false" /><label for="radio10">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ITExemptionAmount, "IT Exemption Amount :", new {  @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ITExemptionAmount, new { @Value = "0", @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MaxGratuityAmount, "Max Gratuity Amount :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MaxGratuityAmount, new { @Value = "0", @class = "popup-content-textbox must" })
+
+            </div>   <div class="row3 content_margine">
+                @Html.LabelFor(m => m.MonthDays, "Month Days :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MonthDays, new { @Value = "0", @class = "popup-content-textbox must" })
+
+            </div>   <div class="row3 content_margine">
+                @Html.LabelFor(m => m.PayableDays, "Payable Days :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PayableDays, new { @Value = "0", @class = "popup-content-textbox must" })
+
+            </div>   <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ServiceFrom, "Service From :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ServiceFrom, new { @Value = "0", @class = "popup-content-textbox  must" })
+
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ServiceTo, "Service To :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ServiceTo, new { @Value = "0", @class = "popup-content-textbox  must" })
+
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="ContactDetailsList_Old"></div>
+                @Html.LabelFor(m => m.GratuityWages, "Gratuity Wages :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="GratuityWageslist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup GratuityWages Details" class="  popup-content-icon-lookup" id="Lookup-GratuityWages-GratuityAct"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" id="Remove-GratuityWages-GratuityAct"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="ContactDetailsList_Old"></div>
+                @Html.LabelFor(m => m.LvHead, "Lv Head :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LvHeadlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                 <div class="icon-row">
+                    <button data-p2btooltip="Lookup LvHead Details" class="  popup-content-icon-lookup" id="Lookup-LvHead-GratuityAct"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove LvHead Details" class="  popup-content-icon-remove" id="Remove-LvHead-GratuityAct"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+
+
+</html>

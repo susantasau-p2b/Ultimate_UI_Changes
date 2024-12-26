@@ -1,0 +1,1537 @@
+﻿@{
+    ViewBag.Title = "Leave Requisition";
+}
+@*@model Leave.LvNewReq*@
+@model P2BUltimate.Models.FileModel
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 1000px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+
+    <title></title>
+
+    <script>
+        $(document).ready(function (e) {
+            
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            // $('#ToDate').datepicker({ dateFormat: 'dd/mm/yy' });
+            //  $("#FromDate").datepicker({ dateFormat: 'dd/mm/yy' });
+            $('#FromDate').P2BDatePicker();
+            $('#ToDate').P2BDatePicker();
+            $('#ResumeDate').P2BDatePicker();
+            $('#ReqDate').P2BDatePicker();
+            $('#Create_Dialog').P2BCreateDialog();
+            @*$('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+            $('button').button();
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+            $.fn.P2BSelectMenuAppendP = function (url1, forwardata1, forwardata21, drop21) {
+                //   ////debugger;
+                var init = jQuery(this);
+                var w = $(init).css('width');
+                var htm = '<option style=' + w + ' value=0 selected=false>-Select-</option>';
+                jQuery(init).empty().append(htm).selectmenu().selectmenu("refresh");
+                $.post(url1, { data: forwardata1, data2: forwardata21 }, function (data) {
+                    $.each(data, function (i, k) {
+                        console.log(i);
+                        console.log('------------------------------------');
+                        console.log(k);
+                        if (k.Text == "FULLSESSION") {
+                            jQuery(init).append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: true
+                            }));
+                        }
+                        else {
+                            jQuery(init).append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: k.Selected
+                            }));
+                        }
+                    });
+                    jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+                });
+                // $("<span class='DropdownCode'>" + forwardata + "</span>").insertAfter(init);
+                // jQuery(drop21).empty().append(htm).selectmenu().selectmenu("refresh");
+            };
+
+            $('#Calendar_DDL').P2BSelectMenuAppend('@Url.Action("Polulate_LeaveCalendar", "LvOpenBal")', "", ""); // To bind dropdown on page load
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Advance-Filter-Symbol').on('click', function (e) {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                e.preventDefault();
+            });
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $.FormReset('#frmLvNewReq');
+                //$.LoadEmpByDefault(true);
+                $.LoadEmpByDefaultWOGeoId(false, "");
+                $.get('@Url.Action("Checkvisiblebtn", "SalAttendanceT")', function (data) {
+                   
+                    data.split('_').forEach(function (item) {
+                      
+                        $("#" + item).hide();
+                    });
+                });
+
+                //var fullDate = new Date(); console.log(fullDate);
+                //var twoDigitMonth = fullDate.getMonth() + ""; if (twoDigitMonth.length == 1) twoDigitMonth = "0" + twoDigitMonth;
+                //var twoDigitDate = fullDate.getDate() + ""; if (twoDigitDate.length == 1) twoDigitDate = "0" + twoDigitDate;
+                //var currentDate = twoDigitDate + "/" + twoDigitMonth + "/" + fullDate.getFullYear(); console.log(currentDate);
+                //alert(currentDate);
+                //$('#ResumeDate').val(currentDate);
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Requisition', 'open', '@Url.Action("Create")', '#frmLvNewReq', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+                // To bind dropdown on page load
+                $('#ReqDate').TodayDate();
+                $('#lvdata').empty();
+                $('#brandata').empty();
+                //$('#FromDate').attr("readonly", true);
+                $('#dispcalender,#ReqDate,#FromDate,#ToDate,#DebitDays,#ResumeDate').attr('readonly', 'readonly');
+                event.preventDefault();
+            });
+            $('#LeaveHead_drop').on('selectmenuopen', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                if (a == null || a.length == 0) {
+                    alert('Select Employee...');
+                }
+            });
+            $('#Reasonlist').on('selectmenuchange', function () {
+
+                if ($('#Reasonlist').val() != 0) {
+                    if ($('#Reasonlist :selected').text().toUpperCase() == 'OTHERS' || $('#Reasonlist :selected').text().toUpperCase() == 'OTHER') {
+                        $('#Reason').val('');
+                        $('#Reason').removeAttr('Readonly');
+                    }
+                    else {
+                        $('#Reason').val($('#Reasonlist :selected').text());
+                        $('#Reason').attr('Readonly', 'Readonly');
+                    }
+
+                }
+                else {
+                    alert('Please Select or enter Reason..!');
+                    $('#Reason').val('');
+                }
+            })
+
+            $('#LeaveHead_drop').on('selectmenuchange', function () {
+                if ($(this).val() != 0) {
+                    var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                    $('#ReqDate').TodayDate();
+                    $('#ReqDate').attr("readonly", "readonly");
+                    $('#ToStatlist').selectmenu("enable");
+                    $('#FromStatlist').P2BSelectMenuAppendP('@Url.Action("GetLeaveHalfdayappl", "LvNewReq")', $(this).val(), a[0], "0");
+                    $('#ToStatlist').P2BSelectMenuAppendP('@Url.Action("GetLeaveHalfdayappl", "LvNewReq")', $(this).val(), a[0], "0");
+                    $('#Reasonlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 451, "");
+
+                    if (a != null && a.length > 0) {
+                        $.getJSON("@Url.Action("GetLeaveBalance", "lvnewreq")", { LvHeadId: $(this).val(), EmpId: a.toString() }, function (data) {
+
+                            if (data != null) {
+
+                                if ($('div#lvdata')[0]) {
+                                    $('div#lvdata').remove();
+                                }
+                                var a = "<div id='lvdata'>LvOpening :" + data.LvOpening + " LvDebit :" + data.LvOccurances + " LvClosing :" + data.LvClosing + "</div>";
+                                // var a = "<div id='lvdata'>LvOpening :" + data.LvClosing + " LvOccurances :" + data.LvOccurances + "</div>";
+                                $('#LeaveHead_drop').parent('div').append(a);
+                                $('#DebitDays').val('');
+                            }
+                            else {
+                                $('div#lvdata').remove();
+                            }
+                        });
+                    } else {
+                        // alert('Select Employee..!');
+                        $('#LeaveHead_drop').val(0).selectmenu('refresh');
+                    }
+                } else {
+                    alert('Select Employee..!');
+                    $('div#lvdata').remove();
+                }
+            });
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            @*$('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#MyTable').DataTable({
+                            "ajax": {
+                                "url": "@Url.Action("Emp_Grid", "LoanAdvRepaymentT")",
+                                "type": "post",
+                                "data": forwarddata,
+                            }
+                        }).load();
+                    },
+                    renderat: "#FormFilter",
+                });
+            });*@
+
+            $('#lblloader').hide();
+
+            $('#process').on("click", function (event) {
+                var x = PerformValidations('#frmLvNewReq', 'DebitDays');
+                if ($('#LeaveHead_drop').val() == 0) {
+                    alert('Select LvHead..!');
+                    return false;
+                }
+                $('#ToStatlist').removeAttr('disabled')
+                if (x == true) {
+                    var form = $("#frmLvNewReq").serialize();
+                    $('#lblloader').show();
+                    $.post({
+                        url: "@Url.Action("Process")",
+                        data: form,
+                        dataType: 'json',
+                        success: function (data) {
+                            ////debugger;
+                            //alert(data);
+                            if (data.errorno > 0) {
+                                alert(data.ShowMessage);
+                            }
+                            else {
+                               
+                                var debitdays = data.debdays;
+                                $('#DebitDays').val(debitdays);
+                                if (data.IsCertAppl == true && data.IsCertOptional == false) {
+                                    $('#Upload_Div').show();
+                                }
+                                else if (data.IsCertAppl == false && data.IsCertOptional == true) {
+                                    $('#Upload_Div').show();
+                                }
+                                else { $('#Upload_Div').hide(); }
+                               
+                            }
+
+                            //if (data.ErrNo == "100") {
+                            //    alert("Holiday calendar not defined");
+                            //}
+                            //if (data.ErrNo == "101") {
+                            //    alert("Holiday calendar not defined for location");
+                            //}
+                            //if (data.ErrNo == "102") {
+                            //    alert("Weekly off calendar not defined ");
+                            //}
+                            //if (data.ErrNo == "103") {
+                            //    alert("Weeklyoff calendar not defined for leave applied");
+                            //}
+                            //if (data.ErrNo == "104") {
+                            //    alert("Fromdate and Todate should not be weekly off or holiday");
+                            //}
+                            //if (data.ErrNo == "1") {
+                            //    alert("Fill the requisition properly");
+                            //}
+                            //if (data.ErrNo == "2") {
+                            //    alert("Fill the opening balance");
+                            //}
+                            //if (data.ErrNo == "3") {
+                            //    alert("End date should not be more than start date");
+                            //}
+                            //if (data.ErrNo == "4") {
+                            //    alert("end date should not be more than start date");
+                            //}
+                            //if (data.ErrNo == "5") {
+                            //    alert("out off leave year");
+                            //}
+                            //if (data.ErrNo == "6") {
+                            //    alert("end date should be more than start date");
+                            //}
+                            //if (data.ErrNo == "7") {
+                            //    alert("Leave balance is less than min apply leave");
+                            //}
+                            //if (data.ErrNo == "8") {
+                            //    alert("From date should be more than Preapplied grace");
+                            //}
+                            //if (data.ErrNo == "9") {
+                            //    alert("from date should be less than Postapplied grace");
+                            //}
+                            //if (data.ErrNo == "10") {
+                            //    alert("Leave prefix/suffix leave apply limit over");
+                            //}
+                            //if (data.ErrNo == "11") {
+                            //    alert("Future leave can not be applied beyond ApplyFutureGraceMonths months");
+                            //}
+                            //if (data.ErrNo == "12") {
+                            //    alert("Past leave can not be applied beyond ApplyPastGraceMonths months");
+                            //}
+                            //if (data.ErrNo == "13") {
+                            //    alert("Half day leave not allowed");
+                            //}
+                            //if (data.ErrNo == "14") {
+                            //    alert("Leave can not be applied beyond maximum limit");
+                            //}
+                            //if (data.ErrNo == "15") {
+                            //    alert("Leave can not be applied beyond minimum limit");
+                            //}
+                            //if (data.ErrNo == "16") {
+                            //    alert("You have already applied Leave for this period. Try different period.");
+                            //} if (data.ErrNo == "17") {
+                            //    alert("Future leave can not be applied.!");
+                            //}
+                            //if (data.ErrNo == "18") {
+                            //    alert("Pre leave can not be applied.!");
+                            //}
+                            //if (data.ErrNo == "19") {
+                            //    alert("you can not apply Leave on Holiday date.!");
+                            //}
+                            //if (data.ErrNo == "20") {
+                            //    alert("you can not apply Leave on Weekly off.!");
+                            //}
+                            //if (data.ErrNo == "21") {
+                            //    alert("you can not apply Combine Leave");
+                            //}
+                            //if (data.ErrNo == "22") {
+                            //    alert("you can not apply Combine Leave");
+                            //}
+                            //if (data.ErrNo == "23") {
+                            //    alert("You can apply PL combine with SL only if SL is 0");
+                            //}
+                            //if (data.ErrNo == "24") {
+                            //    alert("Please Define leave credit policy Credit date ");
+                            //}
+                            //if (data.ErrNo == "25") {
+                            //    alert("Please Update leave credit date  in LVNEWREQ table ");
+                            //}
+                            //if (data.ErrNo == "26") {
+                            //    alert("Leave assignment not done for new head");
+                            //}
+                            //if (data.ErrNo == "27") {
+                            //    alert("No leave structure available");
+                            //}
+                            //if (data.ErrNo == "28") {
+                            //    alert("No leave debit policy defined ");
+                            //}
+                            //if (data.ErrNo == "29") {
+                            //    alert("You Can not apply leave beyond leave occurances limit");
+                            //}
+                            //if (data.ErrNo == "30") {
+                            //    alert("You Can not apply leave beyond Half Day  Leave  limit");
+                            //}
+                            //if (data.ErrNo == "31") {
+                            //    alert("You can not apply for SLHP as SL balance is not 0");
+                            //}
+                            //if (data.ErrNo == "32") {
+                            //    alert("You can not apply FULLSESSION for SLHP Your Service more than 3 Years");
+                            //}
+
+
+
+                        },
+                        complete: function (data) {
+                            $('#lblloader').hide();
+                        }
+                    });
+
+                }
+
+            });
+          
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+            /* Address button click*/
+
+            //To get data in Lookup
+            $('#Lookup-LvWFDetails-LvNewReq').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvWFDetails", "LvNewReq")', '', 'LookupDiv', 'LvWFDetails Look Up Data', '#LvWFDetailslist', 'LvWFDetailslist', 5, 'LvWFDetailslist', '#frmLvNewReq', 'A', '#Remove-LvWFDetails-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            //partial page delete
+
+            $('#Remove-LvWFDetails-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvWFDetailslist').P2BGetTableDataonSelectedRow('#LvWFDetailslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvWFDetailslist', $('#LvWFDetailslist').val(), 200, 200, '#frmLvNewReq', '#LvWFDetailslist', '#Remove-LvWFDetails-LvNewReq');
+                event.preventDefault();
+            });
+            //Lookup-LeaveHead-LvNewReq  LvHeadlist
+            $('#Lookup-LeaveHead-LvNewReq').on('click', function (event) {
+                alert("ok");
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLKLVHeadDetails", "LvNewReq")', '', 'LookupDiv', 'LvHead Look Up Data', '#LvHeadlist', 'LvHeadlist', 5, 'LvHeadlist', '#frmLvNewReq', 'N', '#Remove-LeaveHead-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Remove-LeaveHead-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmLvNewReq', '#LvHeadlist', '#Remove-LeaveHead-LvNewReq');
+                event.preventDefault();
+            });
+
+
+            $('#Lookup-LvCalendar-LvNewReq').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupCalendar", "LvNewReq")', '', 'LookupDiv', 'LvCalendar Look Up Data', '#LvCalendarlist', 'LvCalendarlist', 5, 'LvCalendarlist', '#frmLvNewReq', 'N', '#Remove-LvCalendar-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-LvCalendar-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvCalendarlist').P2BGetTableDataonSelectedRow('#LvCalendarlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvCalendarlist', $('#LvCalendarlist').val(), 200, 200, '#frmLvNewReq', '#LvCalendarlist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+            $('#Create-ContactNo-ContDetails').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '', '', '', '#frmLvNewReq', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0], data[1], 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'N');
+                });
+                event.preventDefault();
+            });
+            $('#Lookup-ContactNo-ContDetails').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#frmLvNewReq', 'A', '#Remove-ContactNo-ContDetails', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Edit-ContactNo-ContDetails').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                b = a[0];
+                console.log(b);
+                event.preventDefault();
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmLvNewReq', '#ContactNos_List', 'ContactNos_List', 'ContactNos_List', 'N', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+
+                    $.each(data, function (i, k) {
+                        $('#frmContactNo').trigger('reset');
+                        $('#MobileNo').val(k.MobileNo);
+                        $('#LandlineNo').val(k.LandlineNo);
+                        $('#STDCode').val(k.STD);
+                    });
+                });
+
+            });
+
+            $('#Remove-ContactNo-ContDetails').button().on('click', function (event) {
+                //var a = [], b;
+                //a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                //b = a[0];
+
+                var selectedRows = [];
+                selectedRows = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#frmLvNewReq', '#ContactNos_List', '#Remove-ContactNo-ContDetails');
+                event.preventDefault();
+            });
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('.popup_radio_button').controlgroup();
+            $('#FromStatlist').selectmenu().selectmenu("menuWidget");
+            $('#ToStatlist').selectmenu().selectmenu("menuWidget");
+            $('#Reasonlist').selectmenu().selectmenu("menuWidget");
+            $('#WFStatuslist').selectmenu().selectmenu("menuWidget");
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+            $('#ToStatlist').selectmenu("enable");
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "LvNewReq")",
+                htmurl: "@Url.Action("GridPartial", "LvNewReq")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["LvHead", "ReqDate", "FromDate", "ToDate", "TotalDays", "Reason", "IsCancel", "DebitDays", "CreditDays", "FromStat", "ToStat", "Status", "LvyrFrom", "Incharge", "Id"],
+                childurl: "@Url.Action("Get_LvNewReq", "LvNewReq")",
+                tableheader: "Leave Requisition",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvNewReqGridPartial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData","lvnewreq")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                $('#Grid-ReqDate').val(k.ReqDate);
+                                $('#Grid-FromDate').val(k.FromDate);
+                                $('#Grid-ToDate').val(k.ToDate);
+                                $('#Grid-TotalDays').val(k.TotalDays);
+                                $('#Grid-Reason').val(k.Reason);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: "@Url.Action("GridPartial", "LoanAdvRepaymentT")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "LoanAdvRepaymentT")",
+                        submiturl: "@Url.Action("GridEditsave", "LoanAdvRepaymentT")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                //console.log(k.MonthlyInstallmentAmount);
+                                $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                                //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+                @*else if ($(init).hasClass('fa fa-upload')) {
+                    var chk = $($(init)).closest('tr');
+                    //  var SubId = $(chk).find('td:eq(6)').html();
+                    var testnew = $('<div></div>').P2BConfidentialModelDialog({
+                        htmlurl: "@Url.Action("UploadLeaveCertificate", "LvNewReq")",
+                        submiturl: "@Url.Action("LeaveCertificateUpload", "LvNewReq")?Id=" + id,
+                        form: '#FormUploadInvestment',
+                        height: "500",
+                        type: "FILE",
+                        width: "800",
+                        title: "DocumentUpload",
+                        BeforeSendurl: "@Url.Action("CheckLeveCertificateUpload", "LvNewReq")?Id=" + id,
+                        returnfun: function (data) {
+                            //  window.location.href = "" + data + "";
+                        },
+                    });
+                }*@
+                else if ($(init).hasClass('ui-icon-image')) {
+                    ////debugger;
+                    var chk = $($(init)).closest('tr');
+                    // var SubId = $(chk).find('td:eq(6)').html();
+                    $.post("@Url.Action("CheckUploadLeaveFile", "LvNewReq")?Id=" + id, function (data) {
+                        ////debugger;
+                        if (data.success == false) {
+
+                            alert("File Not Found");
+                            return false;
+                        } else if (data.fileextension == ".pdf") {
+                            window.location = "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id;
+                        }
+                        else {
+                            $('<div></div>').PartialCreateDialog({
+                                height: '500',
+                                width: '500',
+                                form: "#FormImageViewer",
+                                htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                                state: "open",
+                                mode: "View",
+                                editurl: "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id,
+                                editdata: id,
+                                forwarddata: id,
+                                returndatafunction: function (data) {
+                                    ////debugger;
+                                    console.log(data);
+                                    if (data.status == "pdf") {
+                                        $("#PDFLoad").attr('src', "data:application/pdf;base64," + data.data + "");
+                                    }
+                                    else if (data.status == ".png") {
+                                        $("#Dashboard-Investment-Viewer").attr('src', "data:image/png;base64," + data.data + "");
+                                    } else if (data.status == ".jpg") {
+                                        $("#Dashboard-Investment-Viewer").attr('src', "data:image/jpg;base64," + data.data + "");
+                                    } else {
+                                        alert("First Upload the File");
+                                    }
+                                }
+                            });
+                        }
+                    })
+
+                }
+            };
+
+            //$('#ToDate').on('change', function () {
+
+            //    var from = $("#ToDate").val().split("/");
+            //    // alert(from);
+            //    var convertedStartDate = new Date(from[2], from[1] - 1, from[0]);
+            //    // alert(convertedStartDate);
+            //    var newdate = new Date(convertedStartDate);
+
+            //    newdate.setDate(newdate.getDate() + 1);
+            //    // alert(newdate);
+            //    var dd = newdate.getDate();
+            //    // alert("date" + dd);
+            //    var mm = newdate.getMonth() + 1;
+            //    var yyyy = newdate.getFullYear();
+            //    if (dd < 10) {
+            //        dd = '0' + dd;
+            //    }
+
+            //    if (mm < 10) {
+            //        mm = '0' + mm;
+            //    }
+            //    today = dd + '/' + mm + '/' + yyyy;
+            //    document.getElementById("ResumeDate").value = today;
+
+            //});
+
+            function ajaxloaderv2(cameform) {
+                $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+            };
+            $('#ToDate').on('change', function () {
+                $('#ToStatlist').selectmenu("enable");
+                var e = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                //  alert(e);
+                var h = [];
+                var j = [];
+                var l = [];
+                $.ajax({
+                    url: '@Url.Action("GetSuffixDate", "LvNewreq")',
+                    method: "POST",
+
+                    data: $('#frmLvNewReq').serialize() + '&data=' + e,
+                    beforeSend: function () {
+                        ajaxloaderv2('body');
+                    },
+                    success: function (data) {
+                        $.each(data, function (i, k) {
+
+                            $("#ResumeDate").val(k.Resumedate);
+
+                            if (k.samedatehalfdayappl === 1 && k.halfdayappl === true) {
+                              
+                                $('#ToStatlist').selectmenu("disable");
+                             
+
+                            }
+                            else {
+                                $('#ToStatlist').selectmenu("enable");
+
+                            }
+
+                        });
+
+                    },
+                    complete: function () {
+                        $('.ajax_loder').remove();
+                    }
+                });
+
+
+            });
+
+           
+               
+            $('#FromDate').on('change', function () {
+              
+                if ($('#ToDate').val() != "") {
+                    $('#ToStatlist').selectmenu("enable");
+                    var e = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                    //  alert(e);
+                    var h = [];
+                    var j = [];
+                    var l = [];
+                    $.ajax({
+                        url: '@Url.Action("GetSuffixDate", "LvNewreq")',
+                        method: "POST",
+
+                        data: $('#frmLvNewReq').serialize() + '&data=' + e,
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        success: function (data) {
+                            $.each(data, function (i, k) {
+
+
+                                $("#ResumeDate").val(k.Resumedate);
+                                if (k.samedatehalfdayappl === 1 && k.halfdayappl === true) {
+                                   
+                                    $('#ToStatlist').selectmenu("disable");
+
+                                }
+                                else {
+                                    $('#ToStatlist').selectmenu("enable");
+
+                                }
+
+                            });
+
+                        },
+                        complete: function () {
+                            $('.ajax_loder').remove();
+                        }
+                    });
+
+                }
+                });
+           
+
+            $('#ToDate').on('change', function () {
+
+                document.getElementById("DebitDays").value = '';
+
+            });
+            $('#FromDate').on('change', function () {
+
+                document.getElementById("DebitDays").value = '';
+
+            });
+
+            $('#FromStatlist').on('selectmenuchange', function () {
+
+                document.getElementById("DebitDays").value = '';
+
+            });
+
+            $('#ToStatlist').on('selectmenuchange', function () {
+
+                document.getElementById("DebitDays").value = '';
+
+            });
+
+            // Get Victim Lookup
+            $('#Lookup-Incharge-Employee').on('click', function (event) {
+                @*$('.dialog').P2BLookUpModal('@Url.Action("GetLookupInchargenew", "ELMS")', '', 'LookupDiv', 'Incharge LookUp Data', '#InchargeList', 'InchargeList', 5, 'InchargeList', 650, '#frmLvNewReq', 'N', '#Remove-Incharge-Employee', 'Lookup_table', 'PageNavPosition');*@
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupInchargenew", "LvNewreq")', '', 'LookupDiv', 'Incharge Look Up Data', '#InchargeList', 'InchargeList', 10, 'InchargeList', '#frmLvNewReq', 'N', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            // Victim Lookup remove
+            $('#Remove-Incharge-Employee').button().on('click', function (event) {
+
+                //a = $('#InchargeList').P2BGetTableDataonSelectedRow('#InchargeList', 0);
+                //b = a[0];
+
+                var selectedRows = [];
+                selectedRows = $('#InchargeList').P2BGetTableDataonSelectedRow('#InchargeList', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#InchargeList', $('#InchargeList').val(), 200, 200, '#frmLvNewReq', '#InchargeList');
+                event.preventDefault();
+            });
+
+
+            $('#Employee-Table').OnClickFormReset('#frmLvNewReq', '#Emp', function () {
+                $('#Emp').val();
+
+                //alert($("#Emp").val());
+                var Id = $("#Emp").val();
+
+                $('#LeaveHead_drop').P2BSelectMenuAppend('@Url.Action("GetLVHEAD", "lvnewreq")', "", Id);
+                $('#Incharge_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListIncharge", "lvnewreq")", "", Id);
+
+                $.getJSON("@Url.Action("GetBranchInfo", "lvnewreq")", { EmpId: Id.toString() }, function (data) {
+                    if (data != null) {
+
+                        if ($('div#brandata')[0]) {
+                            $('div#brandata').remove();
+                        }
+                        //var a = "<div id='lvdata'>LvOpening :" + data.LvOpening + " LvOccurances :" + data.LvOccurances + " LvClosing :" + data.LvClosing + "</div>";
+                        var a = "<div id='brandata'>Branch:" + data.Locname + " Job :" + data.Jobname + " Grade :" + data.Gradename + "</div>";
+                        $('#dispcalender').parent('div').append(a);
+                        $('#DebitDays').val('');
+                    }
+                    else {
+                        $('div#lvdata').remove();
+                    }
+                });
+                @*$('#FromStatlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lvnewreq")', 478, ""); // To bind dropdown on page load
+              $('#ToStatlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lvnewreq")', 478, ""); // To bind dropdown on page load*@
+                $('div#lvdata').remove();
+                $('div#brandata').remove();
+                // $('#ReqDate').TodayDate();
+                //  $('#ResumeDate').TodayDate();
+                $.get("@Url.Action("getCalendar","lvnewreq")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+                });
+            });
+
+            $('#Btn-Upload-Data').on('click', function (e) {
+                ////debugger;
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+
+            $('#filepathid').attr('disabled', 'disabled');
+            $('#FileDownload_idUser').hide();
+            $('#Upload_btnUser').button().on("click", function (event) {
+                $('#EmpLvnereq_Id').val($("#Emp").val());
+                var vidFileLength = $("#files")[0].files.length;
+                if (vidFileLength === 0) {
+                    alert("No file selected.");
+                    return false;
+                }
+
+                var form = $("#frmLvNewReq").serialize();
+                var tempExcel = new FormData($("#frmLvNewReq")[0]);
+                $.post({
+                    url: "@Url.Action("LeaveCertificateUpload", "LvNewreq")",
+                    data: tempExcel,
+                    datatype: "json",
+                    method: "POST",
+                    data: tempExcel,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            alert("File Upload Successfully");
+                            //jQuery('.ui-dialog').remove();
+                            $('#FileDownload_idUser').hide();
+                            return false;
+                        }
+                        else {
+                            alert(data.responseText);
+                        }
+                    },
+                    complete: function (data) {
+                        //$('#lblloader').hide();
+                    }
+                });
+                event.preventDefault();
+            });
+
+
+
+            $('#Download_btnUser').button().on("click", function (event) {
+                ////debugger;
+                var filepath = $('#filepathiduser').val();
+                if (filepath != null) {
+                    $.post("@Url.Action("Filename", "ELMS")?filepath=" + filepath, function (data) {
+                        if (data != null && data != "") {
+                            window.location = '@Url.Action("GetCompImage", "ELMS")?filepath=' + data.data;
+                        }
+                        else {
+                            alert("Data Null");
+                        }
+                    })
+                }
+                event.preventDefault();
+            });
+            var imagesPreview = function (input, placeToInsertImagePreview) {
+                ////debugger;
+                if (input.files) {
+                    var filesAmount = input.files.length;
+                    $(placeToInsertImagePreview).empty();
+                    for (i = 0; i < filesAmount; i++) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            $($.parseHTML('<img class="imgdata">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                        }
+
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+
+            };
+            // Loaded via <script> tag, create shortcut to access PDF.js exports.
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            $("#files").on("change", function (e) {
+                ////debugger;
+                var file = e.target.files[0]
+                var filesize = e.target.files[0].size;
+                var maxfilesize = 2000000;//2MB
+                if (filesize <= maxfilesize) {
+                    if (file.type == "application/pdf") {
+                        $('#container2').empty();
+                        $("#user_investment").hide();
+                        $("#pdfViewer").show();
+                        var fileReader = new FileReader();
+                        fileReader.onload = function () {
+                            var pdfData = new Uint8Array(this.result);
+                            // Using DocumentInitParameters object to load binary data.
+                            var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                            loadingTask.promise.then(function (pdf) {
+                                console.log('PDF loaded');
+
+                                // Fetch the first page
+                                // var pageNumber = 1;
+                                //var container = document.getElementById("container")
+                                for (var i = 1; i <= pdf.numPages; i++) {
+                                    pdf.getPage(i).then(function (page) {
+                                        console.log('Page loaded');
+
+                                        var scale = 1.5;
+                                        var viewport = page.getViewport({ scale: scale });
+
+                                        var div = document.createElement("div");
+
+                                        // Set id attribute with page-#{pdf_page_number} format
+                                        div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+                                        // This will keep positions of child elements as per our needs
+                                        div.setAttribute("style", "position: relative");
+                                        div.setAttribute("class", "form-group content_margine");
+
+                                        // Append div within div#Container
+                                        container2.appendChild(div);
+
+                                        // Create a new Canvas element
+                                        var canvas = document.createElement("canvas");
+
+                                        // Append Canvas within div#page-#{pdf_page_number}
+                                        div.appendChild(canvas);
+
+                                        var context = canvas.getContext('2d');
+                                        canvas.height = viewport.height;
+                                        canvas.width = viewport.width;
+
+                                        var renderContext = {
+                                            canvasContext: context,
+                                            viewport: viewport
+                                        };
+
+                                        // Render PDF page
+                                        var renderTask = page.render(renderContext);
+                                        renderTask.promise.then(function () {
+                                            console.log('Page rendered');
+                                        });
+                                    });
+                                }
+                            }, function (reason) {
+                                // PDF loading error
+                                console.error(reason);
+                            });
+                        };
+                        fileReader.readAsArrayBuffer(file);
+                    } if (file.type == "image/jpeg" || file.type == "image/png") {
+                        $('#container2').empty();
+                        $("#user_investment").show();
+                        $("#pdfViewer").hide();
+                        imagesPreview(this, '#user_investment')
+                    }
+                    // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable');
+                    $('#Upload_btnUser').button('enable');
+                } else {
+                    alert("File Size Should Not Be Grater than 2MB");
+                    $('#Upload_btnUser').button('disable');
+                    // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+                }
+            });
+
+        });
+    </script>
+
+    <style>
+        #lvdata {
+            float: right;
+            width: 52%;
+        }
+
+        #brandata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 805px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 85px;
+            left: -95px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 600px;
+            width: 810px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                        <label id="LabelCalendar" class="emplist_label">Calendar:</label>
+                        <select id="Calendar_DDL" name="Calendar_DDL" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                    </div>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+        <div class="filter-div">
+            <label class="advance_filter_label">
+                Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                </span>
+            </label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div>
+                        <label>Search:</label>
+                        <input type="text" id="Employee-Search" style="width: 425px;" />
+                    </div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr>
+                            <th><input type="checkbox" id="Case-Employee" /></th>
+                            <th>Employee</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvNewReq", name = "frmLvNewReq" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+            <div class="heading">Filter View</div>
+            <div class="section2_Leave">
+
+                <div class="heading">Leave Requisition Details</div>
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old"></div>
+                    <label>Leave Calendar :</label>
+                    <input type="text" readonly id="dispcalender" style="width:250px" />
+
+                </div>
+                <br>
+
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old"></div>
+                    @*@Html.LabelFor(m => m.LeaveHead, "Leave Head:", new { @class = "popup-content-label must" })*@
+                    <label class="popup-content-label must">Leave Head:</label>
+                    <select class="drop must" name="LvHeadlist" id="LeaveHead_drop" style="width:200px"></select>
+
+                </div>
+
+
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.ReqDate, "Request Date:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.ReqDate, new { @class = "popup-content-textbox must" })*@
+                    <label class="popup-content-label must">ReqDate:</label>
+                    <input type="text" id="ReqDate" class="popup-content-textbox " name="ReqDate">
+                </div>
+                <br>
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.FromDate, "From Date:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox must" })*@
+                    <label class="popup-content-label must">FromDate:</label>
+                    <input type="text" id="FromDate" class="popup-content-textbox " name="FromDate">
+                </div>
+
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.FromStat, "From Stat:", new { @class = "popup-content-label must" })*@
+                    <label class="popup-content-label must">FromStat:</label>
+                    <select class="must" id="FromStatlist" name="FromStatlist" style="width:160px;"><option value="0">-Select-</option></select>
+                </div>
+
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.ToDate, "To Date:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox must" })*@
+                    <label class="popup-content-label must">ToDate:</label>
+                    <input type="text" id="ToDate" class="popup-content-textbox " name="ToDate">
+                </div>
+
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.ToStat, "To Stat:", new { @class = "popup-content-label must" })*@
+                    <label class="popup-content-label must">ToStat:</label>
+                    <select class="must" id="ToStatlist" name="ToStatlist" style="width:160px;"><option value="0">-Select-</option></select>
+                </div>
+
+                <br>
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.ResumeDate, "Resume Date:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.ResumeDate, new { @class = "popup-content-textbox must" })*@
+                    <label class="popup-content-label must">ResumeDate:</label>
+                    <input type="text" id="ResumeDate" class="popup-content-textbox disabled" name="ResumeDate">
+                </div>
+                <br>
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.Reason, "Reason:", new { @class = "popup-content-label must" })*@
+                    <label class="popup-content-label must">Reason:</label>
+                    <select class="must" id="Reasonlist" name="Reasonlist" style="width:160px;"><option value="0">-Select-</option></select>
+
+                </div>
+
+                <div class="row5 content_margine">
+                    <input type="text" id="Reason" name="Reason" style="position:relative;top:10px">
+                    @*@Html.TextBoxFor(m => m.Reason, new { @class = "popup-content-textbox  must" })*@
+                </div>
+                <br>
+
+                <div class="row2 content_margine">
+                    <button id="process" class="button" name="process" style="top:109px">Process Days</button>
+                </div>
+                <br>
+                <br>
+                <br>
+                <div class="row5 content_margine">
+                    @*@Html.LabelFor(m => m.DebitDays, "Debit Days:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DebitDays, new { @class = "popup-content-textbox must", @readonly = "readonly" })*@
+
+                    <label class="popup-content-label must">DebitDays:</label>
+                    <input type="text" id="DebitDays" class="popup-content-textbox disabled" name="DebitDays">
+                </div>
+
+
+
+
+                <div id="loading_img" class="loader content_margine">
+                    <label id="lblloader" style="color: red; display: block; position: absolute; left: 427px; top: 197px;">Processing...</label>
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.FromStat, "FromStat:", new { @class = "popup-content-label" })<select id="FromStatlist" name="FromStatlist" style="width:120px;"><option value="0">-Select-</option></select></div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.ToStat, "ToStat:", new { @class = "popup-content-label" })<select id="ToStatlist" name="ToStatlist" style="width:120px;"><option value="0">-Select-</option></select></div>*@
+
+                <div class="row3 content_margine">
+                    @*@Html.LabelFor(m => m.ContactNo, "Contact No:", new { @class = "popup-content-label" })*@
+                    <label class="popup-content-label ">Contact No:</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ContactNos_List">
+                            <tr>
+                                <th>ID</th>
+                                <th>LookUp Selected Description</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select Contact Numbers" class="popup-content-icon-lookup" id="Lookup-ContactNo-ContDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Contact Numbers" class="popup-content-icon-create" id="Create-ContactNo-ContDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Contact Numbers" class="popup-content-icon-edit" id="Edit-ContactNo-ContDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Delete Contact Numbers" class="popup-content-icon-remove" id="Remove-ContactNo-ContDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                @*<div class="row3 content_margine">
+                        <label class="popup-content-label ">Incharge:</label>
+                        <select id="Incharge_DDL" name="Incharge_DDL" class="drop" style="width:250px;">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>*@
+                <div id="InchargeDiv">
+                    <div class="row3 content_margine">
+                        <label for="Incharge" class="popup-content-label ">Incharge</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="InchargeList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Incharge Details" class=" popup-content-icon-lookup" id="Lookup-Incharge-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create corresponding Contact Details" class=" popup-content-icon-create" id="Create-CorrsContactDetails-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                            @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Delete Incharge Details" class=" popup-content-icon-remove" id="Remove-Incharge-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-horizontal" id="Upload_Div" style="display:none;">
+                    <div class="form-group content_margine" id="FileBrowes_id">
+                        @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label popup-content-label must" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" }) <button id="Upload_btnUser" name="Upload_btnUser">Upload</button>
+                            <label style="position: absolute;bottom: -3.5em; margin-left: 4px;color:red;"> File Size 2MB. </label><br>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine" id="FileDownload_idUser">
+                        <label class="popup-content-label">File Download :</label>
+                        @*<input type="hidden" class="popup-content-textbox" id="filepathiduser" /> <button id="Download_btnUser" name="Download_btnUser">Download</button>*@
+                    </div>
+                    <div style="height:100%;width:100%;overflow:auto;" id="user_investment" class="content_margine"></div>
+                    <canvas id="pdfViewer"></canvas>
+                    <div id="container2" class="container2">
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</body>
+</html>

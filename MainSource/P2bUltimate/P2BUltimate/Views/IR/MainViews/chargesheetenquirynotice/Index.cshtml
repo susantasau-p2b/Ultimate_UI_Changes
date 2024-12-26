@@ -1,0 +1,443 @@
+﻿<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.ChargeSheetEnquiryNotice
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+
+<script>
+
+    //let caseform = document.createElement("form");
+    //caseform.setAttribute("method", "post");
+    //caseform.setAttribute("action", "submit");
+
+    //document.getElementsByTagName("body")[0].appendChild(caseform);
+    //let nameTag = document.createElement('label');
+    //nameTag.textContent = "kkk";
+    //caseform.appendChild(nameTag);
+    //let nameip = document.createElement("input");
+    //nameip.setAttribute("type", "text");
+    //nameip.setAttribute("name", "textone");
+    //caseform.appendChild(nameip);
+    //let namebtn = document.createElement("input");
+    //namebtn.setAttribute("type", "button");
+    //namebtn.setAttribute("id", "buttonOne");
+    //namebtn.setAttribute("value", "Submit"); caseform.appendChild(namebtn);
+
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'EnquiryNoticeIssueDate', 'EnquiryNoticeNo', 'EnquiryPlace', 'EnquiryScheduleDate', 'EnquiryScheduleTime', 'Narration', 'ReplyPeriod', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'EnquiryNoticeIssueDate', 'EnquiryNoticeNo', 'EnquiryPlace', 'EnquiryScheduleDate', 'EnquiryScheduleTime', 'Narration', 'ReplyPeriod', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Charge Sheet Enquiry Notice';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmChargeSheetEnquiryNotice').trigger("reset");
+
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Charge Sheet Enquiry Notice ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmChargeSheetEnquiryNotice', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+
+            // =============== Get Chargesheet Details from ChargeSheetServing ========================= //
+            $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: empirid }, function (data) {
+
+                if (data != null) {
+                    //alert(data);
+                    $("#chargesheetDetails").val(data);
+                    $('#chargesheetDetails').attr('readonly', 'readonly');
+                    return false;
+                }
+            });
+
+        });
+        $('#Remove-EnquiryAddress-EnquiryAddress').button().on('click', function (event) {
+
+            //a = $('#EnquiryAddressList').P2BGetTableDataonSelectedRow('#EnquiryAddressList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EnquiryAddressList').P2BGetTableDataonSelectedRow('#EnquiryAddressList', 0);
+            console.log("Verify...");
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EnquiryAddressList', $('#EnquiryAddressList').val(), 200, 200, '#frmChargeSheetEnquiryNotice', '#EnquiryAddressList');
+            event.preventDefault();
+        });
+        $('#Remove-EmployeeDocuments-EmployeeDocuments').button().on('click', function (event) {
+
+            //a = $('#EmployeeDocumentsList').P2BGetTableDataonSelectedRow('#EmployeeDocumentsList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EmployeeDocumentsList').P2BGetTableDataonSelectedRow('#EmployeeDocumentsList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmployeeDocumentsList', $('#EmployeeDocumentsList').val(), 200, 200, '#frmChargeSheetEnquiryNotice', '#EmployeeDocumentsList');
+            event.preventDefault();
+        });
+        $('#Remove-EnquiryPanel-EnquiryPanel').button().on('click', function (event) {
+
+            //a = $('#EnquiryPanelList').P2BGetTableDataonSelectedRow('#EnquiryPanelList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EnquiryPanelList').P2BGetTableDataonSelectedRow('#EnquiryPanelList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EnquiryPanelList', $('#EnquiryPanelList').val(), 200, 200, '#frmChargeSheetEnquiryNotice', '#EnquiryPanelList');
+            event.preventDefault();
+        });
+        $('#Remove-Witness-Witness').button().on('click', function (event) {
+
+            //a = $('#WitnessList').P2BGetTableDataonSelectedRow('#WitnessList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WitnessList').P2BGetTableDataonSelectedRow('#WitnessList', 0);
+            console.log("Verify...");
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WitnessList', $('#WitnessList').val(), 200, 200, '#frmChargeSheetEnquiryNotice', '#WitnessList');
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ChargeSheetEnquiryNotice", '#frmChargeSheetEnquiryNotice', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey");
+                    $('#Narration').val(k.Narration);
+                    $('#ChargeSheetDetails').val(k.ChargeSheetDetails);
+                    $('#ReplyPeriod').val(k.ReplyPeriod);
+                    $('#EnquiryPlace').val(k.EnquiryPlace);
+                    $('#EnquiryNoticeNo').val(k.EnquiryNoticeNo);
+                    if (k.EnquiryNoticeIssueDate != null)
+                        $('#EnquiryNoticeIssueDate').val(DateConvert(k.EnquiryNoticeIssueDate));
+                    else
+                        $('#EnquiryNoticeIssueDate').val();
+                    if (k.EnquiryScheduleDate != null)
+                        $('#EnquiryScheduleDate').val(DateConvert(k.EnquiryScheduleDate));
+                    else
+                        $('#EnquiryScheduleDate').val();
+                    if (k.EnquiryScheduleTime != null) {
+                        $('#EnquiryScheduleTime').val(k.EnquiryScheduleTime);
+                    }
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+                    $('#EnquiryAddressList').P2BLookUpEncapsulate('#EnquiryAddressList', 'EnquiryAddressList', k.Address_Id, k.AddressFullAddress, 'EnquiryAddressList', '#Edit-Address-Location,#Remove-Address-Location', 'N');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', k.EmployeeNoticedoc_Id, k.EmployeeNoticedocFullDetails, 'EmployeeDocumentsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EnquiryPanelList').P2BLookUpEncapsulate('#EnquiryPanelList', 'EnquiryPanelList', k.EnquiryPanelNotice_Id, k.EnquiryPanelNoticeFullDetails, 'EnquiryPanelList', '#Remove-WOCalendar-Department,#Edit-WOCalendar-Department', 'A');
+                    $('#WitnessList').P2BLookUpEncapsulate('#WitnessList', 'WitnessList', k.WitnessNotice_Id, k.WitnessNoticeFullDetails, 'WitnessList', '#Remove-WOCalendar-Department,#Edit-WOCalendar-Department', 'A');
+                });
+            });
+        });
+
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ChargeSheetEnquiryNotice', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey");
+                    $('#Narration').val(k.Narration);
+                    $('#ChargeSheetDetails').val(k.ChargeSheetDetails);
+                    $('#ReplyPeriod').val(k.ReplyPeriod);
+                    $('#EnquiryPlace').val(k.EnquiryPlace);
+                    $('#EnquiryNoticeNo').val(k.EnquiryNoticeNo);
+                    if (k.EnquiryNoticeIssueDate != null)
+                        $('#EnquiryNoticeIssueDate').val(DateConvert(k.EnquiryNoticeIssueDate));
+                    else
+                        $('#EnquiryNoticeIssueDate').val();
+                    if (k.EnquiryScheduleDate != null)
+                        $('#EnquiryScheduleDate').val(DateConvert(k.EnquiryScheduleDate));
+                    else
+                        $('#EnquiryScheduleDate').val();
+                    if (k.EnquiryScheduleTime != null) {
+                        $('#EnquiryScheduleTime').val(k.EnquiryScheduleTime);
+                    }
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+                    $('#EnquiryAddressList').P2BLookUpEncapsulate('#EnquiryAddressList', 'EnquiryAddressList', k.Address_Id, k.AddressFullAddress, 'EnquiryAddressList', 'view', 'N');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', k.EmployeeNoticedoc_Id, k.EmployeeNoticedocFullDetails, 'EmployeeDocumentsList', 'view', 'A');
+                    $('#EnquiryPanelList').P2BLookUpEncapsulate('#EnquiryPanelList', 'EnquiryPanelList', k.EnquiryPanelNotice_Id, k.EnquiryPanelNoticeFullDetails, 'EnquiryPanelList', 'view', 'A');
+                    $('#WitnessList').P2BLookUpEncapsulate('#WitnessList', 'WitnessList', k.WitnessNotice_Id, k.WitnessNoticeFullDetails, 'WitnessList', 'view', 'A');
+                });
+
+            });
+        });
+
+        $('#Delete').on('click', function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#Lookup-EnquiryAddress-EnquiryAddress').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsAddress", "chargesheetenquirynotice")', '', 'LookupDiv', 'Look Up Data', '#EnquiryAddressList', 'EnquiryAddressList', 5, 'EnquiryAddressList', '#frmChargeSheetEnquiryNotice', 'N', '#Edit-Address-Location,#Remove-Address-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-EnquiryPanel-EnquiryPanel').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEnquirypanel", "chargesheetenquirynotice")', '', 'LookupDiv', 'Enquirypanel Look Up Data', '#EnquiryPanelList', 'EnquiryPanelList', 5, 'EnquiryPanelList', '#frmChargeSheetEnquiryNotice', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-Witness-Witness').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWitness", "chargesheetenquirynotice")', '', 'LookupDiv', ' Witness Look Up Data', '#WitnessList', 'WitnessList', 5, 'WitnessList', '#frmChargeSheetEnquiryNotice', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-EmployeeDocuments-EmployeeDocuments').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "chargesheetenquirynotice")', '', 'LookupDiv', 'ChargeSheetenquirynoticeDoc Look Up Data', '#EmployeeDocumentsList', 'EmployeeDocumentsList', 4, 'EmployeeDocumentsList', '#frmChargeSheetEnquiryNotice', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-EnquiryPanel-EnquiryPanel').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "chargesheetenquirynotice")', 'Create EnquiryPanel', 'open', '@Url.Action("Create", "EnquiryPanel")', '#frmenquirypanellist', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmChargeSheetEnquiryNotice', '', function (data) {
+                $('#EnquiryPanelList').P2BLookUpEncapsulate('#EnquiryPanelList', 'EnquiryPanelList', data[0], data[1], 'EnquiryPanelList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-EmployeeDocuments-EmployeeDocuments').on("click", function (event) {
+            var a = $('#EmpCode').val();
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', data.Id, data.Val, 'EmployeeDocumentsList', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+
+        $('#EnquiryNoticeIssueDate').P2BDatePicker();
+        $('#EnquiryScheduleDate').P2BDatePicker();
+        $('#EnquiryScheduleTime').P2BTimePicker();
+
+
+
+    });
+    </script>
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>Index</title>
+</head>
+<body>
+    <div id="Hello"></div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+             
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChargeSheetEnquiryNotice", name = "frmChargeSheetEnquiryNoticelist" }))
+        {
+            <div class="row3 content_margine">
+                    <label for="chargesheetDetails" class="popup-content-label ">charge sheet Details</label>
+                <textarea cols="30" id="chargesheetDetails" name="chargesheetDetails" rows="2"></textarea>
+                </div> 
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.EmployeeDocuments, "Suplementory Documents :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EmployeeDocumentsList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding EmployeeDocuments" class=" popup-content-icon-lookup" id="Lookup-EmployeeDocuments-EmployeeDocuments"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create EmployeeDocuments " class=" popup-content-icon-create" id="Create-EmployeeDocuments-EmployeeDocuments"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete EmployeeDocuments" class=" popup-content-icon-remove" id="Remove-EmployeeDocuments-EmployeeDocuments"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryAddress, "EnquiryAddress :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EnquiryAddressList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding EnquiryAddress" class=" popup-content-icon-lookup" id="Lookup-EnquiryAddress-EnquiryAddress"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create EnquiryAddress " class=" popup-content-icon-create" id="Create-EnquiryAddress-EnquiryAddress"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete EnquiryAddress" class=" popup-content-icon-remove" id="Remove-EnquiryAddress-EnquiryAddress"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             
+             <div class="row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryNoticeIssueDate, " Enquiry Notice Issue Date:", new { @class = "popup-content-label must" })
+                 @Html.TextBoxFor(m => m.EnquiryNoticeIssueDate, new { @class = "popup-content-textbox must" })
+                 </div>
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryNoticeNo, "EnquiryNoticeNo :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.EnquiryNoticeNo, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryPanel, "EnquiryPanel :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EnquiryPanelList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding EnquiryPanel" class=" popup-content-icon-lookup" id="Lookup-EnquiryPanel-EnquiryPanel"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create EnquiryPanel " class=" popup-content-icon-create" id="Create-EnquiryPanel-EnquiryPanel"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete EnquiryPanel" class=" popup-content-icon-remove" id="Remove-EnquiryPanel-EnquiryPanel"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryPlace, "EnquiryPlace :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.EnquiryPlace, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryScheduleDate, " Enquiry Schedule Date:", new { @class = "popup-content-label must" })
+              @Html.TextBoxFor(m => m.EnquiryScheduleDate, new { @class = "popup-content-textbox must" }) 
+        </div>
+            <div class="row3 content_margine">
+        @Html.LabelFor(m => m.EnquiryScheduleTime, " Enquiry Schedule Time:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.EnquiryScheduleTime, new { @class = "popup-content-textbox must" })
+               
+        </div>
+           
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.ReplyPeriod, "ReplyPeriod in days :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.ReplyPeriod, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.Witness, "Witness :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="WitnessList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding Witness" class=" popup-content-icon-lookup" id="Lookup-Witness-Witness"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Witness " class=" popup-content-icon-create" id="Create-Witness-Witness"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete Witness" class=" popup-content-icon-remove" id="Remove-Witness-Witness"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+        }
+        </div>
+</body>
+</html>

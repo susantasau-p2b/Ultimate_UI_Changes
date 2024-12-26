@@ -1,0 +1,428 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.SalaryT
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 61px;
+        top: -150px;
+    }
+
+    #Create {
+        top: 526px;
+        left: -515px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 115px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 430px;
+    }
+
+    .row9 {
+        width: 386px;
+        display: inline-flex;
+        float: right;
+        margin-top: -32px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .date-picker {
+        z-index: 999;
+    }
+
+    .employeeselectiondiv {
+        float: left;
+    }
+
+    .addons {
+        height: 246px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+    .earnamt {
+        font-family: Verdana;
+        font-size: 1em;
+        outline: 0px;
+        float: right;
+    }
+    .dedamt {
+        font-family: Verdana;
+        font-size: 1em;
+        outline: 0px;
+        float: right;
+    }
+        
+
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#div2').hide();
+        // console.log("dasd->"+$('#PayMonth').val());
+        //     $('#txtPayMonth1').val($('#PayMonth').val());
+        var ReturnStructIds = function (filterid, returnfun) {
+            $.ajax({
+                method: "Get",
+                url: "Transcation/ByDefaultLoadEmp",
+                success: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id1').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id1').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id1').val(data.FunStruct);
+                    }
+                    var data = {
+                        GeoStruct: $('#geo_id1').val() || null,
+                        PayStruct: $('#pay_id1').val() || null,
+                        FunStruct: $('#fun_id1').val() || null,
+                        Filter: $(filterid).val() || null,
+                    };
+                    returnfun(data);
+                }
+            });
+        };
+
+        $.LoadEmpByDefault1 = function (single, filterid) {
+            single = single || true;
+            ReturnStructIds(filterid, function (data) {
+                var forwarddata = JSON.stringify(data);
+                $('#employee-table1').find('td').remove();
+                $('#employee-table1').P2BTransactionTableDynamic('#employee-search1', '#case-employee1', 'Salaryt/Get_EmployelistSusp?geo_id=' + forwarddata + '', "", single);
+            });
+
+        };
+        $.LoadEmpByDefault1(true, "#txtPayMonth");
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id1').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id1').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id1').val(data.FunStruct);
+                    }
+                    var forwarddata = JSON.stringify(data);
+                    $('#employee-table1').P2BTransactionTableDynamic('#employee-search1', '#case-employee1', './Transcation/Get_Employelist1?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter",
+            });
+        });
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#Create').on("click", function (e) {
+            var form = $("#frmSuspDetails").serialize();
+            $.ajax({
+                type: "Post",
+                url: '@Url.Action("getdataSusp", "SalaryT")',
+                data: form,
+                dataType: 'json',
+                success: function (data) {
+                    $("#div2").show();
+                    $("#div1").hide();
+                    var v1 = data.Sal;
+
+                    var v2 = data.Salded;
+                    $.each(v1, function (i, k) {
+                        $("#Earn1").append("<li>" + "<p class=cb>" + k.earn + "<input class='earnamt' value=" + k.amt + " data-val=" + k.amt + "  name=" + k.Id + " class=cb>" + "</input>" + "</li>");
+                    });
+                    $.each(v2, function (p, q) {
+                        $("#ded1").append("<li>" + "<p class=ba>" + q.Name + "<input class='dedamt' value=" + q.Amount + " data-val=" + q.Amount + "  name=" + q.Id + " class=ab>" + "</input>" + "</li>");
+                    });
+                    $('#SalaryID').val(data.SalaryTId);
+                    $("#empcode").val(data.Name)
+                    $("#empnet").val(data.grossearn)
+                    $("#empgross").val(data.totearn)
+                    $("#empded").val(data.totded)
+                }
+            });
+        });
+        //$('.dedamt').on('change', function (e) {
+
+        //});
+
+        $('#Lock').on("click", function (e) {
+            var dedtextbox = $('.dedamt').toArray();
+            var JsonObj = [];
+            $.each(dedtextbox, function (i, j) {
+                var k = $(j);
+                if (k.attr("data-val") != k.val()) {
+                    var putJson = { Id: null, val: null, SalId: null };
+                    putJson.Id = k.attr("name");
+                    putJson.val = k.val();
+                    putJson.SalId = $('#SalaryID').val();
+                    JsonObj.push(putJson);
+                    console.log("----------------");
+                    console.log(putJson);
+                    console.log("----------------");
+                }
+            });
+            var stringify_JsonObj = JSON.stringify(JsonObj);
+            console.log(stringify_JsonObj);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("LockSuspData", "SalaryT")',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: stringify_JsonObj,
+                success: function (data) {
+                    if (data.success == true) {
+                        alert(data.responseText);
+                    } else {
+                        alert(data.responseText);
+                    }
+                }, error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+        $('#save').on("click", function (e) {
+            var dedtextbox = $('.dedamt').toArray();
+            var earntextbox = $('.earnamt').toArray();
+            var JsonObj = [];
+            $.each(dedtextbox, function (i, j) {
+                var k = $(j);
+                if (k.attr("data-val") != k.val()) {
+                    var putJson = { Id: null, val: null, SalId: null };
+                    putJson.Id = k.attr("name");
+                    putJson.val = k.val();
+                    putJson.SalId = $('#SalaryID').val();
+                    JsonObj.push(putJson);
+                }
+            });
+            $.each(earntextbox, function (i, j) {
+                var k = $(j);
+                if (k.attr("data-val") != k.val()) {
+                    var putJson = { Id: null, val: null, SalId: null };
+                    putJson.Id = k.attr("name");
+                    putJson.val = k.val();
+                    putJson.SalId = $('#SalaryID').val();
+                    JsonObj.push(putJson);
+                }
+            });
+            var stringify_JsonObj = JSON.stringify(JsonObj);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("editdataSusp", "SalaryT")',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: stringify_JsonObj,
+                success: function (data) {
+                    if (data.success == true) {
+                        $("#empnet").val(data.grossearn);
+                        $("#empgross").val(data.totearn);
+                        $("#empded").val(data.totded);
+                        alert(data.responseText);
+                    } else {
+                        alert('Error in saving');
+                    }
+                }, error: function () {
+
+                }
+            });
+        });
+
+        $('#PayProcessGroupList').P2BSelectMenuAppend('@Url.Action("Polulate_PayProcessGroup", "SalaryT")', "", "");
+        $('.popup_radio_button').controlgroup();
+        $('#PayProcessGroupList').selectmenu().selectmenu("menuWidget");
+
+
+
+
+    });
+
+</script>
+<div id="Create_Dialog" title="Create Suspended Employee">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmSuspDetails", name = "frmSuspDetails" }))
+    {
+
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div>
+            <label id="lblPayMonth" class="popup-content-label must" style="margin-top:13px">PayMonth :</label>
+            <input name="txtPayMonth1" type="text" id="txtPayMonth1" class="date-picker" style="margin-top:10px" readonly />
+        </div>
+
+        <div class="section_Method" id="div1">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div>
+                        <label>Search : </label><input type="text" id="employee-search1" style="width: 425px;" />
+                    </div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table1">
+                        <tr><th><input type="checkbox" id="case-employee1" /></th><th>Employee</th></tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="Create-btnclck">
+            <button class="button" data-typeofbtn="Create" id="Create">Create</button>
+        </div>
+    }
+
+    <form id="frmupdate" method="post" name="frmupdate">
+        <div id="div2">
+            <div class="employeeselectiondiv">
+                <div><label>Employee Code & Name </label><input type="text" id="empcode" style="width: 300px;" readonly /></div>
+                <input type="text" id="SalaryID" hidden />
+                <br />
+                <div>
+                    <table class="tbl" style="width:108%">
+                        <tr>
+                            <td class="td1">
+                                <label><center><b>Earning</b></center></label>
+                            </td>
+                            <td class="td1">
+                                <label><center><b>Deduction</b></center></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td1">
+                                <ul id="Earn1" style="float:left"></ul>
+                            </td>
+                            <td class="td1">
+                                <ul id="ded1" style="float:left"></ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button class="save" data-typeofbtn="save" id="save">Save</button>
+                                <button class="save" data-typeofbtn="save" id="Lock">Lock</button>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <td class="td1">
+                                <label>Gross Earn </label><input type="text" id="empgross" style="width: 100px;" readonly />
+                                <label>Net Salary </label><input type="text" id="empnet" style="width: 100px;" readonly />
+                            </td>
+                            <td class="td1">
+                                <label>Deduction</label><input type="text" id="empded" style="width: 100px;" readonly />
+                                @*<label>percentage </label><input type="text" id="empperc" style="width: 100px;" readonly />*@
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+</div>

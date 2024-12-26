@@ -1,0 +1,54 @@
+﻿VB.NET Example
+
+Public Class ServiceResult(Of t)
+    Public MessageCode As String
+    Public Message As String
+    Public Data As t
+End Class
+
+
+Public Class Mobile_Register
+    Public MobileNumber As String
+    Public EmployeeCode As String
+End Class
+
+--Above class are example for below snippet.
+
+Dim reqData As Mobile_Register = New Mobile_Register()
+reqData.MobileNumber = "9930331793"
+reqData.EmployeeCode = "5013"
+Dim serializeData As ServiceResult(Of Mobile_Register)
+Using client As P2BHttpClient = New P2BHttpClient("http://localhost/")
+    Dim reponse = client.request("P2B.API/Global/OTP?flag=1", reqData)
+    Dim data = reponse.Content.ReadAsStringAsync()
+    serializeData = Newtonsoft.Json.JsonConvert.DeserializeObject(Of ServiceResult(Of Mobile_Register))(data.Result)
+End Using
+
+
+
+C# example:
+
+
+ServiceResult<ETRM_RoasterProcess> responseDeserializeData = new ServiceResult<ETRM_RoasterProcess>();
+            using (P2BHttpClient p2BHttpClient = new P2BHttpClient("http://localhost/P2B.API/"))
+            {
+                var response = p2BHttpClient.request("ELMS/getUserAttendanceRoasterProcessRequest",
+                    new ETRM_RoasterProcess()
+                    {
+                        Emp_Ids = new List<int>() { 999, 1234 },
+                        FromPeriod = DateTime.Now,
+                        ToPeriod = DateTime.Now
+                    });
+                ;
+                responseDeserializeData = JsonConvert.DeserializeObject<ServiceResult<ETRM_RoasterProcess>>(response.Content.ReadAsStringAsync().Result);
+            }
+            
+            
+public class ETRM_RoasterProcess
+{
+  public List<int> Emp_Ids { get; set; }
+  //public int EmployeeLeave_Id { get; set; }
+  public DateTime? FromPeriod { get; set; }
+  public DateTime? ToPeriod { get; set; }
+
+}

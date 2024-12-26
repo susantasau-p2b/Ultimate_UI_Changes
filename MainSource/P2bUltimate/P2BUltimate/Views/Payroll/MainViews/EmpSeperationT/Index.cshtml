@@ -1,0 +1,406 @@
+﻿@{
+    ViewBag.Title = " Settlement LV Credit Process";
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+
+                <div style="float:left">
+                    <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Save">Save</button>
+                <button class="button" id="cancle">Cancel</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="JqGrid_pager"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="list-employee">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+        {
+            <div class="row3">
+                <label class="popup-content-label must">Calendar :</label>
+                <select id="CreditDatelist" name="CreditDatelist" class="drop"></select>
+            </div>
+            <br />
+            <div class="row3 ">
+                <label class="popup-content-label must" style="float:left">Leave Head :</label>
+                <select id="lvheadList" multiple name="LvHead"></select>
+            </div>
+            <br />
+            <div class="row1 content_margine" id="DateDiv">
+                <label class="popup-content-label must">From Date :</label>
+                <input type="text" id="FromDate" name="FromDate" class="popup-content-textbox must" />
+                <label class="popup-content-label must">To Date :</label>
+                <input type="text" id="ToDate" name="ToDate" class="popup-content-textbox must" />
+            </div>
+            <br />
+            <div class="row3">
+                <button class="button" type="submit" id="LoadEmp">Load Employee</button>
+                <button class="button" type="submit" id="trial">Trial</button>
+            </div>
+            <br />
+            <br />
+
+            <div id="Grid_Form2" style="float:left">
+                <div>
+                    <table id="JqGridNew"></table>
+                    <div id="pager22"></div>
+                </div>
+            </div>
+
+
+        }
+    </div>
+</body>
+</html>
+<script>
+
+
+    $(document).ready(function () {
+        $('button').button();
+        localStorage.setItem("LEAVECREDITTRAILBALANCE", '');
+
+        $('#trial').hide();
+        $('#DateDiv').hide();
+        $('#LoadEmp').hide();
+
+        function ajaxloaderv2(cameform) {
+            $('<div style="width: 100%;height: 100%;position: fixed;top: 0;left: 0;background-color: #0000;z-index:998;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999" aria-hidden="true"></i></div>').appendTo(cameform);
+        };
+        var ajaxLoderRemove = function (init) {
+            if (!init) {
+                $('.ajax_loder').parents('div').remove();
+            } else {
+                $(init).find("div .ajax_loder").remove();
+            }
+            $(window).off('beforeunload');
+        };
+
+        $("#FromDate,#ToDate").keypress(function (event) { event.preventDefault(); });
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        var ColDisplayNames = ['EmpCode', 'EmpName', 'LvCreditDate', 'Status', 'Id'],
+           ColDisplayModel = ['EmpCode', 'EmpName', 'Creditdate', 'Status', 'Id'],
+           width = 1000,
+           height = 150,
+           Caption_one = "Emp AttendanceT",
+           Caption_second = "Employee List",
+           urlD = "",
+           widthD = 700,
+           heightD = 200;
+
+
+
+        //$('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+
+        //$('#trial').show();
+        $('#list-employee').P2BGridDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#trial').hide();
+            $('#DateDiv').hide();
+            $('#LoadEmp').hide();
+            $('#Grid_Form2').hide();
+            $('#frmEmpList').find('input').val("");
+            $('#frmEmpList').find('#lvheadList option').text("");
+            $('#JqGridNew').PostGridData({ url: urlD, filter: $('#txtPayMonth').val() });
+            $('#CreditDatelist').prop('disabled', false);
+            $('#CreditDatelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 447, "", '#CreditDatelist');
+            $('#FromDate,#ToDate').P2BDatePicker();
+
+            $('#list-employee').P2BGridDialog({
+
+                maindialogtitle: "Create Dialog",
+                submiturl: '@Url.Action("create")',
+                form: "#frmEmpList",
+                height: 475,
+                width: 800,
+                title: "Create",
+                state: "open",
+                gridname: "#JqGridNew",
+                gridreloadname: "#JqGrid",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            event.preventDefault();
+        });
+
+        $('#trial').button().on("click", function (e) {
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable');
+            var empcode = $.GetGridSelctedvalue("#JqGridNew", "EmpCode");
+            var LVH = $('#lvheadList').val()
+
+            if (LVH == 0) {
+                alert("Please select the Leave and try again..!");
+            }
+            if (empcode == 0) {
+                alert("Please select the employee and try again..!");
+            }
+
+            else {
+
+                var a = [];
+                var empcodeindex = ColModel.indexOf("Id");
+                var url = '@Url.Action("FindLeaveEmpId", "EmpSeperationT")';
+                $.ajax({
+                    url: url,
+                    method: "GET",
+                    success: function (data) {
+                        $.each(data.rows, function (i, k) {
+                            a.push(k[empcodeindex]);
+                        });
+                        var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+                        if (emp == "") {
+                            var emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+                        }
+                        var aaaa = emp.toString();
+                        var disco = aaaa.split(',');
+                        var getLen = disco.length;
+                        var arrlen = a.length;
+                        if (getLen == arrlen) {
+                            var ajaxfunct = $.ajax({
+                                url: "@Url.Action("PendingLvCheck", "EmpSeperationT")",
+                                method: "POST",
+                                data: { form: $('#frmEmpList').serialize() + "&PayMonth=" + $('#txtPayMonth').val(), pendingleaveempids: JSON.stringify(a), LvHead: JSON.stringify(LVH) },
+                                beforeSend: function () {
+                                    ajaxloaderv2('body');
+                                },
+                                success: function (data) {
+                                    ////debugger;
+                                    ajaxLoderRemove();
+                                    if (data.status == true) {
+                                        var newdia = $("<div id='newDia'>" + "Please Approve the pending leave first and then continue..!!!" + "</div>");
+                                        newdia.dialog({
+                                            autoOpen: false,
+                                            height: 200,
+                                            width: 350,
+                                            title: "Confirm Box",
+                                            modal: true,
+                                            buttons: {
+                                                Confirm: function () {
+                                                    ////debugger;
+                                                    var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+                                                    if (emp == "") {
+                                                        emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                                                    }
+                                                    emp = "0";
+                                                    localStorage.setItem("LeaveCreditProcess", $("#frmEmpList").serialize());
+                                                    var link = "Reports/Payroll/ReportData.aspx?&ReportName=PENDINGLEAVECREDIT&Employee=" + emp + "&LeaveList=" + LVH;
+                                                    window.open(link, "_blank");
+
+                                                    newdia.dialog("close");
+
+                                                },
+                                                Cancel: function () {
+
+
+                                                }
+                                            }
+                                        });
+                                        newdia.dialog('open');
+                                    }
+                                    else {
+
+
+                                        var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+
+                                        if (emp == "") {
+                                            emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                                        }
+                                        emp = "0";
+                                        var a = $('#FromDate').val();
+                                        var b = $('#ToDate').val();
+                                        var c = $('#CreditDatelist').val();
+                                        localStorage.setItem("LeaveCreditProcess", $("#frmEmpList").serialize());
+                                        var link = "Reports/Payroll/ReportData.aspx?&ReportName=LEAVECREDITTRAILBALANCE&Employee=" + emp + "&CreditDatelist=" + c + "&FromDate=" + a + "&ToDate=" + b + "&settlementemp=" + "1";
+                                        window.open(link, "_blank");
+                                    }
+                                }
+                            });
+
+                            ajaxfunct.done(function () {
+
+
+                            });
+
+                        }
+                        else {
+                            var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+                            if (emp == "") {
+                                emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                            }
+                            var ajaxfunct = $.ajax({
+                                url: "@Url.Action("PendingLvCheck", "EmpSeperationT")",
+                                method: "POST",
+                                data: { form: $('#frmEmpList').serialize() + "&PayMonth=" + $('#txtPayMonth').val(), pendingleaveempids: JSON.stringify(emp), LvHead: JSON.stringify(LVH) },
+                                beforeSend: function () {
+                                    ajaxloaderv2('body');
+                                },
+                                success: function (data) {
+                                    ////debugger;
+                                    ajaxLoderRemove();
+                                    if (data.status == true) {
+                                        var newdia = $("<div id='newDia'>" + "Please Approve the pending leave first and then continue..!!!" + "</div>");
+                                        newdia.dialog({
+                                            autoOpen: false,
+                                            height: 200,
+                                            width: 350,
+                                            title: "Confirm Box",
+                                            modal: true,
+                                            buttons: {
+                                                Confirm: function () {
+                                                    ////debugger;
+                                                    var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+                                                    if (emp == "") {
+                                                        emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                                                    }
+                                                    emp = "0";
+                                                    localStorage.setItem("LeaveCreditProcess", $("#frmEmpList").serialize());
+                                                    var link = "Reports/Payroll/ReportData.aspx?&ReportName=PENDINGLEAVECREDIT&Employee=" + emp + "&LeaveList=" + LVH;
+                                                    window.open(link, "_blank");
+
+                                                    newdia.dialog("close");
+
+                                                },
+                                                Cancel: function () {
+
+
+                                                }
+                                            }
+                                        });
+                                        newdia.dialog('open');
+                                    }
+                                    else {
+
+
+                                        var emp = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+
+                                        if (emp == "") {
+                                            emp = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                                        }
+                                        emp = "0";
+                                        var a = $('#FromDate').val();
+                                        var b = $('#ToDate').val();
+                                        var c = $('#CreditDatelist').val();
+                                        localStorage.setItem("LeaveCreditProcess", $("#frmEmpList").serialize());
+                                        var link = "Reports/Payroll/ReportData.aspx?&ReportName=LEAVECREDITTRAILBALANCE&Employee=" + emp + "&CreditDatelist=" + c + "&FromDate=" + a + "&ToDate=" + b + "&settlementemp=" + "1";
+                                        window.open(link, "_blank");
+                                    }
+                                }
+                            });
+                            ajaxfunct.done(function () {
+
+
+                            });
+                        }
+                    }
+
+                });
+
+
+            }
+
+            e.preventDefault();
+        });
+
+
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['EmpCode', 'EmpName', 'LvCreditDate', 'Closing Balance', 'LeaveCode', 'Status', 'Id'];
+        ColNames = ['Emp Code', 'Emp Name', 'LvCreditDate', 'Closing Balance', 'LeaveCode', 'Status', 'Id'];
+        SortName = 'Id';
+        Caption = 'Employee List';
+        url = '@Url.Action("LoadEmpWithCreditDate")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#JqGrid_pager');
+        @*$('#lvheadList').P2BSelectMenuMuliSelectAppend1("@Url.Action("GetLvhead")");*@
+        $('#CreditDatelist').selectmenu().selectmenu("menuWidget");
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+
+
+        $("#CreditDatelist").on('selectmenuchange', function () {
+            ////debugger;
+            $('#list-employee').trigger('reset');
+            var forwardata = $("#CreditDatelist").children("option:selected").val();
+            var forwardata1 = $("#CreditDatelist").children("option:selected").text();
+            $('#lvheadList').P2BSelectMenuMuliSelectAppend1("@Url.Action("GetLvhead")", forwardata, "");
+
+            if (forwardata1.toUpperCase() == "CALENDAR" || forwardata1.toUpperCase() == "FIXDAYS" || forwardata1.toUpperCase() == "YEARLY") {
+
+                $('#DateDiv').hide();
+            }
+            else {
+                $('#DateDiv').show();
+            }
+            $("#JqGridNew").jqGrid('clearGridData');
+            $('#LoadEmp').show();
+
+        });
+
+        $('#LoadEmp').button().on("click", function (e) {
+            //    $("#pager22_left").find("td").remove();
+            $('#Grid_Form2').show();
+            var fromdate = $('#FromDate').val();
+            var todate = $('#ToDate').val();
+            var CreditDatelist = $("#CreditDatelist").children("option:selected").val();
+            var lvheadlist = $('#lvheadList').val();
+            var url = '@Url.Action("LoadEmp", "EmpSeperationT")' + '?param1=' + fromdate + "&param2=" + todate + "&param3=" + CreditDatelist + "&param4=" + lvheadlist;
+            // $('#JqGridNew').trigger('reloadGrid');
+            $("#JqGridNew").setGridParam({ datatype: 'json', page: 1, url: url }, true).trigger('reloadGrid');
+            var $grid = $('#JqGridNew').P2BGrid1(ColDisplayNames, ColDisplayModel, SortName, Caption_second, url, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+            //$grid.trigger('reloadGrid');
+
+            //$('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+            $('#trial').show();
+
+            e.preventDefault();
+        });
+
+
+
+    });
+</script>
+<style>
+    .row3 {
+        width: 500px;
+        padding: 2px;
+    }
+</style>

@@ -1,0 +1,259 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ForgotPassword</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/P2B_Scripts")
+    @Styles.Render("~/Content/P2B_CSS")
+    <link href="~/Content/Login/Login.css" rel="stylesheet" />
+    <style>
+        input {
+            border-radius: initial;
+            border-top: none;
+            border-right: none;
+            border-left: none;
+        }
+
+            input:focus {
+                box-shadow: none;
+                border-top: none;
+                border-right: none;
+                border-left: none;
+            }
+
+        .middle-content {
+            background-color: rgba(255, 255, 255, 0.66);
+            border-radius: 5px;
+            box-shadow: -1px 0 19px 0 rgba(0, 0, 0, 0.37);
+            display: block;
+            height: 170px;
+            margin: 135px auto;
+            position: relative;
+            max-width: 302px;
+        }
+
+        .row1 {
+        }
+
+        .empcode_submitbtn {
+            width: 154px;
+            margin: 4px;
+        }
+
+        .frm-empcode {
+            padding: 44px 64px;
+        }
+        .popup-content-label {
+            float: left;
+            width: 124px;
+            display: block;
+        }
+
+        .span-empcode {
+            font-size: large;
+        }
+
+        #EmpCode, #Ananomus {
+            padding: 10px 111px;
+        }
+
+        .ques {
+            display: block;
+            margin: 1px 20px;
+        }
+
+        #ans {
+            display: block;
+            height: 15px;
+        }
+
+        .lb-userinput {
+            float: left;
+            margin: 1px auto;
+            width: 70px;
+        }
+
+        .btn-row {
+        }
+
+        .bottom-pane {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .bottom-line {
+            border: 0px;
+            height: 1px;
+            background-color: silver;
+        }
+
+        #frnQAns {
+            margin: 0 3px;
+        }
+
+        .backbtn:hover {
+            text-decoration-line: underline;
+        }
+
+        .backbtn {
+            color: rgba(27, 187, 173, 0.93);
+        }
+
+        .login_loader {
+            position: absolute;
+            margin: 1px 58px;
+        }
+
+        .login-txt {
+            margin: 0 26px;
+            color: grey;
+        }
+
+        .quesnotfound {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body-content">
+        <div class="header-content">
+            <div class="company_name_harder"><h1 class="company_name">P2B Ultimate</h1></div>
+            <h2 class="hrms">Human Resources Management System</h2>
+        </div>
+        <div class="middle-content">
+            <form method="post" class="frm-empcode" id="frmEmpCode" name="frmEmpCode">
+                <div class="content_margine row1">
+                    <input type="text" id="empcode" placeholder="Enter Employee Code" />
+                    <input type="password" id="NewPassword" placeholder="Enter New Password" />
+                    <input type="password" id="ConfirmPassword" placeholder="Enter Confirm Password" />
+                   
+                  
+                </div>
+                <button type="submit" id="btn-submit-empcode" class="empcode_submitbtn">Submit</button>
+                <a href="@Url.Action("index","login")" class='backbtn login-txt'>&#8592; Back to Login</a>
+                <div id="show"></div>
+            </form>
+            <div style="display:none" id="div-input">
+                <div id="EmpCode"></div>
+                <form method="post" name="frnQAns" id="frnQAns">
+                    <div class="row1 content_margine">
+                        <label class="lb-userinput">Question :</label><label id="ques" class="ques"></label>
+                    </div>
+                    <div class="row1 content_margine">
+                        <label class="lb-userinput">Answer :</label><textarea id="ans"></textarea>
+                    </div>
+                    @*<a class="backbtn resetpwd" style="display: block; text-align: center;" href="">Reset PassWord.?</a>*@
+                    <div id="resetpwdlink" class="backbtn"></div>
+                    <div class="bottom-pane">
+                        <hr class="bottom-line" />
+                        <div class="btn-row content_margine">
+                            <button type="submit" id="btn-submit-user" style="width:100px;float:right">Submit</button>
+                        </div>
+                    </div>
+                    <input type="text" style="display:none" id="ques-id" />
+                </form>
+            </div>
+            <div style="display:none" id="div-input-Ananomus">
+                <div id="Ananomus"></div>
+                <div class="quesnotfound ">Question not found <a class="backbtn resetpwd" href="">Reset PassWord</a></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        $('button').button();
+       
+        $('#btn-submit-empcode').on('click', function (e) {
+            $('.resetpwd').on('click', function (e) {
+                $.ajax({
+                    url: "@Url.Action("resetpassword","Forgotpassword")",
+                    data: { data: $('#empcode').val() },
+                    success: function (data) {
+                        if (data.status == true) {
+                            alert(data.responseText);
+                            window.location.href = "" + data.data + "";
+
+                        } else {
+                            console.log(data);
+                        }
+                    }
+
+                });
+                e.preventDefault();
+            });
+            if ($('#empcode').val()) {
+                $('#btn-submit-empcode').button('disable').addClass('login-btn-active');
+                $('#empcode').attr('disabled', 'disabled').addClass('login-textbox-disable-class');
+                $.ajax({
+                    url: "@Url.Action("GetDetails","forgotpassword")",
+                    method: "POST",
+                    data: { data: $('#empcode').val(), newpass: $('#NewPassword').val(), confirmpass: $('#ConfirmPassword').val() },
+                    beforeSend: function () {
+                        $('#show').empty();
+                        $('<a><i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw login_loader" id="login_loder" style="color: rgba(27, 187, 173, 0.93)" aria-hidden="true"></i></a>').appendTo("#show");
+                    },
+                    complete: function () {
+                        $("#login_loder").remove();
+                        $('#btn-submit-empcode').button('enable').removeClass('login-btn-active');
+                        $('#empcode').attr('disabled', false).removeClass('login-textbox-disable-class');
+                    },
+                    success: function (data) {
+                        if (data.success == true) {
+                            $("#login_loder").remove();
+                            $('#btn-submit-empcode').button('enable').removeClass('login-btn-active');
+                            if (data.type == "0") {
+                                //authorise reset Q ans
+                                $('#EmpCode').html("<span class='span-empcode'>" + $('#empcode').val() + "</span><a href='@Url.Action("index","ForgotPassword")' title='Change' class='backbtn'>Change</a>");
+                                $('#ques-id').val(data.id);
+                                $('#ques').html('' + data.data + '');
+                                $('#div-input').show();
+                                $('#frmEmpCode').hide();
+                            }
+                        } else {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                            @*if (data.type == "2") {
+                                //not authorise
+                                $('<span style="color: red;margin: 0 auto;display: block;padding: 9px 26px;">Invalid Empcode..!</span>').appendTo('#show');
+                            } else if (data.type == "1") {
+                                //authorise ques not found
+                                $('#frmEmpCode').hide();
+                                $('#Ananomus').html("<span class='span-Ananomus'>" + $('#empcode').val() + "</span><a href='@Url.Action("index","ForgotPassword")' title='Change' class='backbtn'>Change</a>");
+                                $('#div-input-Ananomus').show();
+                            }*@
+                            console.log(data);
+                        }
+                    }
+                });
+            }
+            e.preventDefault();
+        });
+        $('#btn-submit-user').on('click', function (e) {
+            if ($('#ans').val()) {
+                $.ajax({
+                    url: "@Url.Action("CheckAns","forgotpassword")",
+                    method: "POST",
+                    data: { qus: $('#ques-id').val(), ans: $('#ans').val(), newpassw: $('#NewPassword').val() },
+                    success: function (data) {
+                        if (data.success == true) {
+                            alert("Successfully Reset Password..!");
+                            window.location.href = "" + data.data + "";
+                        } else {
+                            console.log(data);
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                        }
+                    }
+                });
+            }
+            e.preventDefault();
+        });
+    });
+</script>
+</html>

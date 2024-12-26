@@ -1,0 +1,535 @@
+﻿@{
+    ViewBag.Title = "Yearly Program Assignment";
+}
+
+@model Training.YearlyProgramAssignment
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    #Lookup_progassign {
+        left: 420px;
+        top: 7px;
+    }
+
+    #Lookup_FinancialYear_Calendar {
+        left: 313px;
+        top: 20px;
+    }
+
+    #Lookup_FinancialYear_Calendar1 {
+        left: 66%;
+        top: 7%;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#StartDate').P2BDatePicker();
+        $('#EndDate').P2BDatePicker();
+
+
+        @*var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'StartDate', 'EndDate', 'ProgramList'];
+        ColNames = ['Id', 'StartDate', 'EndDate', 'ProgramList'];
+        SortName = 'Id';
+        var btndisablenames = "#Edit_ProgramList_TrainingCal,#Remove_ProgramList_TrainingCal,#dispcalender";
+        Caption = 'Yearly Program Assignment';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);*@
+
+        var btndisablenames = "#Edit_ProgramList_TrainingCal,#Remove_ProgramList_TrainingCal,#dispcalender";
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "YearlyProgramAssignment")",
+            htmurl: "@Url.Action("partial", "YearlyProgramAssignment")",
+            columnname: [ "FullDetails","Id"],
+            childheader: ["StartDate", "EndDate", "ProgramList", "Id" ],
+            childurl: "@Url.Action("Get_ProgramList", "YearlyProgramAssignment")",
+            tableheader: "Yearly Program Assignment",
+            childurlColumnNo: "2"
+        });
+
+        $('#Load').on('click', function (e) {
+            $('#MyTable').DataTable().ajax.url('./YearlyProgramAssignment/Emp_Grid?y=' + $('#Financial_id').val()).load();
+
+        });
+
+        var dt;
+
+        $('#txtprogassign').attr('readonly', 'readonly');
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //$('#StartDate').val(dt.StartDate),
+            //            $('#EndDate').val(dt.EndDate)
+        }
+
+        $('#Lookup_progassign').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtprogassign",
+                lookupurl: "@Url.Action("GetCalendarLKDetails", "TrainingAssignment")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "txtprogassign",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#prog_assign",
+                readonly: true,
+                pagename: "PageNavPosition",
+
+            });
+        });
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+
+                $('<div></div>').PartialCreateDialog({
+                    height: 500,
+                    width: 600,
+                    form: "#frmYearlyProgramAssignmentp",
+                    htmlurl: "@Url.Action("partial", "YearlyProgramAssignment")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "YearlyProgramAssignment")",
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data[0], function (i, k) {
+                            $('#StartDate1').val(k.StartDate);
+
+
+                            $('#EndDate1').val(k.EndDate);
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS1').P2BLookUpEncapsulate('#ProgramListlistS1', 'ProgramListlistS1', k.ProgramListId, k.ProgramListVal, 'ProgramListlistS1', 'view', 'A');
+                        });
+
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 500,
+                    width: 600,
+                    form: "#frmYearlyProgramAssignmentp",
+                    htmlurl: "@Url.Action("partial", "YearlyProgramAssignment")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "YearlyProgramAssignment")",
+                    submiturl: "@Url.Action("GridEditSave", "YearlyProgramAssignment")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        console.log("dnfkjsndf");
+                        console.log(data);
+                        console.log("dnfkjsndf");
+                        console.log(data.data);
+                        $.each(data[0], function (i, k) {
+                            ////debugger;
+                            console.log(k.StartDate);
+                            console.log(k.EndDate);
+                            $('#StartDate1').val(k.StartDate);
+
+
+                            $('#EndDate1').val(k.EndDate);
+
+
+
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#ProgramListlistS1').P2BLookUpEncapsulate('#ProgramListlistS1', 'ProgramListlistS1', k.ProgramListId, k.ProgramListVal, 'ProgramListlistS1', '', 'A');
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                //   return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete", "yearlyprogramassignment")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#process').on("click", function (event) {
+            if (!$("#txtPayMonth1").val()) {
+
+                alert("Please Select Financial Year.")
+                return false;
+            }
+            $('#frmYearlyProgramAssignment').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Yearly Program Assignment', 'open', '@Url.Action("Create")?TrainingYear=' + $('#Financial_id').val(), '#frmYearlyProgramAssignment', 'Message :', 'Request Falied :', '#JqGrid', 370, 522, '', btndisablenames, function (data) {}, { datatablename: "#MyTable" });
+            $('#traincal').show();
+            $('#txtprogassign').addClass('must');
+
+            $('#StartDate').attr('disabled', false);
+            $('#EndDate').attr('disabled', false);
+            // $('#traincal').fadeOut();
+
+            $.get("@Url.Action("getCalendar", "YearlyProgramAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+
+                $('#dispcalender_id').val(data.Id);
+                console.log(data);
+            });
+            @*$.get("@Url.Action("getCalendar1", "YearlyProgramAssignment")", function(data){
+                $('#dispcalender1').val(data.Lvcalendardesc1);
+
+                $('#dispcalender_id1').val(data.Id1);
+                console.log(data);
+            });*@
+            $('#dispcalender').prop('readonly', 'readonly');
+            $('#dispcalender_id').prop('readonly', 'readonly');
+            $('#dispcalender1').prop('readonly', 'readonly');
+            $('#dispcalender_id1').prop('readonly', 'readonly');
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Training Calendar Data", '#frmYearlyProgramAssignment', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 370, 522, '#ProgramListlist', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $('#traincal').hide();
+                $('#txtprogassign').removeClass('must');
+
+                $('#StartDate').attr('disabled', true);
+                $('#EndDate').attr('disabled', true);
+
+                $.get("@Url.Action("getCalendar", "YearlyProgramAssignment")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+
+                    $('#dispcalender_id').val(data.Id);
+                    console.log(data);
+                });
+                $('#dispcalender').prop('readonly', 'readonly');
+                $('#dispcalender_id').prop('readonly', 'readonly');
+                $.each(data[0], function (i, k) {
+                    //console.log(k.StartDate);
+                    $('#StartDate').val(k.StartDate);
+
+                    if (k.StartDate != null) {
+                        $('#StartDate').val(DateConvert(k.StartDate));
+
+                    }
+                    $('#EndDate').val(k.EndDate);
+                    if (k.EndDate != null) {
+                        $('#EndDate').val(DateConvert(k.EndDate));
+
+                    }
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#ProgramListlist').P2BLookUpEncapsulate('#ProgramListlist', 'ProgramListlist', k.ProgramListId, k.ProgramListVal, 'ProgramListlist', btndisablenames, 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            //AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Training Calendar', '#ProgramListlist', '#Create_ProgramList_TrainingCal,#Remove_ProgramList_TrainingCal,#LookUp_ProgramList_TrainingCal,#Edit_ProgramList_TrainingCal', 370, 522, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.get("@Url.Action("getCalendar", "YearlyProgramAssignment")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+
+                    $('#dispcalender_id').val(data.Id);
+                    console.log(data);
+                });
+                $('#dispcalender').prop('readonly', 'readonly');
+                $('#dispcalender_id').prop('readonly', 'readonly');
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#StartDate').val(k.StartDate);
+
+                    if (k.StartDate != null) {
+                        $('#StartDate').val(DateConvert(k.StartDate));
+
+                    }
+                    $('#EndDate').val(k.EndDate);
+                    if (k.EndDate != null) {
+                        $('#EndDate').val(DateConvert(k.EndDate));
+
+                    }
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ProgramListlist').P2BLookUpEncapsulate('#ProgramListlist', 'ProgramListlist', k.ProgramListId, k.ProgramListVal, 'ProgramListlist', 'view', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#StartDate').oldVal(data[2].StartDate);
+                    $('#EndDate').oldVal(data[2].EndDate);
+                    $('#ProgramListlist_old').oldLookupVal(data[2].ProgramList_Val);
+
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth1",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "YearlyProgramAssignment")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#LookUp_ProgramList_TrainingCal').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsProgramList", "YearlyProgramAssignment")', '', 'LookupDiv', 'Look Up Data', '#ProgramListlist', 'ProgramListlist', 10, 'ProgramListlist', '#frmYearlyProgramAssignment', 'N', btndisablenames, 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        // PArtial page create
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_ProgramList_TrainingCal').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TrainingCalendar")', 'Create Dialog', 'open', '@Url.Action("Create", "ProgramList")', '#frmprogramlist', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmYearlyProgramAssignment', '', function (data) {
+
+                $('#ProgramListlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+
+            });
+                event.preventDefault();
+        });*@
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_ProgramList_TrainingCal').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ProgramList")', 'Create Programlist Details', 'open', '@Url.Action("Create", "ProgramList")', '#frmProgramListP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmYearlyProgramAssignment', '', function (data) {
+                $('#ProgramListlist').P2BLookUpEncapsulate('#ProgramListlist', 'ProgramListlist', data[0], data[1], 'ProgramListlist', '#Edit-ContactDetails-Disease,#Remove-ContactDetails-Disease', 'A');
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit_ProgramList_TrainingCal').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ProgramListlist').P2BGetTableDataonSelectedRow('#ProgramListlist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ProgramList")', '@Url.Action("Edit", "ProgramList")', b, '@Url.Action("EditSave", "ProgramList")', 'Edit Program list Details', '#frmProgramListP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmYearlyProgramAssignment', '#ProgramListlist', 'ProgramListlist', 'ProgramListlist', 'N', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmProgramListP').trigger("reset");
+                    $('#Subject').val(k.Subject);
+                    $('#SubjectDetails').val(k.SubjectDetails);
+                    $('#TrainingTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1050, k.TrainingType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#BudgetlistP').P2BLookUpEncapsulate('#BudgetlistP', 'BudgetlistP', k.BudgetDetails_Id, k.BudgetDetails_val, 'BudgetlistP', '#Edit-BudgetParameters-ProgramList,#Remove-BudgetParameters-ProgramList', 'A');
+
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove_ProgramList_TrainingCal').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ProgramListlist').P2BGetTableDataonSelectedRow('#ProgramListlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ProgramListlist').P2BGetTableDataonSelectedRow('#ProgramListlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ProgramListlist', $('#ProgramListlist').val(), 200, 200, '#frmYearlyProgramAssignment', '#ProgramListlist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+    });
+</script>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left;width:30%">
+                    <label id="lblPayMonth" class="popup-content-label must">Training Year:</label>
+                    <input name="txtPayMonth1" type="text" id="txtPayMonth1" class="date-picker" style="width:45%" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup Training Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+
+                <button class="button" id="Load">Load</button>
+                <button class="button" data-typeofbtn="process" id="process">Create</button>
+                @*<button class="button" id="View">View</button>*@
+                @*<button class="button" id="Edit">Edit</button>*@
+                
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Details</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Details</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create YearlyTrainingCalendar">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmYearlyProgramAssignment", name = "frmYearlyProgramAssignment" }))
+        {
+
+            @*<div class="row3 content_margine">
+
+                    <div id="FinancialYearList_old"></div>
+                    @Html.LabelFor(m => m., "Financial year:", new { @class = "popup-content-labelM" })
+
+                    <label class="popup-content-label">Yearly Program Assignment :</label>
+                    <input type="text" hidden id="dispcalender_id" class="popup-content-textbox" name="FinancialYearList" />
+                    <input type="text" readonly id="dispcalender" class="popup-content-textbox " name="" style="width:300px" />
+
+                </div>*@
+            <div style="float: left; width: 440px;" id="traincal">
+
+                @*<label id="lblprogassign" class="popup-content-label must">Training Calendar :</label>
+                    <input name="txtprogassign" type="text" id="txtprogassign" style="width:290px" @*class="must"/>*@
+                @*<input type="text" readonly id="prog_assign" name="prog_assign" class="filter_structure_id" />*@
+                @*<button data-p2btooltip="Select Yearly Program Assignment" class="button popup-content-icon-lookup" id="Lookup_progassign"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>*@
+            </div>
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.TrainingYear.FromDate, "Start Date", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.TrainingYear.FromDate, new { @class = "popup-content-textbox must", @id = "StartDate" })
+            </div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.TrainingYear.ToDate, "End Date", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.TrainingYear.ToDate, new { @class = "popup-content-textbox must", @id = "EndDate" })
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="ProgramListlist_old"></div>
+                @*@Html.LabelFor(m => m.ProgramList, "Program List :", new { @class = "popup-content-label" })*@
+                <label class="popup-content-label">Program List :</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ProgramListlist">
+                        <tr><th>Id</th><th>LookUp Selected ProgramList</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select ProgramList" class="popup-content-icon-lookup" id="LookUp_ProgramList_TrainingCal"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ProgramList" class="popup-content-icon-create" id="Create_ProgramList_TrainingCal"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit ProgramList" class="popup-content-icon-edit" id="Edit_ProgramList_TrainingCal"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ProgramList" class="popup-content-icon-remove" id="Remove_ProgramList_TrainingCal"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>

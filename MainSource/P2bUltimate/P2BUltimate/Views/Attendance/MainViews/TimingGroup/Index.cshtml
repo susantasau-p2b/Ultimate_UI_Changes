@@ -1,0 +1,308 @@
+﻿@{
+    ViewBag.Title = "Timing Group";
+}
+
+@model Attendance.TimingGroup
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+
+        var btndisablenames = "";
+        $('button').button();
+
+        @*var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Id', 'GroupCode', 'GroupName'];
+        ColNames = ['Id', 'GroupCode', 'GroupName'];
+        SortName = 'GroupCode';
+        Caption = 'Timing Group';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);*@
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "TimingGroup")",
+            htmurl: "@Url.Action("partial", "TimingGroup")",
+            columnname: ['GroupCode', 'GroupName', 'Id'],
+            childheader: [ 'FullDetails', 'Id'],
+            childurl: "@Url.Action("Get_TimingPolicy", "TimingGroup")",
+            tableheader: "TimingGroup",
+            childurlColumnNo: "3"
+        });
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#GroupCode').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#GroupCode').MaxLength(10);
+        $('#GroupName').ValidateTextBox({ maxlength: 50, name: true });
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmTimingGroup').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Timing Group', 'open', '@Url.Action("Create")', '#frmTimingGroup', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#TimingPolicylist', btndisablenames, function (data) { }, { validurl: "@Url.Action("ValidateForm", "TimingGroup")" });
+            event.preventDefault();
+
+        });
+
+
+        $('#Edit').on('click', function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Data", '#frmTimingGroup', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#TimingPolicylist', '', function (data) {
+                $('#GroupCode').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+                    $('#frmTimingGroup').trigger("reset");
+                    //$('#frmTimingGroup').trigger('reset');
+                    $('#GroupName').val(k.GroupName);
+                    $('#GroupCode').val(k.GroupCode);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('[name="IsAutoShift"]').val([k.IsAutoShift]).button().button("refresh");
+                    $('[name="IsManualRotateShift"]').val([k.IsManualRotateShift]).button().button("refresh");
+                });
+                $.each(data[1], function (i, k) {
+                    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.TimingPolicy_Id, k.TimingPolicy_FullDetails, 'TimingPolicylist', '#Edit-TimingPolicy-TimingGroup,#Remove-TimingPolicy-TimingGroup', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+
+        $('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View  Data', '#TimingPolicylist', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmTimingGroup').trigger("reset");
+                    $('#Autho_Action').val(k.Action);
+                    $('#GroupName').val(k.GroupName);
+                    $('#GroupCode').val(k.GroupCode);
+                    $('[name="IsAutoShift"]').val([k.IsAutoShift]).button().button("refresh");
+                    $('[name="IsManualRotateShift"]').val([k.IsManualRotateShift]).button().button("refresh");
+
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.TimingPolicy_Id[i], k.TimingPolicy_FullDetails[i], 'TimingPolicylist', 'view', 'A');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#GroupName').StickNote(data[2].GroupName);
+                        $('#GroupCode').StickNote(data[2].GroupCode);
+                        $('#radio2').StickNote([data[2].IsAutoShift]);
+                        $('#radio4').StickNote([data[2].IsManualRotateShift]);
+                        $('#TimingPolicylist_old').StickNote(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmTimingGroup').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+
+            $('frmTimingGroup').P2BDeleteModalDialog('@Url.Action("Delete", "TimingGroup")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+
+        @*$('#Lookup-TimingPolicy-TimingGroup').button().on('click', function (event) {
+          // alert('e');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingPolicyDetails", "TimingGroup")', '', 'LookupDiv', 'Look Timing Policy Details', '#TimingPolicylist', 'TimingPolicylist', 5, 'TimingPolicylist', '#frmTimingGroup', 'A', btndisablenames, '#Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('#Lookup-TimingPolicy-TimingGroup').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingPolicyDetails", "TimingGroup")', '', 'LookupDiv', 'TimingGroup Look Up Data', '#TimingPolicylist', 'TimingPolicylist', 5, 'TimingPolicylist', '#frmTimingGroup', 'A','', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+        $('#Remove-TimingPolicy-TimingGroup').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+            //var a = [], b;
+            //a = $('#TimingPolicylist').P2BGetTableDataonSelectedRow('#TimingPolicylist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TimingPolicylist').P2BGetTableDataonSelectedRow('#TimingPolicylist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingPolicylist', $('#TimingPolicylist').val(), 200, 200, '#frmTimingGroup', '#TimingPolicylist', '#Edit-TimingPolicy-TimingGroup,#Remove-TimingPolicy-TimingGroup');
+            event.preventDefault();
+        });
+
+
+        //$('#GroupName').ForceOnlyAlphaNumeric();
+        //$('#GroupName').MaxLength(50);
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            @*<div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div id="Grid_Form">
+    <div>
+        <div id="Container" class="container">
+            <div id="Demo">
+                <table id="MyTable" class="display" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>DD</th>
+                            <th>GroupCode</th>
+                            <th>GroupName</th>
+                            <th>ID</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>DD</th>
+                            <th>GroupCode</th>
+                            <th>GroupName</th>
+                            <th>ID</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<body>
+    <div id="Create_Dialog" title="Create Timing Group">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTimingGroup" }))
+        {
+
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.GroupCode, " GroupCode", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.GroupCode, new { @class = "popup-content-textbox must" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.GroupName, "GroupName", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.GroupName, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.TimingPolicy, "Timing Policy", new { @class = "popup-content-label" })
+
+                <div id="TimingPolicylist_old"></div>
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="TimingPolicylist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Timing Policy Details" class="popup-content-icon-lookup" id="Lookup-TimingPolicy-TimingGroup"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Timing Policy Details" class="  popup-content-icon-create" id="Create-TimingPolicy-TimingGroup"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    @*<button data-p2btooltip="Edit Timing Policy Details" class="  popup-content-icon-edit" id="Edit-TimingPolicy-TimingGroup"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Timing Policy Details" class="  popup-content-icon-remove" id="Remove-TimingPolicy-TimingGroup"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+
+            </div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsManualRotateShift, "Rotate Shift:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio1" name="IsManualRotateShift" value="true" /> <label class="ui-corner-left" for="radio1">Yes</label>
+                        <input type="radio" id="radio2" name="IsManualRotateShift" value="false" /> <label class="ui-corner-right" for="radio2">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsAutoShift, " Auto Shifit :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="IsAutoShift" value="true" /> <label class="ui-corner-left" for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="IsAutoShift" value="false" /> <label class="ui-corner-right" for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>

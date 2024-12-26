@@ -1,0 +1,389 @@
+﻿@{
+    ViewBag.Title = "App Manual Assignment";
+}
+@model  Appraisal.AppManualAssignment
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 118px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 161px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 471px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 370px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Apprisal Assignment">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAppManualAssignment", name = "frmAppManualAssignment" }))
+        {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        
+        <div class="row3 content_margine">
+
+
+
+            <div id="AppraisalCalendarlist_old"></div>
+            @Html.LabelFor(m => m.AppraisalCalendar, "Appraisal Calendar:", new { @class = "popup-content-label" })
+            <input type="text" hidden id="dispcalender_id" name="AppraisalCalendarlist" style="width:250px" />
+            <input type="text" readonly id="dispcalender" name="" style="width:250px" />
+
+
+        </div>
+
+         <div class="add_row content_margine">
+                @Html.LabelFor(m => m.AppCategory, "Appraisal Category :", new { @class = "popup-content-label  must" })
+                <select id="AppCategorylist" name="AppCategorylist" class="drop must" style="width:280px;">
+                    <option value="0">-Select-</option>
+                </select>
+                
+            </div>
+            <div class="add_row content_margine  ">
+                @Html.LabelFor(m => m.AppSubCategory, "Appraisal Sub Category :", new { @class = "popup-content-label must" })
+                <select id="AppSubCategorylist" name="AppSubCategorylist" class="drop must" style="width:280px;">
+                    <option value="0">-Select-</option>
+                </select>
+                
+            </div>
+
+        <div class="row3 content_margine">@Html.LabelFor(m => m.MaxRatingPoints, "Maximum Rating Points :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MaxRatingPoints, new { @class = "popup-content-textbox must" })</div>
+
+        <div class="row3 content_margine">
+            <div id="AppRatingObjectivelist_old"></div>@Html.LabelFor(m => m.AppRatingObjective, "Appraisal Rating Objective :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="AppRatingObjectivelist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="Lookup-AppRatingObjective-AppManualAssignment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create " class="  popup-content-icon-create" id="Create-AppRatingObjective-AppManualAssignment"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit " class="  popup-content-icon-edit" id="Edit-AppRatingObjective-AppManualAssignment"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove " class="  popup-content-icon-remove" id="Remove-AppRatingObjective-AppManualAssignment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    $(document).ready(function () {
+        //$('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        //$('#Code').MaxLength(10);
+        //// $('#Name').ForceOnlyAlpha();
+        //// $('#Name').MaxLength(50);
+        //$('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Remove-SubCategory-Apprisal,#Edit-SubCategory-Apprisal";
+        var namelookuptable = '#AppRatingObjectivelist, #AppraisalCalendarlist';
+        ColModel = ['Id', 'MaxRatingPoints'];
+        ColNames = ['Id', 'MaxRatingPoints'];
+        SortName = 'Id';
+        Caption = 'Appriasal Manual Assignment';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#MaxRatingPoints').ForceOnlyNumeric();
+        $('#MaxRatingPoints').MaxLength(10);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmAppManualAssignment').trigger("reset");
+            $('#AppCategorylist').prop("disabled", false);
+            $('#AppSubCategorylist').prop("disabled", false);
+            $('#dispcalender').attr('readonly', 'readonly');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Assignment', 'open', '@Url.Action("Create")', '#frmAppManualAssignment', 'Message :', 'Request Falied :', '#JqGrid', 555, 590, namelookuptable, btndisablenames, function (data) { });
+            $('#AppCategorylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppCategory")", "", "", '#AppSubCategorylist');
+
+            $.get("@Url.Action("getCalendar", "AppManualAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+                $('#dispcalender_id').val(data.Id);
+            });
+
+
+            event.preventDefault();
+        });
+
+
+        $('#Edit').on('click', function () {
+            AssignData();
+
+            $('#AppCategorylist').prop("disabled", true);
+            $('#AppSubCategorylist').prop("disabled", true);
+
+            $.get("@Url.Action("getCalendar", "AppManualAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc).attr('readonly', 'readonly');;
+                $('#dispcalender_id').val(data.Id).attr('readonly', 'readonly');;
+            });
+
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Appraisal Assignment", '#frmAppManualAssignment', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 555, 590, '', '', function (data) {
+              
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#MaxRatingPoints').val(k.MaxRatingPoints);
+                    $('#AppCategorylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppCategory")", "", k.AppCategory_Id);
+                    $('#AppSubCategorylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppSubCategory")", "", k.AppSubCategory_Id);
+                    // $('#AppraisalCalendarlist').P2BLookUpEncapsulate('#AppraisalCalendarlist', 'AppraisalCalendarlist', k.AppraisalCalendar_Id, k.AppraisalCalendar_FullDetails, 'AppraisalCalendarlist', ' ', 'N');
+                    //  $('#AppraisalCalendarlist').P2BSelectMenuAppend('@@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", k.AppraisalCalendar_Id);
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AppRatingObjectivelist').P2BLookUpEncapsulate('#AppRatingObjectivelist', 'AppRatingObjectivelist', k.AppRatingObjective_Id, k.IsRatingObjective_FullDetails, 'AppRatingObjectivelist', ' ', 'A');
+                    $('#AppraisalCalendarlist').P2BLookUpEncapsulate('#AppraisalCalendarlist', 'AppraisalCalendarlist', k.AppraisalCalendar_Id, k.AppraisalCalendar_FullDetails, 'AppraisalCalendarlist', '', 'N');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+
+        });
+
+
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $.get("@Url.Action("getCalendar", "AppManualAssignment")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc).attr('readonly', 'readonly');;
+                $('#dispcalender_id').val(data.Id).attr('readonly', 'readonly');;
+            });
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Appraisal Assignment', '#AddressList,#ContactDetailsList', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+
+                    $('#MaxRatingPoints').val(k.MaxRatingPoints);
+                    $('#AppCategorylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppraisalCategory")", "", k.AppCategory_Id);
+                    $('#AppSubCategorylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppSubCategory")", "", k.AppSubCategory_Id);
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AppRatingObjectivelist').P2BLookUpEncapsulate('#AppRatingObjectivelist', 'AppRatingObjectivelist', k.AppRatingObjective_Id, k.IsRatingObjective_FullDetails, 'AppRatingObjectivelist', 'view', 'A');
+                    $('#AppraisalCalendarlist').P2BLookUpEncapsulate('#AppraisalCalendarlist', 'AppraisalCalendarlist', k.AppraisalCalendar_Id, k.AppraisalCalendar_FullDetails, 'AppraisalCalendarlist', 'view', 'N');
+                });
+                $('#Autho_Allow').val(data[3]); 
+                    
+                
+            });
+        });
+        $('#AppCategorylist').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "AppSubCategory")", '#AppSubCategorylist', "");
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        // --------------- SubCategory lookup start ----------
+
+        //To get data in Lookup
+
+
+        // PArtial page create
+
+        $('#Lookup-AppRatingObjective-AppManualAssignment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAppRatingObjectiveLKDetails", "AppManualAssignment")', '', 'LookupDiv', 'Look Up Data', '#AppRatingObjectivelist', 'AppRatingObjectivelist', 10, 'AppRatingObjectivelist', '#frmAppManualAssignment', 'A', '#Edit-AppRatingObjective-AppManualAssignment,#Remove-AppRatingObjective-AppManualAssignment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-Address-Corporate').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-AppRatingObjective-AppManualAssignment').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "AppRatingObjective")', 'Create AppRatingObjective ', 'open', '@Url.Action("Create", "AppRatingObjective")', '#frmAppRatingObjectiveP', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#frmAppManualAssignment', '', function (data) {
+                // to show data which is created in partial page
+                $('#AppRatingObjectivelist').P2BLookUpEncapsulate('#AppRatingObjectivelist', 'AppRatingObjectivelist', data[0], data[1], 'AppRatingObjectivelist', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-AppRatingObjective-AppManualAssignment').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AppRatingObjectivelist').P2BGetTableDataonSelectedRow('#AppRatingObjectivelist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "AppRatingObjective")', '@Url.Action("edit", "AppRatingObjective")', b, '@Url.Action("EditSave", "AppRatingObjective")', 'Edit AppRatingObjective Details', '#frmAppRatingObjectiveP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmAppManualAssignment', '#AppRatingObjectivelist', 'AppRatingObjectivelist', 'AppRatingObjectivelist', 'A', '#Edit-AppRatingObjective-AppManualAssignment,#Remove-AppRatingObjective-AppManualAssignment', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmAppRatingObjectiveP').trigger("reset");
+                    $('#RatingPoints').val(k.RatingPoints);                                   //****************************
+                    // $('#ObjectiveWordings').val(k.ObjectiveWordings_Id);
+                    $('#ObjectiveWordingslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1067, k.ObjectiveWordings_Id);
+                });
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-AppRatingObjective-AppManualAssignment').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#AppRatingObjectivelist').P2BGetTableDataonSelectedRow('#AppRatingObjectivelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AppRatingObjectivelist', $('#AppRatingObjectivelist').val(), 200, 200, '#frmAppManualAssignment', '#AppRatingObjectivelist');
+            event.preventDefault();
+        });
+
+        // --------------- SubCategory lookup end ----------
+
+        // ----------------AppraisalCalendar lookup start ----------
+
+        //To get data in Lookup
+        $('#Lookup-AppraisalCalendar-AppManualAssignment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetailLKDetails", "AppManualAssignment")', '', 'LookupDiv', 'Look Up Data', '#AppraisalCalendarlist', 'AppraisalCalendarlist', 10, 'AppraisalCalendarlist', '#frmAppManualAssignment', 'N', '#Edit-AppraisalCalendar-AppManualAssignment,#Remove-AppraisalCalendar-AppManualAssignment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-AppraisalCalendar-AppManualAssignment').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Calendar")', 'Create Calendar ', 'open', '@Url.Action("Create", "Calendar")', '#frmCalendarP', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#frmAppManualAssignment', '', function (data) {
+                // to show data which is created in partial page
+
+                $('#AppraisalCalendarlist').P2BLookUpEncapsulate('#AppraisalCalendarlist', 'AppraisalCalendarlist', data[0], data[1], 'AppraisalCalendarlist', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-AppraisalCalendar-AppManualAssignment').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AppraisalCalendarlist').P2BGetTableDataonSelectedRow('#AppraisalCalendarlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Calendar")', '@Url.Action("edit", "Calendar")', b, '@Url.Action("Editsave", "Calendar")', 'Edit Calendar', '#frmCalendarP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmAppManualAssignment', '#AppraisalCalendarlist', 'AppraisalCalendarlist', 'AppraisalCalendarlist', 'N', '#Edit-AppraisalCalendar-AppManualAssignment,#Remove-AppraisalCalendar-AppManualAssignment', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmCalendarP').trigger('reset');
+                    $('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 500, k.Name);
+                    $('[name="Default"]').val([k.Default]).button().button("refresh");
+                    if (k.FromDate != null) {
+                        $('#FromDate').val(DateConvert(k.FromDate));
+                    }
+                    if (k.ToDate != null) {
+                        $('#ToDate').val(DateConvert(k.ToDate));
+                    }
+                });
+
+            });
+            event.preventDefault();
+        });
+
+        //partial page delete
+        $('#Remove-AppraisalCalendar-AppManualAssignment').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#AppraisalCalendarlist').P2BGetTableDataonSelectedRow('#AppraisalCalendarlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AppraisalCalendarlist', $('#AppraisalCalendarlist').val(), 200, 200, '#frmAppManualAssignment', '#AppraisalCalendarlist');
+            event.preventDefault();
+        });
+        // ----------------AppraisalCalendar lookup end ----------
+
+
+
+        $('#AppCategorylist').selectmenu().selectmenu("menuWidget");
+        $('#AppSubCategorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

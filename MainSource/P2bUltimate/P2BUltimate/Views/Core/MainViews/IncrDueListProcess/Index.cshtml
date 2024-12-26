@@ -1,0 +1,276 @@
+﻿@{
+    ViewBag.Title = "Increment Due List";
+}
+<style>
+    .btn_row {
+        display: block;
+        float: right;
+        width: 205px;
+    }
+
+    .emplist_row {
+        margin-left: 30px;
+        margin-top: 18px;
+    }
+</style>
+<script>
+    $(function () {
+        $('button').button();
+
+        var SortName, Caption, url, width, height, dt;
+        ColDisplayNames = ['Code', 'Name', 'IncrementOriginalDate', 'IncrementProcessDate', 'OldBasic', 'NewBasic', 'StagnantAppl', 'StagnantCount', 'Id'];
+        ColDisplayModel = ['Employee Code', 'Employee Name', 'Increment Original Date', 'Increment Process Date', 'Old Basic', 'New Basic', 'Stagnant Appl', 'Stagnant Count', 'Id'];
+        
+        Caption_one = "increment",
+        Caption_second = " Increment due list",
+        
+        urlD = '@Url.Action("P2BGrid","IncrDueListProcess")';
+        widthD = 1000;
+        heightD = 200;
+        $('#JqGridNew').P2BGrid(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+        $('#txtPayMonth').MonthYearPicker();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+
+        $('#ReleaseDate_Id').P2BDatePicker();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Code', 'Name', 'Pay Month', 'Total Earning', 'Total Deduction', 'Total Net', 'Id'];
+        ColNames = ['Code', 'Name', 'Pay Month', 'Total Earning', 'Total Deduction', 'Total Net', 'Id'];
+        SortName = 'Id';
+        Caption = 'Salary ';
+        url = '@Url.Action("P2BGrid","IncrDueListProcess")';
+        width = 1000;
+        height = 150;
+        
+        $('#Load').on('click', function (e) {
+            $('#JqGridNew').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+            e.preventDefault();
+        });
+
+        $('#display_emp').on('click', function (e) {
+            var a = "";
+            if ($('#emp_Id').val()) {
+
+                a = $('#emp_Id').val();
+                console.log(a);
+            }
+            else {
+                a = a.toString();
+            }
+            $('#frmEmpList').trigger("reset");          
+            $('#display_emp').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcess","IncrDueListProcess")",
+                month: "#txtPayMonth",
+                msg: "IncrDueList Generation Already Done,Do You Want to Reprocess..?Please Confirm..!",
+                status: function (data) {
+                    if (data == true) {
+                        $.ajax({
+                            method: "POST",
+                            url: "@Url.Action("Create", "IncrDueListProcess")?forwardata="+a,
+                            data: { month: $("#txtPayMonth").val(), typeofbtn: "display" },
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        success: function (data) {
+                           
+                            if (typeof data.rows !== 'undefined' && data.rows.length > 0) {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-info', "Process Is Over");
+                                
+                            }
+                            else {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-info', "Process Is Not Over");                             
+                            }
+                        },
+                        //error: function (data) {                         
+                            //    $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                        //    $('#emp_Id').val("");
+                            //}
+                        complete: function (data) {                         
+                            $('#JqGridNew').trigger('reloadGrid');
+                            $('.ajax_loder').remove();
+                            $('#emp_Id').val("");
+                        }
+                    });
+
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+        $('#relase_incr').on('click', function (e) {
+          
+            var a = "";
+            if ($('#emp_Id').val()) {
+               
+                a = $('#emp_Id').val();
+                console.log(a);
+            }
+            else {
+                a = a.toString();
+            }
+        
+            $.ajax({
+                method: "POST",
+                url: "@Url.Action("ChkIFManual", "incrduelistprocess")?PayMonth=" + $('#txtPayMonth').val(),
+                data: { forwardata: a },
+
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                  
+                    var a = "";
+
+                    if (data.responseText != "") {
+                        $.each(data.responseText, function (index, value) {
+                            a += "<li>" + value + "</li>";
+                        });
+
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-info', a);
+                        return false;
+                    }
+
+
+                },
+                error: function (data) {
+
+                }, complete: function (data) {
+                    $('.ajax_loder').remove();
+                    console.log("release");
+                    console.log(data.responseJSON.responseText);
+                    if (data.responseJSON.responseText == "") {
+                        $('#relase_incr').ProcessConfirmation({
+                            confirmurl: "@Url.Action("ChkProcess", "incrduelistprocess")",
+                            submiturl: "@Url.Action("Create", "incrduelistprocess")?forwardata="+a,
+                            msg: "Do you want to release the increment..? Please Confirm..!",
+                            month: "#txtPayMonth",
+                            gridid: "#JqGridNew",
+                            status: function (data) {
+                                
+                            }
+                        });
+                    }
+
+                }
+            });          
+            e.preventDefault();
+        });
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $.fn.MonthAndYear = function () {
+            $(this).datepicker({
+                changeMonth: true,
+                changeYear: true,
+                stepMonths: true,
+                dateFormat: 'mm/yy',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    
+                }
+            });
+        };
+        $('#Update_Struct').on("click", function (event) {
+            ////debugger;
+            var selectedid = $.GetGridSelctedvalue('#JqGridNew', "Id");
+            var ProcessIncrmentdate = $.GetGridSelctedvalue('#JqGridNew', "Increment Process Date");
+            if ($('#ReleaseDate_Id').val() == "") {
+                alert("Please Enter Release Date!");
+                return false;
+            }
+
+            $.ajax({
+                url: "@Url.Action("HoldIncrement", "incrduelistprocess")",
+                method: "POST",
+                data: $('#frmEmpList').serialize() + "&ReleaseDate=" + $('#ReleaseDate_Id').val() + "&EmpId=" + selectedid + "&ProcessIcrementDate=" + ProcessIncrmentdate,
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    if (data != null) {
+                        alert(data.responseText);
+                    }
+                },
+                complete: function () {
+                    $('.ajax_loder').remove();
+                }
+            });
+            event.preventDefault();
+        });
+        $('#incr_ser_bkupload').on('click', function (e) {
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+        $('#txtPayMonth').MonthAndYear();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+
+
+
+</script>
+<div>
+    <div id="list-employee">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+        {
+            <div class="emplist_row">
+                <label for="payscaleagreement_drop" class="emplist_label must">Month :</label>
+               <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+                <input type="text" id="txtPayMonth" name="txtPayMonth" class="date-picker" />
+                <button id="Load" data-typeofbtn="load">Load</button>
+                <button id="display_emp" data-typeofbtn="display">DueList Display</button>
+                <button id="relase_incr" style="left: 1px;" data-typeofbtn="process">Release Increment</button>
+                <button id="incr_ser_bkupload" style="left: 2px;">Incr Ser BookUpload</button>
+                <label id="lblAgrment" class="emplist_label">ReleaseDate:</label>
+                <input type="text" id="ReleaseDate_Id" name="ReleaseDate_Id" class="popup-content-textbox" />
+                <label id="lblAgrment" class="emplist_label">HoldNarration:</label>
+                <input type="text" id="holdNarration" name="holdNarration" />
+                <button id="Update_Struct">Hold</button>
+            </div>
+            <div class="emplist_row">
+
+            </div>
+            <div class="emplist_row">
+                <div id="Grid_Form2">
+                    <div>
+                        <table id="JqGridNew"></table>
+                        <div id="pager22"></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

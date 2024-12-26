@@ -1,0 +1,551 @@
+﻿@{
+    ViewBag.Title = "Emp Appraisal Cancel Req";
+}
+@model Appraisal.BA_TargetT
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 112px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 555px;
+        float: left;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 350px;
+        display: inline-flex;
+        margin-left: -89px;
+    }
+
+    .loader {
+        width: 299px;
+        display: inline-flex;
+        margin-left: -89px;
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 4px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        width: 534px;
+        margin: 4px auto;
+        /*! position: absolute; */
+        float: left;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 554px;
+        width: 840px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+
+    <title></title>
+
+    <script>
+    $(document).ready(function (e) {
+        var dia;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('button').button();
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmEmpTargetCancelReq').trigger("reset");
+            $.LoadEmpByDefault(true);
+                   
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Emp Appraisal Cancel Req', 'open', '@Url.Action("SanctionOrApproveCancel")', '#frmEmpTargetCancelReq', 'Message :', 'Request Falied :', '#JqGrid', 500, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#EmpAppraisalCalendarlist').P2BSelectMenuAppend('@Url.Action("AppraisalCalenderDropdownlist", "EmpAppraisalCancelReq")', "", '');
+            
+            event.preventDefault();
+        });
+
+        //$('#Employee-Table').on('click', function () {
+        //    $(this).val();
+        //    alert($(this).val());
+
+        //});
+        
+
+        //$('#Employee-Table').OnClickFormReset('#frmEmpTargetCancelReq', '#Emp', function () {
+        //    $('#Emp').val();
+        //    var Id = $("#Emp").val();           
+            
+        //});
+        $('#EmpAppraisalCalendarlist').on('selectmenuchange', function () {
+            var a = $("#EmpAppraisalCalendarlist option:selected").val();
+            var b = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            $('#BA_TargetTDatalist').P2BSelectMenuAppend('@Url.Action("BA_TargetTDropdownlist", "EmpAppraisalCancelReq")?ApprCalendarIds=' + a + '&EmpId=' + b, '', "");
+        });
+
+       
+        @*$('#LvNewReqlist').on('selectmenuopen', function () {
+                console.log($(this).val());
+
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+
+                console.log(a);
+                if (a != null && a.length > 0) {
+                    $('#LvNewReqlist').empty();
+                    $.getJSON("@Url.Action("GetLVNewReqDetails", "lvcancelreq")", { data2: "", data: a.toString() }, function (data) {
+                        if (data.status != false) {
+
+                            $.each(data.data, function (i, k) {
+                                jQuery('#LvNewReqlist').append($('<option>', {
+                                    value: k.Value,
+                                    text: k.Text,
+                                    selected: k.Selected
+                                }));
+                                jQuery('#LvNewReqlist').selectmenu().selectmenu("refresh").selectmenu("menuWidget").css({ "height": "200px" });
+                            });
+                        } else {
+                            $('#LvNewReqlist').empty().append("<option></option>")
+                .css({ "height": "auto" }).selectmenu('refresh');
+                            //  $('div#lvdata').remove();
+                        }
+                    });
+                } else {
+                    alert('Select Employee..!');
+                    $('#LvNewReqlist').val(0).selectmenu('refresh');
+                }
+
+            });*@
+
+        @*$('#LvNewReqlist').P2BSelectMenuAppend('@Url.Action("PopulateLvnewReqDetails", "LvCancelReq")', "", ""); // To bind dropdown on page load*@
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+      
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-LvNewReq-LvCancelReq').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLVNewReqDetails", "LvCancelReq")', '', 'LookupDiv', 'Look Up Data', '#LvNewReqlist', 'LvNewReqlist', 5, 'LvNewReqlist', '#frmLvCancelReq', 'A', '#LookUp_LvNewReq_LvCancelReq,#Create_LvNewReq_LvCancelReq', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+
+            $('#Lookup-ContactNo-LvCancelReq').button().on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupContactNo", "LvCancelReq")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactNolist', 'ContactNolist', 5, 'ContactNolist', '#frmLvCancelReq', 'A', '#Edit-ContactNo-LvCancelReq,#Remove-ContactNo-LvCancelReq', 'lookupdiv_ContactNos', 'pageNavPosition_ContactNos');
+                event.preventDefault();
+            });
+
+            $('#Edit-ContactNo-LvCancelReq').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ContactNolist').P2BGetTableDataonSelectedRow('#ContactNolist', 0);
+                b = a[0];
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactnos_partial", "ContactNumbers")', '@Url.Action("Editcontactnos_partial", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmLvCancelReq', '#ContactNolist', 'ContactNolist', 'ContactNolist', 'A', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+
+                    $.each(data, function (i, k) {
+                        //setTimeout(function () {
+                        $('#frmContactNo').trigger('reset');
+                        $('#MobileNo').val(k.MobileNo);
+                        $('#LandlineNo').val(k.LandlineNo);
+                        $('#STDCode').val(k.STD);
+                        // }, 3000);
+                    });
+                });
+
+            });
+            $('#Create-ContactNo-LvCancelReq').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactnos_partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '', '', '', '#frmLvCancelReq', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactNolist').P2BLookUpEncapsulate('#ContactNolist', 'ContactNolist', data[0], data[1], 'ContactNolist', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                event.preventDefault();
+            });
+
+            $('#Remove-ContactNo-LvCancelReq').button().on('click', function (event) {
+                var c = [], d;
+                c = $('#ContactNolist').P2BGetTableDataonSelectedRow('#ContactNolist', 0);
+                d = c[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', d, "", 'Are you sure you want to remove record???', 'Message : ', 'Request failed', '#ContactNolist', $('#ContactNolist').val(), 200, 200, '#frmLvCancelReq', '#ContactNolist', '');
+                event.preventDefault();
+
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();*@
+        $('#Create-ContactNo-LvCancelReq').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '', '', '', '#frmLvCancelReq', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#ContactNolist').P2BLookUpEncapsulate('#ContactNolist', 'ContactNolist', data[0], data[1], 'ContactNolist', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'N');
+            });
+            event.preventDefault();
+        });
+        $('#Lookup-ContactNo-LvCancelReq').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactNolist', 'ContactNolist', 5, 'ContactNolist', '#frmLvCancelReq', 'A', '#Remove-ContactNo-ContDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-ContactNo-LvCancelReq').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactNolist').P2BGetTableDataonSelectedRow('#ContactNolist', 0);
+            b = a[0];
+            console.log(b);
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmLvCancelReq', '#ContactNolist', 'ContactNolist', 'ContactNolist', 'N', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+
+                $.each(data, function (i, k) {
+                    $('#frmContactNo').trigger('reset');
+                    $('#MobileNo').val(k.MobileNo);
+                    $('#LandlineNo').val(k.LandlineNo);
+                    $('#STDCode').val(k.STD);
+                });
+            });
+
+        });
+
+        $('#Remove-ContactNo-LvCancelReq').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#ContactNolist').P2BGetTableDataonSelectedRow('#ContactNolist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ContactNolist').P2BGetTableDataonSelectedRow('#ContactNolist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactNolist', $('#ContactNolist').val(), 200, 200, '#frmLvCancelReq', '#ContactNolist', '#Remove-ContactNo-ContDetails');
+            event.preventDefault();
+        });
+
+       
+
+
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "EmpAppraisalCancelReq")",
+            @*htmurl: "@Url.Action("partial", "LvCancelReq")",*@
+            columnname: ["Code", "Name", "Id"],
+            childheader: ["EntryDate", "Reason", "Id"],
+            childurl: "@Url.Action("Get_EmpTargetCancelReq", "EmpAppraisalCancelReq")",
+            tableheader: "Emp Appraisal Cancel Req",
+            childurlColumnNo: "3"
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvCancelReqGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "LvCancelReq")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData", "LvCancelReq")",
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $('#Grid-ReqDate').val(data.ReqDate);
+                            $('#Grid-LvNewReq').val(data.LvNewReq);
+                            $('#Grid-Reason').val(data.Reason);
+
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvCancelReqGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "LvCancelReq")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "LvCancelReq")",
+                        submiturl: "@Url.Action("GridEditsave", "LvCancelReq")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $('#Grid-ReqDate').val(data.ReqDate);
+                            $('#Grid-LvNewReq').val(data.LvNewReq);
+                            $('#Grid-Reason').val(data.Reason);
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            $.FormReset('#frmLvCancelReq');*@
+       
+        //$('.popup_radio_button').controlgroup();
+        $('#BA_TargetTDatalist').selectmenu().selectmenu("menuWidget");
+        $('#EmpAppraisalCalendarlist').selectmenu().selectmenu("menuWidget");
+    });
+    </script>
+
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="LV Cancel Req">
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div>
+                        <label>Search : </label>
+                        <input type="text" id="Employee-Search" style="width: 425px;" />
+                    </div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr>
+                            <th><input type="checkbox" id="Case-Employee" /></th>
+                            <th>Employee</th>
+                        </tr>
+                    </table>
+                    @*<span class="btn-span1" aria-hidden="true">
+                            <button id="load_emp" class="loan-btn">Load Employee</button>
+                        </span>*@
+                </div>
+
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpTargetCancelReq", name = "frmEmpTargetCancelReq" }))
+        {
+            <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+            <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+            <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+            <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />           
+             <div class="row3 content_margine">
+                <div id="ContactNolist_old"></div>
+                @*@Html.LabelFor(m => m.LvNewReq, "EmpTarget Cancel Requisition:", new { @class = "popup-content-label must" })*@
+                <label for="EmpAppraisalCalendarlist" class="popup-content-label must">EmpAppraisal Calendar:</label>
+                <div style="margin-left:136px;margin-top:5px">
+                    <select id="EmpAppraisalCalendarlist" name="EmpAppraisalCalendarlist" class="drop must" style="width:450px"></select>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="ContactNolist_old"></div>
+                @*@Html.LabelFor(m => m.LvNewReq, "EmpTarget Cancel Requisition:", new { @class = "popup-content-label must" })*@
+                <label for="BA_TargetTDatalist" class="popup-content-label must">BA_TargetT Datalist:</label>
+                <div style="margin-left:136px;margin-top:5px">
+                    <select id="BA_TargetTDatalist" name="BA_TargetTDatalist" class="drop must" style="width:450px"></select>
+                </div>
+            </div>
+            
+              <label for="Reason" class="popup-content-label must" style="margin-top:15px;">Reason:</label>
+             <input type="text" id="Reason" name="Reason" class="popup-content-textbox must" style="margin-left: 27px;margin-top: 13px;">
+            @*<div class="row3 content_margine">@Html.LabelFor(m => m, "Reason", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Reason, new { @class = "popup-content-textbox must" })</div>*@
+        }
+    </div>
+</body>
+</html>

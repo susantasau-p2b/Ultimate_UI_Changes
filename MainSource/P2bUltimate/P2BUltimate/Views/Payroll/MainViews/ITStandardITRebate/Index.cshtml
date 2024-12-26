@@ -1,0 +1,157 @@
+﻿@{
+    ViewBag.Title = "IT Rebate Master";
+}
+@model Payroll.ITStandardITRebate
+@*<link href="~/Content/it_investment/itinvestment.css" rel="stylesheet" />*@
+<style>
+    .itinvest_icon-row {
+        position: absolute;
+        left: 93px;
+        top: 80px;
+    }
+    .itin_popup-content-label {
+        width: 124px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }					
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+
+        var btnnamedisable = '';
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['StartAmount', 'EndAmount', 'DeductionAmount', 'DeductionPercentage', 'Id'];
+        ColNames = ['StartAmount', 'EndAmount', 'DeductionAmount', 'DeductionPercentage', 'Id'];
+        SortName = 'Id';
+        Caption = 'Standard IT Rebate';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+        $('#StartAmount').val("0").ForceAmount().MaxLength(10);
+        $('#EndAmount').val("0").ForceAmount().MaxLength(10);
+        $('#DeductionAmount').val("0").ForceAmount().MaxLength(10);
+        $('#DeductionPerc').val("0").ForcePercent().MaxLength(5);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function () {
+            $('#frmStdITRebate').trigger('reset');
+          
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Standard IT Rebate', 'open', '@Url.Action("Create", "ITStandardITRebate")', '#frmStdITRebate', 'Message :', 'Request Falied :', '#JqGrid', 400, 549, '', '', function (data) { });
+            $('#Regimelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3036,"");
+            $('#StartAmount').val("0");
+            $('#EndAmount').val("0");
+            $('#DeductionAmount').val("0");
+            $('#DeductionPerc').val("0");
+        
+         });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+        
+        AssignData();
+      
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Standard IT Rebate Data", '#frmStdITRebate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+               
+                $.each(data[0], function (i, k) {
+                    $('#Regimelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3036, k.Regime_Id);
+                    $('#StartAmount').val(k.StartAmount);
+                    $('#StartAmount').attr('readonly', 'readonly');
+                    $('#EndAmount').val(k.EndAmount);
+                    $('#EndAmount').attr('readonly', 'readonly');
+                    $('#DeductionAmount').val(k.DeductionAmount);
+                    $('#DeductionPerc').val(k.DeductionPerc);
+                });
+
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+
+                
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Standard IT Rebate Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Regimelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3036, k.Regime_Id);
+                    $('#StartAmount').val(k.StartAmount);
+                    $('#EndAmount').val(k.EndAmount);
+                    $('#DeductionAmount').val(k.DeductionAmount);
+                    $('#DeductionPerc').val(k.DeductionPerc);
+                });
+
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#StartAmount').oldVal(data[2].StartAmount);
+                        $('#EndAmount').oldVal(data[2].EndAmount);
+                        $('#DeductionAmount').oldVal(data[2].DeductionAmount);
+                        $('#DeductionPerc').oldVal(data[2].DeductionPerc);
+
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmStdITRebate", name = "frmStdITRebate" }))
+{
+    <div class="itin_row1 content_margine" style="width: 420px;">
+        @Html.LabelFor(m => m.Regime, "Regime :", new { @class = "itin_popup-content-label must" })
+        <select class="drop must" style="width:120px;" name="Regimelist" id="Regimelist">
+            <option></option>
+        </select>
+    </div>
+
+        <div class="itin_row1 content_margine">@Html.LabelFor(m => m.StartAmount, "Start Amount :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.StartAmount, new { @class = "itin_popup-content-textbox must" })</div>
+        <div class="itin_row1 content_margine"> @Html.LabelFor(m => m.EndAmount, "End Amount :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.EndAmount, new { @class = "itin_popup-content-textbox must" })</div>
+        <div class="itin_row1 content_margine">@Html.LabelFor(m => m.DeductionAmount, "Deduction Amount :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.DeductionAmount, new { @class = "itin_popup-content-textbox search must" })</div>
+        <div class="itin_row1 content_margine">@Html.LabelFor(m => m.DeductionPerc, "Deduction Percent :", new { @class = "itin_popup-content-label must" })@Html.TextBoxFor(m => m.DeductionPerc, new { @class = "itin_popup-content-textbox search must" })%</div>        
+
+    }
+</div>

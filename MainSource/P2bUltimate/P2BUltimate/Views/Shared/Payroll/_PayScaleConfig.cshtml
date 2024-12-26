@@ -1,0 +1,81 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.PayScaleConfig
+<link href="~/Content/Contactdetails/payscale_config.css" rel="stylesheet" />
+
+<div class="dialog_PayScale">
+    <div title="LookUp Data">
+        <div class="lookupdiv_PayScale"></div>
+    </div>
+    <div id="pageNavPosition_PayScale">
+
+    </div>
+</div>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPayScaleConfig", name = "frmPayScaleConfig" }))
+{
+
+    <div class="payscale_row1 content_margine">@Html.LabelFor(m => m.EffDate, "Effective Date :", new { @class = "payscale_popup-content-label must" })@Html.TextBoxFor(m => m.EffDate, new { @class = "popup-content-textbox-short date must" })</div>
+
+    <div class="payscale_row1 content_margine">
+        @Html.LabelFor(m => m.PayScale, "PayScale:", new { @class = "contact_popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="PayScaleList">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+    </div>
+    <div class="payscale_icon-row">
+        <button data-p2btooltip="Select PayScale" class="  popup-content-icon-lookup" id="Lookup-PayScale-PayScaleConfig"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Create PayScale" class="  popup-content-icon-create" id="Create-PayScale-PayScaleConfig"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+    </div>
+
+    <div class="payscale_row1 content_margine">
+        @Html.LabelFor(m => m.SalaryHead, "SalaryHead:", new { @class = "contact_popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="SalaryHeadList">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+    </div>
+    <div class="payscale_icon-row">
+        <button data-p2btooltip="Select SalaryHead" class="  popup-content-icon-lookup" id="Lookup-SalaryHead-PayScaleConfig"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+        @*<button data-p2btooltip="Create SalaryHead" class="  popup-content-icon-create" id="Create-PayScale-PayScaleConfig"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+    </div>
+}
+</div>
+<style>
+    .payscale_icon-row {
+        position: relative;
+        left: 70px;
+        top: -130px;
+    }
+</style>
+
+ 
+<script>
+    $(document).ready(function () {
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayScale-PayScaleConfig').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreatePayScale_partial", "PayScaleConfig")', 'Create PayScale', 'open', '@Url.Action("Create", "PayScale")', '#frmPayScaleConfig', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPayScaleConfigJobStatus', '', function (data) {
+                $('#PayScaleList').P2BLookUpEncapsulate('#PayScaleList', 'PayScaleList', data[0], data[1], 'PayScaleList', '', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-PayScale-PayScaleConfig').button().on('click', function (event) {
+            $('.dialog_PayScale').P2BLookUpModal('@Url.Action("GetPayScaleLKDetails", "PayScaleConfig")', '', 'lookupdiv_PayScale', 'PayScale Look Up Data', '#PayScaleList', 'PayScaleList', 5, 'PayScaleList', '#frmPayScaleConfig', 'A', '', 'Lookup_table_PayScale', 'pageNavPosition_PayScale');
+            event.preventDefault();
+        });
+
+        $('#Lookup-SalaryHead-PayScaleConfig').button().on('click', function (event) {
+            $('.dialog_PayScale').P2BLookUpModal('@Url.Action("GetSalaryHeadLKDetails", "PayScaleConfig")', '', 'lookupdiv_PayScale', 'PayScale Look Up Data', '#SalaryHeadList', 'SalaryHeadList', 5, 'SalaryHeadList', '#frmPayScaleConfig', 'A', '', 'Lookup_table_PayScale', 'pageNavPosition_PayScale');
+            event.preventDefault();
+        });
+
+        $('.date').P2BDatePicker();
+    });
+
+</script>

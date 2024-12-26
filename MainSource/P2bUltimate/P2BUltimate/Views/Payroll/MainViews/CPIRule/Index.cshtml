@@ -1,0 +1,392 @@
+﻿@{
+    ViewBag.Title = "CPI Rule ";
+}
+
+@model Payroll.CPIRule
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#BaseIndex').ForceOnlyNumeric();
+        //$('#MaxAmountIBase').ForceOnlyNumeric();
+        //$('#MinAmountIBase').ForceOnlyNumeric();
+        $('#IndexMaxCeiling').ForceOnlyNumeric();
+        $('#Unit').ForceOnlyNumeric();
+        $('#MinAmountIBase').ForceOnlyNumeric();
+        $('#IBaseDigit').ForceOnlyNumeric().MaxLength(5);
+        //$('#MinAmountIBase').MaxLength(10);
+        //$('#MaxAmountIBase').MaxLength(10);
+        $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        var namebtndisable = '#Edit-CPIRuleDeatils-CPIRule,#Remove-CPIRuleDeatils-CPIRule';
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var dt;
+        //a.Id, a.Name,a.MinAmountIBase, a.MaxAmountIBase, a.IBaseDigit
+        //ColModel = ['Id', 'Name', 'MinAmountIBase', 'MaxAmountIBase', 'IBaseDigit'];
+        //ColNames = ['Id', 'Name', 'MinAmountIBase', 'MaxAmountIBase', 'IBaseDigit'];
+        ColModel = [ 'Name', 'IBaseDigit','Id'];
+        ColNames = ['Name', 'IBaseDigit', 'Id'];
+        SortName = 'Id';
+        Caption = 'Cpi Rule';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmCPIRule').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Cpi Rule', 'open', '@Url.Action("Create")', '#frmCPIRule', 'Message :', 'Request Falied :', '#JqGrid', 500, 661, '#CPIRuleDetailslist,#CPIUnitCalclist', '', function (data) { });
+            $('#RoundingMethodlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 422, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        $('#Lookup-CPIRuleDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "CPIRuleDetails")', '', 'LookupDiv', 'CpiRule Details Look Up Data', '#CPIRuleDetailslist', 'CPIRuleDetailslist', 5, 'CPIRuleDetailslist', '#frmCPIRule', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //edit cpireuledetails
+
+        $('#Edit-CPIRuleDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CPIRuleDetailslist').P2BGetTableDataonSelectedRow('#CPIRuleDetailslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CpiRuleDetails")', '@Url.Action("Edit", "CpiRuleDetails")', b, '@Url.Action("Editsave", "CpiRuleDetails")', 'Edit Cpi Rule Details', '#frmCPIRuleDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCPIRule', '#CPIRuleDetailslist', 'CPIRuleDetailslist', 'CPIRuleDetailslist', 'A', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmCPIRuleDetails').trigger("reset");
+                    $('#SalFrom').val(k.SalFrom);
+                    $('#SalTo').val(k.SalTo);
+                    $('#ServiceFrom').val(k.ServiceFrom);
+                    $('#ServiceTo').val(k.ServiceTo);
+                    $('#IncrPercent').val(k.IncrPercent);
+                    $('#AdditionalIncrAmount').val(k.AdditionalIncrAmount);
+                    $('#MinAmountIBase').val(k.MinAmountIBase);
+                    $('#MaxAmountIBase').val(k.MaxAmountIBase);
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#CPIWageslist').P2BLookUpEncapsulate('#CPIWageslist', 'CPIWageslist', k.CPIWages_Id, k.CPIWages_FullDetails, 'CPIWageslist', '#Edit-CPIWages-CPIRuleDetails,#Remove-CPIWages-CPIRuleDetails', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-CPIRuleDetails').on('click', function (e) {
+            //var a = [], b;
+            //a = $('#CPIRuleDetailslist').P2BGetTableDataonSelectedRow('#CPIRuleDetailslist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#CPIRuleDetailslist').P2BGetTableDataonSelectedRow('#CPIRuleDetailslist', 0);
+
+            console.log("Verify...");
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CPIRuleDetailslist', $('#CPIRuleDetailslist').val(), 200, 200, '#frmCPIRule', '#CPIRuleDetailslist');
+            e.preventDefault();
+        });
+
+        //cpiunitcalc
+        $('#Lookup-CPIUnitCalc').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "CPIUnitCalc")', '', 'LookupDiv', ' CPI Unit Calc Look Up Data', '#CPIUnitCalclist', 'CPIUnitCalclist', 5, 'CPIUnitCalclist', '#frmCPIRule', 'A', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'Lookup_table', 'PageNavPosition');
+            e.preventDefault();
+        });
+        //remove cpiunitcalc
+        $('#Remove-CPIUnitCalc').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#CPIUnitCalclist').P2BGetTableDataonSelectedRow('#CPIUnitCalclist', 0);
+            //b = a[0];
+            //console.log(b);
+            var selectedRows = [];
+            selectedRows = $('#CPIUnitCalclist').P2BGetTableDataonSelectedRow('#CPIUnitCalclist', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CPIUnitCalclist', $('#CPIUnitCalclist').val(), 200, 200, '#frmCPIRule', '#CPIUnitCalclist');
+            event.preventDefault();
+        });
+
+        //editcpiunitcal
+        $('#Edit-CPIUnitCalc').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CPIUnitCalclist').P2BGetTableDataonSelectedRow('#CPIUnitCalclist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CpiUnitCalc")', '@Url.Action("Edit", "CpiUnitCalc")', b, '@Url.Action("Editsave", "CpiUnitCalc")', 'Edit Cpi Unit Calc ', '#frmCPIUnitCalc', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCPIRule', '#CPIUnitCalclist', 'CPIUnitCalclist', 'CPIUnitCalclist', 'A', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmcpiunit').trigger("reset");
+                    $('#IndexMaxCeiling').val(k.IndexMaxCeiling);
+                    $('#BaseIndex').val(k.BaseIndex);
+                    $('#Unit').val(k.Unit);
+
+                });
+            });
+            event.preventDefault();
+        });
+
+        
+
+        $('#View').button().click(function (event) {
+            $('#frmCPIRule').trigger('reset');
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View CPI Rule Data', '#CPIRuleDetailslist,#CPIUnitCalclist', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Name').val(k.Name);
+                    $('#IBaseDigit').val(k.IBaseDigit);
+                    $('[name="VDAOnDirectBasic"]').val([k.VDAOnDirectBasic]).button().button("refresh");
+                    //$('#MinAmountIBase').val(k.MinAmountIBase);
+                    //$('#MaxAmountIBase').val(k.MaxAmountIBase);
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                    //$('#MinAmountIBase').val(k.MinAmountIBase);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '', 'A');
+                    $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '', 'A');
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    alert(data[2].Name);
+                    $('#Name').oldVal(data[2].Name);
+                    //$('#MaxAmountIBase').oldVal(data[2].MaxAmountIBase);
+                    $('#BaseIndex').oldVal(data[2].BaseIndex);
+                    $('#IndexMaxCeiling').oldVal(data[2].IndexMaxCeiling);
+                    $('#Unit').oldVal(data[2].Unit);
+                    //$('#MinAmountIBase').oldVal(data[2].MinAmountIBase);
+                    $('#IBaseRound').oldVal(data[2].IBaseRound);
+                    $('#IBaseDigit').oldVal(data[2].IBaseDigit);
+                    $('#CPIRuleDeatilslist_old').oldLookupVal(data[2].CPIRuleDeatils_val);
+                    @*$.each(data[2], function (i, k) {
+                            // $('#Code').Oldval(k.Code);
+                            alert(k.Name)
+                            $('#Name').oldVal(k.Name);
+                            $('#Categorylist').oldDropval(k.BusinessType_Val);
+                            $('#AddressList_Old').oldLookupVal(k.Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(k.Contact_Val);
+                            //$('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                        });*@
+                }
+                //}, 2000);
+            });
+        });
+
+
+        $('#Create-CPIRuleDetails').on("click", function (event) {
+            //                                              url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "cpiruledetails")', 'Create CPI Rule Details Dialog', 'open', '@Url.Action("Create", "cpiruledetails")', '#frmCPIRuleDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 550, '', '', '', '#frmCPIRule', '', function (data) {
+                console.log(data[0]);
+                $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', data[0], data[1], 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Create-CPIUnitCalc').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "CpiUnitCalc")', 'Create CPI Unit Calclist Dialog', 'open', '@Url.Action("Create", "CpiUnitCalc")', '#frmCPIUnitCalc', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCPIRule', '', function (data) {
+                console.log(data);
+                $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', data[0], data[1], 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        @*$('#Edit').on('click', function () {
+            $('#frmCPIRule').trigger('reset');
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmCPIRule', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#CPIRuleDetailslist,#CPIUnitCalclist', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmCPIRule').trigger("reset");
+                    $('#Name').val(k.Name);
+                    $('#IBaseDigit').val(k.IBaseDigit);
+                    $('#MinAmountIBase').val(k.MinAmountIBase);
+                    $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+                    $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+
+        });*@
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit CPI Rule Data", '#frmCPIRule', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#CPIRuleDetailslist,#CPIUnitCalclist,#RoundingMethodlist', '', function (data) {
+                $('#Name').attr('readonly', true);
+
+                $.each(data[0], function (i, k) {
+                    $('#frmCPIRule').trigger("reset");
+                    $('#Name').val(k.Name);
+                    $('#IBaseDigit').val(k.IBaseDigit);
+                    $('#MinAmountIBase').val(k.MinAmountIBase);
+                    $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                    $('[name="VDAOnDirectBasic"]').val([k.VDAOnDirectBasic]).button().button("refresh");
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                });
+                $.each(data[2], function (i, k) {
+                    $('#CPIUnitCalclist').P2BLookUpEncapsulate('#CPIUnitCalclist', 'CPIUnitCalclist', k.cpiunitcalc_Id, k.cpiunitcalc_Details, 'CPIUnitCalclist', '#Edit-CPIUnitCalc,#Remove-CPIUnitCalc', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+        });
+
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });       
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+      
+        $(function () {
+            $(".datepicker").datepicker({ dateFormat: 'dd-mm-yy' }).val();
+        });
+    });
+</script>
+<head>
+    <title></title>
+    <style>
+
+        .icon-row {
+            position: relative;
+            left: 77px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 127px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 437px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 427px;
+        }
+
+
+    
+
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Cpi Rule">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCPIRule", name = "frmCPIRule" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.Name, new { @class = "Popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine">
+                <div id="CPIRuleDetails_old"></div>
+                @Html.LabelFor(m => m.CPIRuleDetails, "CPI Rule Details:", new { @class = "popup-content-label" })
+                <div class="popup-content-table" style="width: 552px;">
+                    <table class="lookuptableselected" id="CPIRuleDetailslist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup CPI RuleD etails " class="button popup-content-icon-lookup" id="Lookup-CPIRuleDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create CPI Rule Details " class="button popup-content-icon-create" id="Create-CPIRuleDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit CPI Rule Details " class="button popup-content-icon-edit" id="Edit-CPIRuleDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove CPI Rule Details " class="button popup-content-icon-remove" id="Remove-CPIRuleDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row2 content_margine">
+                <div id="CPIUnitCalc_old"></div>
+                @Html.LabelFor(m => m.CPIUnitCalc, "CPI Unit Calc:", new { @class = "popup-content-label" })
+                <div class="popup-content-table" style="width: 552px;">
+                    <table class="lookuptableselected" id="CPIUnitCalclist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup CPI Unit Calc " class="button popup-content-icon-lookup" id="Lookup-CPIUnitCalc"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create CPI Unit Calc " class="button popup-content-icon-create" id="Create-CPIUnitCalc"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit CPI Unit Calc " class="button popup-content-icon-edit" id="Edit-CPIUnitCalc"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove CPI Unit Calc " class="button popup-content-icon-remove" id="Remove-CPIUnitCalc"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            
+             <div class="row3 content_margine">
+            @Html.LabelFor(m => m.VDAOnDirectBasic, "VDAOnDirectBasic :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="VDAOnDirectBasic" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="VDAOnDirectBasic" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+            
+            <div class="row3 content_margine">@Html.LabelFor(m => m.IBaseDigit, "IBase Digit:", new { @class = "popup-content-label must " }) @Html.TextBoxFor(m => m.IBaseDigit, new { @class = "Popup-content-textbox must" })</div>
+            @*<div class="row3 content_margine">@Html.LabelFor(m => m.MinAmountIBase, "Min Amount IBase:", new { @class = "popup-content-label must " }) @Html.TextBoxFor(m => m.MinAmountIBase, new { @class = "Popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.MaxAmountIBase, "Max Amount IBase:", new { @class = "popup-content-label must " }) @Html.TextBoxFor(m => m.MaxAmountIBase, new { @class = "Popup-content-textbox must" })</div>*@
+            <br />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.RoundingMethod, "Rounding Method:", new { @class = "popup-content-label must " })<select class="selectmenu must" style="width:120px" id="RoundingMethodlist" name="RoundingMethodlist"><option value="0">-Select-</option></select></div>
+
+
+
+        }
+    </div>
+</body>
+
+

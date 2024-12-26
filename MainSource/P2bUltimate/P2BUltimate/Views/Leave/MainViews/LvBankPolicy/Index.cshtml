@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "Leave Bank Policy";
+}
+@model Leave.LvBankPolicy
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        $('#LeaveBankName').MaxLength(20);
+        $('#LvMaxDays').ForceOnlyNumeric();
+        $('#LvMaxDays').MaxLength(5);
+        $('#OccuranceInService').ForceOnlyNumeric();
+        $('#OccuranceInService').MaxLength(5);
+        $('#LvDebitInCredit').ForceOnlyNumeric();
+        $('#LvDebitInCredit').MaxLength(5);
+    });
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#OpeningDate').P2BDatePicker();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['LeaveBankName', 'LvMaxDays', 'OccuranceInService', 'LvDebitInCredit', 'Id'];
+        ColNames = ['LeaveBankName', 'LvMaxDays', 'OccuranceInService', 'LvDebitInCredit', 'Id'];
+        SortName = 'Id';
+        Caption = 'Leave Bank Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmBankPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Bank Policy', 'open', '@Url.Action("Create")', '#frmBankPolicy', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', "", function (data) { });
+
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Bank Policy Data", '#frmBankPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmBankPolicy').trigger("reset");
+                    $('#LeaveBankName').val(k.LeaveBankName);
+                    $('#LeaveBankName').attr('readonly', 'readonly');
+                    $('#LvMaxDays').val(k.LvMaxDays);
+                    $('#OccuranceInService').val(k.OccuranceInService);
+                    $('#LvDebitInCredit').val(k.LvDebitInCredit);
+                    $('[name="SeviceLockOnDebit"]').val([k.IsSeviceLockOnDebit]).button().button("refresh");
+                    $('#MaxServiceForDebit').val(k.MaxServiceForDebit);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#LvHeadCollectionlist').P2BLookUpEncapsulate('#LvHeadCollectionlist', 'LvHeadCollectionlist', k.LvHead_Id, k.LvHead_FullDetails, 'LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Bank Policy Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmBankPolicy').trigger("reset");
+                    $('#LeaveBankName').val(k.LeaveBankName);
+                    $('#LeaveBankName').attr('readonly', 'readonly');
+                    $('#LvMaxDays').val(k.LvMaxDays);
+                    $('#OccuranceInService').val(k.OccuranceInService);
+                    $('#LvDebitInCredit').val(k.LvDebitInCredit);
+                    $('[name="SeviceLockOnDebit"]').val([k.IsSeviceLockOnDebit]).button().button("refresh");
+                    $('#MaxServiceForDebit').val(k.MaxServiceForDebit);
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#LvHeadCollectionlist').P2BLookUpEncapsulate('#LvHeadCollectionlist', 'LvHeadCollectionlist', k.LvHead_Id, k.LvHead_FullDetails, 'LvHeadCollectionlist', 'view', 'A');
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    //$('#PolicyName').oldVal(data[2].PolicyName);
+                    //$('#EncashSpanYear').oldVal(data[2].EncashSpanYear);
+                    //$('#FromServ').oldVal(data[2].FromServ);
+                    //$('#ToServ').oldVal(data[2].ToServ);
+                    //$('#MinBalance').oldVal(data[2].MinBalance);
+                    //$('#MinEncashment').oldVal(data[2].MinEncashment);
+                    //$('#MinUtilized').oldVal(data[2].MinUtilized);
+                }
+                //}, 2000);
+            });
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+       
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Lookup-LvHeadCollection-LvBankPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvBankPolicy")', '', 'LookupDiv', 'Type Of head Look Up Data', '#LvHeadCollectionlist', 'LvHeadCollectionlist', 5, 'LvHeadCollectionlist', '#frmBankPolicy', 'A', '#Remove-LvHeadCollection-LvBankPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //$('#Remove-LvHeadCollection-LvBankPolicy').button().on('click', function (event) {
+        //    //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        //    var a = [], b;
+        //    a = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadCollectionlist', $('#LvHeadCollectionlist').val(), 200, 200, '#frmLvCreditPolicy', '#LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy');
+        //    event.preventDefault();
+        //});
+
+        $('#Remove-LvHeadCollection-LvBankPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadCollectionlist', $('#LvHeadCollectionlist').val(), 200, 200, '#frmBankPolicy', '#LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#MaxServiceForDebit').val(0);
+    });
+</script>
+<style>
+    .popup-content-label {
+        width: 111px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 590px;
+    }
+
+    .popup_radio_button {
+        font-size: 9px;
+        margin: 0 0 2px 2px;
+    }
+
+    .icon-row {
+        left: 76px;
+        position: absolute;
+        top: 106px;
+    }
+</style>
+<html>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Corpoarte">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmBankPolicy", name = "frmBankPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.LeaveBankName, "Bank Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LeaveBankName, new { @class = "popup-content-textbox must" })</div>
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.LvMaxDays, "Max Days:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.LvMaxDays, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.OccuranceInService, "Occ in Service :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.OccuranceInService, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.LvDebitInCredit, "Lv Debit In Credit :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvDebitInCredit, new { @class = "popup-content-textbox" })</div>
+           
+             <div class="row1 content_margine">
+                <div id="LvHeadCollectionlist_old"></div>
+                @Html.LabelFor(m => m.LvHeadCollection, "Type Of Leave :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LvHeadCollectionlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select LvHeadCollection" class="  popup-content-icon-lookup" style=" left:353px" id="Lookup-LvHeadCollection-LvBankPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove LvHeadCollection" class="popup-content-icon-remove" style=" left:353px" id="Remove-LvHeadCollection-LvBankPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            
+             <div class="row1 content_margine">
+            @Html.LabelFor(m => m.IsSeviceLockOnDebit, "Is On Service :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="SeviceLockOnDebit" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="SeviceLockOnDebit" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+             <div class="row1 content_margine">@Html.LabelFor(m => m.MaxServiceForDebit, "Max Service :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.MaxServiceForDebit, new { @class = "popup-content-textbox" })</div>
+            
+
+
+        }
+    </div>
+</body>
+</html>

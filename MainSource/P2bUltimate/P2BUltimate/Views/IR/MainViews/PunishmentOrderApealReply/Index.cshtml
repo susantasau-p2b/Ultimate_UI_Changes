@@ -1,0 +1,242 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.PunishmentOrderApealReply
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        //ColModel = ['Id', 'Code', 'Name', 'OnAttend', 'OnLeave', 'RoundDigit', 'InITax'];
+        //ColNames = ['Id', 'Code', 'Name', 'OnAttend', 'OnLeave', 'RoundDigit', 'InITax'];
+
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'PunishmentOrderApealReplyDate', 'PunishmentOrderApealReplyDetails', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'PunishmentOrderApealReplyDate', 'PunishmentOrderApealReplyDetails', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Punishment Order Apeal Reply';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').button().on("click", function () {
+            $('#frmPunishmentOrderApealReply').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+             var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PunishmentOrderAppeal Reply ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmPunishmentOrderApealReply', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+            $('#PunishmentTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, "");
+            $('#PenaltyTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 408, "");
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Lookup-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "PunishmentOrderApealReply")', '', 'LookupDiv', 'PunishmentOrderApealReply Look Up Data', '#PunishmentOrderApealReplyDocList', 'PunishmentOrderApealReplyDocList', 4, 'PunishmentOrderApealReplyDocList', '#frmPunishmentOrderApealReply', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply').button().on('click', function (event) {
+
+            //a = $('#PunishmentOrderApealReplyDocList').P2BGetTableDataonSelectedRow('#PunishmentOrderApealReplyDocList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PunishmentOrderApealReplyDocList').P2BGetTableDataonSelectedRow('#PunishmentOrderApealReplyDocList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PunishmentOrderApealReplyDocList', $('#PunishmentOrderApealReplyDocList').val(), 200, 200, '#frmPunishmentOrderApealReply', '#PunishmentOrderApealReplyDocList');
+            event.preventDefault();
+        });
+
+        $('#Delete').on('click', function () {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PunishmentOrderApealReply', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "view PunishmentOrderApealReply", '#frmPunishmentOrderApealReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmPunishmentOrderApealReply').trigger("reset");
+                    $('#Narration').val(k.Narration);
+                    $('#PunishmentOrderApealReplyDetails').val(k.PunishmentOrderApealReplyDetails);
+                    if (k.PunishmentOrderApealReplyDate != null)
+                        $('#PunishmentOrderApealReplyDate').val(DateConvert(k.PunishmentOrderApealReplyDate));
+                    else
+                        $('#PunishmentOrderApealReplyDate').val();
+                });
+
+            });
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PunishmentOrderApealReply", '#frmPunishmentOrderApealReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmPunishmentOrderApealReply').trigger("reset");
+                    $('#Narration').val(k.Narration);
+                    $('#PunishmentOrderApealReplyDetails').val(k.PunishmentOrderApealReplyDetails);
+                    if (k.PunishmentOrderApealReplyDate != null)
+                        $('#PunishmentOrderApealReplyDate').val(DateConvert(k.PunishmentOrderApealReplyDate));
+                    else
+                        $('#PunishmentOrderApealReplyDate').val();
+                });
+                $.each(data[1], function (i, k) {
+                    $('#PunishmentOrderApealReplyDocList').P2BLookUpEncapsulate('#PunishmentOrderApealReplyDocList', 'PunishmentOrderApealReplyDocList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'PunishmentOrderApealReplyDocList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#PunishmentOrderApealReplyDocList').P2BLookUpEncapsulate('#PunishmentOrderApealReplyDocList', 'PunishmentOrderApealReplyDocList', data.Id, data.Val, 'PunishmentOrderApealReplyDocList', '', 'A');
+                },
+            });
+            event.preventDefault();
+
+        });
+        $('#PunishmentOrderApealReplyDate').P2BDatePicker();
+
+    });
+</script>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div class="form-bg">
+        <div class="form-input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPunishmentOrderApealReply", name = "frmPunishmentOrderApealReply" }))
+        {
+            
+              <div class="row3 content_margine">
+        @Html.LabelFor(m => m.PunishmentOrderApealReplyDate, "Reply Date:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.PunishmentOrderApealReplyDate, "Reply Date:", new { @class = "popup-content-Textboxt must" })
+            </div>
+              <div class="row3 content_margine">
+        @Html.LabelFor(m => m.PunishmentOrderApealReplyDetails, "Reply Details:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.PunishmentOrderApealReplyDetails, "Reply Details:", new { @class = "popup-content-Textboxt must" })
+            </div>
+            
+              <div class="row3 content_margine">
+                             @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })
+                             @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                             @Html.LabelFor(m => m.PunishmentOrderApealReplyDoc, "Supporting Documents :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="PunishmentOrderApealReplyDocList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding  PunishmentOrderApealReplyDoc" class=" popup-content-icon-lookup" id="Lookup-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create PunishmentOrderApealReplyDoc " class=" popup-content-icon-create" id="Create-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete PunishmentOrderApealReplyDoc" class=" popup-content-icon-remove" id="Remove-PunishmentOrderApealReplyDoc-PunishmentOrderApealReply"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+        }
+        </div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+﻿@*@{
+    ViewBag.Title = "GeoStruct";
+}
+<script>
+    $(function () {
+        $('#corporate-table').P2BTransactionTableAnimation();
+        $('#region-table').P2BTransactionTableAnimation();
+        $('#company-table').P2BTransactionTableAnimation();
+        $('#division-table').P2BTransactionTableAnimation();
+        $('#location-table').P2BTransactionTableAnimation();
+        $('#department-table').P2BTransactionTableAnimation();
+        $('#group-table').P2BTransactionTableAnimation();
+        $('#unit-table').P2BTransactionTableAnimation();
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Object Mapping', 'open', '@Url.Action("Create", "geostruct")', '#frmgeostruct', 'Message :', 'Request Falied :', '#JqGrid', 500, 1000, '#BSCALEDETAILS_List', '', function (data) { });
+        $('#corporate-table').P2BTransactionTable('#corporate-search', '#case-corporate', '@Url.Action("Get_Corporate", "geostruct")', []);
+
+        $('#Load-region').on("click", function () {
+            $('#region-table').find('td').remove();
+            var forwardata = $('#corporate-table').P2BGetTableDataonSelectedRow('#corporate-table', 1);
+            $('#region-table').P2BTransactionTable('#region-search', '#case-region', '@Url.Action("Get_region", "geostruct")', forwardata);
+        });
+        $('#Load-company').on("click", function () {
+            $('#company-table').find('td').remove();
+            var forwardata = $('#region-table').P2BGetTableDataonSelectedRow('#region-table', 1);
+            $('#company-table').P2BTransactionTable('#company-search', '#case-company', '@Url.Action("Get_company", "geostruct")', forwardata);
+        });
+        $('#Load-division').on("click", function () {
+            $('#division-table').find('td').remove();
+            var forwardata = $('#company-table').P2BGetTableDataonSelectedRow('#company-table', 1);
+            $('#division-table').P2BTransactionTable('#division-search', '#case-division', '@Url.Action("Get_division", "geostruct")', forwardata);
+        });
+        $('#Load-location').on("click", function () {
+            $('#location-table').find('td').remove();
+            var forwardata = $('#division-table').P2BGetTableDataonSelectedRow('#division-table', 1);
+            $('#location-table').P2BTransactionTable('#location-search', '#case-location', '@Url.Action("Get_location", "geostruct")', forwardata);
+        });
+        $('#Load-department').on("click", function () {
+            $('#department-table').find('td').remove();
+            var forwardata = $('#location-table').P2BGetTableDataonSelectedRow('#location-table', 1);
+            $('#department-table').P2BTransactionTable('#department-search', '#case-department', '@Url.Action("Get_department", "geostruct")', forwardata);
+        });
+        $('#Load-group').on("click", function () {
+            $('#group-table').find('td').remove();
+            var forwardata = $('#department-table').P2BGetTableDataonSelectedRow('#department-table', 1);
+            $('#group-table').P2BTransactionTable('#group-search', '#case-group', '@Url.Action("Get_group", "geostruct")', forwardata);
+        });
+        $('#Load-unit').on("click", function () {
+            $('#unit-table').find('td').remove();
+            var forwardata = $('#group-table').P2BGetTableDataonSelectedRow('#group-table', 1);
+            $('#unit-table').P2BTransactionTable('#unit-search', '#case-unit', '@Url.Action("Get_unit", "geostruct")', forwardata);
+        });
+        $('button').button();
+        $('div.transactiondiv>span.btn-span>button.refresh_btn').on('click', function (e) {
+            var a = $(this).data('type');
+            $('#' + a + '-table').find('td').remove();
+            $('#' + a + '-table').P2BTransactionTable('#' + a + '-serach', '#case-' + a + '', 'geostruct/Get_' + a + '', []);
+        });
+
+    });
+</script>
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmgeostruct", name = "frmgeostruct" }))
+    {
+        <ul>
+            <li>
+                <input type="radio" id="geo_struct" /><label for="geo_struct">Create GeoStruct</label>
+            </li>
+
+            <li>
+                <input type="radio" id="fun_stuct" />
+                <label for="fun_stuct">Create FunctionalStruct</label>
+            </li>
+            <li>
+                <input type="radio" id="pay_struct" />
+                <label for="pay_struct">Create PayStruct</label>
+            </li>
+        </ul>
+
+        <div class="filter_row">
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="corporate-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="corporate-table">
+                                    <tr><th><input type="checkbox" id="case-corporate" /></th><th>Corporate</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="corporate" id=""></button>
+                                    <button id="load-region" class="loan-btn">Load Region</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="region-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="region-table">
+                                    <tr><th><input type="checkbox" id="case-region" /></th><th>Region</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="region" id="refresh"></button>
+                                    <button id="load-company" class="loan-btn">Load Comp</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="company-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="company-table">
+                                    <tr><th><input type="checkbox" id="case-company" /></th><th>Company</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="company" id="refresh"></button>
+                                    <button id="load-division" class="loan-btn">Load Division</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div id="" style="">
+                        <div class="Division">
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="division-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="division-table">
+                                    <tr><th><input type="checkbox" id="case-division" /></th><th>Division</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="division" id="refresh"></button>
+                                    <button id="load-loction" class="loan-btn">Load Loction</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="location-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="location-table">
+                                    <tr><th><input type="checkbox" id="case-location" /></th><th>Location</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="location" id="refresh"></button>
+                                    <button id="load-department" class="loan-btn">Load Dept</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="row1">
+                <span>
+                    <div>
+                        <div>
+                            <div class="transactiondiv">
+                                <div><label>Search : </label><input type="text" id="department-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="department-table">
+                                    <tr><th><input type="checkbox" id="case-department" /></th><th>Department</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="refresh_btn" data-type="department" id="refresh"></button>
+                                    <button id="load-group" class="loan-btn">Load Group</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </div>
+
+            <div class="row1">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="group-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="group-table">
+                        <tr><th><input type="checkbox" id="case-group" /></th><th>Group</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="refresh_btn" id="refresh"></button>
+                        <button id="load-unit" data-type="group" class="loan-btn">Load Unit</button>
+                    </span>
+                </div>
+            </div>
+            <div class="row1">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="unit-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="unit-table">
+                        <tr><th><input type="checkbox" id="case-unit" /></th><th>Unit</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="refresh_btn" data-type="unit" id="refresh"></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .icon-row {
+        left: -33px;
+        position: relative;
+        top: -147px;
+    }
+
+    .row1 {
+        width: 190px;
+        display: block;
+        margin: 1px 1px 6px 6px;
+        float: left;
+    }
+
+    .row2 {
+        float: left;
+    }
+
+    .filter_row {
+        position: relative;
+        top: 0;
+    }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .refresh_btn {
+        width: 15px;
+    }
+</style>*@

@@ -1,0 +1,544 @@
+﻿<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.MisconductComplaint
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'Complaint No', 'ComplaintDate', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'Complaint No', 'ComplaintDate', 'Narration', 'Id'];
+        SortName = 'Id';
+        Caption = 'Misconduct Complaint';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Create_Dialog').P2BCreateDialog();
+        // Get Complaint Applicant Lookup
+        $('#Lookup-Complaint-Applicant').on('click', function (event) {
+            // alert("hhh");
+            $('.dialog').P2BLookUpModal('@Url.Action("GetComplaintApplicantLKDetails", "MisconductComplaint")', '', 'LookupDiv', 'ComplaintApplicant Look Up Data', '#ComplaintApplicantList', 'ComplaintApplicantList', 5, 'ComplaintApplicantList', '#frmMisconductComplaint', 'N', '#Remove-Complaint-Applicant', 'Lookup_table', 'PageNavPosition');
+
+            event.preventDefault();
+        });
+
+
+
+        // Complaint Applicant Lookup remove
+        $('#Remove-Complaint-Applicant').button().on('click', function (event) {
+
+            //a = $('#ComplaintApplicantList').P2BGetTableDataonSelectedRow('#ComplaintApplicantList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ComplaintApplicantList').P2BGetTableDataonSelectedRow('#ComplaintApplicantList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ComplaintApplicantList', $('#ComplaintApplicantList').val(), 200, 200, '#frmMisconductComplaint', '#ComplaintApplicantList');
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Lookup-OffenseObject-MisconductComplaint').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetOffenceobjectLKDetails", "MisconductComplaint")', '', 'LookupDiv', 'OffenceObject Look Up Data', '#OffenseObjectList', 'OffenseObjectList', 5, 'OffenseObjectList', '#frmMisconductComplaint', 'N', '#Remove-OffenseObject-MisconductComplaint', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // Get Victim Lookup
+        $('#Lookup-Victim-Employee').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupVictim", "MisconductComplaint")', '', 'LookupDiv', 'Victim LookUp Data', '#victimList', 'victimList', 5, 'victimList', '#frmMisconductComplaint', 'A', '#Remove-Victim-Employee', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // Victim Lookup remove
+        $('#Remove-Victim-Employee').button().on('click', function (event) {
+
+            //a = $('#victimList').P2BGetTableDataonSelectedRow('#victimList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#victimList').P2BGetTableDataonSelectedRow('#victimList', 0);
+            console.log("Verify...");
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#victimList', $('#victimList').val(), 200, 200, '#frmMisconductComplaint', '#victimList');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-CorrsContactDetails-Employee').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "MisconductComplaint")', '', 'LookupDiv', 'DocumentsProof Look Up Data', '#DocumentsProofList', 'DocumentsProofList', 5, 'DocumentsProofList', '#frmMisconductComplaint', 'A', '#Remove-OffenseObject-MisconductComplaint', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-OffenseObject-MisconductComplaint').button().on('click', function (event) {
+
+            //a = $('#OffenseObjectList').P2BGetTableDataonSelectedRow('#OffenseObjectList', 0);
+            //b = a[0];
+
+            var selectedRows = []; selectedRows = $('#OffenseObjectList').P2BGetTableDataonSelectedRow('#OffenseObjectList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#OffenseObjectList', $('#OffenseObjectList').val(), 200, 200, '#frmMisconductComplaint', '#OffenseObjectList');
+            event.preventDefault();
+        });
+        $('#Remove-DocumentsProof-MisconductComplaint').button().on('click', function (event) {
+
+            //a = $('#DocumentsProofList').P2BGetTableDataonSelectedRow('#DocumentsProofList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#DocumentsProofList').P2BGetTableDataonSelectedRow('#DocumentsProofList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DocumentsProofList', $('#DocumentsProofList').val(), 200, 200, '#frmMisconductComplaint', '#DocumentsProofList');
+            event.preventDefault();
+        });
+
+        @*var vidFileLen = $("#files")[0].files.length;
+
+        var loadbtn = $.post("@Url.Action("Create")?files=" + vidFileLen, function (data) { });*@
+
+        $('#Create').button().on("click", function () {
+            $('#frmMisconductComplaint').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create  Misconduct Complaint', 'open', '@Url.Action("Create")', '#frmMisconductComplaint', 'Message :', 'Request Falied :', '#JqGrid', 600, 650, '', '', function (data) { });
+
+        });
+
+
+        //***************** UPLOAD Documents **************/
+        $('#Upload_btnUser').button().on("click", function (event) {
+            $('#EmpLvnereq_Id').val($("#Emp").val());
+            var vidFileLength = $("#files")[0].files.length;
+            if (vidFileLength === 0) {
+                alert("No file selected.");
+                return false;
+            }
+
+            var form = $("#frmMisconductComplaint").serialize();
+            var tempExcel = new FormData($("#frmMisconductComplaint")[0]);
+            $.post({
+                url: "@Url.Action("MiscounductDocUpload", "MisConductComplaint")",
+                data: tempExcel,
+                datatype: "json",
+                method: "POST",
+                data: tempExcel,
+                cache: false,
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+                        alert("File Upload Successfully");
+                        //jQuery('.ui-dialog').remove();
+                        $('#FileDownload_idUser').hide();
+                        return false;
+                    }
+                    else {
+                        alert(data.responseText);
+                    }
+                },
+                complete: function (data) {
+                    //$('#lblloader').hide();
+                }
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+        $("#files").on("change", function (e) {
+            ////debugger;
+            var file = e.target.files[0]
+            var filesize = e.target.files[0].size;
+            var maxfilesize = 500000;//500kb
+            if (filesize <= maxfilesize) {
+                if (file.type == "application/pdf") {
+                    $('#container2').empty();
+                    $("#user_investment").hide();
+                    $("#pdfViewer").show();
+                    var fileReader = new FileReader();
+                    fileReader.onload = function () {
+                        var pdfData = new Uint8Array(this.result);
+                        // Using DocumentInitParameters object to load binary data.
+                        var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                        loadingTask.promise.then(function (pdf) {
+                            console.log('PDF loaded');
+
+                            // Fetch the first page
+                            // var pageNumber = 1;
+                            //var container = document.getElementById("container")
+                            for (var i = 1; i <= pdf.numPages; i++) {
+                                pdf.getPage(i).then(function (page) {
+                                    console.log('Page loaded');
+
+                                    var scale = 1.5;
+                                    var viewport = page.getViewport({ scale: scale });
+
+                                    var div = document.createElement("div");
+
+                                    // Set id attribute with page-#{pdf_page_number} format
+                                    div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+                                    // This will keep positions of child elements as per our needs
+                                    div.setAttribute("style", "position: relative");
+                                    div.setAttribute("class", "form-group content_margine");
+
+                                    // Append div within div#Container
+                                    container2.appendChild(div);
+
+                                    // Create a new Canvas element
+                                    var canvas = document.createElement("canvas");
+
+                                    // Append Canvas within div#page-#{pdf_page_number}
+                                    div.appendChild(canvas);
+
+                                    var context = canvas.getContext('2d');
+                                    canvas.height = viewport.height;
+                                    canvas.width = viewport.width;
+
+                                    var renderContext = {
+                                        canvasContext: context,
+                                        viewport: viewport
+                                    };
+
+                                    // Render PDF page
+                                    var renderTask = page.render(renderContext);
+                                    renderTask.promise.then(function () {
+                                        console.log('Page rendered');
+                                    });
+                                });
+                            }
+                        }, function (reason) {
+                            // PDF loading error
+                            console.error(reason);
+                        });
+                    };
+                    fileReader.readAsArrayBuffer(file);
+                } if (file.type == "image/jpeg" || file.type == "image/png") {
+                    $('#container2').empty();
+                    $("#user_investment").show();
+                    $("#pdfViewer").hide();
+                    imagesPreview(this, '#user_investment')
+                }
+                // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable');
+                $('#Upload_btnUser').button('enable');
+            } else {
+                alert("File Size Should Not Be Grater than 500kb");
+                $('#Upload_btnUser').button('disable');
+                // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            }
+        });
+
+
+
+
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+
+
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View MisconductComplaint', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //Compulsory for authorisation
+                //alert(data);
+
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmMisconductComplaint').trigger("reset");
+                    $('#ComplaintNo').val(k.ComplaintNo);
+                    if (k.ComplaintDate != null)
+                        $('#ComplaintDate').val(DateConvert(k.ComplaintDate));
+                    else
+                        $('#ComplaintDate').val();
+
+                    $('#Narration').val(k.Narration);
+                    $('#OffenseObjectList').P2BLookUpEncapsulate('#OffenseObjectList', 'OffenseObjectList', k.OffenseObject_Id, k.OffenseObjectDetails, 'OffenseObjectList', 'view', 'N');
+                    $('#ComplaintApplicantList').P2BLookUpEncapsulate('#ComplaintApplicantList', 'ComplaintApplicantList', k.ComplaintApplicant_Id, k.ComplaintApplicantDetails, 'ComplaintApplicantList', 'view', 'N');
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#DocumentsProofList').P2BLookUpEncapsulate('#DocumentsProofList', 'DocumentsProofList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'DocumentsProofList', 'view', 'A');
+                });
+
+                $.each(data[2], function (i, k) {
+                    console.log(data);
+                    $('#victimList').P2BLookUpEncapsulate('#victimList', 'victimList', k.ReturnVictim_Id, k.VictimFulldetails, 'victimList', '', 'N');
+                });
+
+            });
+        });
+
+
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-OffenseObject-MisconductComplaint').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "MisConductComplaint")', 'Create  OffenceObject', 'open', '@Url.Action("Create", "OffenseObject")', '#frmOffenseObject', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmOffenseObject', '', function (data) {
+
+                $('#OffenseObjectList').P2BLookUpEncapsulate('#OffenseObjectList', 'OffenseObjectList', data[0], data[1], 'OffenseObjectList', '#Remove-OffenseObject-MisconductComplaint', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-DocumentsProof-MisconductComplaint').on("click", function (event) {
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#DocumentsProofList').P2BLookUpEncapsulate('#DocumentsProofList', 'DocumentsProofList', data.Id, data.Val, 'DocumentsProofList', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit MisconductComplaint", '#frmMisconductComplaint', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmMisconductComplaint').trigger("reset");
+                    $('#ComplaintNo').val(k.ComplaintNo);
+                    if (k.ComplaintDate != null)
+                        $('#ComplaintDate').val(DateConvert(k.ComplaintDate));
+                    else
+                        $('#ComplaintDate').val();
+
+                    $('#Narration').val(k.Narration);
+                    $('#OffenseObjectList').P2BLookUpEncapsulate('#OffenseObjectList', 'OffenseObjectList', k.OffenseObject_Id, k.OffenseObjectDetails, 'OffenseObjectList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+                    $('#ComplaintApplicantList').P2BLookUpEncapsulate('#ComplaintApplicantList', 'ComplaintApplicantList', k.ComplaintApplicant_Id, k.ComplaintApplicantDetails, 'ComplaintApplicantList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#DocumentsProofList').P2BLookUpEncapsulate('#DocumentsProofList', 'DocumentsProofList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'DocumentsProofList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#victimList').P2BLookUpEncapsulate('#victimList', 'victimList', k.ReturnVictim_Id, k.VictimFulldetails, 'victimList', '#Remove-Victim-Employee,#Edit-ContactDetails-Location', 'N');
+                });
+
+            });
+        });
+
+        $('#ComplaintDate').P2BDatePicker();
+        $('.popup_radio_button').controlgroup();
+
+    });
+
+
+
+
+
+</script>
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmMisconductComplaint", name = "frmMisconductComplaint", enctype = "multipart/form-data" }))
+        {
+            <div class="section1">
+                <div class=" row3 content_margine">
+                    @Html.LabelFor(m => m.ComplaintNo, "Complaint No :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.ComplaintNo, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ComplaintDate, " Complaint Date:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.ComplaintDate, new { @class = "popup-content-textbox must" })
+                </div>
+            </div><br>
+
+            <div class="section2">
+                <div class=" row3 content_margine">
+                    @Html.LabelFor(m => m.OffenseObject, "Offense Object :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="OffenseObjectList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup OffenseObject" class=" popup-content-icon-lookup" id="Lookup-OffenseObject-MisconductComplaint"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create OffenseObject " class=" popup-content-icon-create" id="Create-OffenseObject-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete OffenseObject" class=" popup-content-icon-remove" id="Remove-OffenseObject-MisconductComplaint"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div><br>
+
+
+                <div class=" row3 content_margine">
+                    <label for="Documents Proof" class="popup-content-label ">Documents Proof</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="DocumentsProofList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup DocumentsProof Details" class=" popup-content-icon-lookup" id="Lookup-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create DocumentsProof " class=" popup-content-icon-create" id="Create-DocumentsProof-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Delete DocumentsProof" class=" popup-content-icon-remove" id="Remove-DocumentsProof-MisconductComplaint"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div><br>
+
+
+                @*<div class=" row3 content_margine">
+                    <label for="Documents Proof" class="popup-content-label ">Documents Proof</label>
+                    <input type="file" id="files" name="files" multiple="multiple">
+                    <button id="Upload_btnUser" name="Upload_btnUser">Upload</button>
+                </div><br>*@
+
+
+
+                <div class="row3 content_margine">
+                    <label for="Victim/Defender" class="popup-content-label ">Victim</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="victimList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Victim Details" class=" popup-content-icon-lookup" id="Lookup-Victim-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create corresponding Contact Details" class=" popup-content-icon-create" id="Create-CorrsContactDetails-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete Victim Details" class=" popup-content-icon-remove" id="Remove-Victim-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div><br>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ComplaintApplicant, "Complaint Applicant:", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ComplaintApplicantList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup ComplaintApplicant Details" class=" popup-content-icon-lookup" id="Lookup-Complaint-Applicant"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create ComplaintApplicant" class=" popup-content-icon-create" id="Create-ComplaintApplicant-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete ComplaintApplicant" class=" popup-content-icon-remove" id="Remove-Complaint-Applicant"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+                @Html.TextAreaFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div style="height:100%;width:100%;overflow:auto;" id="user_investment" class="content_margine"></div>
+            <canvas id="pdfViewer"></canvas>
+            <div id="container2" class="container2"></div>
+
+
+        }
+    </div>
+</body>
+</html>

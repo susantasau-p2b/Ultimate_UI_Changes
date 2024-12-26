@@ -1,0 +1,202 @@
+﻿@model P2b.Global.PromoPolicy
+@{
+	Layout = null;
+}
+<script>
+    $(document).ready(function (e) {
+        
+		$('button').button();
+		$('.popup_radio_button').controlgroup();
+		$('#create_dialog_promotionpolicy').P2BCreateDialog();
+		$('#Name_PromopolicyP').ValidateTextBox({ maxlength: 50, name: true });
+
+		$('#Lookup-IncrActivity-PromoPolicyP').on('click', function (event) {
+			$('.dialog').P2BLookUpModal('@Url.Action("GetIncrActivityDetails", "IncrActivity")', '', 'LookupDiv', 'Incr Activity Look Up Data', '#IncrActivitylist', 'IncrActivitylist', 5, 'IncrActivitylist', '#frmPromoPolicyP', 'N', '#Edit-IncrActivity-PromoPolicy,#Remove-IncrActivity-PromoPolicy', 'Lookup_table', 'PageNavPosition');
+			event.preventDefault();
+		});
+		$('#Create-IncrActivity-PromoPolicyP').on("click", function (event) {
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("IncrApartial", "IncrActivity")', 'Create Incr Actvity', 'open', '@Url.Action("Create", "IncrActivity")', '#frmIncrActivityP', 'Message :', 'Request Falied :', '#JqGrid', 500,700, '', '', '', '#frmPromoPolicyP', '', function (data) {
+				// to show data which is created in partial page
+				$('#IncrActivitylist').P2BLookUpEncapsulate('#IncrActivitylist', 'IncrActivitylist', data[0], data[1], 'IncrActivitylist', '#Edit-IncrActivity-PromoPolicyP,#Remove-IncrActivity-PromoPolicyP', 'N');
+			});
+			event.preventDefault();
+		});
+		$('#Edit-IncrActivity-PromoPolicyP').button().on("click", function (event) {
+			var a = [], b;
+			a = $('#IncrActivitylist').P2BGetTableDataonSelectedRow('#IncrActivitylist', 0);
+			b = a[0];
+			console.log(b);
+			//url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+			$('<div></div>').P2BPatialEditModalDialog('@Url.Action("IncrApartial", "IncrActivity")', '@Url.Action("Edit", "IncrActivity")', b, '@Url.Action("EditSave", "IncrActivity")', 'Edit Incr Activity details Details', '#frmIncrActivityP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 650, '#frmPromoPolicyP', '#IncrActivitylist', 'IncrActivitylist', 'IncrActivitylist', 'N', '', function (data) {
+				// setTimeout(function () {
+				$.each(data[0], function (i, k) {
+					$('#frmIncrActivityP').trigger('reset');
+					$('#IncrActivityP_Name').val(k.Name);
+					$('#IncrActivity_List').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 307, k.IncrList_id);
+				});
+
+				$.each(data[1], function (i, k) {
+
+					$('#IncrPolicyList').P2BLookUpEncapsulate('#IncrPolicyList', 'IncrPolicyList', k.IncrPolicy_Id, k.IncrPolicy_FullDetails, 'IncrPolicyList', '#Edit_IncrPolicy_IncrActivity,#Remove_IncrPolicy_IncrActivity', 'N');
+					$('#StagIncrPolicyList').P2BLookUpEncapsulate('#StagIncrPolicyList', 'StagIncrPolicyList', k.StagIncrPolicy_Id, k.StagIncrPolicy_FullDetails, 'StagIncrPolicyList', '#Edit_StagIncrPolicy_IncrActivity,#Remove_StagIncrPolicy_IncrActivity', 'N');
+				});
+				// }, 3000);
+			});
+			event.preventDefault();
+		});
+		$('#Remove-IncrActivity-PromoPolicyP').button().on('click', function (event) {
+			//dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+			//var a = [], b;
+			//a = $('#IncrActivitylist').P2BGetTableDataonSelectedRow('#IncrActivitylist', 0);
+			//b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#IncrActivitylist').P2BGetTableDataonSelectedRow('#IncrActivitylist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#IncrActivitylist', $('#IncrActivitylist').val(), 200, 200, '#frmPromoPolicyP', '#IncrActivitylist', '');
+			event.preventDefault();
+		});
+		$('#Name_PromopolicyP').MaxLength(50);
+		$('#IncrActivitylist');	
+	});
+</script>
+<style>
+
+
+	.icon-row {
+		position: relative;
+		left: 144px;
+		top: -150px;
+	}
+
+	#BusinessType-button {
+		font-size: 9px;
+		padding-top: 1px;
+		font-weight: bold;
+	}
+
+	.popup-content-label {
+		display: block;
+		float: left;
+		width: 178px;
+	}
+
+	.popup-content-textbox {
+		margin-bottom: 1px;
+		min-width: 150px;
+	}
+
+	.row3 {
+		width: 490px;
+	}
+
+	.row4 {
+		position: absolute;
+		top: 294px;
+		width: 400px;
+	}
+
+	.popup-content-textbox-long {
+		margin-bottom: 1px;
+		width: 290px;
+	}
+
+
+	.row2 {
+		width: 402px;
+	}
+        
+
+
+
+
+</style>
+
+<div>
+
+
+	@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPromoPolicyP", name = "frmPromoPolicyP" }))
+	{
+		<div class="row3 content_margine ">
+			@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", id = "Name_PromopolicyP" })
+		</div>
+
+
+		<div class="row3 content_margine ">
+			<div id="IncrActivitylist_old"></div>
+			@Html.LabelFor(m => m.IncrActivity, "IncrActivity :", new { @class = "popup-content-label" })
+			<div class="popup-content-table">
+				<table class="lookuptableselected" id="IncrActivitylist">
+					<tr><th>Id</th><th>LookUp Selected Description</th></tr>
+				</table>
+			</div>
+			<div class="icon-row">
+				<button data-p2btooltip="Select IncrActivity" class="  popup-content-icon-lookup" id="Lookup-IncrActivity-PromoPolicyP"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+				@*<button data-p2btooltip="Create IncrActivity" class="popup-content-icon-create" id="Create-IncrActivity-PromoPolicyP"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+				<button data-p2btooltip="Edit IncrActivity" class="popup-content-icon-edit" id="Edit-IncrActivity-PromoPolicyP"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+				<button data-p2btooltip="Remove IncrActivity" class="popup-content-icon-remove" id="Remove-IncrActivity-PromoPolicyP"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+			</div>
+		</div>
+
+		<div class="row3 content_margine">
+			@Html.LabelFor(m => m.IsActionDateAsIncrDate, "Promotion Date as Increment:", new { @class = "popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="radio1" name="IsActionDateAsIncrDate" value="true" /><label for="radio1">Yes</label>
+				<input type="radio" id="radio2" name="IsActionDateAsIncrDate" value="false" checked="checked" /><label for="radio2">No</label>
+
+			</div>
+		</div>
+		<div class="row3 content_margine ">
+			@Html.LabelFor(m => m.IsFuncStructChange, "Func Struct Change Appl :", new { @class = "popup-content-label" })
+			<div class="popup_radio_button">
+
+				<input type="radio" id="radio3" name="IsFuncStructChange" value="true" /><label for="radio3">Yes</label>
+				<input type="radio" id="radio4" name="IsFuncStructChange" value="false" checked="checked" /><label for="radio4">No</label>
+
+			</div>
+		</div>
+		<div class="row3 content_margine ">
+
+			@Html.LabelFor(m => m.IsNewScaleIncrAction, "Increment On New Scale :", new { @class = "popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="radio5" name="IsNewScaleAction" value="true" /><label for="radio5">Yes</label>
+				<input type="radio" id="radio6" name="IsNewScaleAction" value="false" checked="checked" /><label for="radio6">No</label>
+
+			</div>
+		</div>
+		<div class="row3 content_margine ">
+			@Html.LabelFor(m => m.IsOldScaleIncrAction, "Increment On Old Scale :", new { @class = "popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="radio7" name="IsOldScaleAction" value="true" /><label for="radio7">Yes</label>
+				<input type="radio" id="radio8" name="IsOldScaleAction" value="false" checked="checked" /><label for="radio8">No</label>
+
+			</div>
+		</div>
+		<div class="row3 content_margine">
+			@Html.LabelFor(m => m.IsPayJobStatusChange, "Pay JobStatus Change Appl :", new { @class = "popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="radio9" name="IsPayJobStatusChange" value="true" /><label for="radio9">Yes</label>
+				<input type="radio" id="radio10" name="IsPayJobStatusChange" value="false" checked="checked" /><label for="radio10">No</label>
+
+			</div>
+		</div>
+		<div class="row3 content_margine">
+			@Html.LabelFor(m => m.IsPayStructChange, "Pay Structure Change Appl :", new { @class = "popup-content-label" })
+			<div class="popup_radio_button ">
+
+				<input type="radio" id="radio11" name="IsPayStructChange" value="true" /><label for="radio11">Yes</label>
+				<input type="radio" id="radio12" name="IsPayStructChange" value="false" checked="checked" /><label for="radio12">No</label>
+
+			</div>
+		</div>
+
+
+
+
+	}
+
+</div>
+

@@ -1,0 +1,267 @@
+﻿@{
+    Layout = null;
+}
+
+@model Training.Category
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+        $('button').button();
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        //"#StayFees","#TrainingFees",  "#TravelFees"
+
+        $('#codecat').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#Detailscat').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+        //$('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+
+
+
+        $('#Lookup-SubCategory-Category').button().on('click', function (event) {
+            $('.Lookup_Increment22').P2BLookUpModal('@Url.Action("GetSubCategoryLKDetails", "Category")', '', 'lookupdiv22', 'Sub Category Look Up Data', '#SubCategorylist', 'SubCategorylist', 5, 'SubCategorylist', '#frmCategoryP', 'A', '', 'Lookup_table', 'pageNavPosition22');
+            event.preventDefault();
+        });
+
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-SubCategory-Category').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "SubCategory")', 'Create Sub Category', 'open', '@Url.Action("Create", "SubCategory")', '#frmSubCategoryP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCategoryP', '', function (data) {
+                $('#SubCategorylist').P2BLookUpEncapsulate('#SubCategorylist', 'SubCategorylist', data[0], data[1], 'SubCategorylist', '', 'A');
+            });
+            event.preventDefault();
+        });
+        $('#Edit-SubCategory-Category').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#SubCategorylist').P2BGetTableDataonSelectedRow('#SubCategorylist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "SubCategory")', '@Url.Action("Edit", "SubCategory")', b, '@Url.Action("EditSave", "SubCategory")', 'Edit Sub Category', '#frmSubCategoryP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCategoryP', '#SubCategorylist', 'SubCategorylist', 'SubCategorylist', 'A', '', function (data) {
+                // setTimeout(function () {
+
+                $.each(data[0], function (i, k) {
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Details').val(k.Details);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                    $('#BudgetlistS').P2BLookUpEncapsulate('#BudgetlistS', 'BudgetlistS', k.Budget_Id, k.Budget_val, 'BudgetlistS', '', 'A');
+
+                });
+
+                //$.each(data[0], function (i, k) {
+                //    $('#frmSubCategoryP').trigger('reset');
+                //    $('#CodeS').val(k.Code);
+                //    $('#CodeS').attr('readonly', 'readonly');
+                //    $('#DetailsS').val(k.Details);
+                //});
+
+                //$.each(data[1], function (i, k) {
+                //    $('#ProgramListlist').P2BLookUpEncapsulate('#ProgramListlist', 'ProgramListlist', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlist', '', 'A');
+                //});
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-SubCategory-Category').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#SubCategorylist').P2BGetTableDataonSelectedRow('#SubCategorylist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Category")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SubCategorylist', $('#SubCategorylist').val(), 200, 200, '#frmCategoryP', '#SubCategorylist', '#Edit-ContactDetails-Category,#Remove-ContactDetails-Category');
+            event.preventDefault();
+        });
+
+        $('#Lookup-Budget-Category').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "Budget")', '', 'LookupDiv', '  Look Up Data', '#BudgetlistC', 'BudgetlistC', 5, 'BudgetlistC', '#frmCategory', 'N', ' ', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+      
+
+
+            @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Budget-Category').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Budget")', 'Create Budget', 'open', '@Url.Action("Create", "Budget")', '#frmBudget', 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '', '', '', '#frmCategory', '', function (data) {
+                $('#Budgetlist').P2BLookUpEncapsulate('#Budgetlist', 'Budgetlist', data[0], data[1], 'Budgetlist', '', 'N');
+            });
+            event.preventDefault();
+        });*@
+
+
+    $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Budget-Category').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Budget")', 'Create Budget', 'open', '@Url.Action("Create", "Budget")', '#frmBudgetP', 'Message :', 'Request Falied :', '#JqGrid', 205, 385, '', '', '', '#frmCategory', '', function (data) {
+                $('#BudgetlistC').P2BLookUpEncapsulate('#BudgetlistC', 'BudgetlistC', data[0], data[1], 'BudgetlistC', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-Budget-Category').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#BudgetlistC').P2BGetTableDataonSelectedRow('#BudgetlistC', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Budget")', '@Url.Action("Edit", "Budget")', b, '@Url.Action("EditSave", "Budget")', 'Edit Budget Details', '#frmBudgetP', b, 'Message :', 'Request Falied :', '#JqGrid', 205, 385, '#frmCategory', '#BudgetlistC', 'BudgetlistC', 'BudgetlistC', 'N', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmBudget').trigger('reset');
+                    $('#BudgetCredit').val(k.BudgetCredit);
+                    $('#BudgetDebit').val(k.BudgetDebit);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+        $('#Remove-Budget-Category').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#BudgetlistC').P2BGetTableDataonSelectedRow('#BudgetlistC', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#BudgetlistC', $('#BudgetlistC').val(), 200, 200, '#frmCategory', '#BudgetlistC');
+            event.preventDefault();
+        });
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+
+    });
+
+
+</script>
+
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Lookup_Increment">
+        <div title="LookUp Data">
+            <div class="lookupdiv2"></div>
+        </div>
+        <div id="pageNavPosition2">
+
+        </div>
+    </div>
+    <div class="Lookup_Increment22">
+        <div title="LookUp Data">
+            <div class="lookupdiv22"></div>
+        </div>
+        <div id="pageNavPosition22">
+
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create SubCategory">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCategoryP" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Code, " Code :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "codecat", @maxlength = "10" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Details, "Details :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Details, new { @class = "popup-content-textbox must", @id = "Detailscat", @maxlength = "50" })</div>
+
+            <div class="row3 content_margine">
+                <div id="SubCategorylist_old"></div>@Html.LabelFor(m => m.SubCategory, "Sub Category :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="SubCategorylist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Sub Category Details" class="  popup-content-icon-lookup" id="Lookup-SubCategory-Category"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Sub Category Details" class="  popup-content-icon-create" id="Create-SubCategory-Category"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Sub Category Details" class="  popup-content-icon-edit" id="Edit-SubCategory-Category"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Sub Category Details" class="  popup-content-icon-remove" id="Remove-SubCategory-Category"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="Budgetlist_old"></div>@Html.LabelFor(m => m.Budget, "Budget :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="BudgetlistC">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Budget Details" class="  popup-content-icon-lookup" id="Lookup-Budget-Category"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Budget Details" class="  popup-content-icon-create" id="Create-Budget-Category"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Budget Details" class="  popup-content-icon-edit" id="Edit-Budget-Category"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Budget Details" class="  popup-content-icon-remove" id="Remove-Budget-Category"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+
+</html>

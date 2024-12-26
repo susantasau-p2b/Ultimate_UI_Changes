@@ -1,0 +1,164 @@
+﻿@{
+    ViewBag.Title = "Hotel Eligibility policy";
+}
+@model Payroll.HotelEligibilityPolicy
+<style>
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 180px;
+    }
+</style>
+
+<html>
+<head>
+    <title>@ViewBag.title</title>
+    @*<link href="~/Content/tds_master/tds_master.css" rel="stylesheet" />*@
+    <script>
+    $(document).ready(function () {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        //a.Id, a.IncomeRangeFrom, a.IncomeRangeTo, a.SurchargeAmount, a.Percentage, a.Amount, a.EduCessPercent, a.EduCessAmount, a.SurchargePercent
+        var SortName, Caption, url, width, height;
+        ColModel = ['HotelEligibilityCode', 'Hotel Type', 'Room Type', 'Lodging Elligible Amt PerDay', 'Food Elligible Amt PerDay', 'Id'];
+        ColNames = ['HotelEligibilityCode', 'Hotel Type', 'Room Type', 'Lodging Elligible Amt PerDay', 'Food Elligible Amt PerDay', 'Id'];
+        SortName = 'Id';
+        Caption = 'Hotel Eligibility Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            //  $('#Cat').oldDropval("Category");
+            $("#frmTDS").trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', 0, '', '', 'Create Hotel Eligibility Policy', 'open', '@Url.Action("Create")', '#frmTDS', 'Message :', 'Request Falied :', '#JqGrid', 350, 400, '', '', function (data) {
+                $('#HotelTypelist').prop('disabled', false);
+                $('#HotelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3003, "");
+                $('#RoomTypelist').prop('disabled', false);
+                $('#RoomTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3004, "");
+            });
+        });
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Edit').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("edit")', dt.Id, '@Url.Action("EditSave")', "Edit Hotel Eligibility Policy Data", '#frmTDS', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 350, 400, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#HotelEligibilityCode').attr('readonly', 'readonly');
+                    $('#HotelEligibilityCode').val(k.HotelEligibilityCode);
+                    $('#Lodging_Eligible_Amt_PerDay').val(k.Lodging_Eligible_Amt_PerDay);
+                    $('#Food_Eligible_Amt_PerDay').val(k.Food_Eligible_Amt_PerDay);
+                    $('#HotelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3003, k.HotelType_Id);
+                    $('#RoomTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3004, k.RoomType_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    //  $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, k.Category_Id);
+
+                });
+
+            });
+        });
+
+
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Hotel Eligibility Policy Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#HotelEligibilityCode').attr('readonly', 'readonly');
+                        $('#HotelEligibilityCode').val(k.HotelEligibilityCode);
+                        $('#Lodging_Eligible_Amt_PerDay').val(k.Lodging_Eligible_Amt_PerDay);
+                        $('#Food_Eligible_Amt_PerDay').val(k.Food_Eligible_Amt_PerDay);
+                        $('#HotelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3003, k.HotelType_Id);
+                        $('#RoomTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3004, k.RoomType_Id);
+                    });
+
+                  
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[2] != null) {
+                            $('#Name').oldVal(data[2].Name);
+                            $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                            $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                        }
+                    }
+                });
+            });
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are You Sure You Want To Delete', 'Message : ', 'Request failed', '#JqGrid');
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "60px" });
+        $('#Lodging_Eligible_Amt_PerDay').attr("value", "0").ForceAmount().MaxLength(10);
+        $('#Food_Eligible_Amt_PerDay').attr("value", "0").ForceAmount().MaxLength(10);
+        //$('#Percentage').attr("value", "0.0").ForcePercent().MaxLength(4);
+        //$('#Amount').attr("value", "0").ForceAmount().MaxLength(10);
+        //$('#EduCessPercent').attr("value", "0.0").ForcePercent().MaxLength(4);
+        //$('#EduCessAmount').attr("value", "0").ForceAmount().MaxLength(10);
+        //$('#SurchargePercent').attr("value", "0.0").ForcePercent().MaxLength(4);
+        //$('#SurchargeAmount').attr("value", "0").ForceAmount().MaxLength(10);
+
+
+    });
+    </script>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+
+
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTDS" }))
+        {
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.HotelEligibilityCode, "Hotel Eligibility Code :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.HotelEligibilityCode, new { @class = "popup-content-textbox", @id = "HotelEligibilityCode", @maxlength = "10" })
+            </div>
+            
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.HotelType, new { @class = "popup-content-label must" })
+                <select class="drop" id="HotelTypelist" name="HotelTypelist" style="width:120px;">
+                    <option value="0">-Select-</option>
+                </select>
+        </div>
+            
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.RoomType, new { @class = "popup-content-label must" })
+                <select class="drop" id="RoomTypelist" name="RoomTypelist" style="width:120px;">
+                    <option value="0">-Select-</option>
+                </select>
+        </div>
+            
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.Lodging_Eligible_Amt_PerDay, "Lodging Eligible Amt PerDay :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Lodging_Eligible_Amt_PerDay, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.Food_Eligible_Amt_PerDay, "Food Eligible Amt PerDay :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Food_Eligible_Amt_PerDay, new { @class = "popup-content-textbox" })
+            </div>
+                      
+
+        }
+    </div>
+
+</body>
+</html>

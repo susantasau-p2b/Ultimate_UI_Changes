@@ -1,0 +1,735 @@
+﻿@{
+    ViewBag.Title = "Loan Advance Request PFT";
+}
+@model P2B.PFTRUST.LoanAdvRequestPFT
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-label2 {
+            display: block;
+            float: left;
+            margin-left: -72px;
+           
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row4 {
+            width: 238px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+
+        .form-of-element {
+            display: block;
+            border: #DEDEDE solid 0.1px;
+            width: auto;
+            height: 800px;
+            padding: 5px 2px;
+            margin-top: 3px;
+        }
+
+        .select_div {
+        }
+
+        .section1 {
+            margin-top: 10px;
+            /*    width: 200px;*/
+        }
+
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            /*  width: 170px;*/
+            margin-right: 50px;
+        }
+
+        .popup-content-textbox1 {
+            margin-bottom: 1px;
+            min-width: 150px;
+            margin-right: 30px;
+        }
+
+        .section7_Leave {
+            display: block;
+            border: 1px solid #51e7d0;
+            height: 116px;
+            width: 348px;
+            margin: 9px 4px;
+            position: absolute;
+            left: 827px;
+        }
+
+        .section8_Leave {
+            display: block;
+            border: 1px solid #51e7d0;
+            height: 116px;
+            width: 348px;
+            margin: 152px 4px;
+            position: absolute;
+            left: 827px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left">
+                    <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="add">Add</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                @*<button class="button" id="Delete">Delete</button>*@
+                @*<button class="button" id="release">Release</button>*@
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLoanAdvRequestPFT", name = "frmLoanAdvRequestPFT" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" name="geo_id" class="filter_structure_id" />
+            <input id="pay_id" name="pay_id" class="filter_structure_id" />
+            <input id="fun_id" name="fun_id" class="filter_structure_id" />
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <div class="form-of-element">
+                <div class="fileremployee">
+                    <div class="employee-transcationdiv" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                        <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="add-dialog-content" style="margin-right:175px">
+                    <div class="row3 content_margine">
+                        <div id="LoanAdvanceHeadlist_old"></div>
+                        @Html.LabelFor(m => m.LoanAdvanceHeadPFT, "Loan Advance Head :", new { @class = "popup-content-label must" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LoanAdvanceHeadlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup LoanAdvance Head" class="popup-content-icon-lookup" id="Lookup-LoanAdvanceHead-LoanAdvRequest"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove LoanAdvance Head" class="popup-content-icon-remove" id="Remove-LoanAdvanceHead-LoanAdvRequest"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LoanAccBranch, " Loan Account Branch:", new { @class = "popup-content-label must" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LoanAccBranchlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Loan Account Branch" class="popup-content-icon-lookup" id="Lookup-LoanAccBranch-LoanAdvRequest"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Loan Account Branch" class="popup-content-icon-remove" id="Remove-LoanAccBranch-LoanAdvRequest"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    @*<div class="row2 select_div content_margine">@Html.LabelFor(m => m.LoanAccBranch, "Loan Account Branch :", new { @class = "popup-content-label must" })<select id="LoanAccBranchlist" name="LoanAccBranchlist" class="must" style="width:159px;"><option value="0">-Select-</option></select></div>*@
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.LoanAccNo, "Loan Account No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LoanAccNo, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.RequisitionDate, "Requisition Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.RequisitionDate, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.SanctionedDate, "Sanctioned Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SanctionedDate, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.LoanAppliedAmount, "Loan Applied Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LoanAppliedAmount, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.LoanSanctionedAmount, "Loan Sanctioned Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LoanSanctionedAmount, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.MonthlyInstallmentAmount, "Monthly Installment Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MonthlyInstallmentAmount, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.TotalInstall, "Total Install :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TotalInstall, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.MonthlyPricipalAmount, "Monthly Principal Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MonthlyPricipalAmount, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.MonthlyInterest, "Monthly Interest :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MonthlyInterest, new { @class = "popup-content-textbox must" })</div>
+
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.EnforcementDate, "Enforcement Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EnforcementDate, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row2 content_margine">
+                        @Html.LabelFor(m => m.IsActive, "Active :", new { @class = "popup-content-label" })
+                        <div class="popup_radio_button">
+                            <div id="radioset">
+                                <span><input type="radio" id="radio1" name="IsActive" value="true" checked="checked" /> <label for="radio1">Yes</label></span>
+                                <span><input type="radio" id="radio2" name="IsActive" value="false" /> <label for="radio2">No</label></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row2 content_margine" style="visibility:hidden">@Html.LabelFor(m => m.CloserDate, "Closer Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.CloserDate, new { @class = "popup-content-textbox", disabled = "disabled" })</div>
+                    <div>
+                        <div><label style="font-size:15px;text-decoration:underline">Bifurcate and update Loan Amount according Criteria </label></div>
+                        <div class="section1">
+                            <label style="margin-right:170px"></label>
+                            <label style="margin-right:270px; font-size:12px">Contibution</label>
+                            <label style="font-size:12px">Interest</label>
+                        </div>
+                        <div class="section1">@Html.LabelFor(m => m.OwnPFAmount, "Own PF :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnPFAmount, new { @class = "popup-content-textbox", @style = "margin-right:180px" })@Html.TextBoxFor(m => m.OwnPFIntAmount, new { @class = "popup-content-textbox" })</div>
+                        <div class="section1">@Html.LabelFor(m => m.OwnerPFAmount, "Owner PF :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OwnerPFAmount, new { @class = "popup-content-textbox", @style = "margin-right:180px" })@Html.TextBoxFor(m => m.OwnerPFIntAmount, new { @class = "popup-content-textbox" })</div>
+
+                        <div class="section1">@Html.LabelFor(m => m.VPFAmount, "VPF PF:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.VPFAmount, new { @class = "popup-content-textbox", @style = "margin-right:180px" })@Html.TextBoxFor(m => m.VPFIntAmount, new { @class = "popup-content-textbox" })</div>
+
+                        <div class="section1">@Html.LabelFor(m => m.PaymentMode, "PayMode :", new { @class = "popup-content-label must" })<select class="selectmenu must" style="width:120px" id="PayMode_drop" name="PayMode_drop"><option>-Select-</option></select></div>
+                        <div id="hidedivdetails">
+                            <div class="section1">@Html.LabelFor(m => m.ChequeNo, "ChequeNo :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ChequeNo, new { @class = "popup-content-textbox" })</div>
+                            <div class="section1">@Html.LabelFor(m => m.ChequeDate, "ChequeDate :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ChequeDate, new { @class = "popup-content-textbox" })</div>
+                        </div>
+                        <div class="section1">@Html.LabelFor(m => m.BankBranchDetails, "BranchDetails :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BankBranchDetails, new { @class = "popup-content-textbox" })</div>
+
+                    </div>
+                </div>
+                <div class="section7_Leave">                  
+                    <div style=" float: left; margin-left: 88px;">
+                        <label>PF Creteria</label><br><br>
+                        <label class="popup-content-label2">Own:</label><label id="labelOwnpfcrta"></label><br><br>
+                        <label class="popup-content-label2">Owner:</label><label id="labelOwnerpfcrta"></label><br><br>
+                        <label class="popup-content-label2">VPF:</label> <label id="labelVPFpfcrta"></label>
+                        <input type="hidden" id="labelOwnpfcrta" name="labelOwnpfcrta">
+                    </div>
+                    <div style="float: left; margin-left: 241px; margin-top: -89px;">
+                        <label>Int Creteria</label><br><br>
+                        <label id="labelOwnIntcrta"></label><br><br>
+                        <label id="labelOwnerIntcrta"></label><br><br>
+                        <label id="labelVPFIntcrta"></label><br><br>
+                    </div>                 
+                </div>
+
+                <div class="section8_Leave">
+                    <div style=" float: left; margin-left: 88px;">
+                        <label>PF Actual Balance</label><br><br>
+                        <label class="popup-content-label2">Own:</label><label id="labelOwnpfactl"></label><br><br>
+                        <label class="popup-content-label2">Owner:</label><label id="labelOwnerpfactl"></label><br><br>
+                        <label class="popup-content-label2">VPF:</label><label id="labeVPFlpfactl"></label>
+                    </div>
+                    <div style="float: left; margin-left: 241px; margin-top: -89px;">
+                        <label>Int Actual Balance</label><br><br>
+                        <label id="labelOwnIntactl"></label><br><br>
+                        <label id="labelOwnerIntactl"></label><br><br>
+                        <label id="labeVPFlIntactl"></label>
+                    </div>
+                </div>               
+            </div>
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $('#hidedivdetails').hide();
+    $(document).ready(function (e) {
+        $('button').button();
+
+        $('#hidedivdetails').hide();
+        $("#PayMode_drop").on("selectmenuchange", function () {
+            // alert($(this).text());
+            // alert($("#PayMode_drop :selected").text());
+
+            if ($("#PayMode_drop :selected").text() == "Cheque") {
+                $('#hidedivdetails').fadeIn();
+
+            }
+            else {
+                $('#hidedivdetails').fadeOut();
+            }
+
+
+        });
+
+
+        $('input[name="IsActive"]:radio').change(function () {
+            if (this.value == "false") { $('#CloserDate').prop("disabled", false); $('#CloserDate').val(""); }
+            else { $('#CloserDate').prop("disabled", true); }
+        });
+
+        $('#Load').on('click', function (e) {
+            //$('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        // PayMonthObj();
+        $('#Load').on('click', function () {
+
+            if ($('#txtPayMonth').val()) {
+                $.LocalStorageHelper("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //  localStorage.setItem("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //PayMonthObj.SetMonth($('#txtPayMonth').val());
+            }
+            //paramdataload = PayMonthObj.GetMonth();
+            //   console.log(PayMonthObj.GetMonth());
+            // localStorage.setItem("LoanAdvRequest_LoadEmp", paramdataload);
+
+        });
+        $('#reset').on('click', function () {
+            //localStorage.setItem("LoanAdvRequest_LoadEmp", "");
+            $.LocalStorageHelper("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+            //  PayMonthObj.SetMonth();
+            $('#txtPayMonth').val("");
+            // console.log(PayMonthObj.GetMonth());
+        });
+        //var PayMonthObj = {
+        //    Month: null,
+        //    SetMonth: function (val) {
+        //        if (val != null || val != undefined) this.Month = val;
+        //        this.Month = null;
+        //    },
+        //    GetMonth: function () {
+        //        return this.Month;
+        //    }
+
+        //};
+        //$('#loademp').on('click', function () {
+        //    if ($('#txtPayMonth').val()) {
+        //        PayMonthObj.SetMonth($('#txtPayMonth').val());
+        //    }
+        //});
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid")",
+            editurl: "@Url.Action("EditGridDetails", "LoanAdvRequestPFT")",
+            htmurl: "@Url.Action("partial", "LoanAdvRequestPFT")",
+            submiturl: "@Url.Action("GridEditSave", "LoanAdvRequestPFT")",
+            columnname: ["Code", "Name", "Location", "Id", ],
+            childheader: ["LoanAdvHeadPFT", "LoanAccNo", "LoanAccBranch", "ReqDate", "EnforcementDate", "LoanAppliedAmt", "LoanSancAmt", "MonthlyInstallAmt", "TotalInstall", "LoanStatus", "OwnPFAmount", "OwnerPFAmount", "VPFAmount", "OwnPFIntAmount", "OwnerPFIntAmount", "VPFIntAmount", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            childurl: "@Url.Action("Get_LoanAdvReq", "LoanAdvRequestPFT")",
+            tableheader: "Loan Advance Request PFT",
+            childurlColumnNo: "4"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequestPFT")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequestPFT")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequestPFT")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequestPFT")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequestPFT")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequestPFT")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    //console.log(data);
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h_PFT?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+        $('#LoanAccNo').ForceOnlyNumeric();
+        $('#OwnPFAmount').ForceOnlyNumeric();
+        $('#OwnerPFAmount').ForceOnlyNumeric();
+        $('#VPFAmount').ForceOnlyNumeric();
+        $('#OwnPFIntAmount').ForceOnlyNumeric();
+        $('#OwnerPFIntAmount').ForceOnlyNumeric();
+        $('#VPFIntAmount').ForceOnlyNumeric();
+
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#CreateRelease_dialog').P2BCreateDialog();
+        //Create Function
+        $('#add').on("click", function (event) {
+
+            //$('#frmLoanAdvRequest').trigger("reset");
+            //$.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+            $.LoadEmpByDefaultPFTRUST(false, "");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Loan Advance Request PFT', 'open', '@Url.Action("Create")', '#frmLoanAdvRequestPFT', 'Message :', 'Request Falied :', '#JqGrid', 850, 1210, '', '', function (data) { });
+            $('input[name="IsActive"]:radio').filter('[value=true]').prop('checked', true);
+            $('#RequisitionDate').attr('readonly', true);
+            $('#SanctionedDate').attr('readonly', true);
+            $('#EnforcementDate').attr('readonly', true);
+            //$('#OwnPFAmount').prop("readonly", true);
+            //$('#OwnerPFAmount').prop("readonly", true);
+            //$('#VPFAmount').prop("readonly", true);
+            //$('#OwnPFIntAmount').prop("readonly", true);
+            //$('#OwnerPFIntAmount').prop("readonly", true);
+            //$('#VPFIntAmount').prop("readonly", true);
+
+            $('#PayMode_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 404, "");
+            // $('#LoanAccBranchlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownLocList", "LoanAdvRequest")', "", ""); // To bind dropdown on page load
+            $("#MonthlyInterest").on('focusout', function () {
+
+                var c = $("#MonthlyInstallmentAmount").val();
+                var a = $("#MonthlyInterest").val();
+                var b = $("#MonthlyPricipalAmount").val();
+                var d = parseInt(a) + parseInt(b);
+
+                if (parseInt(c) > parseInt(d)) {
+                    $("#MonthlyInterest").val("");
+                    alert("Monthly installment amount should not be greater than principal + Interest");
+                }
+
+                if (parseInt(c) < parseInt(d)) {
+                    $("#MonthlyInterest").val("");
+                    alert("Monthly installment amount should not be less than principal + Interest");
+                }
+
+            });
+
+            $("#TotalInstall").on('focusout', function () {
+
+                var a = $("#LoanSanctionedAmount").val();
+                var b = $("#TotalInstall").val();
+                var c = $("#MonthlyInstallmentAmount").val();
+
+                var d = parseInt(b) * parseInt(c);
+
+                if (parseInt(a) < parseInt(d)) {
+                    //$("#TotalInstall").val("");
+                    ////debugger;
+                    var e = confirm("Total no of installments should not be greater than loan sanctioned amount");
+                    if (e == true) {
+                        $("#TotalInstall").val("");
+                    }
+                    else {
+                        $("#TotalInstall").val(b);
+                    };
+                }
+
+                if (parseInt(a) > parseInt(d)) {
+                    ////debugger;
+                    var d = confirm("Total no of installments should not be less than loan sanctioned amount");
+                    if (d == true) {
+                        $("#TotalInstall").val("");
+                    }
+                    else {
+                        $("#TotalInstall").val(b);
+                    };
+
+                }
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-LoanAdvanceHead-LoanAdvRequest').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLoanAdvHeadLKDetails", "LoanAdvRequestPFT")', '', 'LookupDiv', 'Look Up Data', '#LoanAdvanceHeadlist', 'LoanAdvanceHeadlist', 5, 'LoanAdvanceHeadlist', '#frmLoanAdvRequestPFT', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+
+        });
+
+        $('#Remove-LoanAdvanceHead-LoanAdvRequest').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#LoanAdvanceHeadlist').P2BGetTableDataonSelectedRow('#LoanAdvanceHeadlist', 0);
+            //b = a[0];
+            var selectedRow = [];
+            selectedRow = $('#LoanAdvanceHeadlist').P2BGetTableDataonSelectedRow('#LoanAdvanceHeadlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LoanAdvanceHeadlist', $('#LoanAdvanceHeadlist').val(), 200, 200, '#frmLoanAdvRequestPFT', '#LoanAdvanceHeadlist', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LoanAccBranch-LoanAdvRequest').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("PopulateDropDownLocList", "LoanAdvRequest")', '', 'LookupDiv', 'Look Up Data', '#LoanAccBranchlist', 'LoanAccBranchlist', 5, 'LoanAccBranchlist', '#frmLoanAdvRequestPFT', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-LoanAccBranch-LoanAdvRequest').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#LoanAccBranchlist').P2BGetTableDataonSelectedRow('#LoanAccBranchlist', 0);
+            //b = a[0];
+            var selectedRow = [];
+            selectedRow = $('#LoanAccBranchlist').P2BGetTableDataonSelectedRow('#LoanAccBranchlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LoanAccBranchlist', $('#LoanAccBranchlist').val(), 200, 200, '#frmLoanAdvRequestPFT', '#LoanAccBranchlist', '');
+            event.preventDefault();
+        });
+
+        $('#Btn-Upload-Data').on('click', function (e) {
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            var Empid = $(this).val();
+            $("#LoanAppliedAmount").keyup(function () {
+
+                var text = $('#LoanAdvanceHeadlist').text();
+                var arr1 = [];
+                arr1 = text.split(":");
+                var arr = arr1[1].toString();
+                var arr2 = arr.split(",");
+                var a = arr2[0];
+                $.post("@Url.Action("GetContributionperct")", { Emp: Empid.toString(), Codes: a.toString() }, function (data) {
+                    $('#OwnPFAmount').val(data[0]);
+                    $('#OwnerPFAmount').val(data[1]);
+                    $('#VPFAmount').val(data[2]);
+                    $('#OwnPFIntAmount').val(data[3]);
+                    $('#OwnerPFIntAmount').val(data[4]);
+                    $('#VPFIntAmount').val(data[5]);
+                    $('#labelOwnpfcrta').html(data[0]);
+                    $('#labelOwnerpfcrta').html(data[1]);
+                    $('#labelVPFpfcrta').html(data[2]);
+                    $('#labelOwnpfactl').html(data[6]);
+                    $('#labelOwnerpfactl').html(data[7]);
+                    $('#labeVPFlpfactl').html(data[8]);
+                    $('#labelOwnIntcrta').html(data[3]);
+                    $('#labelOwnerIntcrta').html(data[4]);
+                    $('#labelVPFIntcrta').html(data[5]);
+                    $('#labelOwnIntactl').html(data[9]);
+                    $('#labelOwnerIntactl').html(data[10]);
+                    $('#labeVPFlIntactl').html(data[11]);
+                });
+
+            });
+        });
+
+        $("#OwnPFAmount").keyup(function () {
+
+            var v1 = $("#labelOwnpfcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#OwnPFAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply own pf loan amount should not be grater than own pf criteria amount ");
+            }           
+        });
+
+        $("#OwnerPFAmount").keyup(function () {
+
+            var v1 = $("#labelOwnerpfcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#OwnerPFAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply owner pf loan amount should not be grater than owner pf criteria amount ");
+            }
+        });
+
+        $("#VPFAmount").keyup(function () {
+            var v1 = $("#labelVPFpfcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#VPFAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply vpf pf loan amount should not be grater than vpf pf criteria amount ");
+            }
+        });
+
+        $("#OwnPFIntAmount").keyup(function () {
+
+            var v1 = $("#labelOwnIntcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#OwnPFIntAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply own Interest loan amount should not be grater than own Interest criteria amount ");
+            }
+        });
+       
+        $("#OwnerPFIntAmount").keyup(function () {
+            var v1 = $("#labelOwnerIntcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#OwnerPFIntAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply owner Interest loan amount should not be grater than owner Interest criteria amount ");
+            }
+        });
+
+        $("#VPFIntAmount").keyup(function () {
+            var v1 = $("#labelVPFIntcrta").text();
+            var a1 = parseFloat(v1);
+            var v2 = $("#VPFIntAmount").val();
+            var b1 = parseFloat(v2);
+
+            if (b1 > a1) {
+                alert("  apply vpf Interest loan amount should not be grater than vpf Interest criteria amount ");
+            }
+        });
+
+        $('#PayMode_drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        $('#SalaryHeadReleaselist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: true });
+        $('#Name').MaxLength(50);
+        $('#LoanAppliedAmount,#LoanSanctionedAmount,#MonthlyInstallmentAmount,#TotalInstall,#MonthlyPricipalAmount,#MonthlyInterest').ForceAmount();
+        $('#RequisitionDate,#SanctionedDate,#EnforcementDate,#CloserDate,#ChequeDate').P2BDatePicker();
+
+    });
+</script>

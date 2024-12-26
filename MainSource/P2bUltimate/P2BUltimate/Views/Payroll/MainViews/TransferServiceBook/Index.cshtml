@@ -1,0 +1,791 @@
+﻿@{
+    ViewBag.Title = "Transfer Service Book";
+}
+@model Payroll.TransferServiceBook
+<html>
+
+<head>
+
+    <title></title>
+    <style>
+        .without-btn {
+            height: 216px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            width: 144px;
+            top: 768px;
+            position: absolute;
+        }
+
+        .popup-content-narration {
+            margin-bottom: 1px;
+            min-width: 150px;
+            position: absolute;
+            top: 772px;
+            left: 415px;
+        }
+
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .newcontentdiv {
+            float: right;
+            /*margin-right: 262px;*/
+            margin-top: -67px;
+        }
+        .newcontentdiv1 {
+            float: right;
+            /*margin-right: 261px;*/
+             margin-top: -40px;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+
+
+        .oldstruct-div {
+            width: 192px;
+            float: left;
+            margin: 1px 105px;
+            position: relative;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .oldstruct-label-class {
+            margin: 0 44px;
+            font-weight: bold;
+        }
+
+        .oldstruct-textarea-class {
+            height: 192px;
+        }
+
+        .row3 {
+            display: inline-block;
+            width: 563px;
+        }
+
+        .row4 {
+            display: inline-block;
+            width: 510px;
+            right: 288px;
+            position: absolute;
+            top: 239px;
+        }
+
+        .earnamt1 {
+            float: right;
+            min-width;
+        }
+
+        .earnamt {
+            width: 50px;
+            /* Adjust as needed */
+            margin-left: 10px;
+            /* Adjust margin for spacing */
+        }
+
+        .earn-container {
+            margin-bottom: 10px; /* Adjust spacing between salary heads */
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            $('#Employee-Table').P2BTransactionTable('#Employee-Search', '#Case-Employee', '@Url.Action("GetEmployeeDetails")', "");
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#CreateRelease_dialog').P2BCreateDialog();
+            $('#ProcessTransDate').P2BDatePicker();
+            $('#ToPeriod').P2BDatePicker();
+            $('#ReleaseDate').P2BDatePicker();
+
+            var ColNames_release = [];
+            var ColModel_release = [];
+            var SortName_release, Caption_release, url_release, width_release, height_release;
+
+            ColNames_release = ['EmpCode', 'EmpName', 'Activity', 'Process Date', 'Old Location', 'New Location', 'TransId', 'Id'];
+            ColModel_release = ['EmpCode', 'Emp Name', 'Activity', 'Process Date', 'Old Location', 'New Location', 'TransId', 'Id'];
+            SortName_release = 'Id';
+            Caption_release = 'TransferServiceBook';
+            url_release = '@Url.Action("P2BGridRelease")';
+            width_release = 1000;
+            height_release = 150;
+
+            $('#divinline_jq').hide();
+            $('#note').hide();
+            $('#JqGrid_release').on('click', function () {
+                $('#divinline_jq').hide();
+                $('#note').hide();
+                setTimeout(function () {
+                    //  var EmpId = $.GetGridSelctedvalue("#JqGrid_release", "EmpId");
+                    var Id = $.GetGridSelctedvalue("#JqGrid_release", "Id");
+                    var trans_Id = $.GetGridSelctedvalue("#JqGrid_release", "TransId");
+                    console.log(Id);
+                    //$('#emp_Id').val(EmpId);
+                    $('#releas_Id').val(Id);
+                    $('#trans_Id').val(trans_Id)
+                    $("#Earn1").empty();
+                    $("#EarnNew").empty();
+                    $.get("@Url.Action("GetNonstdData")", { data: $('#releas_Id').val(), data1: $('#trans_Id').val() }, function (data) {
+
+                        if (data.msg != "") {
+                            alert(data.msg);
+                        }
+                        if (data.Sal != "" && data.SalNew != "") {
+                            $('#divinline_jq').removeAttr("style");
+                            $('#note').show();
+                            var v1 = data.Sal;
+                            var v2 = data.SalNew;
+                            var elems = [];
+                            var elemsNew = [];
+                            $.each(v1, function (i, k) {
+                                $('#SalHeadCount').val(i);
+                                elems[i] = k.SalaryHead.Id;
+                                $("#Earn1").append("<li>" + "<p class=cb>" + k.SalaryHead.Name + "<div id='olddiv' style='margin-right: 23px;margin-top: -24px;'>" + "<input style ='width:50px; margin-left: 175px;' class='earnamt' disabled  name=Amt" + i + " value=" + k.Amount + " >" + "</input>" + "<input style='width:50px;' class='earnamt' disabled  value=" + k.FormulaEditable + " name=F" + i + " class=bc>" + "</div>" + "</li>");
+                            });
+
+
+                            $.each(v2, function (p, q) {
+                                $("#EarnNew").append("<li>" + "<p class=cb><div id='newdiv'><input class='earnamt' name=AmtNew" + p + " value=" + q.Amount + " >" + "</input>" + "<input class='earnamt' value=" + q.FormulaEditable + " name=FNew" + p + " class=bc>" + "</div>" + "</li>");
+                            });
+
+
+                            $('#input_hidden_field').val(elems);
+                        } else {
+                            $('#note').hide();
+                            $("#Earn1").empty();
+                            $("#EarnNew").empty();
+                            $('#divinline_jq').attr("display", "none");
+                        }
+                    });
+
+                }, 500);
+
+
+
+            });
+
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#pay_id').val(data.PayStruct);
+                        //$('#fun_id').val(data.FunStruct);
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+            $('#ReleaseDate').prop("disabled", true);
+            $('input[name="ProcessFlag"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#ReleaseDate').prop("disabled", true);
+                    $('#ReleaseDate').val("");
+                }
+                else {
+                    $('#ReleaseDate').prop("disabled", false);
+                }
+            });
+            $('#add').on("click", function (event) {
+                //$('#frmTransferServiceBookT').trigger("reset");
+                //$.LoadEmpByDefault(true);
+                $.LoadEmpByDefaultWOGeoId(true, "");
+                $('#frmTransferServiceBookT').trigger("reset");
+                $('#NewFuncT-table').find('tr:gt(0)').remove();
+                $('#NewPayT-table').find('tr:gt(0)').remove();
+                $('#NewGeoT-table').find('tr:gt(0)').remove();
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Transfer Service Book', 'open', '@Url.Action("Create")', '#frmTransferServiceBookT', 'Message :', 'Request Falied :', '#JqGrid', 600, 1150, '#AddressList,#ContactDetailsList', '', function (data) { }, { datatablename: "#MyTable" });
+
+                event.preventDefault();
+            });
+
+
+
+
+            $('#txtNarrationRelease').prop("disabled", true);
+            $('#OldFuncT-table').prop("disabled", true);
+            $('#OldPayT-table').prop("disabled", true);
+            $('#OldGeoT-table').prop("disabled", true);
+            $('#txtOldPayScaleAgreementrelease').prop("disabled", true);
+            $('#txtNewPayScaleAgreementrelease').prop("disabled", true);
+            $('#txtProcessPromoDaterelease').prop("disabled", true);
+            $('#SalaryHeadReleaselist').prop("disabled", true);
+            var Empdata = {
+                Get: $('#Emp').val(),
+                Set: function (data) {
+                    $('#Emp').val(data);
+                },
+                Remove: function () {
+                    $('#Emp').val()
+                }
+            };
+            $('#release').on("click", function (event) {
+                $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+                $('#frmTransferServiceBookTRelease').trigger("reset");
+                $('#CreateRelease_dialog').P2BGridDialog({
+                    maindialogtitle: "Release Increment",
+                    submiturl: "@Url.Action("Release")",
+                    form: "#frmTransferServiceBookTRelease",
+                    height: 555,
+                    width: 1100,
+                    state: "open",
+                    gridname: "#JqGrid_release",
+                    gridfunction: "GetGridSelctedvalue",
+                    editurl: url_release,
+                    returnToGrid: "#JqGrid_release",
+                });
+                $.ajax({
+                    success: function () {
+                        confirm('Please note that in the case of multiple selections of employee releases, the nonstandard salary component value has to be changed manually... ?');
+                    }
+
+                });
+            });
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["Release", "ReleaseDate", "Activity", "TransferDate", "OldGeoStruct", "NewGeoStruct", "Id"],
+                childurl: "@Url.Action("Get_TransServBook", "TransferServiceBook")",
+                tableheader: "Transfer Service Book",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                // console.log($(init).parents('tr:eq(0)'));
+                var parent_element = $(init).parents('td:last').parent().prev();
+                //var element = $(init).parents('tr:eq(0)');
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                //   console.log(element);
+                var dt = $('#MyTable').DataTable();
+
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    //    $('<div></div>').PartialCreateDialog({
+                    //        height: 'auto',
+                    //        width: 'auto',
+                    //        form: "#frm-YearlyPaymentT-partial",
+                    //        htmlurl: htmurl,
+                    //        state: "open",
+                    //        mode: "View",
+                    //        editurl: editurl,
+                    //        submiturl: submiturl,
+                    //        editdata: id,
+                    //        forwarddata: id,
+                    //        returndatafunction: function (data) {
+                    //            $.each(data.data, function (i, k) {
+                    //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                    //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                    //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                    //                $('#yearlypayment-Narration').val(k.NarrationP);
+                    //            });
+                    //        }
+                    //    });
+                    //} else if ($(init).hasClass('ui-icon-pencil')) {
+                    //    $('<div></div>').PartialCreateDialog({
+                    //        height: 'auto',
+                    //        width: 'auto',
+                    //        form: "#frm-YearlyPaymentT-partial",
+                    //        htmlurl: htmurl,
+                    //        state: "open",
+                    //        mode: "Edit",
+                    //        editurl: editurl,
+                    //        submiturl: submiturl,
+                    //        editdata: id,
+                    //        forwarddata: id,
+                    //        returndatafunction: function (data) {
+                    //            $.each(data.data, function (i, k) {
+                    //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                    //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                    //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                    //                $('#yearlypayment-Narration').val(k.NarrationP);
+                    //            });
+                    //        },
+                    //        submitfun: function (data) {
+                    //            var row = dt.row(parent_element);
+                    //            if (row.child.isShown()) {
+                    //                parent_element.removeClass('details');
+                    //                row.child.hide();
+                    //            }
+                    //        }
+                    //    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+
+            $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+                // $('input[type="checkbox"]').not(this).prop("checked", false);
+                if (this.checked) {
+                    var id = $(this).val();
+                    $('#NewFuncT-table').find('tr:gt(0)').remove();
+                    $('#NewPayT-table').find('tr:gt(0)').remove();
+                    $('#NewGeoT-table').find('tr:gt(0)').remove();
+
+                    @*$('#TransActivitylist').SelectMenuAppend('@Url.Action("PopulateDropDownFunction", "OtherServiceBook")', id, "TransActivity"); // To bind dropdown on page load
+                    $('#TransActivitylist').SelectMenuOnChange("@Url.Action("PopulateDropDownFunction", "OtherServiceBook")", "#transpolicy_drop", id, "TransPolicy");*@
+
+                    $('#TransActivitylist').SelectMenuAppend('@Url.Action("PopulateDropDownActivityList", "TransferServiceBook")', id, "TRANSACTIVITY");
+                    $('#TransActivitylist').SelectMenuOnChange("@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")", "#transpolicy_drop", id, "TRANSPOLICY");
+                }
+                else {
+                    Empdata.Remove();
+                    return false;
+                }
+            });
+            function AppendData(id) {
+                $.get("@Url.Action("Getstruct", "PromotionServiceBook")", { data: id }, function (jsondata) {
+                    if (jsondata != null) {
+                        $.each(jsondata, function (i, k) {
+                            $.each(k.fun, function (i, k) {
+                                $("#OldFuncT-table").val(k.value);
+                            });
+                            $.each(k.pay, function (i, k) {
+                                $("#OldPayT-table").val(k.value);
+                            });
+                            $.each(k.geo, function (i, k) {
+                                $("#OldGeoT-table").val(k.value);
+                            });
+                        });
+                    }
+                });
+                $.post("@Url.Action("Get_Struct", "Transcation")", { empid: id }, function (data) {
+                    ////debugger;
+                    $.each(data[0], function (i, k) {
+                        //   $('#NewFuncT-table').P2BTransactionTableSelected([k.code]);
+                        if (k.value != null || k.value != "") {
+                            $("#OldFuncT-table").val(k.value);
+                        }
+                        // $('#NewFuncT-table ').find('tr:eq(' + k.code + ')').prependTo("#NewFuncT-table");
+                        setTimeout(
+                       function () {
+                           $('#NewFuncT-table ').find("tr td input[type=checkbox][value=" + k.code + "]").closest('tr').insertAfter("#NewFuncT-table tr:first");
+                       }, 1000);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#NewPayT-table').P2BTransactionTableSelected([k.code]);
+                        if (k.value != null || k.value != "") {
+                            $("#OldPayT-table").val(k.value);
+                        }
+                    });
+                    $.each(data[2], function (i, k) {
+                        //$('#NewGeoT-table').P2BTransactionTableSelected([k.code]);
+                        if (k.value != null || k.value != "") {
+                            $("#OldGeoT-table").val(k.value);
+                        }
+                        setTimeout(
+                        function () {
+                            //$('#NewGeoT-table ').find('tr:eq(' + k.Code + ')').prependTo("#NewGeoT-table");
+                            $('#NewGeoT-table ').find("tr td input[type=checkbox][value=" + k.Code + "]").closest('tr').insertAfter("#NewGeoT-table tr:first");
+                        }, 1000);
+                    });
+                });
+            };
+
+            $('#TransActivitylist').on('selectmenuopen', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                console.log(a);
+                if (a != null && a.length > 0) {
+                } else {
+                    alert('Select Employee..!');
+                    $('#TransActivitylist').selectmenu('refresh');
+                }
+            });
+
+
+            $('#transpolicy_drop').on('selectmenuchange', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+
+                if (a != null && a.length > 0) {
+                    console.log(a[0]);
+                    $.post("@Url.Action("GetApplicableData")", { data: $(this).val(), data2: a[0] }, function (data) {
+                        //console.log(data);
+                        var id = a[0];
+                        if (data != null) {
+                            AppendData(id);
+                            $('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWGEO"], true);
+                            $('#NewPayT-table').P2BTransactionTable('#NewPay-search', '#case-Newpay', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWPAY"], true);
+                            $('#NewFuncT-table').P2BTransactionTable('#NewFuncT-search', '#case-NewFunct', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWFUNC"], true);
+
+
+                            @*$('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("GetNewGeoStructDetails")', "");
+                            $('#NewPayT-table').P2BTransactionTable('#NewPay-search', '#case-Newpay', '@Url.Action("GetNewPayStructDetails")', "");
+                            $('#NewFuncT-table').P2BTransactionTable('#NewFuncT-search', '#case-NewFunct', '@Url.Action("GetNewFuncStructDetails")', "");*@
+                            $.each(data, function (i, k) {
+                                //console.log(k.IsFuncSructChange);
+                                if (k.IsFuncStructChange == true) {
+                                    $('#FunctStruct-div').show();
+                                } else {
+                                    $('#FunctStruct-div').hide();
+                                }
+                                if (k.IsDivsionChange == true || k.IsLocationChange == true || k.IsDepartmentChange == true || k.IsGroupChange == true || k.IsUnitChange == true) {
+
+                                    $('#Geo-div').show();
+                                } else {
+                                    $('#Geo-div').hide();
+                                }
+
+                            });
+
+                        }
+                    });
+                    $('#PayT-div').hide();
+                } else {
+                    alert('Select Employee..!');
+                    $('#otherpolicy_drop').selectmenu('refresh');
+                }
+            });
+
+            $('#Employee-Table').OnClickFormReset('#frmTransferServiceBookT', '#Emp', function () {
+                $('#JobStatus-div').show();
+                $('#FunctStruct-div,#Geo-div').show();
+
+            });
+            $('#Btn-Upload-Data').on('click', function (e) {
+                ////debugger;
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+            $('#ReleaseDate').prop("disabled", true);
+            $('input[name="ReleaseFlag"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#ReleaseDate').prop("disabled", true);
+                    $('#ReleaseDate').val("");
+                }
+                else {
+                    $('#ReleaseDate').prop("disabled", false);
+                    $('#ReleaseDate').TodayDate();
+
+                }
+            });
+            $.OnCheckMakeTextboxDisable('ReleaseFlag', '#ReleaseDate,#txtNarrationRelease');
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="add">Add</button>
+                <button class="button" id="release">Release</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                @*<button class="button" id="filterShow">filterShow</button>*@
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+
+
+
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Yearly payment T">
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        <div class="fileremployee">
+            <div class="employee-transcationdiv" style="float:left">
+                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                </table>
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTransferServiceBookT", name = "frmTransferServiceBookT" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="Emp" class="filter_structure_id" name="Employee-Table" />
+
+
+            <div class="FormYearlypymentt">
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TransActivity, "Activity:", new { @class = "popup-content-label" })<select id="TransActivitylist" name="TransActivitylist" class="drop" style="width:159px;"><option value="0">-Select-</option></select>
+                @*</div>*@
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">TransPolicy :</label><select class="drop" id="transpolicy_drop" name="transpolicy" style="width:159px;"></select>
+                </div>
+                <div class="newcontentdiv">
+                    @Html.LabelFor(m => m.ProcessTransDate, "Trans Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessTransDate, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="newcontentdiv1">
+                    @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must", id = "Promotion_Narration" })
+                </div>
+                    </div>
+                <div class="filterdivcollection"></div>
+
+                <div id="FunctStruct-div">
+                    <div class="oldstruct-div">
+
+                        <label class="oldstruct-label-class">Old FunctStruct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldFuncT-table"></textarea>
+                    </div>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv1 without-btn">
+                            <div><label>Search : </label><input type="text" id="NewFuncT-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewFuncT-table">
+                                <tr><th><input type="checkbox" id="case-NewFunct" /></th><th>New FunctStruct</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="PayT-div">
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old PayStruct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldPayT-table"></textarea>
+
+
+                    </div>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv1 without-btn">
+                            <div><label>Search : </label><input type="text" id="NewPay-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewPayT-table">
+                                <tr><th><input type="checkbox" id="case-Newpay" /></th><th>New PayStruct</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="Geo-div">
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old Geo Struct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldGeoT-table"></textarea>
+
+                    </div>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv1 without-btn">
+                            <div><label>Search : </label><input type="text" id="NewGeoT-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewGeoT-table">
+                                <tr><th><input type="checkbox" id="case-NewGeoT" /></th><th>New Geostruct</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.EmployeeCTC, "CTC:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EmployeeCTC, new { @class = "popup-content-textbox must" })</div>*@
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.ToPeriod, "PeriodTo:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessMonth, "ProcessMonth:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessMonth, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.AmountPaid, "AmountPaid:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.AmountPaid, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDSAmount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.OtherDeduction, "OtherDeduction:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OtherDeduction, new { @class = "popup-content-textbox must" })</div>*@
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>*@
+
+                @*<div class="row2 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label1 must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-narration must", id = "Promotion_Narration" })</div>*@
+            </div>
+
+        }
+    </div>
+
+    <div id="CreateRelease_dialog" title="Create  Yearly payment T Release">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTransferServiceBookTRelease", name = "frmTransferServiceBookTRelease" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+            <input id="releas_Id" class="filter_structure_id" name="releas_Id" />
+            <input id="trans_Id" class="filter_structure_id" name="trans_Id" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <div class="Release_grid">
+                <div id="Grid_Form_release">
+                    <div>
+                        <table id="JqGrid_release"></table>
+                        <div id="pager2_release"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="FormRelaseYearlypymentt">
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ReleaseFlag, "Release Flag:", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ProcessFlag_radio1" name="ReleaseFlag" value="true" /><label for="ProcessFlag_radio1">Yes</label>
+                        <input type="radio" id="ProcessFlag_radio2" name="ReleaseFlag" value="false" checked="checked" /><label for="ProcessFlag_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ReleaseDate, "Release Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ReleaseDate, new { @class = "popup-content-textbox must" })</div>
+                @*<div class="row3 content_margine">
+                        <label id="lblNarrationRelease" class="popup-content-label">Narration:</label>
+                        <input type="text" id="txtNarrationRelease" name="txtNarrationRelease" class="popup-content-textbox must" />
+                    </div>*@
+
+
+                <div class="row3 content_margine" id="note">
+                    <label><b style="color:red">Note : Y-SalHeadFormula Applicable <br />&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N-SalHeadFormula Not Applicable</b> </label>
+                </div>
+
+                <div class="row4 content_margine" id="divinline_jq" style="display:none">
+                    <input type="hidden" id="SalHeadCount" name="SalHeadCount" value="">
+                    <input type="hidden" id="input_hidden_field" name="input_hidden_field" value="">
+                    <table class="tbl" style="width: 850px; " id="tblinline">
+                        <tr>
+                            <td class="td1">
+                                <label><center><b style="margin-right:226px;">&nbsp; &nbsp;&nbsp;&nbsp;Old Structure</b></center></label>
+                            </td>
+                            <td class="td1">
+                                <label><center><b style="margin-right: 365px;">New Structure</b></center></label>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td class="td1" style="padding:10px;">
+                                <ul id="Earn1" float:left"></ul>
+                            </td>
+                            <td class="td1">
+                                <ul id="EarnNew" float:left"></ul>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

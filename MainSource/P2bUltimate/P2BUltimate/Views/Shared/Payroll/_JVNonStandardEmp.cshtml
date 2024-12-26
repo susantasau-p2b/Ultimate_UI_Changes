@@ -1,0 +1,258 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.JVNonStandardEmp
+@*<link href="~/Content/Wages_Range/Wages_Range.css" rel="stylesheet" />*@
+
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#EmpIn-table').P2BTransactionTableAnimation();
+        $('#EmpIn-table').P2BTransactionTable('#EmpIn-search', '#case-EmpIn', '@Url.Action("GetEmployee", "JVParameter")', []);
+        $('#EmpLocIn-table').P2BTransactionTableAnimation();
+        $('#EmpLocIn-table').P2BTransactionTable('#EmpLocIn-search', '#case-EmpLocIn', '@Url.Action("GetBranch", "JVParameter")', []);
+        $('#AccountType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 405, "");// To bind dropdown on page load
+
+        $('#CreateEmployee').on("click", function () {
+            var ajaxdata = $.ajax({
+                url: "@Url.Action("JVNonStandardEmpCreate", "JVNonStandardEmp")",
+                method: "POST",
+                beforeSend: function () {
+                    $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('disable').addClass('submitbtndisable');
+                    $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('disable').addClass('submitbtndisable');
+                    $('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);" aria-hidden="true"></i></div>').appendTo($('body')).parent();
+                },
+                data: $('#frmJVNonStandardEmp').serialize()
+            });
+            ajaxdata.done(function (msg) {
+                $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('enable').removeClass('submitbtndisable');
+                $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('enable').removeClass('submitbtndisable');
+
+                //newDiv1.dialog("close");
+                //newDiv1.remove();
+
+                if (msg.status == true) {
+                    ////debugger;
+                    //var existing = localStorage.getItem('JVIdForNonStd');
+                    //var data = existing ? existing + ',' + msg.data : msg.data;
+                    //localStorage.setItem('JVIdForNonStd', data);
+                    console.log(msg.data);
+
+                    var existing1 = $('#JVIdForNonStd').val();
+                    var data1 = existing1 ? existing1 + ',' + msg.data.emp : msg.data.emp;
+                    $('#JVIdForNonStd').val(data1);
+                  //  $('#JVLocIdForNonStd').val(msg.data.loc);
+
+                    var newDiv = $(document.createElement('div'));
+                    var htmltag = '<p><span class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                    htmltag += '</p>';
+                    newDiv.html(htmltag);
+                    newDiv.dialog({
+                        autoOpen: false,
+                        title: "Confirmation",
+                        closeOnEscape: false,
+                        height: 150, width: 250, modal: true,
+                        buttons: {
+                            Ok: function () {
+                                newDiv.dialog("close");
+                                newDiv.remove();
+                                //newDiv1.dialog("close");
+                                //newDiv1.remove();
+                                //var newdiv2 = jQuery("#ui-id-1").parent()
+                                //newdiv2.remove();
+                            }
+                        }
+                    });
+                    newDiv.dialog('open');
+                    // $("body .ajax_loder").remove();
+                    $('body').find(".ajax_loder").remove();
+                } else {
+                    ////debugger;
+                    var newDiv = $(document.createElement('div'));
+                    var htmltag = '<p><span class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                    htmltag += '</p>';
+                    newDiv.html(htmltag);
+                    newDiv.dialog({
+                        autoOpen: false,
+                        title: "Confirmation",
+                        closeOnEscape: false,
+                        height: 150, width: 250, modal: true,
+                        buttons: {
+                            Ok: function () {
+                                newDiv.dialog("close");
+                                newDiv.remove();
+                                //newDiv1.dialog("close");
+                                //newDiv1.remove();
+                                //var newdiv2 = jQuery("#ui-id-1").parent()
+                                //newdiv2.remove();
+                            }
+                        }
+                    });
+                    newDiv.dialog('open');
+                }
+            });
+        });
+        //$('#RangeFrom').ForceAmount().MaxLength(10);22;
+        //$('#RangeTo').ForceAmount().MaxLength(10);;
+        //$('#Percentage').ForcePercent().MaxLength(10);;
+        //$('#CompShareAmount').ForceAmount().MaxLength(10);;
+        //$('#EmpShareAmount').ForceAmount().MaxLength(10);;
+        //$('#CompSharePercentage').ForcePercent().MaxLength(10);;
+        //$('#EmpSharePercentage').ForcePercent().MaxLength(10);;
+
+        //$('#RangeTo ').on('focusout', function (e) {
+        //    if (!$('#RangeFrom').val()) {
+        //        alert('Enter Range From value...!');
+        //        $('#RangeTo').val('');
+        //        return false;
+        //    }
+        //    if (parseFloat($("#RangeTo").val()) < parseFloat($("#RangeFrom").val())) {
+        //        alert("  Range To value Should Be Grater Than Starting Range Value ..!");
+        //        $('#RangeTo').val('');
+        //    }
+        //});
+    });
+
+</script>
+<style>
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 133px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 551px;
+        display: inline-flex;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 434px;
+    }
+
+    .icon-row {
+        left: 94px;
+        position: relative;
+        top: -147px;
+    }
+
+    .row1 {
+        width: 190px;
+        display: block;
+        margin: 1px 1px 6px 6px;
+        float: left;
+    }
+
+    .row2 {
+        float: left;
+    }
+
+    .filter_row {
+        padding-top: 60px;
+    }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .transcation_btn {
+        width: 21px;
+        height: 21px;
+    }
+
+    .StrctSelectionClass {
+        float: left;
+    }
+
+    .grid_colllpase_height {
+        height: 43px;
+    }
+</style>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmJVNonStandardEmp", name = "frmJVNonStandardEmp" }))
+    {
+
+        <div class="row3 content_margine">@Html.LabelFor(m => m.ProductCode, "ProductCode:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProductCode, new { @class = "popup-content-textbox must" })</div>
+        <div class="content_margine row3">
+            @Html.LabelFor(m => m.AccountType, "AccountType:", new { @class = "popup-content-label must" })
+            <select class="drop must" name="AccountType_drop" id="AccountType_drop" style="width:180px">
+                <option value="0">-Select-</option>
+            </select>
+        </div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.AccountNo, "AccountNo:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.AccountNo, new { @class = "popup-content-textbox must", @id = "AccountNoP" })</div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.SubAccountNo, "SubAccountNo:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SubAccountNo, new { @class = "popup-content-textbox must", @id = "SubAccountNoP" })</div>
+
+        <div class="row3" id="multiple-shwdiv">
+            <label class="popup-content-label">Select Location :</label>
+            <div class="row8">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="EmpIn-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="EmpIn-table">
+                        <tr><th><input type="checkbox" id="case-EmpIn" /></th><th>EmpIn</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="EmpIn" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="row8">
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="EmpLocIn-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="EmpLocIn-table">
+                        <tr><th><input type="checkbox" id="case-EmpLocIn" /></th><th>EmpLocIn</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="EmpLocIn" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div>
+            @*<input type="button" value="Create" id="CreateEmployee" name="CreateEmployee" />*@
+            <button data-typeofbtn="Create" id="CreateEmployee" name="CreateEmployee">Create</button>
+        </div>
+    }
+</div>

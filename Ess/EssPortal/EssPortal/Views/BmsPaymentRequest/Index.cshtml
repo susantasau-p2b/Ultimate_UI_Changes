@@ -1,0 +1,312 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.BMSPaymentReq
+
+<html>
+<head>
+    <title></title>
+    <script>
+        
+        $('#inchhide').fadeOut();
+        $('#lvlisting').fadeOut();
+
+    $.ajax({
+        method: "get",
+        url: '@Url.Action("GetApplicableEmpPayStructAppl", "BmsPaymentRequest")',
+        success: function (data) {
+           // alert(data);
+            if (data == true) {
+                $('#inchhide').fadeIn();
+            }
+            else {
+              //  alert("Manish for look")
+                $('#inchhide').fadeOut();
+            }
+        }
+
+
+    });
+    $(document).ready(function (e) {
+
+        //$('#ProcessMonth').fadeOut(); //hide //.fadeIn() -show
+        var now = new Date();
+        // Format date as mm/yyyy
+        var month = String(now.getMonth() + 1).padStart(2, '0'); // Get month and pad with leading zero if needed
+        var year = now.getFullYear(); // Get full year
+        var formattedDate = month + '/' + year;
+
+        $('#ProcessMonth').val(formattedDate);
+        $('#officiatinghide').fadeOut();
+
+        $('#txtPayMonth').MonthYearPicker();
+        $('#PayMonth').MonthYearPicker();
+        $('#FromPeriod').P2BDatePicker();
+        $('#ToPeriod').P2BDatePicker();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+
+        $('#lookup_Incharge').on('click', function (e) {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtIncharge",
+                appendToId: "#Incharge_id",
+                lookupurl: "@Url.Action("GetLookupIncharge1", "BmsPaymentRequest")",
+                NoOfRecordToShow: "2",
+                setnameofthelookupbyppage: "txtIncharge_FName-lookup",
+                lookupdiv: "lookupdiv",
+                lookuppagename: "lookup",
+                pagename: "pageNavPosition",
+                readonly: true,
+            });
+            e.preventDefault();
+        });
+
+
+
+
+        //alert($('#OfficiatingParameterlist').val());
+        $('#NewPay-search1').on('keypress', function (e) {
+            if (e.which === 13) { // 13 is the Enter key
+                e.preventDefault(); // Prevent the default action
+                return false; // Optionally return false
+            }
+        });
+
+        // Your existing code
+        $('#NewPayT-table').P2BTransactionTable('#NewPay-search1', '#case-Newpay', '@Url.Action("GetNewPayStructDetails")', "", "");
+
+
+        @*$('#NewPayT-table').P2BTransactionTable('#NewPay-search1', '#case-Newpay', '@Url.Action("GetNewPayStructDetails")', "", "");*@
+        @*$.post("@Url.Action("GetApplicableData")", { data: a, data2: $('#OfficiatingParameterlist').val() }, function (data) {
+
+                $('#OfficiatingParameterlist').SelectMenuAppend('@Url.Action("PopulateDropDownActivityList", "Officiating")', "Id", "");
+            });*@
+
+
+
+
+
+        @*$('#OfficiatingParameterlist').SelectMenuAppend('@Url.Action("PopulateDropDownActivityList", "Officiating")', "Id", ""); lookup_Incharge*@
+        @*$('#OfficiatingParameterlist').P2BSelectMenuAppend('@Url.Action("GetApplicableData", "Officiating")', '', '');
+        $('#OfficiatingParameterlist').on('selectmenuchange', function () {*@
+        //});
+
+       
+
+        $('#Salheadlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "BmsPaymentRequest")', '', '');
+        $('#Salheadlist').on('selectmenuchange', function () {
+            var value = $("#Salheadlist option:selected").text();
+            $.ajax({
+                method: "post",
+                url: '@Url.Action("SalHeadType", "BmsPaymentRequest")?saltype=' + value,
+                success: function (data) {
+                    //alert(JSON.stringify(data));
+                    if (data == "OFFICIATING") {
+
+                        $('#officiatinghide').fadeIn();
+                        $('#lvlisting').fadeOut();
+                
+                    }
+                    else if (data == "LTA" ) {
+                        $('#officiatinghide').fadeOut();
+                        $('#Leavelist').addClass('drop');
+                        @*$('#lvlisting').fadeIn();
+                        $('#Leavelist').P2BSelectMenuAppend('@Url.Action("lvHeadType", "Officiating")', '', '');*@
+                         
+                            $.ajax({
+                                method: "post",
+                                url: '@Url.Action("lvHeadType", "BmsPaymentRequest")',
+                                success: function (data) {
+                                    //alert(JSON.stringify(data));
+                                    $('#Leavelist').P2BSelectMenuAppend('@Url.Action("lvHeadType", "BmsPaymentRequest")', '', '');
+                                    if (data.length > 0) {
+                                        $('#lvlisting').fadeIn();
+                                    } else {
+                                        $('#lvlisting').fadeOut(); 
+                                    }
+                                }
+                            });
+
+              
+                        $('#Leavelist').on('selectmenuchange', function () {
+                            var value = $("#Leavelist option:selected").val();
+                            $.ajax({
+                                method: "post",
+                                url: '@Url.Action("GetLeaveId", "BmsPaymentRequest")?leaveid=' + value,
+                            });
+                        });
+                    }
+                    else {
+                        $('#officiatinghide').fadeOut();
+                        $('#lvlisting').fadeOut();
+                    }
+                }
+            });
+
+            
+        });
+    });
+
+    </script>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 108px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 153px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 568px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .disabledbutton {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv" id="lookup"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+   
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmOfficiating", name = "frmOfficiating" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            
+            <div class="">
+
+                <div class="row3 content_margine" >
+                    <label class="popup-content-label" style="width:170px;">Salary Head Operation Type :</label>
+                    <select class="drop must" style="width:200px;" name="Salheadlist" id="Salheadlist">
+                        <option value="0">--Select--</option>
+                    </select>
+                </div>
+                <div id="lvlisting">
+                    <div class="row3 content_margine">
+                        <label class="popup-content-label must" style="width:170px;">Leave Code :</label>
+                        <select class="drop " style="width:200px;" name="Leavelist" id="Leavelist">
+                            <option value="0">--Select--</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="officiatinghide">
+
+                    @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OfficiatingParameter, "OfficiatingParameter:", new { @class = "popup-content-label" })<select id="OfficiatingParameterlist" name="OfficiatingParameterlist" class="drop" style="width:159px;"><option value="0">-Select-</option></select>
+                    </div>*@
+
+                    <div id="inchhide" style="display:none">
+                        <div class="row3 content_margine">
+                            <label id="lblIncharge" class="popup-content-label">Officiating In Place Of :</label>
+                            <input name="txtIncharge" type="text" id="txtIncharge" class="date-picker" style="width: 250px" />
+                            <input type="text" id="Incharge_id" name="Incharge_id" class="filter_structure_id" />
+
+                            <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="lookup_Incharge" style="width: 20px;height: 20px; margin-bottom:10px"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="row3 content_margine" id="NewPayT-div">
+
+                        <div class="newstruct-div">
+                            @*<div class="transactiondiv without-btn">
+                                <div><label>Search : </label><input type="text" id="NewPay-search1" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewPayT-table">
+                                    <tr><th><input type="checkbox" id="case-Newpay" /></th><th>New PayStruct</th></tr>
+                                </table>
+                            </div>*@
+                            <div class="transactiondiv1 without-btn">
+                                <div>
+                                    <label>Search : </label><input type="text" id="NewPay-search1" />
+                                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewPayT-table">
+                                        <tr>
+                                            <th><input type="checkbox" id="case-Newpay" /></th>
+                                            <th>New PayStruct</th>
+                                        </tr>
+                                    </table>
+                                </div>
+                               
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                    <div class="row3 content_margine">
+                        
+                        
+                            
+                            <input type="hidden" id="ProcessMonth" name="ProcessMonth" style="margin-left:25px" />
+                        
+                        
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.FromPeriod, "From Period:", new { @class = "popup-content-label must hasDatepicker" }) @Html.TextBoxFor(m => m.FromPeriod, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ToPeriod, "To Period:", new { @class = "popup-content-label must hasDatepicker" })@Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row2 content_margine">
+                        @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-narration must" })
+                    </div>
+
+
+                </div>
+        }
+    
+
+</body>
+</html>

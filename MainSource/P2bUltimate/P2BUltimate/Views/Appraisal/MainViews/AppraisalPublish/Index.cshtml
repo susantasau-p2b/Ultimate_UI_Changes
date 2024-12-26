@@ -1,0 +1,223 @@
+﻿@{
+    ViewBag.Title = "Appraisal Publish";
+}
+@model   Appraisal.AppraisalPublish
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 93px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 370px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>     
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Apprisal Category">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAppraisalPublish", name = "frmAppraisalPublish" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+            <div class="dropdown_row1 row3 content_margine">
+                @Html.LabelFor(m => m.AppraisalPeriodCalendar, "Calendar :", new { @class = "popup-content-label" })
+                <select id="AppCalendardrop" style="width:290px" name="AppCalendardrop" class="drop"></select>
+            </div>
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.BatchName, "Batch Name :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Extension, new { @class = "popup-content-textbox must", @id = "BatchName", @maxlength = "50"  })  </div>
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.BatchCode, "Batch Code :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Extension, new { @class = "popup-content-textbox must", @id = "BatchCode", @maxlength = "10" })  </div>
+            
+            
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.PublishDate, "Publish Date:", new { @class = "popup-content-label  must" })@Html.TextBoxFor(m => m.PublishDate, new { @class = "popup-content-textbox date must" })</div>
+                          
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.SpanPeriod, "Span Period :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SpanPeriod, new { @class = "popup-content-textbox " })  </div>
+             
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.Extension, "Extension :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Extension, new { @class = "popup-content-textbox must"  })  </div>
+           
+             <div class="row1 content_margine horizontal_row1">
+                @Html.LabelFor(m => m.IsTrClose, " Is Batch Complete :", new { @class = "popup-content-label" })
+                <span class="popup_radio_button">
+                    <span><input type="radio" id="radio1" name="IsTrClose" value="true" /> <label for="radio1">Yes</label></span>
+                    <span><input type="radio" id="radio2" name="IsTrClose" value="false" /> <label for="radio2">No</label></span>
+                </span>
+            </div> 
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        $('#BatchCode').MaxLength(10);
+        $('#BatchName').MaxLength(50);
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        var namelookuptable = '';
+        ColModel = ['Id', 'SpanPeriod', 'Extension'];
+        ColNames = ['Id', 'SpanPeriod', 'Extension'];
+        SortName = 'Id';
+        Caption = 'Appraisal Publish';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $("#Extension").ForceOnlyNumeric().MaxLength(8);
+        $("#SpanPeriod").ForceOnlyNumeric().MaxLength(8);
+       
+       $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmAppraisalPublish').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Publish', 'open', '@Url.Action("Create")', '#frmAppraisalPublish', 'Message :', 'Request Falied :', '#JqGrid', 270, 620, '', '', function (data) { });
+            $('#PublishDate').attr('readonly', true);
+            $('#AppCalendardrop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "AppraisalPublish")', "", '');
+            event.preventDefault();                                                                  
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Appraisal Publish", '#frmAppraisalPublish', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 270, 620, ' ', "", function (data) {
+                // setTimeout(function () {
+                $('#PublishDate').attr('readonly', true);
+                $.each(data[0], function (i, k) {
+                    $('#frmAppraisalPublish').trigger('reset');
+                    $('#PublishDate').val(DateConvert(k.PublishDate));  
+                    $('#SpanPeriod').val(k.SpanPeriod);
+                    $('#Extension').val(k.Extension);
+                    $('[name="IsTrClose"]').val([k.IsTrClose]).button().button("refresh");
+                    $('#AppCalendardrop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "AppraisalPublish")', "", k.AppraisalPeriodCalendar_Id);
+                   
+                });
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+      
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Appraisal Publish', '#AddressList,#ContactDetailsList', '', 270, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#IsTrClose').prop("disabled", true);
+                $.each(data[0], function (i, k) {
+                    $('#frmAppraisalPublish').trigger('reset');
+                    $('#PublishDate').val(DateConvert(k.PublishDate));
+                    $('#SpanPeriod').val(k.SpanPeriod);
+                    $('#Extension').val(k.Extension);
+                    $('[name="IsTrClose"]').val([k.IsTrClose]).button().button("refresh");
+                    $('#AppCalendardrop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "AppraisalPublish")', "", k.AppraisalPeriodCalendar_Id);
+
+                });
+               
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                    
+                
+            });
+        });
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('.date').P2BDatePicker();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget').addClass('overflow');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

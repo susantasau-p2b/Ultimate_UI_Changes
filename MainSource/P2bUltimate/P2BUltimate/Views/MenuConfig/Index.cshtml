@@ -1,0 +1,155 @@
+﻿<link href="~/Scripts/JQurey.tree/src/themes/default/style.css" rel="stylesheet" />
+<script src="~/Scripts/JQurey.tree/src/jstree.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.dnd.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.contextmenu.js"></script>
+@{
+    ViewBag.Title = "Menu Config";
+}
+<script>
+    $(function () {
+        $('button').button();
+        var menu_type = {
+            defaultMenu: {},
+            newMenu: {
+                menu: [{
+                    "id": 1, "text": "Menu",
+                    "children": [
+                        { "id": 2, "text": "Master", "data": { "url": "#", "authority": "" } },
+                        { "id": 3, "text": "Transction", "data": { "url": "#", "authority": "" } },
+                        { "id": 4, "text": "Report", "data": { "url": "#", "authority": "" } },
+                        { "id": 5, "text": "Utilities", "data": { "url": "#", "authority": "" } },
+                        { "id": 6, "text": "Help", "data": { "url": "#", "authority": "" } },
+                        { "id": 7, "text": "ParameterSetting", "data": { "url": "#", "authority": "" } },
+                        { "id": 8, "text": "PayrollObject", "data": { "url": "#", "authority": "" } },
+                    ]
+                }]
+            }
+        };
+        $('#menu_tree').jstree({
+            'core': {
+                "check_callback": true,
+               // 'data': menu_type.newMenu.menu,
+            },
+            'plugins': ["dnd", "contextmenu"]
+
+        });
+        $('#newMenu').on('click', function (e) {
+            $('#menu_tree').jstree(true).settings.core.data = menu_type.newMenu.menu;
+            $('#menu_tree').jstree(true).refresh();
+        });
+        $.getJSON("@Url.Action("getjson","menuconfig")", function (data) {
+            $('#menu_tree').jstree(true).settings.core.data = data;
+            $('#menu_tree').jstree(true).refresh();
+        });
+        $('#defaultMenu').on("click", function () {
+            $.getJSON("@Url.Action("getjson","menuconfig")", function (data) {
+                $('#menu_tree').jstree(true).settings.core.data = data;
+                $('#menu_tree').jstree(true).refresh();
+            });
+        });
+        //function appendJsonForXml(node, element, xmldoc) {
+        //    $.each(node.children, function (i, k) {
+        //        var newElement = xmldoc.createElement(k.text);
+        //        element.appendChild(newElement);
+        //        xmldoc.documentElement.appendChild(element);
+        //    });
+        //};
+
+        $('#put_json').on("click", function () {
+            var json_data = $('#menu_tree').jstree(true).get_json('#', { no_state: true });
+            $.ajax({
+                method: "Post",
+                url: "@Url.Action("putjson")",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(json_data),
+                success: function (data) {
+                    alert(data.responseText);
+                },
+                error: function (data) { console.log(data); }
+            });
+
+        });
+        ////function readxml(filename) {
+        //    if (window.ActiveXObject) {
+        //        xhttp = new ActiveXObject("Msxml2.XMLHTTP");
+        //    }
+        //    else {
+        //        xhttp = new XMLHttpRequest();
+        //    }
+        //    xhttp.open("GET", filename, false);
+        //    try { xhttp.responseType = "msxml-document" } catch (err) { } // Helping IE11
+        //    xhttp.send();
+        //    return xhttp.responseXML;
+        //};
+
+        $('#getselected').on("click", function (e) {
+            var a = $('#menu_tree').jstree("get_selected");
+            if ($('#url_val').val() && a.length != 0) {
+                var b = $('#menu_tree').jstree(true).get_node("" + a + "").data.url = $('#url_val').val();
+                alert("Url Added");
+            } else if (a.length == 0) {
+                alert('Select Node..!');
+            }
+        });
+        $('#menu_tree').on('select_node.jstree', function (e, data) {
+            var a = $('#menu_tree').jstree(true).get_node("" + data.node.id + "").data.url;
+            console.log(a);
+            $('#url_val').val(a);
+        });
+        $('#menu_tree').on('create_node.jstree', function (e, data) {
+            $('#menu_tree').jstree(true).get_node("" + data.node.id + "").data = { "url": "#", "authority": "" };
+        });
+        $('#get_authority').on('click', function () {
+            var a = $('#menu_tree').jstree("get_selected");
+            var b = $('#menu_tree').jstree(true).get_node("" + a + "").data.authority;
+            console.log(b);
+        });
+        $('#checkurl').on('click', function () {
+            var a = $('#menu_tree').jstree("get_selected");
+            var b = $('#menu_tree').jstree(true).get_node("" + a + "").data.url;
+            console.log(b);
+        });
+        $.ajax({
+            url: "@Url.Action("GetUrl","MenuConfig")",
+            method: "POST",
+            data: { data: "0055" },
+            success: function (data) {
+                if (data.data != null && data.success == true) {
+                    $.each(data.data, function (i, k) {
+                        console.log(k.val);
+                        $('#url').append($('<option>', {
+                            value: k.val
+                        }));
+                    });
+                }
+            }
+        });
+    });
+</script>
+<div style="padding:10px">
+    <div class="btn_class">
+        <button id="defaultMenu" style="width:100px">Default Menu</button>
+        <button id="newMenu" style="width:100px">New Menu</button>
+    </div>
+    <div style="overflow: auto; height: 329px; float: left; width: 364px; position: absolute; top: 144px;"> <div id="menu_tree"></div></div>
+    <div class="form">
+        <div class="input">
+            <input type="text"  list="url" name="url_val" placeholder="url" id="url_val" />
+            <button id="getselected">Write Url</button><br />
+            <datalist id="url"></datalist>
+        </div>
+        <button id="put_json" style="width:165px">Write Menu</button>
+    </div>
+</div>
+<style>
+    .btn_class {
+        float: left;
+        /*! width: 223px; */
+    }
+
+    .form {
+        position: absolute;
+        left: 381px;
+    }
+</style>

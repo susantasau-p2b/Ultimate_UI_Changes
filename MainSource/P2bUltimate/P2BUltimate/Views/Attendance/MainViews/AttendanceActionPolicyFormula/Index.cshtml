@@ -1,0 +1,766 @@
+﻿@{
+    ViewBag.Title = "AttendanceActionPolicyFormula";
+}
+@model Attendance.AttendanceActionPolicyFormula
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <style>
+        .icon-row {
+            left: 85px;
+            position: relative;
+            top: -149px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 128px;
+        }
+
+        .popup-content-label-short {
+            display: block;
+            float: left;
+            width: 87px;
+        }
+
+        .popup-content-textbox {
+            width: 87px;
+        }
+
+        .row1 {
+            width: 431px;
+            /*! margin: 0 auto; */
+        }
+
+        .row2 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 500px;
+        }
+
+        .row2 {
+            width: 198px;
+        }
+
+        .popup-row {
+            width: 446px;
+            margin: 1px 0px 0px 127px;
+        }
+
+        .name {
+            width: 293px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+    <script>
+    $(document).ready(function () {
+        $('#PolicyName').ForceOnlyAlphaNumeric();
+        $('#PolicyName').MaxLength(10);
+        $('#EncashSpanYear').ForceOnlyNumeric(),
+        $('#FromServ').ForceOnlyNumeric(),
+        $('#ToServ').ForceOnlyNumeric(),
+        $('#MinBalance').ForceOnlyNumeric(),
+        $('#MinEncashment').ForceOnlyNumeric(),
+        $('#MinUtilized').ForceOnlyNumeric()
+    });
+    </script>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            //$('#OpeningDate').P2BDatePicker();
+
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['Id', 'Name'];
+            ColNames = ['Id', 'Name'];
+            SortName = 'Id';
+            Caption = 'AttendanceActionPolicy Formula';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            //$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+            var dt;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Formula_Grid", "AttendanceActionPolicyFormula")",
+                editurl: "@Url.Action("EditGridDetails", "AttendanceActionPolicyFormula")",
+                htmurl: "@Url.Action("partial", "AttendanceActionPolicyFormula")",
+                submiturl: "@Url.Action("GridEditSave", "AttendanceActionPolicyFormula")",
+                //columnname: ["Id", "Name", "CeilingMin", "CeilingMax", "DependRule"],
+                columnname: ["Name", "Id"],
+                childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+                childurl: "@Url.Action("Get_FormulaStructDetails", "AttendanceActionPolicyFormula")",
+                tableheader: "AttendanceAction Policy Formula",
+                childurlColumnNo: "2"
+            });
+
+
+            $('#Create_Dialog').P2BCreateDialog();
+
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $('input:checkbox').removeAttr('checked');
+                $('tr').removeClass('selectedtr');
+                $('#frmAttendanceActionPolicyFormula').trigger("reset");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Policy Formula', 'open', '@Url.Action("Create")', '#frmAttendanceActionPolicyFormula', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '', "", function (data) { }, { datatablename: "#MyTable" });
+
+                event.preventDefault();
+            });
+
+
+            // Main page edit
+            $('#Edit').on('click', function () {
+                //AssignData();
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Policy Formula Data", '#frmAttendanceActionPolicyFormula', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#WagesList', '#Edit-Wages-SalHeadFormula', function (data) {
+                    var selected = data[3];
+
+                    $.each(data[0], function (i, k) {
+                        $('#Name').val(k.Name);
+                        $('#Name').attr('readonly', 'readonly');
+
+                    });
+
+
+                    if (selected == "1") {
+                        $('#load_div').trigger('reset');
+                        $('#IncrPolicy1').prop('checked', 'checked');
+                        $('#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#ExtnRednPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').fadeIn();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#AttendAbsentPolicyList').P2BLookUpEncapsulate('#AttendAbsentPolicyList', 'AttendAbsentPolicyList', k.Incrementpolicy_Id, k.Incrementpolicy_Fulldetails, 'AttendAbsentPolicyList', '#Remove-AttAbsentPolicy-PolicyFormula', 'A');
+                        });
+
+                    }
+
+                    if (selected == "2") {
+                        $('#load_div').trigger('reset');
+                        $('#PromoPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#ExtnRednPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').fadeIn();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#AttendLeavePriorityList').P2BLookUpEncapsulate('#AttendLeavePriorityList', 'AttendLeavePriorityList', k.Promotionpolicy_Id, k.Promotionpolicy_Fulldetails, 'AttendLeavePriorityList', '#Remove-AttLeavePrio-PolicyFormula', 'A');
+                        });
+                    }
+
+                    if (selected == "3") {
+                        $('#load_div').trigger('reset');
+                        $('#TransPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#OthServiceBookPolicy1,#ExtnRednPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').fadeIn();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.Transferpolicy_Id, k.Transferpolicy_Fulldetails, 'TransPolicyList', '#Remove-TransPolicy-PolicyFormula', 'A');
+                        });
+                    }
+
+                    if (selected == "4") {
+                        $('#load_div').trigger('reset');
+                        $('#OthServiceBookPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#ExtnRednPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#BankpolicyId  ').fadeIn();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#OthServiceBookPolicyList').P2BLookUpEncapsulate('#OthServiceBookPolicyList', 'OthServiceBookPolicyList', k.Otherpolicy_Id, k.Otherpolicy_Fulldetails, 'OthServiceBookPolicyList', '#Remove-OthServiceBookPolicy-PolicyFormula', 'A');
+                        });
+                    }
+
+                    if (selected == "5") {
+                        $('#load_div').trigger('reset');
+                        $('#ExtnRednPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $('#ExtnRednPolicyId  ').fadeIn();
+                        $.each(data[1], function (i, k) {
+                            $('#ExtnRednPolicyList').P2BLookUpEncapsulate('#ExtnRednPolicyList', 'ExtnRednPolicyList', k.ExtnRednpolicy_Id, k.ExtnRednpolicy_Fulldetails, 'ExtnRednPolicyList', '#Remove-ExtnRednPolicy-PolicyFormula', 'A');
+                        });
+                    }
+
+                    if (selected == "6") {
+                        $('#load_div').trigger('reset');
+                        $('#OfficiatingPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#ExtnRednPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').fadeIn();
+                        $.each(data[1], function (i, k) {
+                            $('#OfficiatingPolicyList').P2BLookUpEncapsulate('#OfficiatingPolicyList', 'OfficiatingPolicyList', k.Officiatingpolicy_Id, k.Officiatingpolicy_Fulldetails, 'OfficiatingPolicyList', '#Remove-OfficiatingPolicy-PolicyFormula', 'A');
+                        });
+                    }
+
+
+                });
+            });
+
+
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                //AssignData();
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Leave Head Formula data', '#IncrPolicyList', '#Remove-AttAbsentPolicy-PolicyFormula', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                    var selected = data[3];
+
+                    $.each(data[0], function (i, k) {
+                        $('#Name').val(k.Name);
+                        $('#Name').attr('readonly', 'readonly');
+
+                    });
+
+
+
+                    if (selected == "1") {
+                        $('#load_div').trigger('reset');
+                        $('#IncrPolicy1').prop('checked', 'checked');
+                        $('#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,ExtnRednPolicyList,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').fadeIn();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#AttendAbsentPolicyList').P2BLookUpEncapsulate('#AttendAbsentPolicyList', 'AttendAbsentPolicyList', k.Incrementpolicy_Id, k.Incrementpolicy_Fulldetails, 'AttendAbsentPolicyList', 'view', 'N');
+                        });
+
+                    }
+
+                    if (selected == "2") {
+                        $('#load_div').trigger('reset');
+                        $('#PromoPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').fadeIn();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#PromoPolicyList').P2BLookUpEncapsulate('#PromoPolicyList', 'PromoPolicyList', k.Promotionpolicy_Id, k.Promotionpolicy_Fulldetails, 'PromoPolicyList', 'view', 'N');
+                        });
+                    }
+
+                    if (selected == "3") {
+                        $('#load_div').trigger('reset');
+                        $('#TransPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#OthServiceBookPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').fadeIn();
+                        $('#BankpolicyId  ').hide();
+                        $('#ExtnRednPolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#TransPolicyList').P2BLookUpEncapsulate('#TransPolicyList', 'TransPolicyList', k.Transferpolicy_Id, k.Transferpolicy_Fulldetails, 'TransPolicyList', 'view', 'N');
+                        });
+                    }
+
+                    if (selected == "4") {
+                        $('#load_div').trigger('reset');
+                        $('#OthServiceBookPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').fadeIn();
+                        $('#ExtnRednPolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $.each(data[1], function (i, k) {
+                            $('#OthServiceBookPolicyList').P2BLookUpEncapsulate('#OthServiceBookPolicyList', 'OthServiceBookPolicyList', k.Otherpolicy_Id, k.Otherpolicy_Fulldetails, 'OthServiceBookPolicyList', 'view', 'N');
+                        });
+                    }
+
+                    if (selected == "5") {
+                        $('#load_div').trigger('reset');
+                        $('#ExtnRednPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId ').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId  ').hide();
+                        $('#OfficiatingPolicyId').hide();
+                        $('#ExtnRednPolicyId  ').fadeIn();
+                        $.each(data[1], function (i, k) {
+                            $('#ExtnRednPolicyList').P2BLookUpEncapsulate('#ExtnRednPolicyList', 'ExtnRednPolicyList', k.ExtnRednpolicy_Id, k.ExtnRednpolicy_Fulldetails, 'ExtnRednPolicyList', 'view', 'N');
+                        });
+                    }
+
+                    if (selected == "6") {
+                        $('#load_div').trigger('reset');
+                        $('#OfficiatingPolicy1').prop('checked', 'checked');
+                        $('#IncrPolicy1,#PromoPolicy1,#TransPolicy1,#OthServiceBookPolicy1,#ExtnRednPolicy1,#OfficiatingPolicy1').prop('disabled', 'disabled');
+                        $('#creditpolicyId').hide();
+                        $('#debitPolicyId').hide();
+                        $('#encashpolicyId').hide();
+                        $('#BankpolicyId').hide();
+                        $('#ExtnRednPolicyId').hide();
+                        $('#OfficiatingPolicyId').fadeIn();
+                        $.each(data[1], function (i, k) {
+                            $('#OfficiatingPolicyList').P2BLookUpEncapsulate('#OfficiatingPolicyList', 'OfficiatingPolicyList', k.Officiatingpolicy_Id, k.Officiatingpolicy_Fulldetails, 'OfficiatingPolicyList', '#Remove-OfficiatingPolicy-PolicyFormula', 'A');
+                        });
+                    }
+                });
+            });
+
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#frmAttendanceActionPolicyFormula').trigger("reset");
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                @*$('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);*@
+                $('#frmAttendanceActionPolicyFormula').P2BDeleteModalDialog('@Url.Action("Delete", "AttendanceActionPolicyFormula")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '', 200, 200, { datatablename: "#MyTable" });
+                event.preventDefault();
+            });
+
+            //$('.popup_radio_button').controlgroup();
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('#Lookup-LvHeadCollection-LvBankPolicy').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvBankPolicy")', '', 'LookupDiv', 'Type Of head Look Up Data', '#LvHeadCollectionlist', 'LvHeadCollectionlist', 5, 'LvHeadCollectionlist', '#frmBankPolicy', 'A', '#Remove-LvHeadCollection-LvBankPolicy', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Remove-LvHeadCollection-LvBankPolicy').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#LvHeadCollectionlist').P2BGetTableDataonSelectedRow('#LvHeadCollectionlist', 0);
+
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadCollectionlist', $('#LvHeadCollectionlist').val(), 200, 200, '#frmLvCreditPolicy', '#LvHeadCollectionlist', '#Remove-LvHeadCollection-LvBankPolicy');
+                event.preventDefault();
+            });
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+
+                        $('#fun_id').val(data.FunStruct);
+                        $('#pay_id').val(data.PayStruct);
+                        $('#geo_id').val(data.GeoStruct);
+                    },
+                    renderat: "#FormFilter",
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+            ///////Increment Policy
+
+            $('#Lookup-AttAbsentPolicy-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupAttendanceAbsentPolicy", "AttendanceActionPolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#AttendAbsentPolicyList', 'AttendAbsentPolicyList', 5, 'AttendAbsentPolicyList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-AttAbsentPolicy-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-AttAbsentPolicy-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#IncrPolicyList').P2BGetTableDataonSelectedRow('#IncrPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#AttendAbsentPolicyList').P2BGetTableDataonSelectedRow('#AttendAbsentPolicyList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AttendAbsentPolicyList', $('#AttendAbsentPolicyList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#AttendAbsentPolicyList', '#Remove-AttAbsentPolicy-PolicyFormula');
+                event.preventDefault();
+            });
+
+            ///////Promotion Policy
+
+            $('#Lookup-AttLeavePrio-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupAttendanceLeavePriority", "AttendanceActionPolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#AttendLeavePriorityList', 'AttendLeavePriorityList', 5, 'AttendLeavePriorityList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-AttLeavePrio-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-AttLeavePrio-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#PromoPolicyList').P2BGetTableDataonSelectedRow('#PromoPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#AttendLeavePriorityList').P2BGetTableDataonSelectedRow('#AttendLeavePriorityList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AttendLeavePriorityList', $('#AttendLeavePriorityList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#AttendLeavePriorityList', '#Remove-AttLeavePrio-PolicyFormula');
+                event.preventDefault();
+            });
+
+            ///////Transfer Policy
+
+            $('#Lookup-TransPolicy-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupTransPolicy", "PolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#TransPolicyList', 'TransPolicyList', 5, 'TransPolicyList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-TransPolicy-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-TransPolicy-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#TransPolicyList').P2BGetTableDataonSelectedRow('#TransPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#TransPolicyList').P2BGetTableDataonSelectedRow('#TransPolicyList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TransPolicyList', $('#TransPolicyList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#TransPolicyList', '#Remove-TransPolicy-PolicyFormula');
+                event.preventDefault();
+            });
+
+            ///////OthServiceBook Policy
+
+            $('#Lookup-OthServiceBookPolicy-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupOthServiceBookPolicy", "PolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#OthServiceBookPolicyList', 'OthServiceBookPolicyList', 5, 'OthServiceBookPolicyList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-OthServiceBookPolicy-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-OthServiceBookPolicy-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#OthServiceBookPolicyList').P2BGetTableDataonSelectedRow('#OthServiceBookPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#OthServiceBookPolicyList').P2BGetTableDataonSelectedRow('#OthServiceBookPolicyList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#OthServiceBookPolicyList', $('#OthServiceBookPolicyList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#OthServiceBookPolicyList', '#Remove-OthServiceBookPolicy-PolicyFormula');
+                event.preventDefault();
+            });
+
+            ///////ExtnRedn Policy
+
+            $('#Lookup-ExtnRednPolicy-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupExtnRednPolicy", "PolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#ExtnRednPolicyList', 'ExtnRednPolicyList', 5, 'ExtnRednPolicyList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-ExtnRednPolicy-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-ExtnRednPolicy-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ExtnRednPolicyList').P2BGetTableDataonSelectedRow('#ExtnRednPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ExtnRednPolicyList').P2BGetTableDataonSelectedRow('#ExtnRednPolicyList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExtnRednPolicyList', $('#ExtnRednPolicyList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#ExtnRednPolicyList', '#Remove-ExtnRednPolicy-PolicyFormula');
+                event.preventDefault();
+            });
+
+            ///////Officiating Policy
+
+            $('#Lookup-OfficiatingPolicy-PolicyFormula').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupOfficiatingPolicy", "PolicyFormula")', '', 'LookupDiv', 'Look Up Data', '#OfficiatingPolicyList', 'OfficiatingPolicyList', 5, 'OfficiatingPolicyList', '#frmAttendanceActionPolicyFormula', 'A', '#Remove-OfficiatingPolicy-PolicyFormula', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-OfficiatingPolicy-PolicyFormula').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#OfficiatingPolicyList').P2BGetTableDataonSelectedRow('#OfficiatingPolicyList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#OfficiatingPolicyList').P2BGetTableDataonSelectedRow('#OfficiatingPolicyList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#OfficiatingPolicyList', $('#OfficiatingPolicyList').val(), 200, 200, '#frmAttendanceActionPolicyFormula', '#OfficiatingPolicyList', '#Remove-OfficiatingPolicy-PolicyFormula');
+                event.preventDefault();
+            });
+
+            $('#creditpolicyId').hide();
+            $('#debitPolicyId ').hide();
+            $('#encashpolicyId').hide();
+            $('#BankpolicyId').hide();
+            $('#ExtnRednPolicyId').hide();
+            $('#OfficiatingPolicyId').hide();
+
+            $('.popup_radio_button').on('change', function () {
+                var selected = $(".popup_radio_button input[type='radio']:checked").val();
+                if (selected == "1") {
+                    $('#creditpolicyId').fadeIn();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#ExtnRednPolicyId').hide();
+                    $('#OfficiatingPolicyId').hide();
+                }
+                if (selected == "2") {
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').fadeIn();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#ExtnRednPolicyId').hide();
+                    $('#OfficiatingPolicyId').hide();
+                }
+                if (selected == "3") {
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').fadeIn();
+                    $('#BankpolicyId').hide();
+                    $('#ExtnRednPolicyId').hide();
+                    $('#OfficiatingPolicyId').hide();
+                }
+                if (selected == "4") {
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').fadeIn();
+                    $('#ExtnRednPolicyId').hide();
+                    $('#OfficiatingPolicyId').hide();
+                }
+                if (selected == "5") {
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#ExtnRednPolicyId').fadeIn();
+                    $('#OfficiatingPolicyId').hide();
+                }
+                if (selected == "6") {
+                    $('#creditpolicyId').hide();
+                    $('#debitPolicyId').hide();
+                    $('#encashpolicyId').hide();
+                    $('#BankpolicyId').hide();
+                    $('#ExtnRednPolicyId').hide();
+                    $('#OfficiatingPolicyId').fadeIn();
+                }
+
+            });
+
+
+        });</script>
+</head>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                @*<div id="Grid_Form">
+                        <div>
+                            <table id="JqGrid"></table>
+                            <div id="pager2"></div>
+                        </div>
+                    </div>*@
+
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <div class="section_Method">
+            <div class="heading">Filter View</div>
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+        </div>
+        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmAttendanceActionPolicyFormula", name = "frmAttendanceActionPolicyFormula" }))
+        {
+
+
+            <input name="geo_id" id="geo_id" class="filter_structure_id" />
+            <input name="pay_id" id="pay_id" class="filter_structure_id" />
+            <input name="fun_id" id="fun_id" class="filter_structure_id" />
+
+
+            @*<div style="float:left;">*@
+            <div class="section_Method">
+                <div class="heading">PolicyFomula Details</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox name must" })</div>
+
+
+                <div class="popup-row">
+                    <div class="popup_radio_button">
+                        <input type="radio" id="IncrPolicy1" name="radio" value="1" /><label for="IncrPolicy1">AttendanceAbsentPolicy</label>
+                        <input type="radio" id="PromoPolicy1" name="radio" value="2" /><label for="PromoPolicy1">AttendanceLeavePriority</label>
+                        @*<input type="radio" id="TransPolicy1" name="radio" value="3" /><label for="TransPolicy1">TransPolicy </label>
+                            <input type="radio" id="OthServiceBookPolicy1" name="radio" value="4" /><label for="OthServiceBookPolicy1">OthServiceBookPolicy</label>
+                            <input type="radio" id="ExtnRednPolicy1" name="radio" value="5" /><label for="ExtnRednPolicy1">ExtnRednPolicy</label>
+                            <input type="radio" id="OfficiatingPolicy1" name="radio" value="6" /><label for="OfficiatingPolicy1">OfficiatingPolicy</label>*@
+                    </div>
+                </div>
+                <div id="load_div" style="display:none;"></div>
+
+                <div id="creditpolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.AttendanceAbsentPolicy, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="AttendAbsentPolicyList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select AttAbsentPolicy" class="popup-content-icon-lookup" id="Lookup-AttAbsentPolicy-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove AttAbsentPolicy" class="popup-content-icon-remove" id="Remove-AttAbsentPolicy-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="debitPolicyId">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.AttendanceLeavePriority, new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="AttendLeavePriorityList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select AttLeavePrio" class="popup-content-icon-lookup" id="Lookup-AttLeavePrio-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove AttLeavePrio" class="popup-content-icon-remove" id="Remove-AttLeavePrio-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div id="encashpolicyId">
+                        <div class="row3 content_margine">
+                            @Html.LabelFor(m => m.TransActivity, new { @class = "popup-content-label" })
+                            <div class="popup-content-table">
+                                <table class="lookuptableselected" id="TransPolicyList">
+                                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                                </table>
+                            </div>
+                            <div class="icon-row">
+                                <button data-p2btooltip="Select TransPolicy" class="popup-content-icon-lookup" id="Lookup-TransPolicy-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Remove TransPolicy" class="popup-content-icon-remove" id="Remove-TransPolicy-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="BankpolicyId">
+                        <div class="row3 content_margine">
+                            @Html.LabelFor(m => m.OthServiceBookActivity, new { @class = "popup-content-label" })
+                            <div class="popup-content-table">
+                                <table class="lookuptableselected" id="OthServiceBookPolicyList">
+                                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                                </table>
+                            </div>
+                            <div class="icon-row">
+                                <button data-p2btooltip="Select OthServiceBookPolicy" class="popup-content-icon-lookup" id="Lookup-OthServiceBookPolicy-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Remove OthServiceBookPolicy" class="popup-content-icon-remove" id="Remove-OthServiceBookPolicy-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ExtnRednPolicyId">
+                        <div class="row3 content_margine">
+                            @Html.LabelFor(m => m.ExtnRednActivity, new { @class = "popup-content-label" })
+                            <div class="popup-content-table">
+                                <table class="lookuptableselected" id="ExtnRednPolicyList">
+                                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                                </table>
+                            </div>
+                            <div class="icon-row">
+                                <button data-p2btooltip="Select ExtnRednPolicy" class="popup-content-icon-lookup" id="Lookup-ExtnRednPolicy-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Remove ExtnRednPolicy" class="popup-content-icon-remove" id="Remove-ExtnRednPolicy-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="OfficiatingPolicyId">
+                        <div class="row3 content_margine">
+                            @Html.LabelFor(m => m.OfficiatingParameter, new { @class = "popup-content-label" })
+                            <div class="popup-content-table">
+                                <table class="lookuptableselected" id="OfficiatingPolicyList">
+                                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                                </table>
+                            </div>
+                            <div class="icon-row">
+                                <button data-p2btooltip="Select OfficiatingPolicy" class="popup-content-icon-lookup" id="Lookup-OfficiatingPolicy-PolicyFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Remove OfficiatingPolicy" class="popup-content-icon-remove" id="Remove-OfficiatingPolicy-PolicyFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                            </div>
+                        </div>
+                    </div>*@
+
+            </div>
+
+            @*</div>*@
+
+        }
+    </div>
+
+</body>
+</html>

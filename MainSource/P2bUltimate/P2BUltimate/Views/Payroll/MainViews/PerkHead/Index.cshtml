@@ -1,0 +1,231 @@
+﻿@model Payroll.PerkHead
+@{
+    ViewBag.Title = "Perk_head";
+}
+
+<html>
+
+<head>
+
+    <title></title>
+    <style>
+        .popup-content-textbox {
+            min-width: 111px;
+            margin: 0px 0px 1px 0px;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 108px;
+        }
+
+        .horizontal_row3, .radio_button_div_3 {
+            display: inline-block;
+        }
+
+        .horizontal_row2, .radio_button_div_2 {
+            display: inline-block;
+        }
+
+        .popup-content-dropdown {
+            position: relative;
+        }
+
+        .row3 {
+            width: 295px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog_address">
+        <div title="LookUp Data">
+            <div class="LookupDiv-address"></div>
+        </div>
+        <div id="PageNavPosition-address">
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Perk Head">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPerkHead" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine"> @Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox", @id = "PerkHeadCode", @maxlength = "10" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox", @id = "PerkHeadName", @maxlength = "50" })</div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.PerkType, "Perk Type :", new { @class = "popup-content-label must" })
+                <select id="PerkTypelist" name="PerkTypelist" style="width:161px;" class="drop must"></select>
+            </div>
+
+            <div class="row3 content_margine horizontal_row2 content_margine">
+                @Html.LabelFor(m => m.InPayslip, "Apper in Payslip :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <div id="radioset">
+                        <span><input type="radio" id="radio3" name="InPayslip" value="true" /> <label for="radio3">Yes</label></span>
+                        <span><input type="radio" id="radio4" name="InPayslip" value="false" /> <label for="radio4">No</label></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row3 content_margine horizontal_row3 ">
+                @Html.LabelFor(m => m.InITax, "Include in Tax :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <div id="radioset">
+                        <span><input type="radio" id="radio5" name="InITax" value="true" /> <label for="radio5">Yes</label></span>
+                        <span><input type="radio" id="radio6" name="InITax" value="false" /> <label for="radio6">No</label></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.RoundingMethod, "Rounding Method :", new { @class = "popup-content-label must" })
+                <select id="RoundingMethodlist" name="RoundingMethodlist" style="width:161px;" class="drop must"></select>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Frequency, "Frequency :", new { @class = "popup-content-label must" })
+                <select id="Frequencylist" name="Frequencylist" style="width:161px;" class="drop must"></select>
+            </div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.RoundDigit, "RoundDigit :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.RoundDigit, new { @class = "popup-content-textbox", id = "RoundDigit" })</div>
+
+
+
+        }
+    </div>
+</body>
+
+
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('#PerkHeadCode').MaxLength(10);
+        $('#PerkHeadName').MaxLength(50);
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var dt;
+        var btndisablename = "";
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+
+        ColModel = ['Id', 'Name', 'PerkType', 'RoundingMethod', 'Frequency', 'RoundingDigit'];
+        ColNames = ['Id', 'Name', 'PerkType', 'RoundingMethod', 'Frequency', 'RoundingDigit'];
+        SortName = 'Id';
+        Caption = 'EmpSocialInfo';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            $('#frmPerkHead').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Perk Head Master', 'open', '@Url.Action("create") ', '#frmPerkHead', 'Message :', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) { });
+            $('#RoundingMethodlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 422, "");
+            $('#Frequencylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, "");
+            $('#PerkTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 415, "");
+            e.preventDefault();
+
+        });
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmPerkHead').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Perk Head Master", '#frmPerkHead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', btndisablename, function (data) {
+                $.each(data[0], function (i, k) {
+                        $('#Name').val(k.Name);
+                        $('#Code').val(k.Code);
+                        $('#Code').attr('readonly', 'readonly');
+                        $('#RoundDigit').val(k.RoundDigit);
+                        $('[name="InPayslip"]').val([k.InPayslip]).button().button("refresh");
+                        $('[name="InITax"]').val([k.InITax]).button().button("refresh");
+                        $('#PerkTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 415, k.PerkType); // Dropdown bind
+                        $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod); // Dropdown bind
+                        $('#Frequencylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 421, k.Frequency); // Dropdown bind
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+
+            e.preventDefault();
+        });
+
+
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        var Viewbtndisable = '#Lookup-SocialActivities-EmpSocialInfo,#Create-SocialActivities-EmpSocialInfo,#Edit-SocialActivities-EmpSocialInfo,#Remove-SocialActivities-EmpSocialInfo';
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+            //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', Viewbtndisable, 356, 612, '#Autho', '', '', '', '', 'Message : ', 'Request Falied :', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Name').val(k.Name);
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#RoundDigit').val(k.RoundDigit);
+                    $('[name="InPayslip"]').val([k.InPayslip]).button().button("refresh");
+                    $('[name="InITax"]').val([k.InITax]).button().button("refresh");
+                    $('#PerkTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 415, k.PerkType); // Dropdown bind
+                    $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod); // Dropdown bind
+                    $('#Frequencylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 421, k.Frequency); // Dropdown bind
+
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    $.each(data[2], function (i, k) {
+                        $('#RoundingMethodlist').oldDropval(data[2].RoundingMethod);
+                        $('#PerkTypelist').oldDropval(data[2].PerkType);
+                        $('#Frequencylist').oldDropval(data[2].Frequency);
+                    });
+                }
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Code').ForceOnlyAlphaNumeric();
+        $('#Code').MaxLength(10);
+        $('#Name').ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(25);
+        $('#RoundDigit').ForceOnlyNumeric();
+        $('#RoundDigit').MaxLength(3);
+        $('#Code').ValidateTextBox({ maxlength: 5, alphanum: true });
+        $('#Name').ValidateTextBox({ maxlength: 25, name: true });
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        });
+</script>

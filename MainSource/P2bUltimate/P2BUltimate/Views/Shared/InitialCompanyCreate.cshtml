@@ -1,0 +1,106 @@
+﻿
+@model P2b.Global.Company
+@{
+    ViewBag.title = "InitialCompanyCreate";
+}
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('#Create_Dialog').CustomeCreateDialog({
+            submiturl: '@Url.Action("Create", "InitialCompanyCreate")',
+            form: '#frminitialCompanyCreate',
+            title: 'Create Company',
+            height: 'auto',
+            width:'450',
+            submitfun: function (data) {
+                if (data.success == true) {
+                    window.location.href = "" + data.data + "";
+                }
+                else { alert(data.responseText); }
+            }
+        });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Name').ValidateTextBox({ maxlength: 250});
+       
+        $('#create_state').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Calendar") ', 'Create Calendar', 'open', '@Url.Action("CreateCalender", "InitialCompanyCreate")', '#frmCalendarP', 'Message :', 'Request Falied :', '#JqGrid', 250, 350, $("#Financial_Yearlist option:selected").val(), '#Financial_Yearlist', 'change', '', '', function (data) {
+                $('#Financial_Yearlist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListCalendar", "InitialCompanyCreate")", "", data[0], '#Financial_Yearlist');
+            });
+            e.preventDefault();
+        });
+        $('#Financial_Yearlist').selectmenu().selectmenu("menuWidget");
+        $('#Financial_Yearlist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListCalendar", "InitialCompanyCreate")", "", "", '#Financial_Yearlist');
+    });
+</script>
+<style>
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+    #create_state {
+        position: relative;
+        left: 263px;
+        top: -27px;
+    }
+</style>
+
+<div id="Create_Dialog" style="display:none">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frminitialCompanyCreate" }))
+    {
+        <div>
+            @Html.LabelFor(e => e.Code, new { @class = "popup-content-label" })
+            @Html.TextBoxFor(e => e.Code, new { @class = "popup-content-textbox" })
+        </div>
+        <div>
+            @Html.LabelFor(e => e.Name, new { @class = "popup-content-label" })
+            @Html.TextBoxFor(e => e.Name, new { @class = "popup-content-textbox" })
+        </div>
+        <div>
+            <label id="Financialyear" class="popup-content-label">Financial_Year</label><select id="Financial_Yearlist" name="Financial_Yearlist" style="width:161px;"><option></option></select>
+
+            <div>
+                <button data-p2btooltip="Create FinancialYear" class="popup-content-icon-create" id="create_state">
+                    <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                </button>
+            </div>
+        </div>
+    }
+</div>

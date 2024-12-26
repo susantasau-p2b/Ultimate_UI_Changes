@@ -1,0 +1,47 @@
+﻿
+@model Payroll.CPIUnitCalc
+@{
+    Layout = null;
+}
+@*<link href="~/Content/Cpi%20Rule%20Details/cpi_rule_details.css" rel="stylesheet" />*@
+<style>
+    .CPIWages_icon-row {
+        position: absolute;
+        left: 110px;
+        top: 7px;
+    }
+/*    .cp_popup-content-label{
+        width:150px;
+    }*/
+</style>
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCPIUnitCalc" }))
+    {
+        <div class="cp_row3 content_margine">@Html.LabelFor(m => m.BaseIndex, "BaseIndex :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BaseIndex, new { @class = "cp_popup-content-textbox must" })</div>
+         <div class="cp_row3 content_margine">@Html.LabelFor(m => m.IndexMaxCeiling, "IndexMaxCeiling :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.IndexMaxCeiling, new { @class = "cp_popup-content-textbox must" })</div>              
+        <div class="cp_row3 content_margine">@Html.LabelFor(m => m.Unit, "Unit:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Unit, new { @class = "cp_popup-content-textbox must" })</div>
+        
+    }
+</div>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#Lookup-CPIWages-CPIRuleDetails').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetLookupDetails", "wages")', '', 'lookupdiv_address', 'Look Up Data', '#CPIWageslist', 'CPIWageslist', 5, 'CPIWageslist', '#frmCPIRuleDetails', 'N', '#Basic_Edit,#Basic_remove', 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+        $('#Create-CPIWages-CPIRuleDetails').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Cpi Wages List', 'open', '@Url.Action("Create", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 374, 585, '', '', '', '#frmCPIRule', '', function (data) {
+                $('#CPIWageslist').P2BLookUpEncapsulate('#CPIWageslist', 'CPIWageslist', data[0], data[1], 'CPIWageslist');
+            });
+            e.preventDefault();
+        });
+
+
+        $('#BaseIndex').ForceOnlyNumeric().MaxLength(10);
+        $('#IndexMaxCeiling').ForceOnlyNumeric().MaxLength(10);
+        $('#Unit').ForceOnlyNumeric().MaxLength(6);
+
+    });
+</script>

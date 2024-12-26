@@ -1,0 +1,249 @@
+﻿@{
+    ViewBag.Title = "CTC";
+}
+@model Recruitment.CTCDefinition
+
+
+
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                @*<button class="button" id="Autho">Authorised</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmCTCIndex", name = "frmCTCIndexEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            //  <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessIncrDate, "Activity Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessIncrDate, new { @class = "popup-content-textbox must" })</div>  
+           @*<div class="row3 content_margine">   Date : &nbsp;&nbsp;&nbsp;<input type="text" name="Date" id="Date" value="" class="popup-content-textbox must" />  </div>*@
+             <div class="row3 content_margine">@Html.LabelFor(m => m.EffectiveDate, "Effective Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox must" })</div>
+      
+          
+            <div class="row3 content_margine">
+                <div id="AddressList_Old"></div>
+                @Html.LabelFor(m => m.SalaryHead, "SalaryComponent :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="SalaryComponentList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup SalaryComponent" class="  popup-content-icon-lookup" id="Lookup-SalaryComponent-CTC"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-Address-Corporate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-Address-Corporate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button*@
+                    <button data-p2btooltip="Remove SalaryComponent" class="popup-content-icon-remove" id="Remove-SalaryComponent-CTC"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        // $('#Name').MaxLength(50);
+        // $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-SalaryComponent-CTC,#Remove-SalaryComponent-CTC";
+        ColModel = ['EffectiveDate', 'EndDate', 'Id'];
+        ColNames = ['EffectiveDate', 'EndDate', 'Id'];
+        SortName = 'Id';
+        Caption = 'CTC Definition';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#EffectiveDate').P2BDatePicker();
+        $('#EndDate').P2BDatePicker();
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmCTCIndex').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Data', 'open', '@Url.Action("Create")', '#frmCTCIndex', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#SalaryComponentList', btndisablenames, function (data) { });
+            // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        // Main page edit
+     
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit CTC Data", '#frmCTCIndex', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#SalaryComponentList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+
+                    if (k.EffectiveDate != null) { $('#EffectiveDate').val(DateConvert(k.EffectiveDate)); }
+                    if (k.EndDate != null) { $('#EndDate').val(DateConvert(k.EndDate)); }
+
+
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#SalaryComponentList').P2BLookUpEncapsulate('#SalaryComponentList', 'SalaryComponentList', k.salhd_id, k.salhd_details, 'SalaryComponentList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+    
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View  Data', '#SalaryComponentList', '#Remove-SalaryComponent-CTC', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                
+
+                    if (k.EffectiveDate != null) { $('#EffectiveDate').val(DateConvert(k.EffectiveDate)); }
+                    if (k.EndDate != null) { $('#EndDate').val(DateConvert(k.EndDate)); }
+
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#SalaryComponentList').P2BLookUpEncapsulate('#SalaryComponentList', 'SalaryComponentList', k.salhd_id, k.salhd_details, 'SalaryComponentList', '#Remove-SalaryComponent-CTC', 'A');
+                   
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                  
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                       
+                    }
+                }
+            });
+        });
+
+
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+    
+        $('#Lookup-SalaryComponent-CTC').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("Getsalarycomponent", "CTCDefinition")', '', 'LookupDiv', 'salarycomponent Look Up Data', '#SalaryComponentList', 'SalaryComponentList', 5, 'SalaryComponentList', '#frmCTCIndex', 'A', '#Edit-SalaryComponent-CTC,#Remove-SalaryComponent-CTC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //partial page delete
+        $('#Remove-SalaryComponent-CTC').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#SalaryComponentList').P2BGetTableDataonSelectedRow('#SalaryComponentList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#SalaryComponentList').P2BGetTableDataonSelectedRow('#SalaryComponentList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SalaryComponentList', $('#SalaryComponentList').val(), 200, 200, '#frmCTCIndex', '#SalaryComponentList', '#Remove-SalaryComponent-CTC');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+
+
+    });
+</script>

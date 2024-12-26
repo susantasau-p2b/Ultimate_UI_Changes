@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "ITTDS";
+}
+@model Payroll.ITTDS
+<style>
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+</style>
+
+<html>
+<head>
+    <title>@ViewBag.title</title>
+    @*<link href="~/Content/tds_master/tds_master.css" rel="stylesheet" />*@
+    <script>
+        $(document).ready(function () {
+            $('button').button();
+            var ColNames = [];
+            var ColModel = [];
+            //a.Id, a.IncomeRangeFrom, a.IncomeRangeTo, a.SurchargeAmount, a.Percentage, a.Amount, a.EduCessPercent, a.EduCessAmount, a.SurchargePercent
+            var SortName, Caption, url, width, height;
+            ColModel = ['Category', 'IncomeRangeFrom', 'IncomeRangeTo', 'Percentage', 'Amount', 'Id'];
+            ColNames = ['Category', 'IncomeRangeFrom', 'IncomeRangeTo', 'Percentage', 'Amount', 'Id'];
+            SortName = 'Id';
+            Caption = 'IT TDS';
+            url = '@Url.Action("Grid_TDSMaster")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function () {
+                //  $('#Cat').oldDropval("Category");
+                $("#frmTDS").trigger("reset");
+                $('#Create_Dialog').P2BCreateDialog('', 0, '', '', 'Create TDS Master', 'open', '@Url.Action("Create")', '#frmTDS', 'Message :', 'Request Falied :', '#JqGrid', 350, 400, '', '', function (data) {
+                    $('#Cat').prop('disabled', false);
+                    $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, "");
+                });
+            });
+            var dt;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#Edit').button().click(function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("edit")', dt.Id, '@Url.Action("EditSave")', "Edit TDS Master Data", '#frmTDS', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 350, 400, '', '', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#IncomeRangeFrom').attr('readonly', 'readonly');
+                        $('#IncomeRangeTo').attr('readonly', 'readonly');
+                        $('#Cat').prop('disabled', true);
+                        $('#IncomeRangeFrom').val(k.IncomeRangeFrom);
+                        $('#IncomeRangeTo').val(k.IncomeRangeTo);
+                        $('#Percentage').val(k.Percentage);
+                        $('#Amount').val(k.Amount);
+                        $('#EduCessPercent').val(k.EduCessPercent);
+                        $('#EduCessAmount').val(k.EduCessAmount);
+                        $('#SurchargePercent').val(k.SurchargePercent);
+                        $('#SurchargeAmount').val(k.SurchargeAmount);
+                        // $('#Cat').prop("disabled", true);
+                        $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, k.Category_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        //  $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, k.Category_Id);
+
+                    });
+
+                });
+            });
+
+            @*$('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ITTDS Data', '', 500, 620, '#Autho', '', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                     $('#IncomeRangeFrom').val(k.IncomeRangeFrom);
+                    $('#IncomeRangeTo').val(k.IncomeRangeTo);
+                    $('#Percentage').val(k.Percentage);
+                    $('#Amount').val(k.Amount);
+                    $('#EduCessPercent').val(k.EduCessPercent);
+                    $('#EduCessAmount').val(k.EduCessAmount);
+                    $('#SurchargePercent').val(k.SurchargePercent);
+                    $('#SurchargeAmount').val(k.SurchargeAmount);
+                    $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, k.Category_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+
+                });
+
+            });
+        });*@
+
+            $('#View').button().click(function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View IT TDS Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#IncomeRangeFrom').val(k.IncomeRangeFrom);
+                        $('#IncomeRangeTo').val(k.IncomeRangeTo);
+                        $('#Percentage').val(k.Percentage);
+                        $('#Amount').val(k.Amount);
+                        $('#EduCessPercent').val(k.EduCessPercent);
+                        $('#EduCessAmount').val(k.EduCessAmount);
+                        $('#SurchargePercent').val(k.SurchargePercent);
+                        $('#SurchargeAmount').val(k.SurchargeAmount);
+                        $('#Cat').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 412, k.Category_Id);
+                    });
+
+                    $.each(data[1], function (i, k) {
+
+                    });
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[2] != null) {
+                            $('#Name').oldVal(data[2].Name);
+                            $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                            $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                        }
+                    }
+                });
+            });
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are You Sure You Want To Delete', 'Message : ', 'Request failed', '#JqGrid');
+            });
+            $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "60px" });
+            $('#IncomeRangeFrom').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#IncomeRangeTo').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#Percentage').attr("value", "0.0").ForcePercent().MaxLength(4);
+            $('#Amount').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#EduCessPercent').attr("value", "0.0").ForcePercent().MaxLength(4);
+            $('#EduCessAmount').attr("value", "0").ForceAmount().MaxLength(10);
+            $('#SurchargePercent').attr("value", "0.0").ForcePercent().MaxLength(4);
+            $('#SurchargeAmount').attr("value", "0").ForceAmount().MaxLength(10);
+
+
+        });
+    </script>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+
+
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTDS" }))
+        {
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.Category, new { @class = "popup-content-label must" })
+            <select class="drop" id="Cat" name="Cat" style="width:120px;">
+                <option value="0">-Select-</option>
+            </select>
+        </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.IncomeRangeFrom, "Income From :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.IncomeRangeFrom, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.IncomeRangeTo, "Income To :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.IncomeRangeTo, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.Percentage, " Tax Perc :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Percentage, new { @class = "popup-content-textbox" })
+                <i class="fa fa-percent" aria-hidden="true"></i>
+                @*<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" />*@
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.Amount, " Tax Amt :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Amount, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.EduCessPercent, " Edu Cess Perc :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EduCessPercent, new { @class = "popup-content-textbox" })
+                <i class="fa fa-percent" aria-hidden="true"></i>
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.EduCessAmount, " Edu Cess Amt :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EduCessAmount, new { @class = "popup-content-textbox" })
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.SurchargePercent, "Surcharge Perc:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SurchargePercent, new { @class = "popup-content-textbox" })
+                <i class="fa fa-percent" aria-hidden="true"></i>
+            </div>
+            <div class="tds_row1 content_margine">
+                @Html.LabelFor(m => m.SurchargeAmount, "Surcharge Amt :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SurchargeAmount, new { @class = "popup-content-textbox" })
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>

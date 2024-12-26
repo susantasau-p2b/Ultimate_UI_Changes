@@ -1,0 +1,437 @@
+﻿@{
+    Layout = null;
+}
+@model P2B.EExMS.ExpenseT
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+</style>
+
+<html>
+
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            @*var dataemp = $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+            $('button').button();
+            $('.popup_radio_button').buttonset();
+            $('#autho').makeDisable('#create,#edit,#delete');
+            $('.drop').selectmenu().selectmenu('menuWidget');
+            $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+            $('#Categorylist').selectmenu().selectmenu("menuWidget");
+            $('#Type_Nomines').selectmenu().selectmenu("menuWidget");
+
+            $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+            $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+            // $('#NoOfRooms').ForceAmount().MaxLength(10);
+
+            $('#ExpenseCalendarList').P2BSelectMenuAppend('@Url.Action("GetExpCalendarDrop", "ExpenseT")', '', "");
+            $('#ExpenseTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 718, "");
+
+
+            var btndisablenames = "#edit-Address-BenefitNominees,#remove-HotelEligibilityPolicy,#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees";
+            $("#handicapRemarkdiv").fadeOut();
+            $('#lvexcludeleavediv').fadeOut();
+
+            function AssignData() {
+                dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+
+            }
+
+            $('#EntryDate').P2BDatePicker();
+            $('#EntryDate').TodayDate();
+            $('#EntryDate').css("pointer-events", "none");
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            var ExpenseCalendarids = "";
+
+            $('#ExpenseCalendarList').on('selectmenuchange', function (event) {
+                ExpenseCalendarids = $("#ExpenseCalendarList option:selected").val();
+                event.preventDefault();
+            });
+
+            $('#ExpenseTypelist').on('selectmenuchange', function (event) {
+                var ExpenseTypelookup = $("#ExpenseTypelist option:selected").text();
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+                if (a != null && a != "") {
+                    $.post("@Url.Action("getBudgetAllocated", "ExpenseT")?EmpID=" + a + '&ExpenseTypelookup=' + ExpenseTypelookup + '&ExpenseCalendarids=' + ExpenseCalendarids, function (data) {
+                        $('#BudgetAllocated').val(data);
+
+                    });
+                }
+
+                @*var b = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";*@
+                //if (b != null && b != "") {
+                $.get("@Url.Action("getUtilizedAmount", "ExpenseT")", function (data) {
+                    //console.log("data: " + data);
+                    $('#UtilizedBudget').val(data);
+                });
+                //}
+                event.preventDefault();
+            });
+
+
+            var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+            if (a != null && a != "") {
+                $.post("@Url.Action("getTotalAmt", "ExpenseT")?IdEmp=" + a, function (data) {
+                    
+                    $('#bhtxn').append("BudgetAllocated:" + data[0] + ", " + "UtilizedBudget:" + data[1]);
+                });
+            }
+
+            //$('.popup_radio_button').
+            $('#FileDownload_idUser').hide();
+            /* ======================= Document upload ===================== */
+            $('#Upload_btnUser').button().on("click", function (event) {
+                debugger;
+                var vidFileLength = $("#files")[0].files.length;
+                if (vidFileLength === 0) {
+                    alert("No file selected.");
+                    return false;
+                }
+                var form = $("#frmExpenseTReq").serialize();
+                var tempExcel = new FormData($("#frmExpenseTReq")[0]);
+                $.post({
+                    url: "@Url.Action("FilesUpload", "ExpenseT")",
+                    data: tempExcel,
+                    datatype: "json",
+                    method: "POST",
+                    data: tempExcel,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            alert("File Upload Successfully");
+                            //jQuery('.ui-dialog').remove();
+                            $('#FileDownload_idUser').hide();
+                            return false;
+                        }
+                        else {
+                            alert(data.responseText);
+                        }
+                    },
+                    complete: function (data) {
+                        //$('#lblloader').hide();
+                    }
+                });
+                event.preventDefault();
+            });
+
+            $('#Download_btnUser').button().on("click", function (event) {
+                debugger;
+                var filepath = $('#filepathiduser').val();
+                if (filepath != null) {
+                    $.post("@Url.Action("Filename", "ExpenseT")?filepath=" + filepath, function (data) {
+                        if (data != null && data != "") {
+                            window.location = '@Url.Action("GetCompImage", "ELMS")?filepath=' + data.data;
+                        }
+                        else {
+                            alert("Data Null");
+                        }
+                    })
+                }
+                event.preventDefault();
+            });
+
+
+            var imagesPreview = function (input, placeToInsertImagePreview) {
+                debugger;
+                if (input.files) {
+                    var filesAmount = input.files.length;
+                    $(placeToInsertImagePreview).empty();
+                    for (i = 0; i < filesAmount; i++) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            $($.parseHTML('<img class="imgdata">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                        }
+
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+
+            };
+
+
+
+            // Loaded via <script> tag, create shortcut to access PDF.js exports.
+            var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            $("#files").on("change", function (e) {
+                debugger;
+                var file = e.target.files[0]
+                var filesize = e.target.files[0].size;
+                var maxfilesize = 500000;//500kb
+                if (filesize <= maxfilesize) {
+                    if (file.type == "application/pdf") {
+                        $('#container2').empty();
+                        $("#user_investment").hide();
+                        $("#pdfViewer").show();
+                        var fileReader = new FileReader();
+                        fileReader.onload = function () {
+                            var pdfData = new Uint8Array(this.result);
+                            // Using DocumentInitParameters object to load binary data.
+                            var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                            loadingTask.promise.then(function (pdf) {
+                                console.log('PDF loaded');
+
+                                // Fetch the first page
+                                // var pageNumber = 1;
+                                //var container = document.getElementById("container")
+                                for (var i = 1; i <= pdf.numPages; i++) {
+                                    pdf.getPage(i).then(function (page) {
+                                        console.log('Page loaded');
+
+                                        var scale = 1.5;
+                                        var viewport = page.getViewport({ scale: scale });
+
+                                        var div = document.createElement("div");
+
+                                        // Set id attribute with page-#{pdf_page_number} format
+                                        div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+                                        // This will keep positions of child elements as per our needs
+                                        div.setAttribute("style", "position: relative");
+                                        div.setAttribute("class", "form-group content_margine");
+
+                                        // Append div within div#container
+                                        container2.appendChild(div);
+
+                                        // Create a new Canvas element
+                                        var canvas = document.createElement("canvas");
+
+                                        // Append Canvas within div#page-#{pdf_page_number}
+                                        div.appendChild(canvas);
+
+                                        var context = canvas.getContext('2d');
+                                        canvas.height = viewport.height;
+                                        canvas.width = viewport.width;
+
+                                        var renderContext = {
+                                            canvasContext: context,
+                                            viewport: viewport
+                                        };
+
+                                        // Render PDF page
+                                        var renderTask = page.render(renderContext);
+                                        renderTask.promise.then(function () {
+                                            console.log('Page rendered');
+                                        });
+                                    });
+                                }
+                            }, function (reason) {
+                                // PDF loading error
+                                console.error(reason);
+                            });
+                        };
+                        fileReader.readAsArrayBuffer(file);
+                    } if (file.type == "image/jpeg" || file.type == "image/png") {
+                        $('#container2').empty();
+                        $("#user_investment").show();
+                        $("#pdfViewer").hide();
+                        imagesPreview(this, '#user_investment')
+                    }
+                    // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable');
+                    $('#Upload_btnUser').button('enable');
+                } else {
+                    alert("File Size Should Not Be Grater than 500kb");
+                    $('#Upload_btnUser').button('disable');
+                    // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+                }
+            });
+
+            //$('button').button();
+
+
+        });
+    </script>
+
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmExpenseTReq", name = "frmExpenseTReq", enctype = "multipart/form-data" }))
+        {
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+             <p id="bhtxn"></p>
+            <div class="section2_Leave">
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label must">Expense Calendar :</label>
+                    <select id="ExpenseCalendarList" name="ExpenseCalendarList" class="drop must" style="width:180px;">
+                        <option value="0">-Select-</option>
+                    </select>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ExpenseBudget.ExpenseType, "Expense Type :", new { @class = "popup-content-label must" })
+                    <select id="ExpenseTypelist" name="ExpenseTypelist" class="drop must" style="width:180px;">
+                        <option value="0">-Select-</option>
+                    </select>
+                </div>
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label must">Budget Allocated :</label>
+                    <input type="text" id="BudgetAllocated" class="popup-content-textbox" name="BudgetAllocated" readonly />
+                </div>
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">Utilized Budget :</label>
+                    <input type="text" id="UtilizedBudget" name="UtilizedBudget" class="popup-content-textbox" readonly />
+                </div>
+                
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.EntryDate, "Expense EntryDate :", new { @class = "popup-content-label" })
+                    <input type="text" id="EntryDate" name="EntryDate" class="popup-content-textbox" />
+                </div>             
+                @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.MonthYear, "MonthYear :", new { @class = "popup-content-label" })
+                        <select id="MonthYearlist" name="MonthYearlist" class="drop" style="width:180px;">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>*@
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ExpenseAmount, "Expense Amount :", new { @class = "popup-content-label must" })
+                    <input type="text" id="ExpenseAmount" name="ExpenseAmount" class="popup-content-textbox must" />
+                </div>
+
+
+                <div class="row3 content_margine ">
+                    @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+                </div>
+
+                @*<div class="form-horizontal" id="Upload_Div">
+                        <div class="form-group content_margine" id="FileBrowes_id">
+                            @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label popup-content-label" })
+                            <div class="col-md-10">
+                                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" }) <button id="Upload_btnUser" name="Upload_btnUser">Upload</button>
+                            </div>
+                        </div>
+                        <div class="row3 content_margine" id="FileDownload_idUser">
+                            <label class="popup-content-label">File Download :</label>
+
+                        </div>
+                        <div style="height:100%;width:100%;overflow:auto;" id="user_investment" class="content_margine"></div>
+                        <canvas id="pdfViewer"></canvas>
+                        <div id="container2" class="container2">
+                        </div>
+                    </div>*@
+
+
+                <div class="row3 content_margine ">
+                    @Html.ValidationSummary()
+                    <ol>
+                        <li class="lifile" style="list-style-type:none;">
+                            <label style="margin-right:13px;">Upload Documents</label>
+                            <input type="file" id="files" name="files" />
+                            <span class="field-validation-error" id="spanfile"></span>
+                        </li>
+                    </ol>
+                    <input type="submit" id="Upload_btnUser" value="Upload" />
+                </div>
+
+                <div style="height:100%;width:100%;overflow:auto;" id="user_investment" class="content_margine"></div>
+                <canvas id="pdfViewer"></canvas>
+                <div id="container2" class="container2">
+                </div>
+
+            </div>
+        }
+    </div>
+</body>
+</html>

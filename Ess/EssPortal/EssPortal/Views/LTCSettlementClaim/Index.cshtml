@@ -1,0 +1,372 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.LTCSettlementClaim
+
+<style>
+    /*.icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }*/
+
+
+
+
+    .icon-row {
+        position: relative;
+        left: 146px;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 167px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 548px;
+    }
+
+    .row2 {
+        display: inline-block;
+        width: 450px;
+    }
+
+    .add-dialog-content {
+        float: right;
+        right: 0;
+        width: 678px;
+    }
+
+    .form-of-element {
+        display: block;
+        border: #DEDEDE solid 0.1px;
+        width: auto;
+        height: 800px;
+        padding: 5px 2px;
+        margin-top: 3px;
+    }
+
+    .select_div {
+    }
+
+
+</style>
+
+<html>
+
+<head>
+    <title></title>
+    <script>
+    $(document).ready(function (e) {
+
+        @*var dataemp = ("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+            alert(dataemp);*@
+        $('button').button();
+        //$('#ResumeDate').P2BDatePicker();
+        // $('#ReqDate').P2BDatePicker();
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+
+        $('#DateOfAppl').attr('readonly', 'readonly');
+        $('#DateOfAppl').TodayDate();
+        $('#LTCTypelist').selectmenu().selectmenu("menuWidget");
+        $('#LTCTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "Lookup")', 3000, "");
+
+
+
+
+        var EMPID = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+        if (EMPID != null || EMPID != "") {
+            //alert($(this).val());
+            //var id = $(this).val();
+            $.get("@Url.Action("GetEmpLTCBlock")", { data: EMPID }, function (data) {
+                $('#txtLTCBlock').val(data.Id);
+                $('#BlockId').val(data.Id);
+                $('#LvReqList').P2BSelectMenuAppend('@Url.Action("GetLVReqLKDetails", "LTCAdvanceClaim")', EMPID, data.Id); // To bind dropdown on page load
+                $('#txtLTCBlock').val(data.FullDetails).attr("readonly", "readonly");
+            });
+        }
+
+
+
+
+
+        $('#lookup-JourneyDetails-LTCSettlementClaim').on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetJourneyLKDetails", "LTCSettlementClaim")', '', 'lookupdiv', ' Look Up Data', '#JourneyDetailsList', 'JourneyDetailsList', 5, 'JourneyDetailsList', '#frmLTCSettlmentClaim', 'N', '#remove-JourneyDetails-LTCSettlementClaim', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+
+        /******************************** Journey Details Lookup Create Button *********************************/
+        $('#create-JourneyDetails-LTCSettlementClaim').on("click", function (event) {
+            var a = ("@Request.RequestContext.HttpContext.Session["TempEmpId"]"); // $('#employee-table').P2BGetTableDataonSelectedRow('#employee-table', 1);
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_JourneyDetails", "LTCSettlementClaim")', 'Create JourneyDetails Master', 'open', '@Url.Action("Create", "JourneyDetails")', '#frmJourneyDetailsPartial', 'Message :', 'Request Falied :', '#jqgrid', 600, 600, '', '', '#edit-JourneyObject1-JourneyDetails,#edit-JourneyObject-JourneyDetails,#edit-FamilyDetails-JourneyDetails,#remove-FamilyDetails-JourneyDetails', '#frmLTCSettlementClaim', '', function (data) {
+                $('#JourneyDetailsList').P2BLookUpEncapsulate('#JourneyDetailsList', 'JourneyDetailsList', data[0], data[1], 'JourneyDetailsList', '#remove-JourneyDetails-LTCSettlementClaim', 'N');
+                $('#TravelModeEligibilityPolicylist').P2BSelectMenuAppend("@Url.Action("TravelModeEligibilityPolicylistd", "LTCSettlementClaim")", a.toString(), "");
+            });
+            event.preventDefault();
+        });
+        /******/
+
+        /******************************** Journey Details Lookup Delete Button *********************************/
+        $('#remove-JourneyDetails-LTCSettlementClaim').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmLTCSettlmentClaim', '#JourneyDetailsList', '#remove-CandidateDocuments-Candidate');
+            event.preventDefault();
+        });
+        /******/
+
+        $('#lookup-HotelBookingDetails-LTCSettlementClaim').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetHotelBookingDetails", "LTCSettlementClaim")', '', 'lookupdiv', ' Look Up Data', '#HotelBookingDetailsList', 'HotelBookingDetailsList', 5, 'HotelBookingDetailsList', '#frmLTCSettlmentClaim', 'A', '#remove-HotelBookingDetails-LTCSettlementClaim', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        /******************************** Hotel Booking Lookup Create Button *********************************/
+        $('#create-HotelBookingDetails-LTCSettlementClaim').on("click", function (event) {
+            var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_TravelHotelBooking", "LTCSettlementClaim")', 'Create HotelBookingDetails Master', 'open', '@Url.Action("Create", "TravelHotelBooking")', '#frmTravelHotelBookingDetails', 'Message :', 'Request Falied :', '#jqgrid', 600, 600, '', '', '#edit-HotelBookingDetails-LTCSettlementClaim', '#frmLTCSettlmentClaim', '', function (data) {
+                $('#HotelBookingDetailsList').P2BLookUpEncapsulate('#HotelBookingDetailsList', 'HotelBookingDetailsList', data[0], data[1], 'HotelBookingDetailsList', '#remove-HotelBookingDetails-LTCSettlementClaim', 'N');
+            });
+            event.preventDefault();
+        });
+            /******/
+
+            /******************************** Hotel Booking Lookup Delete Button *********************************/
+            $('#remove-HotelBookingDetails-LTCSettlementClaim').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#HotelBookingDetailsList').P2BGetTableDataonSelectedRow('#HotelBookingDetailsList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HotelBookingDetailsList', $('#HotelBookingDetailsList').val(), 200, 200, '#frmLTCSettlmentClaim', '#HotelBookingDetailsList', '#remove-CandidateDocuments-Candidate');
+                event.preventDefault();
+            });
+            /******/
+
+
+
+            $('#remove-JourneyDetails-LTCSettlementClaim').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmLTCSettlmentClaim', '#JourneyDetailsList', '#remove-CandidateDocuments-Candidate');
+                event.preventDefault();
+            });
+            /******/
+
+
+            $('#lookup-LTCAdvanceClaim-LTCSettlementClaim').on('click', function (event) {
+                var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]"; // $('#employee-table').P2BGetTableDataonSelectedRow('#employee-table', 1);
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            var blockid = $('#BlockId').val();
+            if (blockid == "") {
+                alert("BlockId Is Empty");
+                return false;
+            }
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAdavanceClaimLKDetails", "LTCSettlementClaim")?Empid=' + a + '&EmpLTCBlockId=' + blockid, '', 'lookupdiv', ' Look Up Data', '#LTCAdvanceClaimList', 'LTCAdvanceClaimList', 5, 'LTCAdvanceClaimList', '#frmLTCSettlmentClaim', 'N', '#remove-LTCAdvanceClaim-LTCSettlementClaim', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+        $('.popup_radio_button').buttonset();
+        $('#LTCTypelist').selectmenu().selectmenu("menuWidget");
+        $('#LvReqList').selectmenu().selectmenu("menuWidget");
+    });
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLTCSettlmentClaim", name = "frmLTCSettlmentClaim" }))
+        {
+
+             <input id="BlockId" type="hidden" name="BlockId" />
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+            <div class="section2_Leave">
+
+                <div class="row2 select_div content_margine"><label class="popup-content-label must">LTC Block</label>
+                <input name="txtLTCBlock" type="text" id="txtLTCBlock" style="width:263px;" />
+                </div>
+
+
+                <div class="row6 content_margine addons">
+                    <div id="LTCAdvanceClaimList_old"></div>
+                    @Html.LabelFor(m => m.LTCAdvanceClaim, "LTC Advance Claim:", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="LTCAdvanceClaimList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Advance Claim Details" class="button popup-content-icon-lookup" id="lookup-LTCAdvanceClaim-LTCSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Advance Claim Details" class="button popup-content-icon-create" id="create-LTCAdvanceClaim-SettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Advance Claim Details" class="button popup-content-icon-edit" id="edit-LTCAdvanceClaim-SettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove Advance Claim Details" class="button popup-content-icon-remove" id="remove-LTCAdvanceClaim-SettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                @*<div class="row2 select_div content_margine">@Html.LabelFor(m => m.LTC_TYPE, "LTC Type :", new { @class = "popup-content-label must" })<select id="LTCTypelist" name="LTCTypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>*@
+                @*<br />*@
+                <div class="row2 content_margine">@Html.LabelFor(m => m.DateOfAppl, "Requisition Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DateOfAppl, new { @class = "popup-content-textbox must" })</div>
+                <br />
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.LvNewReq, "Leave Requisition:", new { @class = "popup-content-label must" })<select id="LvReqList" name="LvReqList" style="width:263px;" class="drop must"><option value="0">-Select-</option></select>
+                </div>
+                <div class="row6 content_margine addons">
+                    <div id="JourneyDetailsList_old"></div>
+                    @Html.LabelFor(m => m.JourneyDetails, "Journey Details:", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="JourneyDetailsList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Journey Details" class="button popup-content-icon-lookup" id="lookup-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Journey Details" class="button popup-content-icon-create" id="create-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Journey Details" class="button popup-content-icon-edit" id="edit-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Journey Details" class="button popup-content-icon-remove" id="remove-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row6 content_margine addons">
+                    <div id="HotelBookingDetailsList_old"></div>
+                    @Html.LabelFor(m => m.Travel_Hotel_Booking, "Hotel Booking  Details:", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="HotelBookingDetailsList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Hotel Booking Details" class="button popup-content-icon-lookup" id="lookup-HotelBookingDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Hotel Booking Details" class="button popup-content-icon-create" id="create-HotelBookingDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Hotel Booking Details" class="button popup-content-icon-edit" id="edit-HotelBookingDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Hotel Booking Details" class="button popup-content-icon-remove" id="remove-HotelBookingDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row2 select_div content_margine">@Html.LabelFor(m => m.LTC_TYPE, "LTC Type :", new { @class = "popup-content-label must" })<select id="LTCTypelist" name="LTCTypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>
+                <br />
+                <div class="row2 content_margine">@Html.LabelFor(m => m.LTC_Claim_Amt, "LTC Claim Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTC_Claim_Amt, new { @class = "popup-content-textbox must" })</div>
+                <br />
+                <div class="row2 content_margine">@Html.LabelFor(m => m.LTC_Eligible_Amt, "LTC Eligible Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTC_Eligible_Amt, new { @class = "popup-content-textbox must" })</div>
+                <div>
+                    <div class="row2 content_margine">@Html.LabelFor(m => m.NoOfDays, "No Of Days :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.NoOfDays, new { @class = "popup-content-textbox must" })</div>
+                    <br />
+                    <div id="hideENCDivdetails">
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.EncashmentAmount, "Encashment Amount :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EncashmentAmount, new { @class = "popup-content-textbox" })</div>
+                    </div>
+                </div>
+                <div class="row2 content_margine">@Html.LabelFor(m => m.LTCAdvAmt, "LTC Advance Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTCAdvAmt, new { @class = "popup-content-textbox must" })</div>
+                <br />
+                <div class="row2 content_margine">@Html.LabelFor(m => m.LTC_Sanction_Amt, "Sanction Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTC_Sanction_Amt, new { @class = "popup-content-textbox must" })</div>
+                <br />
+                <div class="row2 content_margine">@Html.LabelFor(m => m.LTC_Settle_Amt, "LTC Settlement Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTC_Settle_Amt, new { @class = "popup-content-textbox must" })</div>
+                <br />
+                <div class="row2 content_margine">@Html.LabelFor(m => m.Remark, "Remark :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+
+        }
+    </div>
+</body>
+</html>

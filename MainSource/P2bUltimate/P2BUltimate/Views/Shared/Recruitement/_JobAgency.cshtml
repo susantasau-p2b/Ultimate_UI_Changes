@@ -1,0 +1,279 @@
+﻿@{
+    Layout = null;
+}
+@model Recruitment.JobAgency
+<style>
+    .radio_button_div_1, .horizontal_increpoly_row1 {
+        display: inline-block;
+    }
+
+    .increpoly_popup-content-label {
+        display: block;
+        float: left;
+        width: 123px;
+    }
+
+    .increpoly_popup-content-textbox {
+        width: 120px;
+    }
+
+    .increpoly_row1 {
+        width: 424px;
+    }
+
+    .increpoly_icon-row {
+        position: relative;
+        left: 81px;
+        top: -150px;
+    }
+
+    .popup-content-drop-icon-edit, .popup-content-drop-icon-create, .popup-content-drop-icon-lookup {
+        height: 20px;
+        margin: auto;
+        position: absolute;
+        width: 20px;
+        left: 24px;
+    }
+
+    .emp_icon-row {
+        position: relative;
+        left: 324px;
+        top: -27px;
+    }
+
+    .popup-content-drop-icon-edit {
+        left: 76px;
+    }
+
+    .popup-content-drop-icon-lookup {
+        left: 29px;
+    }
+
+    .popup-content-drop-icon-create {
+        left: 52px;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        var dt;
+        $('button').button();
+        $('#Name_JobAgency').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        $('#GSTNo').ValidateTextBox({ maxlength: 12, name: true, alphanum: true });
+        $('#PANNo').ValidateTextBox({ maxlength: 10, name: true, alphanum: true });
+
+        $('#Lookup-AgencyAddress-JobAgency').on('click', function (event) {
+            $('.dialogA').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "JobAgency")', '', 'lookupdivJA', 'Address Look Up Data', '#AgencyAddressList', 'AgencyAddressList', 5, 'AgencyAddressList', '#frmJobAgency', 'N', '#Edit-AgencyAddress-JobAgency,#Remove-AgencyAddress-JobAgency', 'Lookup_tableJA', 'PageNavPosition');
+            event.preventDefault();
+        });
+        @*$('#Lookup-AgencyAddress-JobAgency').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AgencyAddressList', 'AgencyAddressList', 5, 'AgencyAddressList', '#frmJobAgency', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-AgencyAddress-JobAgency').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmJobAgency', '', function (data) {
+                // to show data which is created in partial page
+                $('#AgencyAddressList').P2BLookUpEncapsulate('#AgencyAddressList', 'AgencyAddressList', data[0], data[1], 'AgencyAddressList', '#Edit-AgencyAddress-JobAgency,#Remove-AgencyAddress-JobAgency', 'N');
+            });
+            event.preventDefault();
+        });
+
+        // Partial page edit
+        $('#Edit-AgencyAddress-JobAgency').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AgencyAddressList').P2BGetTableDataonSelectedRow('#AgencyAddressList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobAgency', '#AgencyAddressList', 'AgencyAddressList', 'AgencyAddressList', 'N', '#Edit-AgencyAddress-JobAgency,#Remove-AgencyAddress-JobAgency', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#FormAddress').trigger("reset");
+                    $('#Address1').val(k.Address1);
+                    $('#Address2').val(k.Address2);
+                    $('#Address3').val(k.Address3);
+                    $('#Landmark').val(k.Landmark);
+                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                    $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                    $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                    $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                    $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-AgencyAddress-JobAgency').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#AgencyAddressList').P2BGetTableDataonSelectedRow('#AgencyAddressList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AgencyAddressList', $('#AgencyAddressList').val(), 200, 200, '#frmJobAgency', '#AgencyAddressList', '#Edit-AgencyAddress-JobAgency,#Remove-AgencyAddress-JobAgency');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-ContactDetails-JobAgency').button().on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+            $('.dialogA').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "JobAgency")', '', 'lookupdivJA', 'ContactDetails Look Up Data', '#ContactDetailslistJA', 'ContactDetailslistJA', 5, 'ContactDetailslistJA', '#frmJobAgency', 'N', '#Edit-ContactDetails-JobAgency,#Remove-ContactDetails-JobAgency', 'Lookup_tableJA', 'PageNavPosition');
+
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ContactDetails-JobAgency').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "JobAgency")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#ContactDetailslistJA').P2BLookUpEncapsulate('#ContactDetailslistJA', 'ContactDetailslistJA', data[0], data[1], 'ContactDetailslistJA', '#Edit-ContactDetails-JobAgency,#Remove-ContactDetails-JobAgency', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ContactDetails-JobAgency').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactDetailslistJA').P2BGetTableDataonSelectedRow('#ContactDetailslistJA', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "JobAgency")', '@Url.Action("Editcontactdetails_partial", "JobAgency")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJobAgency', '#ContactDetailslistJA', 'ContactDetailslistJA', 'ContactDetailslistJA', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ContactDetails-JobAgency').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#ContactDetailslistJA').P2BGetTableDataonSelectedRow('#ContactDetailslistJA', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailslistJA', $('#ContactDetailslistJA').val(), 200, 200, '#frmJobAgency', '#ContactDetailslistJA', '#Edit-ContactDetails-JobAgency,#Remove-ContactDetails-JobAgency');
+            event.preventDefault();
+        });
+
+        $('#Lookup-EmpName-FName').on('click', function () {
+
+            $('.dialogA').AddDataToTextbox({
+                appendTo: "#ContactPerson_FullNameFML",
+                lookupurl: "@Url.Action("GetLookup_Name", "JobAgency")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "ContactPerson-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#EmpName_id",
+                readonly: true,
+                pagename: "PageNavPosition"
+            });
+        });
+
+        $('#Create-EmpName-FName').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "NameSingle")', 'Create NameSingle', 'open', '@Url.Action("Create", "NameSingle")', '#frmNameSingle', 'Message :', 'Request Falied :', '#JqGrid', 251, 460, '', '#DepartmentObjlist', 'change', '', '', function (data) {
+                $('#EmpName_id').val(data[0]);
+                $('#EmpName_FullNameFML').val(data[1]);
+            });
+        });
+
+        $('#Edit-EmpName-FName').button().on("click", function (event) {
+            var a = $('#EmpName_id').val() == false ? alert("Select Record..!") : $('#EmpName_id').val();
+            if (a == undefined) return false;
+            $("<div></div>").CustomeDialog({
+                htmlurl: '@Url.Action("partial", "NameSingle")',
+                onloaddataurl: '@Url.Action("edit", "NameSingle")',
+                onloaddataid: a,
+                submiturl: '@Url.Action("EditSave", "NameSingle")',
+                form: '#frmNameSingle',
+                title: 'Name Single',
+                onloadreturnfunction: function (data) {
+
+                    $('#frmNameSingle').trigger('reset');
+                    $('#FName').val(data.FName);
+                    $('#MName').val(data.MName);
+                    $('#LName').val(data.LName);
+                    $('#title').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 100, data.EmpTitle);
+                    $('#id').val(data.id);
+                },
+                onsubmitreturnfunction: function (data) {
+                    $('#EmpName_id').val(data[0]);
+                    $('#EmpName_FullNameFML').val(data[1]);
+                }
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        //$('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>
+<div class="dialogA">
+    <div title="LookUp Data">
+        <div class="lookupdivJA"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create JobAgency">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmJobAgency", name = "frmJobAgency" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        //<div class="increpoly_row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "increpoly_popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "increpoly_popup-content-textbox" }) </div>
+
+        <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", @id = "Name_JobAgency" })</div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.PANNo, "PAN No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PANNo, new { @class = "popup-content-textbox must" })</div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.GSTNo, "GST No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.GSTNo, new { @class = "popup-content-textbox must" })</div>
+
+
+        <div class="row3 content_margine ">
+            <div id="AgencyAddress_old"></div>
+            @Html.LabelFor(m => m.AgencyAddress, "Agency Address :", new { @class = "popup-content-label" })
+              <div class="popup-content-table">
+                <table class="lookuptableselected" id="AgencyAddressList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="LookUp Agency Address Details" class="popup-content-icon-lookup" id="Lookup-AgencyAddress-JobAgency"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Crate Agency Address Details" class="popup-content-icon-create" id="Create-AgencyAddress-JobAgency"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Agency Address Details" class="popup-content-icon-edit" id="Edit-AgencyAddress-JobAgency"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Agency Address Details" class="popup-content-icon-remove" id="Remove-AgencyAddress-JobAgency"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <div id="ContactDetails_old"></div>
+            @Html.LabelFor(m => m.ContactDetails, "Contact Details:", new { @class = "popup-content-label" }) 
+             <div class="popup-content-table">
+                <table class="lookuptableselected" id="ContactDetailslistJA">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="LookUp Contact Details Details" class="popup-content-icon-lookup" id="Lookup-ContactDetails-JobAgency"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Crate Contact Details Details" class="popup-content-icon-create" id="Create-ContactDetails-JobAgency"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Contact Details Details" class="popup-content-icon-edit" id="Edit-ContactDetails-JobAgency"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Contact Details Details" class="popup-content-icon-remove" id="Remove-ContactDetails-JobAgency"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+         
+    }
+</div>

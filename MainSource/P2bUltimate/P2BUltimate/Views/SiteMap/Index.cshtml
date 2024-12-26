@@ -1,0 +1,378 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+@{
+    ViewBag.title = "SiteMap";
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Scripts/JQurey.tree/src/themes/default/style.css" rel="stylesheet" />
+    <script src="~/Scripts/JQurey.tree/src/jstree.js"></script>
+    <script src="~/Scripts/JQurey.tree/src/jstree.dnd.js"></script>
+    <script src="~/Scripts/JQurey.tree/src/jstree.contextmenu.js"></script>
+    <style>
+        .sitemap_submenu_level_4 {
+            list-style: inside;
+        }
+
+        .sitemap_header {
+            background-color: #bdbdbd;
+            width: 97%;
+            display: block;
+            padding: 1px 2px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        #menu_tree a {
+            color: black;
+        }
+
+
+            #menu_tree a:hover {
+                text-decoration: underline;
+            }
+
+        .site_menu {
+            padding: 2px;
+            border: 0.1px #e7e7e7 solid;
+            display: inline-block;
+        }
+
+
+        .sitemap_elms {
+            width: 27%;
+            height: 322px;
+            overflow: auto;
+        }
+
+        .sitemap_etrm {
+            width: 29%;
+        }
+
+        .sitemap_submenu {
+            padding: 5px 10px;
+            list-style: inside;
+        }
+
+        .sitemap_submenu_level_2 {
+            padding: 5px 0px;
+            list-style: inherit;
+        }
+
+            .sitemap_submenu_level_2 > li {
+                position: relative;
+                vertical-align: top;
+                margin: 4px 25px;
+                width: 253px;
+                padding: 0 4px;
+            }
+
+        .sitemap_submenu_level_4 > li {
+            padding: 0px 10px;
+        }
+
+        .sitemap_submenu_level_3 {
+            padding: 5px 0px 0px 20px;
+            list-style: inherit;
+        }
+
+        .sitemap_core, .sitemap_epms, .sitemap_elms, .sitemap_etrm {
+            float: left;
+            margin: 6px;
+            overflow: auto;
+        }
+
+        .menu_tree {
+            height: 100%;
+        }
+
+        .sitemap_epms {
+            width: 27%;
+            height: 475px;
+            overflow: auto;
+            /*! float: right; */
+        }
+
+        .sitemap_core {
+            width: 11%;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .sitemap-search-box-class {
+            display: block;
+            float: left;
+            width: 95%;
+            padding: 8px 12px;
+        }
+
+        .btn-ancher-class {
+            display: block;
+            float: left;
+            padding: 3px 10px;
+            width: 49px;
+            height: 15px;
+            background-color: grey;
+            /*! text-decoration-color: white; */
+            margin: 1px 8px;
+        }
+
+        #sitemap-search-submit-btn {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="createdialog">
+        <div id="sitemap-search-box" class="sitemap-search-box-class">
+            <form>
+                <input type="text" id="sitemap-search-input" placeholder="Search" list="ancher-list" style="float:left;width:300px;" />
+                <datalist id="ancher-list"><option></option></datalist>
+                <div class="btn-ancher-class">
+
+                    <a id="sitemap-search-submit-btn" href="#" target="_blank">Submit</a>
+                </div>
+            </form>
+        </div>
+        <div id="menu_tree">
+            <ul id="sitemap_htm1_core" class="site_menu sitemap_core">
+                <li>
+                    <span class="sitemap_header">Core</span>
+                </li>
+            </ul>
+            <ul id="sitemap_htm1_epms" class="site_menu sitemap_epms">
+                <li>
+                    <span class="sitemap_header">EPMS</span>
+                </li>
+            </ul>
+
+            <ul id="sitemap_htm1_elms" class="site_menu sitemap_elms">
+                <li>
+                    <span class="sitemap_header">ELMS</span>
+                </li>
+            </ul>
+            <ul id="sitemap_htm1_etrm" class="site_menu sitemap_etrm">
+                <li>
+                    <span class="sitemap_header">ETRM</span>
+                </li>
+            </ul>
+
+        </div>
+        <div id="aaaa"></div>
+    </div>
+</body>
+
+</html>
+<script>
+    $(function () {
+        var htm2 = "";
+        var htm3 = "";
+        var htm4 = "";
+        $('#sitemap-search-input').on('keyup', function () {
+            if ($(this).val()) {
+                var allancher = $('#menu_tree').find('a');
+                var input = $(this).val().toUpperCase().replace(/\s/g, '');
+                $(allancher).each(function (i, k) {
+                    var ancher_text = $(k).html().toUpperCase().replace(/\s/g, '');
+                    if (ancher_text.indexOf(input) > -1) {
+                        if ($('#ancher-list').find('option[value="' + $(k).html() + '"]').length == 0) {
+                            $('#ancher-list').append($('<option>', {
+                                value: $(k).html(),
+                                "data-id": $(k).attr('href')
+                            }));
+                        }
+                    } else {
+                        $('#ancher-list').remove('option[value="' + $(k).html() + '"]');
+                    }
+                });
+            }
+        });
+        $('#sitemap-search-submit-btn').on('click', function (e) {
+            var data_id = $('#ancher-list').find('option[value="' + $('#sitemap-search-input').val() + '"]').attr('data-id');
+            $(this).attr('href', "" + data_id + "");
+        });
+        var GenrateLink = function (str) {
+            var parm = "";
+            if (str.split('/').length > 2) {
+                parm += "?parm=" + str.split('/')[2];
+                var link = str.split('/');
+                str = link[0] + "/" + link[1];
+            }
+            if (window.location.pathname.split('/').length > $.LocalStorageHelper('LinkLength')) {
+                return "../" + str + parm + "";
+
+            } else {
+                return "./" + str + parm + "";
+            }
+        };
+        var ModulewiseData = {
+            CORE: "#sitemap_htm1_core",
+            EPMS: "#sitemap_htm1_epms",
+            ELMS: "#sitemap_htm1_elms",
+            ETRM: "#sitemap_htm1_etrm",
+        };
+        function MenuCreation(data, mod) {
+            var module = ModulewiseData[mod];
+            if (data.children) {
+                for (var i = 0; i < data.children.length; i++) {
+                    var link;
+                    if (data.children[i].data.url.trim() != "#") {
+                        link = GenrateLink(data.children[i].data.url.trim());
+                    } else {
+                        link = "#";
+                    }
+                    $(module).append('<li id=' + i + '_li ><a id=' + i + '_a name=' + i + '_name href=' + link.toLowerCase() + '>' + data.children[i].text + '</a><li>');
+
+                    if (data.children[i]) {
+                        for (var j = 0; j < data.children[i].children.length; j++) {
+                            var link;
+                            if (data.children[i].children[j].data.url.trim() != "#") {
+                                link = GenrateLink(data.children[i].children[j].data.url.trim());
+                            } else {
+                                link = '#';
+                            }
+                            htm2 += '<li id=' + i + j + '_li><a id=' + +i + j + '_a name=' + +i + j + '_name href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].data.authority + ' >' + data.children[i].children[j].text + '</a></li>';
+
+                            if (j == data.children[i].children.length - 1) {
+                                $(module + " li#" + i + "_li").append("<ul class='sitemap_submenu'>" + htm2 + "</ul>");
+                                htm2 = "";
+                            }
+                        }
+                    }
+                }
+
+                //for second level of menu
+                for (var i = 0; i < data.children.length; i++) {
+                    if (data.children[i]) {
+                        for (var j = 0; j < data.children[i].children.length; j++) {
+                            if (data.children[i].children[j].children) {
+                                for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+                                    var link;
+                                    if (data.children[i].children[j].children[l].data.url != undefined) {
+                                        if (data.children[i].children[j].children[l].data.url != "#") {
+                                            link = GenrateLink(data.children[i].children[j].children[l].data.url.trim());
+                                        } else {
+                                            link = '#';
+                                        }
+                                    } else {
+                                        link = '#';
+                                    }
+                                    //console.log(link);
+                                    htm3 += '<li id=' + i + j + l + '_li><a id=' + i + j + l + '_a name=' + i + j + l + '_name href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].data.authority + '>' + data.children[i].children[j].children[l].text + '</a></li>';
+                                    if (l == data.children[i].children[j].children.length - 1) {
+                                        $(module + ">li>ul.sitemap_submenu>li#" + i + j + "_li").append("<ul class='sitemap_submenu_level_2'>" + htm3 + "</ul>");
+                                        htm3 = "";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //for third level of menu
+                for (var i = 0; i < data.children.length; i++) {
+
+                    if (data.children[i]) {
+                        for (var j = 0; j < data.children[i].children.length; j++) {
+
+                            if (data.children[i].children[j].children) {
+                                for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+
+                                    if (data.children[i].children[j].children[l].children) {
+                                        for (var m = 0; m < data.children[i].children[j].children[l].children.length; m++) {
+                                            var link;
+                                            if (data.children[i].children[j].children[l].children[m].data.url != undefined) {
+                                                if (data.children[i].children[j].children[l].children[m].data.url != "#") {
+                                                    link = GenrateLink(data.children[i].children[j].children[l].children[m].data.url.trim());
+                                                } else {
+                                                    link = "#";
+                                                }
+                                            } else {
+                                                link = "#";
+                                            }
+                                            htm4 += '<li id=' + i + j + l + m + '_li><a id=' + i + j + l + m + '_a name=' + i + j + l + m + '_name href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].children[m].data.authority + '>' + data.children[i].children[j].children[l].children[m].text + '</a></li>';
+
+                                            if (m == data.children[i].children[j].children[l].children.length - 1) {
+                                                $(module + ">li>ul.sitemap_submenu>li>ul.sitemap_submenu_level_2>li#" + i + j + l + "_li").append("<ul class='sitemap_submenu_level_3'>" + htm4 + "</ul>");
+                                                htm4 = "";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //for forth level of menu
+                for (var i = 0; i < data.children.length; i++) {
+
+                    if (data.children[i]) {
+                        for (var j = 0; j < data.children[i].children.length; j++) {
+
+                            if (data.children[i].children[j].children) {
+                                for (var l = 0; l < data.children[i].children[j].children.length; l++) {
+
+                                    if (data.children[i].children[j].children[l].children) {
+                                        for (var m = 0; m < data.children[i].children[j].children[l].children.length; m++) {
+
+                                            if (data.children[i].children[j].children[l].children[m].children) {
+                                                for (var n = 0; n < data.children[i].children[j].children[l].children[m].children.length; n++) {
+                                                    var link;
+                                                    if (data.children[i].children[j].children[l].children[m].children[n].data.url != undefined) {
+                                                        if (data.children[i].children[j].children[l].children[m].children[n].data.url != "#") {
+                                                            //console.log(data.children[i].children[j].children[l].children[m].children[n].data.url);
+                                                            link = GenrateLink(data.children[i].children[j].children[l].children[m].children[n].data.url.trim());
+
+                                                        } else {
+                                                            link = "#";
+                                                        }
+                                                    } else {
+                                                        link = "#";
+                                                    }
+                                                    htm4 += '<li><a id=' + i + j + l + m + n + '_a name=' + i + j + l + m + n + '_name href=' + link.toLowerCase() + ' data-authority=' + data.children[i].children[j].children[l].children[m].children[n].data.authority + '>' + data.children[i].children[j].children[l].children[m].children[n].text + '</a></li>';
+
+                                                    if (n == data.children[i].children[j].children[l].children[m].children.length - 1) {
+                                                        $(module + ">li>ul.sitemap_submenu>li>ul.sitemap_submenu_level_2>li>ul.sitemap_submenu_level_3>li#" + i + j + l + m + "_li").append("<ul class='sitemap_submenu_level_4'>" + htm4 + "</ul>");
+                                                        htm4 = "";
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        function MenuGenration(url, ModuleType) {
+            ModuleType = ModuleType || null;
+            $.getJSON(url, function (data) {
+                //  $('#sitemap_htm1').empty();
+                $(data).each(function (i, k) {
+                    $(k.children).each(function (i, k) {
+                        if (k.text.toLowerCase() == ModuleType.toLocaleLowerCase()) {
+                            MenuCreation(k, ModuleType.toUpperCase());
+                        }
+                    });
+                });
+            });
+        };
+        MenuGenration("@Url.Action("GetJson","MenuConfig")", "CORE");
+        MenuGenration("@Url.Action("GetJson","MenuConfig")", "EPMS");
+        MenuGenration("@Url.Action("GetJson","MenuConfig")", "ELMS");
+        MenuGenration("@Url.Action("GetJson","MenuConfig")", "ETRM");
+        $('#menu_tree').on('click', 'a', function (e) {
+            var url = $(this).attr('href');
+            if (url != "#" && url != undefined) {
+                window.open("" + url + "", "_blank");
+            }
+            e.preventDefault();
+        });
+    });
+</script>

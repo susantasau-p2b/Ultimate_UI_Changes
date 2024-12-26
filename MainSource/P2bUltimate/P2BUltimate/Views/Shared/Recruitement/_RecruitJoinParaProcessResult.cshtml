@@ -1,0 +1,214 @@
+﻿@{
+    Layout = null;
+}
+@model Recruitment.RecruitJoinParaProcessResult
+<style>
+    .icon-row {
+        position: relative;
+        left: 91px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 137px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 450px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dt;
+        $('.popup_radio_button').controlgroup();
+        $('button').button();
+        //$('#Name_Recruit').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+        $('#Lookup-RecruitJoiningPara-ResumeCollection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "RecruitJoiningPara")', '', 'LookupDiv', 'Recruit Evaluation Process Look Up Data', '#RecruitJoiningParalist', 'RecruitJoiningParalist', 5, 'RecruitJoiningParalist', '#frmRecruitJoinParaProcessResult', 'N', '#Edit-RecruitEvaluationPara-RecruitJoinParaProcessResult,#Remove-RecruitEvaluationPara-RecruitJoinParaProcessResult', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-RecruitJoiningPara-ResumeCollection').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "RecruitJoiningPara")', 'Create Recruit Joining Para', 'open', '@Url.Action("Create", "RecruitJoiningPara")', '#frmRecruitJoiningPara', 'Message :', 'Request Falied :', '#JqGrid', 479, 544, '', '', '', '#frmRecruitJoinParaProcessResult', '', function (data) {
+                $('#RecruitJoiningPara').P2BLookUpEncapsulate('#c', 'RecruitJoiningParalist', data[0], data[1], 'RecruitJoiningParalist', '#Edit-RecruitJoiningPara-RecruitJoinParaProcessResult,#Remove-RecruitJoiningPara-RecruitJoinParaProcessResult', 'N');
+
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-RecruitEvaluationPara-ResumeCollection').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RecruitEvaluationParalist').P2BGetTableDataonSelectedRow('#RecruitEvaluationParalist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "RecruitEvaluationPara")', '@Url.Action("Edit", "RecruitEvaluationPara")', b, '@Url.Action("Editsave", "RecruitEvaluationPara")', 'Edit Recruit Evaluation Para data', '#frmRecruitEvaluationPara', b, 'Message :', 'Request Falied :', '#JqGrid', 479, 544, '#frmRecruitEvaluationProcess', '#RecruitEvaluationParalist', 'RecruitEvaluationParalist', 'RecruitEvaluationParalist', 'N', '#Edit-RecruitEvaluationPara-RecruitEvaluationProcess,#Remove-RecruitEvaluationPara-RecruitEvaluationProcess', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmRecruitEvaluationPara').trigger("reset");
+
+                    $('#Name_Eval').val(k.Stage);
+                    $('#CategorylistEvalpara').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 500, k.RecruitEvalPara_Id);
+
+                });
+                //}, 3000);
+                $.each(data[1], function (i, k) {
+                    $('#SelectionPanellist').P2BLookUpEncapsulate('#SelectionPanellist', 'SelectionPanellist', k.RE_id, k.RE_val, 'SelectionPanellist', '#Edit-RecruitEvaluationPara-RecruitEvaluationProcess,#Remove-RecruitEvaluationPara-RecruitEvaluationProcess', 'N');
+
+                });
+
+
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-RecruitJoiningPara-ResumeCollection').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#RecruitJoiningParalist').P2BGetTableDataonSelectedRow('#RecruitJoiningParalist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RecruitJoiningParalist', $('#RecruitJoiningParalist').val(), 200, 200, '#frmRecruitJoinParaProcessResult', '#RecruitJoiningParalist', '#Edit-RecruitJoiningPara-ResumeCollection,#Remove-RecruitJoiningPara-ResumeCollection');
+            event.preventDefault();
+        });
+
+
+        @*$('#Lookup-RecruitJoiningPara-RecruitEvaluationProcess').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsJoiningPara", "RecruitEvaluationProcess")', '', 'LookupDiv', 'JobSource Look Up Data', '#RecruitJoiningParalist', 'RecruitJoiningParalist', 5, 'RecruitJoiningParalist', '#frmRecruitEvaluationProcess', 'N', '#Edit-RecruitJoiningPara-RecruitEvaluationProcess,#Remove-RecruitJoiningPara-RecruitEvaluationProcess', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-RecruitJoiningPara-RecruitEvaluationProcess').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "RecruitJoiningPara")', 'Create Recruit Joining Para', 'open', '@Url.Action("Create", "RecruitJoiningPara")', '#frmRecruitJoiningPara', 'Message :', 'Request Falied :', '#JqGrid', 479, 544, '', '', '', '#frmRecruitEvaluationProcess', '', function (data) {
+                $('#RecruitJoiningParalist').P2BLookUpEncapsulate('#RecruitJoiningParalist', 'RecruitJoiningParalist', data[0], data[1], 'RecruitJoiningParalist', '#Edit-RecruitEvaluationPara-RecruitEvaluationProcess,#Remove-RecruitEvaluationPara-RecruitEvaluationProcess', 'N');
+
+            });
+            event.preventDefault();
+        });
+        // Partial page edit
+
+        $('#Edit-RecruitJoiningPara-RecruitEvaluationProcess').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RecruitJoiningParalist').P2BGetTableDataonSelectedRow('#RecruitJoiningParalist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "RecruitJoiningPara")', '@Url.Action("Edit", "RecruitJoiningPara")', b, '@Url.Action("Editsave", "RecruitJoiningPara")', 'Edit Recruit Joining Para data', '#frmRecruitJoiningPara', b, 'Message :', 'Request Falied :', '#JqGrid', 479, 544, '#frmRecruitEvaluationProcess', '#RecruitJoiningParalist', 'RecruitJoiningParalist', 'RecruitJoiningParalist', 'N', '#Edit-RecruitJoiningPara-RecruitEvaluationProcess,#Remove-RecruitJoiningPara-RecruitEvaluationProcess', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmRecruitJoiningPara').trigger("reset");
+                    $('#RecruitJoinParalist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 500, k.RecruitJoinPara_Id);
+                    $('#Stage_Join').val(k.Stage);
+                });
+                //}, 3000);
+
+
+
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-RecruitJoiningPara-RecruitEvaluationProcess').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#RecruitJoiningParalist').P2BGetTableDataonSelectedRow('#RecruitJoiningParalist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RecruitJoiningParalist', $('#RecruitJoiningParalist').val(), 200, 200, '#RecruitJoiningParalist', '#RecruitJoiningParalist', '#Edit-RecruitJoiningPara-RecruitEvaluationProcess,#Remove-RecruitJoiningPara-RecruitEvaluationProcess');
+            event.preventDefault();
+        });*@
+        $('#ActivityResultlist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#ActivityResultlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 500, "");
+        $('#ActAccepted').P2BDatePicker();
+        // $('#ActivityAcceptedDate').prop('readonly', 'readonly');
+        $('#actdate').P2BDatePicker();
+        //  $('#ActivityDate').prop('readonly', 'readonly');
+        $('#ActivityScore_ID').ForceOnlyNumeric();
+        //$('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmRecruitJoinParaProcessResult", name = "frmRecruitJoinParaProcessResult" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.ActivityDate, "ActivityDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ActivityDate, new { @class = "popup-content-textbox must", @id = "actdate" })
+        </div>
+        <div class="row1_empoff  horizontal_row1 content_margine ">
+            @Html.LabelFor(m => m.ActivityLetterIssue, "ActivityLetterIssue :", new { @class = "popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio772" name="ActivityLetterIssueAppl" value="true" /><label for="radio772">Yes</label>
+                    <input type="radio" id="radio882" name="ActivityLetterIssueAppl" value="false" checked="checked" /><label for="radio882">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row1_empoff  horizontal_row1 content_margine " id="Activity_Aceepted">
+            @Html.LabelFor(m => m.ActivityAccepted, "ActivityAccepted :", new { @class = "popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio771" name="ActivityAcceptedAppl" value="true" /><label for="radio771">Yes</label>
+                    <input type="radio" id="radio881" name="ActivityAcceptedAppl" value="false" checked="checked" /><label for="radio881">No</label>
+                </span>
+            </div>
+        </div>
+
+        <div class="row1 content_margine" id="activity_accepteddate">
+            @Html.LabelFor(m => m.ActivityAcceptedDate, "ActivityAcceptedDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ActivityAcceptedDate, new { @class = "popup-content-textbox must", @id = "ActAccepted" })
+        </div>
+        @*<div class="row3 content_margine">
+                <div id="RecruitEvaluationPara_old"></div>
+                @Html.LabelFor(m => m.RecruitJoiningPara, "RecruitJoiningPara :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="RecruitJoiningParalist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup RecruitJoiningPara" class="popup-content-icon-lookup" id="Lookup-RecruitJoiningPara-ResumeCollection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove RecruitJoiningPara" class="popup-content-icon-remove" id="Remove-RecruitJoiningPara-ResumeCollection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>*@
+        //<div class="increpoly_row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "increpoly_popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "increpoly_popup-content-textbox" }) </div>
+    }
+</div>

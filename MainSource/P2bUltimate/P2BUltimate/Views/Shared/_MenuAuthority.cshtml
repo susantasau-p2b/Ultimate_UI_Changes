@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "Menu Authority";
+    Layout = null;
+}
+<link href="~/Scripts/JQurey.tree/src/themes/default/style.css" rel="stylesheet" />
+<script src="~/Scripts/JQurey.tree/src/jstree.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.dnd.js"></script>
+<script src="~/Scripts/JQurey.tree/src/jstree.contextmenu.js"></script>
+
+<!Doctype html>
+<html>
+<head>
+    <title></title>
+    <style>
+        ul > li {
+            margin-left: 10px;
+        }
+
+        .menutreeclass {
+            display: block;
+            float: left;
+            height: 250px;
+            width: 438px;
+            overflow: auto;
+            border: 0.1px solid #ddd;
+        }
+
+        .form {
+            width: 762px;
+        }
+
+        .sec2 {
+            float: left;
+            top: 0;
+            margin: 0 13px;
+        }
+
+        .dynamic {
+            width: 293px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form" id="frmMenuAuthority">
+        <div class="row1 content_margine">
+            <label for="employee" class="popup-content-label">Assign Employee :</label>
+            <select id="employee" class="drop" name="employee" style="width:200px">
+                <option>-Select-</option>
+            </select>
+        </div>
+        <div class="menutreeclass">
+            <div id="menu_tree"></div>
+        </div>
+        <div class="sec2">
+            <div>
+                <label>
+                    Select Who is.?
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </label>
+                <ul>
+                    <li>
+                        <input type="radio" id="checker" name="whois" value="checker" /> <label for="checker">Checker</label>
+                    </li>
+                    <li>
+                        <label> Or</label>
+                    </li>
+                    <li>
+                        <input type="radio" id="meaker" name="whois" value="meaker" checked /> <label for="meaker">Maker</label>
+                    </li>
+                </ul>
+                <label>Select Authority</label>
+                <ul>
+                    <li><input type="checkbox" id="select_all" /> <label for="select_all">Select All</label></li>
+                    <li><label> Or</label></li>
+                    <li><input type="checkbox" id="Create" name="autho_rights[]" value="create" /> <label for="create">Create</label></li>
+                    <li><input type="checkbox" id="View" value="view" name="autho_rights[]" /> <label for="view">View</label></li>
+                    <li><input type="checkbox" id="Edit" value="edit" name="autho_rights[]" /> <label for="edit">Edit</label></li>
+                    <li><input type="checkbox" id="Delete" value="delete" name="autho_rights[]" /> <label for="delete">Delete</label></li>
+                </ul>
+                <button id="Write" style="width:100px;">Write</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(function () {
+        $('.drop').selectmenu();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#employee').P2BSelectMenuAppend("@Url.Action("GetEmp1", "AddNewUser")", "", "");
+        $('button').button();
+        $('#menu_tree').jstree({
+            'core': {
+                "check_callback": true,
+                "multiple": true,
+                "themes": {
+                    "variant": "large"
+                }
+            },
+        });
+        $.getJSON("@Url.Action("GetJson", "MenuConfig")", function (data) {
+            console.log(data);
+            $('#menu_tree').jstree(true).settings.core.data = data;
+            $('#menu_tree').jstree('open_node');
+            $('#menu_tree').jstree(true).refresh();
+        });
+
+
+        $('#select_all').on('click', function () {
+            if ($('#select_all').is(":checked")) {
+                $('#Create, #View, #Edit,#Delete').checked(true);
+            } else {
+                $('#Create, #View, #Edit,#Delete').checked(false);
+            }
+        });
+
+
+        $('#Write').on('click', function (e) {
+            if ($('#group_type').val() == 0) {
+                alert("Select Group Type");
+                return false;
+
+            } else {
+                //  menuobj.EmpCode = ;
+                var menuobj = new Object();
+                menuobj.urlauthority = {};
+                
+                var array = [];
+                array.push($('input[name="whois"]:checked').val().toLowerCase());
+
+                array.push($.map($('input[name="autho_rights[]"]:checked'), function (c) {
+                    return c.value.toLowerCase();
+                }));
+
+                var a = $('#menu_tree').jstree("get_selected");
+                //console.log(a);
+                if (array.length && a.length != 0) {
+                    $.each(a, function (i, k) {
+                        var parent = $('#menu_tree').jstree(true).get_node("" + k + "").data.url.toLowerCase();
+                        //console.log(parent);
+                        menuobj.urlauthority[parent] = array;
+                    });
+
+                    // var jsonstr = JSON.stringify(menuobj);
+                    // console.log(jsonstr);
+                    alert("Authority Submitted..!");
+
+                    $.ajax({
+                        method: "POST",
+                        url: "@Url.Action("PutJson", "MenuAuthority")?EmpCode=" + $('#employee').val(),
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify(menuobj),
+                        success: function (data) {
+                            alert(data.responseText);
+                        },
+                        error: function (data) { console.log(data); }
+                    });
+                } else {
+                    alert("Select Tree Node");
+                    return false;
+                }
+            }
+        });
+
+    });
+</script>

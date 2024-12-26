@@ -1,0 +1,302 @@
+﻿@{
+    ViewBag.Title = "PolicyAssignment";
+}
+@model Payroll.PolicyAssignment
+<!DOCTYPE html>
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['PolicyName', 'PayScaleAgreementFullDetails', 'Id'];
+        ColNames = ['PolicyName', 'PayScaleAgreement', 'Id'];
+        SortName = 'Id';
+        Caption = 'Policy Assignment';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmPolicyAssignment').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PolicyAssignment', 'open', '@Url.Action("Create")', '#frmPolicyAssignment', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', "", function (data) { });
+            $('#PolicyNamelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "PolicyAssignment")", 804, "", '#PolicyNamelist');
+            event.preventDefault();
+        });
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PolicyAssignment  Data", '#frmPolicyAssignment', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#PolicyNamelist,#PolicyFormulalist', "", function (data) {
+                $.each(data[0], function (i, k) {
+
+                    $('#PolicyNamelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "PolicyAssignment")", 804, k.PolicyName);
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgreement_Id, k.PayScaleAgreement_FullDetails, 'PayScaleAgreementlist', '#Remove-PayScaleAgreement-PolicyAssignment', 'N');
+
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    ////debugger;
+                    $('#PolicyFormulalist').P2BLookUpEncapsulate('#PolicyFormulalist', 'PolicyFormulalist', k.PolicyFormula_Id, k.PolicyFormula_fulldetails, 'PolicyFormulalist', '#Remove-PolicyFormula-PolicyAssignment', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PolicyAssignment Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#PolicyNamelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "PolicyAssignment")", 804, k.PolicyName);
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgreement_Id, k.PayScaleAgreement_FullDetails, 'PayScaleAgreementlist', 'view', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    console.log("fdsfdsf");
+                    console.log(k);
+                    console.log("fdsfdsf");
+                    $('#PolicyFormulalist').P2BLookUpEncapsulate('#PolicyFormulalist', 'PolicyFormulalist', k.PolicyFormula_Id, k.PolicyFormula_fulldetails, 'PolicyFormulalist', '#Remove-PolicyFormula-PolicyAssignment', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        /* ContactDetails button click*/
+
+        $('#Lookup-PolicyName-PolicyAssignment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPolicyName", "PolicyAssignment")', '', 'LookupDiv', 'Look Up Data', '#PolicyNamelist', 'PolicyNamelist', 5, 'PolicyNamelist', '#frmPolicyAssignment', 'N', '#Remove-PolicyName-PolicyAssignment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-PolicyFormula-PolicyAssignment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPolicyformula", "PolicyAssignment")', '', 'LookupDiv', 'Look Up Data', '#PolicyFormulalist', 'PolicyFormulalist', 5, 'PolicyFormulalist', '#frmPolicyAssignment', 'A', '#Remove-PolicyFormula-PolicyAssignment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Remove-PolicyFormula-PolicyAssignment').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PolicyFormulalist').P2BGetTableDataonSelectedRow('#PolicyFormulalist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PolicyFormulalist').P2BGetTableDataonSelectedRow('#PolicyFormulalist', 0);
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PolicyFormulalist', $('#PolicyFormulalist').val(), 200, 200, '#frmPolicyAssignment', '#PolicyFormulalist', '');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-PayScaleAgreement-PolicyAssignment').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPayscaleagreement", "PolicyAssignment")', '', 'LookupDiv', 'Look Up Data', '#PayScaleAgreementlist', 'PayScaleAgreementlist', 5, 'PayScaleAgreementlist', '#frmPolicyAssignment', 'N', '#Remove-PayScaleAgreement-PolicyAssignment', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-PayScaleAgreement-PolicyAssignment').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PayScaleAgreementlist').P2BGetTableDataonSelectedRow('#PayScaleAgreementlist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayScaleAgreementlist', $('#PayScaleAgreementlist').val(), 200, 200, '#frmPolicyAssignment', '#PayScaleAgreementlist', '');
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 96px;
+            top: -151px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            width: 137px;
+            margin: 1px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            display: inline-block;
+            width: 500px;
+            margin-top: 10px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Policy Assignment">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPolicyAssignment", name = "frmPolicyAssignment" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+             <div class="row3 content_margine">
+                <div id="lvnewreqlist_old"></div>
+                @Html.LabelFor(m => m.PayScaleAgreement, "PayScaleAgreement :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PayScaleAgreementlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select PayScaleAgreement" class="  popup-content-icon-lookup" id="Lookup-PayScaleAgreement-PolicyAssignment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove PayScaleAgreement" class="popup-content-icon-remove" id="Remove-PayScaleAgreement-PolicyAssignment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.PolicyName, "PolicyName:", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:300px;" name="PolicyNamelist" id="PolicyNamelist"><option></option></select>
+            </div>
+
+
+            <div class="row3 content_margine">
+                <div id="lvnewreqlist_old"></div>
+                @Html.LabelFor(m => m.PolicyFormula, "PolicyFormula :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PolicyFormulalist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select PolicyFormula" class="  popup-content-icon-lookup" id="Lookup-PolicyFormula-PolicyAssignment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove PolicyFormula" class="popup-content-icon-remove" id="Remove-PolicyFormula-PolicyAssignment"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>

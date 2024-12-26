@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "LvCancelReq";
+}
+@model Leave.LvCancelReq
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#ReqDate').P2BDatePicker();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'InputMethod', 'ReqDate', 'Reason'];
+        ColNames = ['Id', 'InputMethod', 'ReqDate', 'Reason'];
+        SortName = 'Id';
+        Caption = 'Leave Cancel Request';
+        btnEnablenames = '#Edit_ContactNo_LvCancelReq,#Remove_ContactNo_LvCancelReq,#Edit_Lvwfdetails_LvCancelReq,#Remove_Lvwfdetails_LvCancelReq'
+        btnEnablenamesAll = '#Create_ContactNo_LvCancelReq,#LookUp_ContactNo_LvCancelReq,#Edit_ContactNo_LvCancelReq,#Remove_ContactNo_LvCancelReq,#Create_Lvwfdetails_LvCancelReq,#LookUp_Lvwfdetails_LvCancelReq,#Edit_Lvwfdetails_LvCancelReq,#Remove_Lvwfdetails_LvCancelReq'
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#frmLVcancelReq').trigger("reset");
+        $('#Create').button().on("click", function (e) {
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create LeaveCancelRequest', 'open', '@Url.Action("create") ', '#frmLVcancelReq', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#ContactNoList,#LeaveWFDetailsList', btnEnablenames, function (data) { });
+            e.preventDefault();
+        });
+
+        
+
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            //$('#frmLVcancelReq').trigger("reset");
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmLVcancelReq', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#ContactNoList,#LeaveWFDetailsList', btnEnablenames, function (data) {
+                // setTimeout(function () {
+                alert(dt.Id)
+                $.each(data[0], function (i, k) {
+                    alert(data[0])
+                    $('#InputMethod').val(dt.InputMethod),
+              $('#ReqDate').val(dt.ReqDate),
+                    $('#Reason').val(dt.Reason)
+                    $('#ContactNoList').P2BLookUpEncapsulate('#ContactNoList', 'ContactNoList', k.ContactNo_Id, k.Contact_Fulldtl, 'ContactNoList', '#LookUp_ContactNo_LvCancelReq,#Create_ContactNo_LvCancelReq', 'N');
+
+                    // console.log(k.ID);
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#LeaveWFDetailsList').P2BLookUpEncapsulate('#LeaveWFDetailsList', 'LeaveWFDetailsList', k.LvWFDetails_Id, k.LvWFDetails_val, 'LeaveWFDetailsList', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'N');
+                 });
+             
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+                //partial page bind
+                //$.each(data[4], function (i, k) {
+                //    $('#LeaveWFDetailsList').P2BLookUpEncapsulate('#LeaveWFDetailsList', 'LeaveWFDetailsList', k.LvWFDetails_Id, k.LvWFDetails_val, 'LeaveWFDetailsList', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'N');
+                //});
+
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#ContactNoList,#LeaveWFDetailsList', btnEnablenamesAll, 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);                    
+                         $('#InputMethod').val(k.InputMethod),
+              $('#ReqDate').val(k.ReqDate),
+                    $('#Reason').val(k.Reason)
+                    $('#ContactNoList').P2BLookUpEncapsulate('#ContactNoList', 'ContactNoList', k.ContactNo_Id, k.Contact_Fulldtl, 'ContactNoList', '#LookUp_ContactNo_LvCancelReq,#Create_ContactNo_LvCancelReq', 'N');
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#LeaveWFDetailsList').P2BLookUpEncapsulate('#LeaveWFDetailsList', 'LeaveWFDetailsList', k.LvWFDetails_Id, k.LvWFDetails_val, 'LeaveWFDetailsList', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'N');
+                });
+                                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#InputMethod').oldVal(data[2].InputMethod);
+                    $('#ReqDate').oldDropval(data[2].ReqDate);
+                    $('#Reason').oldDropval(data[2].Reason);
+                   $('#ContactNoList_old').oldLookupVal(data[2].Contact_val);
+                    $('#LeaveWFDetailsList_old').oldLookupVal(data[2].LvWFDetails_val);
+                    @*$.each(data[2], function (i, k) {
+                        // $('#Code').Oldval(k.Code);
+                        alert(k.Name)
+                        $('#Name').oldVal(k.Name);
+                        $('#Categorylist').oldDropval(k.BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(k.Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(k.Contact_Val);
+                        //$('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                    });*@
+                }
+                //}, 2000);
+                
+                $.each(data[1], function (i, k) {
+                    $('#LeaveWFDetailsList').P2BLookUpEncapsulate('#LeaveWFDetailsList', 'LeaveWFDetailsList', k.LvWFDetails_Id, k.LvWFDetails_val, 'LeaveWFDetailsList', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'N');
+                });
+            });
+        });
+
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        //To get data in Lookup1
+        $('#LookUp_ContactNo_LvCancelReq').on('click', function (event) {
+            alert('Show ContactNo')
+            $('.Lookup_Increment').P2BLookUpModal('@Url.Action("GetLookupContactNo", "LeaveCancelRequest")', '', 'LookupDiv', 'Look Up Data', '#ContactNoList', 'ContactNoList', 5, 'ContactNoList', '#frmLVcancelReq', 'N', '#LookUp_ContactNo_LvCancelReq,#Create_ContactNo_LvCancelReq', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        //To get data in Lookup2
+        $('#LookUp_Lvwfdetails_LvCancelReq').on('click', function (event) {
+            alert('Show Lvwfdetails')
+            $('.Lookup_Increment').P2BLookUpModal('@Url.Action("GetLookupLeaveWFDetails", "LeaveCancelRequest")', '', 'LookupDiv', 'Look Up Data', '#LeaveWFDetailsList', 'LeaveWFDetailsList', 5, 'LeaveWFDetailsList', '#frmLVcancelReq', 'A', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_Lvwfdetails_LvCancelReq').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "LeaveWFDetails")', 'Create LeaveWFDetails', 'open', '@Url.Action("Create", "LeaveWFDetails")', '#frmLeaveWFDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLVcancelReq', '', function (data) {
+                alert(data[0]);
+                $('#LeaveWFDetailsList').P2BLookUpEncapsulate('#LeaveWFDetailsList', 'LeaveWFDetailsList', data[0], data[1], 'LeaveWFDetailsList', '#LookUp_Lvwfdetails_LvCancelReq,#Create_Lvwfdetails_LvCancelReq', 'A');
+            });
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_ContactNo_LvCancelReq').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ContactDetails")', 'Create ContactNumbers', 'open', '@Url.Action("CreateSave", "ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLVcancelReq', '', function (data) {
+                alert(data[0]);
+                $('#ContactNoList').P2BLookUpEncapsulate('#ContactNoList', 'ContactNoList', data[0], data[1], 'ContactNoList', '#LookUp_ContactNo_LvCancelReq,#Create_ContactNo_LvCancelReq', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="Lookup_Increment">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog" title="LV Cancel Req">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmLVcancelReq", name = "frmLVcancelReqEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.InputMethod, "Input Method :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.InputMethod, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.ReqDate, "Request Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.ReqDate, new { @class = "popup-content-textbox" })</div>
+
+            //LeaveWFDetails
+            <div class="row3 content_margine">
+                <div id="LeaveWFDetailsList_old"></div>
+                @Html.LabelFor(m => m.LvWFDetails, "Leave WF Details :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LeaveWFDetailsList">
+                        <tr><th>ID</th><th>LookUp Selected LeaveWFDetails</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp LeaveWFDetails" class="popup-content-icon-lookup" id="LookUp_Lvwfdetails_LvCancelReq"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create LeaveWFDetails" class="popup-content-icon-create" id="Create_Lvwfdetails_LvCancelReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit LeaveWFDetails" class="popup-content-icon-edit" id="Edit_Lvwfdetails_LvCancelReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove LeaveWFDetails" class="popup-content-icon-remove" id="Remove_Lvwfdetails_LvCancelReq"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            //ContactNo
+            <div class="row3 content_margine">
+                <div id="ContactNoList_old"></div>
+                @Html.LabelFor(m => m.ContactNo, "ContactNo Details:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ContactNoList">
+                        <tr><th>ID</th><th>LookUp Selected ContactNo</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp ContactNo" class="popup-content-icon-lookup" id="LookUp_ContactNo_LvCancelReq"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ContactNo" class="popup-content-icon-create" id="Create_ContactNo_LvCancelReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit ContactNo" class="popup-content-icon-edit" id="Edit_ContactNo_LvCancelReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ContactNo" class="popup-content-icon-remove" id="Remove_ContactNo_LvCancelReq"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Reason, "Reason", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Reason, new { @class = "popup-content-textbox" })</div>
+        }
+    </div>
+</body>

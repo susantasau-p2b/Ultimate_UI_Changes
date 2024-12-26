@@ -1,0 +1,139 @@
+﻿@model P2b.Global.Holiday
+@{
+    ViewBag.Title = "Holiday";
+}
+
+<link href="~/Content/other_sal_head/other_sal_head.css" rel="stylesheet" />
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog_address">
+        <div title="LookUp Data">
+            <div class="LookupDiv-address"></div>
+        </div>
+        <div id="PageNavPosition-address">
+        </div>
+    </div>
+
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormHoliday" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.HolidayName, "Holiday Name :", new { @class = "popup-content-label must" })
+                <select id="HolidayNamelist" name="HolidayNamelist" style="width:150px;" class="drop must"></select>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.HolidayType, "Holiday Type :", new { @class = "popup-content-label must" })
+                <select id="HolidayTypelist" name="HolidayTypelist" style="width:150px;" class="drop must"></select>
+            </div>
+        }
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+
+        var dt;
+        var btndisablename = "";
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        // SalaryCode, SalaryDesc, HolidayType, HolidayName, RoundDigit
+
+        ColModel = ['Id', 'HolidayType', 'HolidayName'];
+        ColNames = ['Id',  'HolidayType', 'HolidayName'];
+        SortName = 'Id';
+        Caption = 'Holiday ';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            $('#FormHoliday').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Holiday', 'open', '@Url.Action("create") ', '#FormHoliday', 'Message :', 'Request Falied :', '#JqGrid',180, 330, '', btndisablename, function (data) { });
+            $('#HolidayNamelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 202, "");
+            $('#HolidayTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 203, "");
+            e.preventDefault();
+
+        });
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#FormHoliday').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Holiday", '#FormHoliday', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid',180, 330, '', btndisablename, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#HolidayTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 203, k.HolidayType); // Dropdown bind
+                    $('#HolidayNamelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 202, k.HolidayName); // Dropdown bind
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+
+            e.preventDefault();
+        });
+
+
+
+
+
+
+       // $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        //var Viewbtndisable = '#Lookup-SocialActivities-EmpSocialInfo,#Create-SocialActivities-EmpSocialInfo,#Edit-SocialActivities-EmpSocialInfo,#Remove-SocialActivities-EmpSocialInfo';
+
+        $('#View').button().click(function (event) {
+            AssignData();
+           // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 315, 343, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', Viewbtndisable, 356, 612, '#Autho', '', '', '', '', 'Message : ', 'Request Falied :', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#HolidayTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 203, k.HolidayType); // Dropdown bind
+                    $('#HolidayNamelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")",202, k.HolidayName); // Dropdown bind
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#HolidayNamelist').oldDropval(data[2].HolidayName);
+                    $('#HolidayTypelist').oldDropval(data[2].HolidayType);
+                    }
+                });
+        });
+
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+</script>

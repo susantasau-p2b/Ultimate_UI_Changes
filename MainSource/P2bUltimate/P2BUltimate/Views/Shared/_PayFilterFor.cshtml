@@ -1,0 +1,97 @@
+﻿@{
+    Layout = null;
+}
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "pay", name = "pay" }))
+    {
+        <div class="all-table">
+            <div class="emp_filter" style="display:none">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="grade-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="grade-table">
+                        <tr><th><input type="checkbox" id="case-grade" /></th><th>Grade</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <button id="load-next" class="loan-btn" data-tabletype="grade">LoadNext</button>
+                    </span>
+                </div>
+            </div>
+            <div class="emp_filter" style="display:none">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="level-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="level-table">
+                        <tr><th><input type="checkbox" id="case-level" /></th><th>Level</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <button id="load-next" class="loan-btn" data-tabletype="level">LoadNext</button>
+                    </span>
+                </div>
+            </div>
+            <div class="emp_filter" style="display:none">
+                <div class="transactiondiv">
+                    <div><label>Search : </label><input type="text" id="jobstatus-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="jobstatus-table">
+                        <tr><th><input type="checkbox" id="case-jobstatus" /></th><th>JobStatus</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <button id="load-next" class="loan-btn" data-tabletype="jobstatus">LoadNext</button>
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+
+<style>
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        /*height: 300px;*/
+    }
+
+
+    .all-table {
+        display: inline-block;
+        float: left;
+    }
+
+    .emp_filter {
+        float: left;
+        margin: 1px 1px;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+
+        $('#grade-table').P2BTransactionTableDynamic('#grade-search', '#case-grade', '@Url.Action("Check_ExitanceFirstLevelPay", "Transcation")', []);
+        $('#level-table').P2BTransactionTableDynamic('#level-search', '#case-level', '', []);
+        @*$('#jobstatus-table').P2BTransactionTableDynamic('#jobstatus-search', '#case-jobstatus', '@Url.Action("Get_JobStatus", "Transcation")', []);*@
+
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+
+        $('form#pay .btn-span button').on("click", function (e) {
+            var a = $(this).data('tabletype');
+            var b = TranscationTableCheckboxCount('#' + a + '-table');
+            if (b > 1) {
+                alert("select one record");
+                return false;
+            } else if (b == 0) {
+                alert("select Atleast one record");
+                return false;
+            }
+            var forwardata = $('#' + a + '-table').P2BGetTableDataonSelectedRow('#' + a + '-table', 1);
+            $('#' + a + '-table').P2BTransactionTableDynamic('#' + a + '-search', '#case-' + a + '', "@Url.Action("GenrationPayFor", "Transcation")?typeoftable=" + a + "-table", forwardata, '#applyfilter-pay');
+            e.preventDefault();
+        });
+
+        $('button').button();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+
+    });
+</script>
+

@@ -1,0 +1,281 @@
+﻿@*<link href="~/Content/popup_form.css" rel="stylesheet" />*@
+@model Attendance.AttendanceAbsentPolicy
+<style>
+    .popup-content-label {
+        width: 255px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+</style>
+@*<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>*@
+<script>
+    $(document).ready(function () {
+        $('#RoundDigit').ForceOnlyNumeric();
+        $('#RoundDigit').MaxLength(1);
+        $('#RoundDigit').attr("value", "0");
+        $('#Name').ValidateTextBox({ maxlength: 35, PersonName: true });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#SeqNo').MaxLength(3).ForceOnlyNumeric();
+        //$('#Name').ForceOnlyAlphaNumeric();
+        //$('#Name').MaxLength(50);
+    });
+
+   
+    $(document).ready(function () {
+       
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+        
+        ColModel = ['OnAttendPolicy', 'AuthoAbsentPolicy', 'OnNormalHoliPolicy', 'OnPublicHoliPolicy', 'UnauthoAbsentPolicy', 'Id'];
+        ColNames = ['OnAttendPolicy', 'AuthoAbsentPolicy', 'OnNormalHoliPolicy', 'OnPublicHoliPolicy', 'UnauthoAbsentPolicy', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Attendance Absent Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmAttendanceAbsentPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Attendance Absent Policy', 'open', '@Url.Action("create")', '#frmAttendanceAbsentPolicy', 'Message :', 'Request Falied :', '#JqGrid', 450, 500, '', '', function (data) { }, '');
+
+
+        });
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#View').button().click(function (event) {
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Attendance Absent Policy', '', '', 450, 500, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmAttendanceAbsentPolicy').trigger("reset");
+                     $('[name="OnAttendancePolicyAppl"]').val([k.OnAttendancePolicyAppl]).button().button("refresh");
+                    $('[name="OnNormalHolidayPolicyApp"]').val([k.OnNormalHolidayPolicyApp]).button().button("refresh");
+                    $('[name="OnPublicHoldayPolicyAppl"]').val([k.OnPublicHoldayPolicyAppl]).button().button("refresh");
+                    $('[name="AuthorizedAbsentPolicyApp"]').val([k.AuthorizedAbsentPolicyApp]).button().button("refresh");
+                    $('[name="UnauthorizedAbsentPolicyApp"]').val([k.UnauthorizedAbsentPolicyApp]).button().button("refresh");
+                    
+                });
+
+                
+            });
+        });
+
+
+
+
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Attendance Absent Policy", '#frmAttendanceAbsentPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 450, 500, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmAttendanceAbsentPolicy').trigger("reset");
+
+                    $('[name="OnAttendancePolicyAppl"]').val([k.OnAttendancePolicyAppl]).button().button("refresh");
+                    $('[name="OnNormalHolidayPolicyApp"]').val([k.OnNormalHolidayPolicyApp]).button().button("refresh");
+                    $('[name="OnPublicHoldayPolicyAppl"]').val([k.OnPublicHoldayPolicyAppl]).button().button("refresh");
+                    $('[name="AuthorizedAbsentPolicyApp"]').val([k.AuthorizedAbsentPolicyApp]).button().button("refresh");
+                    $('[name="UnauthorizedAbsentPolicyApp"]').val([k.UnauthorizedAbsentPolicyApp]).button().button("refresh");
+
+
+                });
+
+
+                $('#Autho_Allow').val(data[3]);
+            });
+
+
+        });
+
+        $('#hidelv').hide();
+        $('input[name="OnLeave"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#hidelv').fadeOut();
+            }
+            else {
+                $('#hidelv').fadeIn();
+
+            }
+        });
+        /* Address button click*/
+
+
+        $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        //To get data in Lookup
+        $('#Lookup-LvDependPolicy-SalaryHead').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLvDependPolicyLKDetails", "SalaryHead")', '', 'LookupDiv', 'LvDependPolicy Look Up Data', '#LvDependPolicylist', 'LvDependPolicylist', 5, 'LvDependPolicylist', '#frmSalaryHead', 'A', '#Edit-LvDependPolicy-SalaryHead,#Remove-LvDependPolicy-SalaryHead', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-LvDependPolicy-SalaryHead').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "SalaryHead")', 'Create LeaveDependPolicy', 'open', '@Url.Action("Create", "LeaveDependPolicy")', '#frmLeaveDependPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmSalaryHead', '', function (data) {
+                // to show data which is created in partial page
+                $('#LvDependPolicylist').P2BLookUpEncapsulate('#LvDependPolicylist', 'LvDependPolicylist', data[0], data[1], 'LvDependPolicylist', '#Edit-LvDependPolicy-SalaryHead,#Remove-LvDependPolicy-SalaryHead', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+
+        //partial page delete
+        $('#Remove-LvDependPolicy-SalaryHead').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvDependPolicylist').P2BGetTableDataonSelectedRow('#LvDependPolicylist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#LvDependPolicylist').P2BGetTableDataonSelectedRow('#LvDependPolicylist', 0);
+            console.log("Verify...");
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvDependPolicylist', $('#LvDependPolicylist').val(), 200, 200, '#frmSalaryHead', '#LvDependPolicylist', '');
+            event.preventDefault();
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+           
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmAttendanceAbsentPolicy", name = "frmAttendanceAbsentPolicy" }))
+    {
+
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        @*<input  id="Autho_Action" style="display:none" value="c"/>*@
+
+     
+
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.OnAttendancePolicyAppl, "On Attendance Policy Applicable :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="OnAttendancePolicyAppl" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="OnAttendancePolicyAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+        
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.AuthorizedAbsentPolicyApp, "Authorized Absent Policy Applicable :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio5" name="AuthorizedAbsentPolicyApp" value="true" /><label class="ui-corner-left" for="radio5">Yes</label>
+                    <input type="radio" id="radio6" name="AuthorizedAbsentPolicyApp" value="false" checked="checked" /><label class="ui-corner-right" for="radio6">No</label>
+                </span>
+            </div>
+        </div>
+       
+
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.OnNormalHolidayPolicyApp, "On Normal Holiday Policy Applicable :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio7" name="OnNormalHolidayPolicyApp" value="true" /><label class="ui-corner-left" for="radio7">Yes</label>
+                    <input type="radio" id="radio8" name="OnNormalHolidayPolicyApp" value="false" checked="checked" /><label class="ui-corner-right" for="radio8">No</label>
+                </span>
+            </div>
+        </div>
+        
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.OnPublicHoldayPolicyAppl, "On Public Holday Policy Applicable :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio9" name="OnPublicHoldayPolicyAppl" value="true" /><label class="ui-corner-left" for="radio9">Yes</label>
+                    <input type="radio" id="radio10" name="OnPublicHoldayPolicyAppl" value="false" checked="checked" /><label class="ui-corner-right" for="radio10">No</label>
+                </span>
+            </div>
+        </div>
+        
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.UnauthorizedAbsentPolicyApp, "Unauthorized Absent Policy Applicable :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio11" name="UnauthorizedAbsentPolicyApp" value="true" /><label class="ui-corner-left" for="radio11">Yes</label>
+                    <input type="radio" id="radio12" name="UnauthorizedAbsentPolicyApp" value="false" checked="checked" /><label class="ui-corner-right" for="radio12">No</label>
+                </span>
+            </div>
+        </div>
+       
+       
+    }
+</div>

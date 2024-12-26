@@ -1,0 +1,82 @@
+﻿@model P2BUltimate.Models.FileModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmUpload", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <div class="content_margine">
+            <div class="header-title Note-Header">
+                Note :
+            </div>
+            <div>Update File name according to employee code</div>
+        </div>
+        <div class="content_margine">
+            <label class="popup-content-label">Type :</label>
+            <select id="type" name="type"></select>
+        </div>
+
+        <div class="row3 content_margine  ">
+            <label class="popup-content-label must">SubDocument Name:</label>
+            <select id="SubDocList" name="SubDocList" class="drop must" style="width:180px;">
+                <option value="0">-Select-</option>
+            </select>
+        </div>
+
+        <div class="form-group content_margine">
+            @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label popup-content-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.files, "", new { @type = "file", @accept = ".png, .jpg, .jpeg", @multiple = "multiple" })
+            </div>
+        </div>
+        <div id="user_img" class="content_margine"></div>
+    </div>
+}
+<style>
+    .popup-content-label{
+        width:75px;
+        float:left;
+        display:block;
+    }
+</style>
+<script>
+    $(function () {
+
+        $.fn.doval = function () {
+            //if ($('#employee').val() == 0) {
+            //    return false;
+            //}
+            return true;
+
+        };
+        var imagesPreview = function (input, placeToInsertImagePreview) {
+
+            if (input.files) {
+                var filesAmount = input.files.length;
+                $(placeToInsertImagePreview).empty();
+                for (i = 0; i < filesAmount; i++) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (event) {
+                        $($.parseHTML('<img height="100" width="100">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                    }
+
+                    reader.readAsDataURL(input.files[i]);
+                }
+            }
+
+        };
+
+        $('#files').on('change', function () {
+            imagesPreview(this, '#user_img');
+        });
+        $('#type').selectmenu().selectmenu("menuWidget");
+        $('#SubDocList').selectmenu().selectmenu('menuWidget');
+        $('#SubDocList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1071, "");
+        $('#type').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1004, ""); // To bind dropdown on page load
+
+    });
+</script> 

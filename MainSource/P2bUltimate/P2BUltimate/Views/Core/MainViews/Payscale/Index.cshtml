@@ -1,0 +1,292 @@
+﻿@model P2b.Global.PayScale
+@{
+    ViewBag.Title = "PayScale";
+}
+<html>
+<head>
+    <title></title>
+    @*<link href="~/Content/Pay_scale/Pay_scale.css" rel="stylesheet" />*@
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+
+            $('#MultiplyingFactor').ForceOnlyNumeric();
+            $('#MultiplyingFactor').MaxLength(3);
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablenames = "#Edit-PayScaleArea-PayScale,removet-PayScaleArea-PayScale";
+
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['BasicScaleAppl', 'CPIAppl', 'PayscaleType', 'Id'];
+            ColNames = ['BasicScaleAppl', 'CPIAppl', 'PayscaleType', 'Id'];
+            SortName = 'Id';
+            Caption = 'PayScale';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmPayScale').trigger('reset');
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PayScale ', 'open', '@Url.Action("create") ', '#frmPayScale', 'Message :', 'Request Falied :', '#JqGrid', 415, 540, '#PayScaleArealist', btndisablenames, function (data) { });
+                $('#PayScaleTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 423, '');
+                $('#RoundingList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 422, '');
+                e.preventDefault();
+            });
+
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#frmPayScale').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+
+            $('#Edit').on('click', function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PayScale Data", '#frmPayScale', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 415, 540, '#PayScaleArealist', '', function (data) {
+                    $.each(data[1], function (i, k) {
+                        $('#PayScaleArealist').P2BLookUpEncapsulate('#PayScaleArealist', 'PayScaleArealist', k.PayScale_id, k.PayScale_FullDetails, 'PayScaleArealist', '#Edit-PayScaleArea-PayScale,#Remove-PayScaleArea-PayScale', 'A');
+
+                    });
+                    $.each(data[0], function (i, k) {
+                        $('#frmPayScale').trigger('reset');
+                        $('[name="BasicScaleAppl"]').val([k.BasicScaleAppl]).button().button("refresh");
+                        $('[name="CPIAppl"]').val([k.CPIAppl]).button().button("refresh");
+                        $('[name="ActualIndexAppl"]').val([k.ActualIndexAppl]).button().button("refresh");
+                        $('#PayScaleTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 423, k.PayScaleType_Id)
+                        $('#RoundingList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 422, k.Roundinglist_Id);
+                        $('#MultiplyingFactor').val(k.MultiplyingFactor);
+                        //  alert(k.ActualIndexAppl);
+                        if (k.ActualIndexAppl == true) {
+                            $("#hidedetails").fadeIn();
+                        }
+                        else {
+                            $("#hidedetails").fadeOut();
+                        }
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PayScale Data', '#PayScaleArealist', '#Lookup-PayScaleArea-PayScale,#Create-PayScaleArea-PayScale,#Edit-PayScaleArea-PayScale,#removet-PayScaleArea-PayScale', 415, 540, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('[name="BasicScaleAppl"]').val([k.BasicScaleAppl]).button().button("refresh");
+                        $('[name="CPIAppl"]').val([k.CPIAppl]).button().button("refresh");
+                        $('[name="ActualIndexAppl"]').val([k.ActualIndexAppl]).button().button("refresh");
+                        $('#PayScaleTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 423, k.PayScaleType_Id)
+                        $('#RoundingList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 422, k.Roundinglist_Id);
+                        $('#MultiplyingFactor').val(k.MultiplyingFactor);
+                        //  alert(k.ActualIndexAppl);
+                        if (k.ActualIndexAppl == true) {
+                            $("#hidedetails").fadeIn();
+                        }
+                        else {
+                            $("#hidedetails").fadeOut();
+                        }
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#PayScaleArealist').P2BLookUpEncapsulate('#PayScaleArealist', 'PayScaleArealist', k.PayScale_id, k.PayScale_FullDetails, 'PayScaleArealist', 'view', 'A');
+
+                    });
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        $('[name="BasicScaleAppl"]').StickNote([data[2].BasicScaleAppl]);
+                        $('[name="CPIAppl"]').StickNote([data[2].CPIAppl]);
+                        $('#PayScaleTypeList').StickNote(data[2].PayScaleType_Val);
+                        $('#PayScaleArealist_old').StickNote(data[2].PayScaleDetails_Val);
+                    }
+                });
+            });
+
+            $("#hidedetails").hide();
+            $('input[name="ActualIndexAppl"]:radio').change(function () {
+                if (this.value == "false") {
+                    $("#hidedetails").fadeOut();
+                }
+                else {
+                    $("#hidedetails").fadeIn();
+                }
+            });
+            $('#Lookup-PayScaleArea-PayScale').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLocationDetails", "Payscale")', '', 'LookupDiv', 'PayscaleArea Look Up Data', '#PayScaleArealist', 'PayScaleArealist', 5, 'PayScaleArealist', '#frmPayScale', 'A', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            @*$('#Lookup-PayScaleArea-PayScale').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLocationValues", "Payscale")', '', 'LookupDiv', 'Look Up Data', '#PayScaleArealist', 'PayScaleArealist', 10, 'PayScaleArealist', '#frmPayScale', 'A', '#Payscale_Edit,#Payscale_remove', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });*@
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('Create-PayScaleArea-PayScale').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "PayScale")', 'Create Location', 'open', '@Url.Action("Create", "Location")', '#FormLocation', 'Message :', 'Request Failed :', '#JqGrid', 200, 300, '', '', '', '#PayScaleArealist', '', function (data) {
+                    $('#PayScaleArealist').P2BLookUpEncapsulate('#PayScaleArealist', 'PayScaleArealist', data[0], data[1], 'PayScaleArealist', '#Edit-PayScaleArea-PayScale,removet-PayScaleArea-PayScale', 'A');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-PayScaleArea-PayScale').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#PayScaleArealist').P2BGetTableDataonSelectedRow('#PayScaleArealist', 0);
+                b = a[0];
+                console.log(b);
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Location")', '@Url.Action("edit", "Location")', b, '@Url.Action("EditSave", "Location")', 'Edit Location Values', '#FormLocation', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmPayscale', '#Edit-PayScaleArea-PayScale,#removet-PayScaleArea-PayScale', '#PayScaleArealist', 'PayScaleArealist', 'PayScaleArealist', function (data) {
+                    setTimeout(function () {
+                        $.each(data, function (i, k) {
+                            $('#Name').val(k.Name);
+                        });
+                    }, 3000);
+                });
+                event.preventDefault();
+            });
+
+
+            $('#Remove-PayScaleArea-PayScale').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                //var a = [], b;
+                //a = $('#PayScaleArealist').P2BGetTableDataonSelectedRow('#PayScaleArealist', 0);
+                //b = a[0];
+              
+                var selectedRows = [];
+                selectedRows = $('#PayScaleArealist').P2BGetTableDataonSelectedRow('#PayScaleArealist', 0);
+              
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayScaleArealist', $('#PayScaleArealist').val(), 200, 200, '#frmPayScale', '#PayScaleArealist');
+                event.preventDefault();
+            });
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+    </script>
+</head>
+<body>
+    <style>
+        .icon-row {
+            position: absolute;
+            left: 80px;
+            top: 35px;
+        }
+        .popup-content-label {
+            display:block;
+            float: left;
+            width: 106px;
+        }
+    </style>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Payscale">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPayScale" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="payscale_row3 content_margine">
+                @Html.LabelFor(m => m.PayScaleType, "Payscale Type :", new { @class = "popup-content-label must" })
+                <select class="drop must" name="PayScaleTypeList" id="PayScaleTypeList" style="width:120px;"></select>
+            </div>
+            <div class="payscale_row3 content_margine">
+
+                    <div id="PayScaleArealist_old"></div>
+                    @Html.LabelFor(m => m.PayScaleArea, "Payscale Area:", new { @class = "popup-content-label" })  <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PayScaleArealist"style="margin-left: 100px;">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp PayScaleArea" class="popup-content-icon-lookup" id="Lookup-PayScaleArea-PayScale"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" id="Create-PayScaleArea-PayScale"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    @*<button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-PayScaleArea-PayScale"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove PayScaleArea" class="popup-content-icon-remove" id="Remove-PayScaleArea-PayScale"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="payscale_row3 content_margine horizontal_row2">
+                @Html.LabelFor(m => m.BasicScaleAppl, "Basic Scale Appl:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="BasicScaleAppl" value="true" /><label for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="BasicScaleAppl" value="false"  checked="checked"/><label for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="payscale_row3 content_margine horizontal_row2">
+                @Html.LabelFor(m => m.CPIAppl, "CPI Appl:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="CPIAppl" value="true" /><label for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="CPIAppl" value="false"  checked="checked"/><label for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="payscale_row3 content_margine horizontal_row2">
+                @Html.LabelFor(m => m.ActualIndexAppl, "Actual Index Appl:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio10" name="ActualIndexAppl" value="true" /><label for="radio10">Yes</label>
+                        <input type="radio" id="radio11" name="ActualIndexAppl" value="false"  checked="checked"/><label for="radio11">No</label>
+                    </span>
+                </div>
+            </div>
+            <div id="hidedetails">
+                <div class="payscale_row3 content_margine">
+                    @Html.LabelFor(m => m.Rounding, "Rounding:", new { @class = "popup-content-label " })
+                    <select class="drop " name="RoundingList" id="RoundingList" style="width:120px;">
+
+                        <option>-Select-</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="payscale_row3 content_margine">
+                @Html.LabelFor(m => m.MultiplyingFactor, "Multiplying Factor:", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MultiplyingFactor, new { @class = "popup-content-textbox must" })
+            </div>
+        }
+    </div>
+
+</body>
+
+
+</html>

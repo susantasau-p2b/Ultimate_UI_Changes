@@ -1,0 +1,345 @@
+﻿@{
+    ViewBag.Title = "Retirement Day";
+}
+@model Payroll.RetirementDay
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 160px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmRetirementDay", name = "frmRetirementDay" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+
+                @Html.LabelFor(m => m.ServiceEndMonLastDay, "Service End Mon Last Day :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio1" name="ServiceEndMonLastDay" value="true"/><label class="ui-corner-left" for="radio1">Yes</label>
+                        <input type="radio" id="radio2" name="ServiceEndMonLastDay" value="false" /><label class="ui-corner-right" for="radio2">No</label>
+                    </span>
+                </div>
+
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ServiceEndMonRegDay, "Service End Mon Reg Day :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="ServiceEndMonRegDay" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="ServiceEndMonRegDay" value="false"/><label class="ui-corner-right" for="radio4">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.FirstdayExclude, "FirstdayExclude :", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio5" name="FirstdayExclude" value="true" /><label class="ui-corner-left" for="radio5">Yes</label>
+                        <input type="radio" id="radio6" name="FirstdayExclude" value="false"/><label class="ui-corner-right" for="radio6">No</label>
+                    </span>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Year, "Year :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Year, new { @class = "popup-content-textbox must" })
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        // $('#Name').MaxLength(50);
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['ServiceEndMonLastDay', 'ServiceEndMonRegDay','FirstdayExclude','Year','Id'];
+        ColNames = ['ServiceEndMonLastDay', 'ServiceEndMonRegDay', 'FirstdayExclude', 'Year', 'Id'];
+        SortName = 'Id';
+        Caption = 'Retirement Day';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        
+
+        $('#Create').on("click", function (event) {
+            $('#frmRetirementDay').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Retirement Day', 'open', '@Url.Action("Create")', '#frmRetirementDay', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) { });
+            //$('#Categorylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            //$('#frmRetirementDay').trigger("reset");
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Retirement Day Data", '#frmRetirementDay', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmRetirementDay').trigger("reset");
+                    $('[name="ServiceEndMonLastDay"]').val([k.ServiceEndMonLastDay]).button().button("refresh");
+                    $('[name="FirstdayExclude"]').val([k.FirstdayExclude]).button().button("refresh");
+                    $('[name="ServiceEndMonRegDay"]').val([k.ServiceEndMonRegDay]).button().button("refresh");
+                    $('#Year').val(k.Year);
+
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Retirement Day Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmRetirementDay').trigger("reset");
+                    $('#Autho_Action').val(k.Action);
+                    $('[name="ServiceEndMonLastDay"]').val([k.ServiceEndMonLastDay]).button().button("refresh");
+                    $('[name="ServiceEndMonRegDay"]').val([k.ServiceEndMonRegDay]).button().button("refresh");
+                    $('[name="FirstdayExclude"]').val([k.FirstdayExclude]).button().button("refresh");
+                    $('#Year').val(k.Year);
+                    //$('#Code').val(k.Code);
+                    //$('#Name').val(k.Name);
+                   // $('#Categorylist').P2BSelectMenuAppend("@@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', 'view', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', 'view', 'N');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+            /* Address button click*/
+
+            //To get data in Lookup
+            $('#Lookup-Address-Corporate').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmRetirementDay', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-Address-Corporate').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmRetirementDay', '', function (data) {
+                    // to show data which is created in partial page
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                });
+                event.preventDefault();
+            });
+
+            // Partial page edit
+            $('#Edit-Address-Corporate').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+                b = a[0];
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmRetirementDay', '#AddressList', 'AddressList', 'AddressList', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', function (data) {
+                    // setTimeout(function () {
+                    //to bind data according to selected id
+                    $.each(data[0], function (i, k) {
+                        $('#FormAddress').trigger("reset");
+                        $('#Address1').val(k.Address1);
+                        $('#Address2').val(k.Address2);
+                        $('#Address3').val(k.Address3);
+                        $('#Landmark').val(k.Landmark);
+                        $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                        $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                        $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                        $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                        $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                        $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                        $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                    });
+                    //}, 3000);
+
+
+                });
+                event.preventDefault();
+            });
+
+            //partial page delete
+            $('#Remove-Address-Corporate').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmRetirementDay', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+
+            /* ContactDetails button click*/
+
+            $('#Lookup-ContactDetails-Corporate').button().on('click', function (event) {
+                @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmRetirementDay', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+                $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmRetirementDay', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'Lookup_table', 'PageNavPosition');
+                // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 10, 'ContactDetailsList', '#frmRetirementDay', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-ContactDetails-Corporate').button().on("click", function (event) {
+                //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                });
+                event.preventDefault();
+            });
+
+            $('#Edit-ContactDetails-Corporate').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+                b = a[0];
+                console.log(b);
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmRetirementDay', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        $('#frmContactDetails').trigger('reset');
+                        $('#EmailId').val(k.EmailId);
+                        $('#Website').val(k.Website);
+                        $('#FaxNo').val(k.FaxNo);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                    });
+                    // }, 3000);
+                });
+                event.preventDefault();
+            });
+
+            $('#Remove-ContactDetails-Corporate').button().on('click', function (event) {
+                // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailsList', $('#ContactDetailsList').val(), 200, 200, '#frmRetirementDay', '#ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate');
+                event.preventDefault();
+            });
+
+            $('.popup_radio_button').controlgroup();
+            $('#Categorylist').selectmenu().selectmenu("menuWidget");
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        });
+</script>

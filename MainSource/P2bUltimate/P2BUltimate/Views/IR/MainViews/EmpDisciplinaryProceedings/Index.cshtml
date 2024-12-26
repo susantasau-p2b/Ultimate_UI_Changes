@@ -1,0 +1,1007 @@
+﻿@{
+    ViewBag.Title = "EmpDisciplineProcedings";
+}
+@model IR.EmpDisciplineProcedings
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 859px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+
+    <title></title>
+    
+    <script>
+        $(document).ready(function (e) {
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+
+            $('#CaseOpeningDate').P2BDatePicker();
+            // $('#Create_Dialog').P2BCreateDialog();
+            $('#create_dialognewcase').P2BCreateDialog();
+            @*$('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+            $('button').button();
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+
+            $('#CaseList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownCaseList", "EmpDisciplinaryProceedings")', "", "");
+
+
+            //$('#Create_Dialog').P2BCreateDialog();
+            $('#Advance-Filter-Symbol').on('click', function (e) {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                e.preventDefault();
+            });
+
+
+            var loadbtn;
+            $('#Load').on("click", function (event) {
+                var selectedText = $('#CaseList').find("option:selected").text();
+               // alert(selectedText);
+               
+                loadbtn = $.post("@Url.Action("Load")?CaseList=" + selectedText, function (data) { });
+                $.FormReset('#frmNewcase');
+                $('#MyTable').MultiLevelInlineEditGrid({
+
+                    url: "@Url.Action("Emp_Grid", "EmpDisciplinaryProceedings")",
+                    columnname: ["Code", "VictimName", "CaseOpeningDate", "LastStage", "Id"],
+                    childheader: ["Stage", "Description", "IsCaseClosed", "Id"],
+                    childurl: "@Url.Action("Get_EmpDiscipline", "EmpDisciplinaryProceedings")",
+                    tableheader: "Employee Disciplinary Proceedings Details",
+                    childurlColumnNo: "5"
+                });
+                //$.get("/EmpDisciplinaryProceedings/Emp_Grid", null, function (data) {
+                //   // alert(data);
+                //});
+            });
+
+            let getEmpIrId;
+           
+            $('#MyTable').on('click', '.odd, .selected', function (e) {
+                var currentRow = $(this).closest("tr");
+                getEmpIrId = currentRow.find("td:eq(5)").text();
+                localStorage.setItem("getEmpIrIdKey", getEmpIrId);
+                
+
+            });
+            $('#MyTable').on('click', '.even, .selected', function (e) {
+                var currentRow = $(this).closest("tr");
+                getEmpIrId = currentRow.find("td:eq(5)").text();
+                localStorage.setItem("getEmpIrIdKey", getEmpIrId);
+            });
+            
+            
+            //Create Function
+            $('#Create').on("click", function (event) {
+                if (getEmpIrId == undefined) {
+                    getEmpIrId = 0;
+                    //alert(getEmpIrId);
+                }
+                else {
+                    getEmpIrId;
+                }
+               
+                console.log("Clicked on Create");
+                var closed = @TempData["Stage"]
+                $.post("@Url.Action("Create")", { Id: parseInt(getEmpIrId, 10) }, function (data) {
+
+                    //if (closed != null || closed != "") {
+                    //    alert("closed alert" + closed);
+                    //        return false;
+                    //    }
+                    //alert("data" + data + "closed" + closed);
+                    var CLose = data.data;
+                    if (CLose == "Closed") {
+                        alert(data.responseText);
+                        return false;
+                    }
+                   
+                    var mis;
+                    if (data.responseText == "MisconductComplaint") {
+                        mis = window.open('./misconductcomplaint', '_blank');
+                        return false;
+                    }
+                   
+                    var pre;
+                    if (data.responseText == "PreminaryEnquiry") {
+                        pre = window.open('./preminaryenquiry?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    var preAction;
+                    if (data.responseText == "PreminaryEnquiryAction") {
+                        preAction = window.open('./preminaryenquiryaction?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+
+                    if (data.responseText == "ChargeSheet") {
+                        window.open('./chargesheet?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+
+                    if (data.responseText == "ChargeSheetServing") {
+                        window.open('./chargesheetserving?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+
+                    //if (preAction != "" && data[5] == null) {
+                    //    window.open('/chargesheetservingstatus', '_blank');
+                    //    return false;
+                    //}
+
+                    if (data.responseText == "ChargeSheetReply") {
+                        window.open('./chargesheetreply?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "ChargeSheetEnquiryNotice") {
+                        window.open('./chargesheetenquirynotice?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "ChargeSheetEnquiryNoticeServing") {
+                        window.open('./chargesheetenquirynoticeserving?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "ChargeSheetEnquiryProceedings") {
+                        window.open('./chargesheetenquiryproceedings?EmpIr=' + getEmpIrId, '_blank');
+                        return false; chargesheetenquiryreport
+                    }
+
+                    if (data.responseText == "ChargeSheetEnquiryReport") {
+                        window.open('./chargesheetenquiryreport?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "PostEnquiryPrerquisite") {
+                        window.open('./postenquiryprerquisite?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "FinalShowCauseNotice") {
+                        window.open('./finalshowcausenotice?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "FinalShowCauseNoticeServing") {
+                        window.open('./finalshowcausenoticeserving?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "FinalShowCauseNoticeReply") {
+                        window.open('./finalshowcausenoticereply?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "FinalShowCauseNoticeClarificarion") {
+                        window.open('./finalshowcausenoticeclarification?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "FinalShowCauseNoticeClarificarionServing") {
+                        window.open('./finalshowcausenoticeclarificarionserving?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "PunishmentOrder") {
+                        window.open('./punishmentorder?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "PunishmentOrderDelivery") {
+                        window.open('./punishmentorderdelivary?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "PunishmentOrderApeal") {
+                        window.open('./punishmentorderappeal?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == "PunishmentOrderApealReply") {
+                        window.open('./punishmentorderapealreply?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+                    if (data.responseText == null) {
+                        window.open('./PunishmentOrderImplementation?EmpIr=' + getEmpIrId, '_blank');
+                        return false;
+                    }
+
+
+                    
+                });
+
+                @*$.ajax({
+                    method: "Get",
+                    url: "@Url.Action("GetCode")",
+                    // data: { data: $('#Code').val() },
+                    success: function (d) {
+                        alert(d);
+                        if (d == "SDCC") {
+                            var a = 342.66968064;
+                            var b = parseInt($('#ActualIndexPoint').val());
+                            var d = (a * b);
+                            if (isNaN(d)) {
+                                $('#CalIndexPoint').val(0);
+                            }
+
+                        } else {
+                            $('.error').remove();
+                        }
+                    }
+                });*@
+                // $.FormReset('#frmLvNewReq');
+                @*$.LoadEmpByDefaultWOGeoId(true, "");
+
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create EmpDisciplinaryProceedings', 'open', '@Url.Action("Create")', '#frmLvNewReq', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });*@
+                //$.post("/EmpDisciplinaryProceedings/Create", null, function (data) {
+                //    window.open('/misconductcomplaint', '_blank');
+                //    event.preventDefault();
+                //});
+
+
+            });
+
+            //NewCasebtn Function
+            $('#newcase').on("click", function (event) {
+                $('#frmNewcase').trigger("reset");
+                //$.FormReset('#frmNewcase');
+                $.LoadEmpByDefaultWOGeoId(true, "");
+
+                $('#create_dialognewcase').P2BCreateDialog('', '', '', '', 'Create EmpDisciplinaryProceedings', 'open', '@Url.Action("NewCase")', '#frmNewcase', 'Message :', 'Request Falied :', '#JqGrid', 200, 400, '', "", function (data) { }, { datatablename: "#MyTable" });
+                
+
+
+                event.preventDefault();
+            });
+            
+
+            $('#LeaveHead_drop').on('selectmenuopen', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                if (a == null || a.length == 0) {
+                    alert('Select Employee...');
+                }
+            });
+
+            $('#Reasonlist').on('selectmenuchange', function () {
+
+                if ($('#Reasonlist').val() != 0) {
+                    if ($('#Reasonlist :selected').text().toUpperCase() == 'OTHERS' || $('#Reasonlist :selected').text().toUpperCase() == 'OTHER') {
+                        $('#Reason').val('');
+                        $('#Reason').removeAttr('Readonly');
+                    }
+                    else {
+                        $('#Reason').val($('#Reasonlist :selected').text());
+                        $('#Reason').attr('Readonly', 'Readonly');
+                    }
+
+                }
+                else {
+                    alert('Please Select or enter Reason..!');
+                    $('#Reason').val('');
+                }
+            })
+
+            $('#LeaveHead_drop').on('selectmenuchange', function () {
+                if ($(this).val() != 0) {
+                    var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                    $('#ReqDate').TodayDate();
+                    $('#ReqDate').attr("readonly", "readonly");
+
+                    $('#FromStatlist').P2BSelectMenuAppendP('@Url.Action("GetLeaveHalfdayappl", "LvNewReq")', $(this).val(), a[0], "0");
+                    $('#ToStatlist').P2BSelectMenuAppendP('@Url.Action("GetLeaveHalfdayappl", "LvNewReq")', $(this).val(), a[0], "0");
+                    $('#Reasonlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 451, "");
+
+                    if (a != null && a.length > 0) {
+                        $.getJSON("@Url.Action("GetLeaveBalance", "lvnewreq")", { LvHeadId: $(this).val(), EmpId: a.toString() }, function (data) {
+
+                            if (data != null) {
+
+                                if ($('div#lvdata')[0]) {
+                                    $('div#lvdata').remove();
+                                }
+                                var a = "<div id='lvdata'>LvOpening :" + data.LvOpening + " LvDebit :" + data.LvOccurances + " LvClosing :" + data.LvClosing + "</div>";
+                                // var a = "<div id='lvdata'>LvOpening :" + data.LvClosing + " LvOccurances :" + data.LvOccurances + "</div>";
+                                $('#LeaveHead_drop').parent('div').append(a);
+                                $('#DebitDays').val('');
+                            }
+                            else {
+                                $('div#lvdata').remove();
+                            }
+                        });
+                    } else {
+                        // alert('Select Employee..!');
+                        $('#LeaveHead_drop').val(0).selectmenu('refresh');
+                    }
+                } else {
+                    alert('Select Employee..!');
+                    $('div#lvdata').remove();
+                }
+            });
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+
+
+            $('#lblloader').hide();
+
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+            /* Address button click*/
+
+            //To get data in Lookup
+            $('#Lookup-LvWFDetails-LvNewReq').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvWFDetails", "LvNewReq")', '', 'LookupDiv', 'LvWFDetails Look Up Data', '#LvWFDetailslist', 'LvWFDetailslist', 5, 'LvWFDetailslist', '#frmLvNewReq', 'A', '#Remove-LvWFDetails-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+            // PArtial page create
+            $('<div></div>').P2BPartialCreateModalDialog();
+            //partial page delete
+
+            $('#Remove-LvWFDetails-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvWFDetailslist').P2BGetTableDataonSelectedRow('#LvWFDetailslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvWFDetailslist', $('#LvWFDetailslist').val(), 200, 200, '#frmLvNewReq', '#LvWFDetailslist', '#Remove-LvWFDetails-LvNewReq');
+                event.preventDefault();
+            });
+            //Lookup-LeaveHead-LvNewReq  LvHeadlist
+            $('#Lookup-LeaveHead-LvNewReq').on('click', function (event) {
+                alert("ok");
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLKLVHeadDetails", "LvNewReq")', '', 'LookupDiv', 'LvHead Look Up Data', '#LvHeadlist', 'LvHeadlist', 5, 'LvHeadlist', '#frmLvNewReq', 'N', '#Remove-LeaveHead-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('#Remove-LeaveHead-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmLvNewReq', '#LvHeadlist', '#Remove-LeaveHead-LvNewReq');
+                event.preventDefault();
+            });
+
+
+            $('#Lookup-LvCalendar-LvNewReq').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupCalendar", "LvNewReq")', '', 'LookupDiv', 'LvCalendar Look Up Data', '#LvCalendarlist', 'LvCalendarlist', 5, 'LvCalendarlist', '#frmLvNewReq', 'N', '#Remove-LvCalendar-LvNewReq', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-LvCalendar-LvNewReq').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvCalendarlist').P2BGetTableDataonSelectedRow('#LvCalendarlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvCalendarlist', $('#LvCalendarlist').val(), 200, 200, '#frmLvNewReq', '#LvCalendarlist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+            $('#Create-ContactNo-ContDetails').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '', '', '', '#frmLvNewReq', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0], data[1], 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'N');
+                });
+                event.preventDefault();
+            });
+            $('#Lookup-ContactNo-ContDetails').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#frmLvNewReq', 'A', '#Remove-ContactNo-ContDetails', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+
+            $('#Remove-ContactNo-ContDetails').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#frmLvNewReq', '#ContactNos_List', '#Remove-ContactNo-ContDetails');
+                event.preventDefault();
+            });
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('.popup_radio_button').controlgroup();
+            $('#FromStatlist').selectmenu().selectmenu("menuWidget");
+            $('#ToStatlist').selectmenu().selectmenu("menuWidget");
+            $('#Reasonlist').selectmenu().selectmenu("menuWidget");
+            $('#gridcase').selectmenu().selectmenu("menuWidget");
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+
+                url: "@Url.Action("Emp_Grid", "EmpDisciplinaryProceedings")",
+                columnname: ["Code", "VictimName", "CaseOpeningDate", "LastStage", "Id"],
+                childheader: ["Stage", "Description", "IsCaseClosed", "Id"],
+                childurl: "@Url.Action("Get_EmpDiscipline", "EmpDisciplinaryProceedings")",
+                tableheader: "Employee Disciplinary Proceeding Details",
+                childurlColumnNo: "5"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+
+                // for EditSave of child grid
+                if ($(init).hasClass('ui-icon-pencil')) {
+                    // //debugger
+                    
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: '35%',
+                        form: "#Edit-empdisciplinaryproceedingsPartial",
+                        htmlurl: "@Url.Action("GridPartial", "EmpDisciplinaryProceedings")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "EmpDisciplinaryProceedings")",
+                        submiturl: "@Url.Action("GridEditSave", "EmpDisciplinaryProceedings")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (returndata) {
+                            $.each(returndata.returndata, function (i, k) {
+                                $('#Edit-CaseClosingDate').prop("disabled", true);
+                                $('[name="IsCaseClosed"]').val([k.IsCaseClosed]).button().button("refresh");
+                                console.log("....IsCaseClosed......" + k.IsCaseClosed);
+                                if (k.CaseClosingDate != null) {
+                                    $('#Edit-CaseClosingDate').val(DateConvert(k.CaseClosingDate));
+                                }
+
+                                $('input[name="IsCaseClosed"]:radio').change(function () {
+
+                                    if (this.value == "false") {
+                                       // alert("aaaaaaa");
+                                        $('#Edit-CaseClosingDate').prop("disabled", true);
+                                    }
+                                    else {
+                                        $('#Edit-CaseClosingDate').prop("disabled", false);
+
+                                    }
+                                });
+                                //$('#Edit-CaseClosingDate').val(DateConvert(k.CaseClosingDate));
+                                @*$('#Edit-Category').P2BSelectMenuAppend("@Url.Action("CategoryDrop")", "", k.Category);
+                                $('#Edit-SubCategory').P2BSelectMenuAppend("@Url.Action("SubCategoryDrop")", "", k.SubCategory);
+                                $('#Edit-TargetAccounts').val(k.TargetAccounts);
+                                $('#Edit-TargetAmount').val(k.TargetAmount);
+                                $('#Edit-TargetCompliance').val(k.TargetCompliance);*@
+
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+
+            };
+
+            $('#CaseList').selectmenu().selectmenu("menuWidget");
+        });
+    </script>
+
+    <style>
+        #lvdata {
+            float: right;
+            width: 52%;
+        }
+
+        #brandata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 805px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 57px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 810px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        #Create_Dialog {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left;">
+                    @Html.LabelFor(m => m.CaseNo, "Case No :", new { @class = "popup-content-label" })
+                    @*@Html.TextBoxFor(m => m.CaseNo, new { @class = "popup-content-textbox", @id = "gridcase" })*@
+                    <select class="drop must" style="width:180px;" name="CaseList" id="CaseList">
+                        <option value="0">-select-</option>
+                    </select>
+                </div>
+
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="newcase">NewCase</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Victim Name</th>
+                                <th>CaseOpeningDate</th>
+                                <th>LastStage</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+        <div class="filter-div">
+            <label class="advance_filter_label">
+                Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                </span>
+            </label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div>
+                        <label>Search:</label>
+                        <input type="text" id="Employee-Search" style="width: 425px;" />
+                    </div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr>
+                            <th><input type="checkbox" id="Case-Employee" /></th>
+                            <th>Employee</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvNewReq", name = "frmLvNewReq" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+            <div class="heading">Filter View</div>
+            <div class="section2_Leave">
+
+                <div class="heading">EmpDisciplinary Details</div>
+
+                @*<div class="row5 content_margine">
+                        @Html.LabelFor(m => m.CaseNo, "Case No :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.CaseNo, new { @class = "popup-content-textbox must" })
+                    </div>
+
+
+
+                    <div class="row5 content_margine">
+                        @Html.LabelFor(m => m.CaseOpeningDate, "CaseOpening Date :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.CaseOpeningDate, new { @class = "popup-content-textbox must" })
+                    </div>*@
+
+
+
+
+                <div id="loading_img" class="loader content_margine">
+                    <label id="lblloader" style="color: red; display: block; position: absolute; left: 427px; top: 197px;">Processing...</label>
+                </div>
+
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label ">CaseStage:</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ContactNos_List">
+                            <tr>
+                                <th>ID</th>
+                                <th>LookUp Selected Description</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select Contact Numbers" class="popup-content-icon-lookup" id="Lookup-ContactNo-ContDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Contact Numbers" class="popup-content-icon-create" id="Create-ContactNo-ContDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Contact Numbers" class="popup-content-icon-edit" id="Edit-ContactNo-ContDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Delete Contact Numbers" class="popup-content-icon-remove" id="Remove-ContactNo-ContDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        }
+    </div>
+
+    <div id="create_dialognewcase" title="Create LvNewReq">
+        @*<div class="filter-div">
+                <label class="advance_filter_label">
+                    Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                    </span>
+                </label>
+                <div id="FormFilter"></div>
+            </div>*@
+
+        @*<div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="Employee-Search" style="width: 425px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr>
+                                <th><input type="checkbox" id="Case-Employee" /></th>
+                                <th>Employee</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>*@
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmNewcase", name = "frmNewcase" }))
+        {
+
+            @*<input id="Autho_Action" type="hidden" name="Autho_Action" />
+                <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+                <input id="geo_id" class="filter_structure_id" name="geo_id" />
+                <input id="pay_id" class="filter_structure_id" name="pay_id" />
+                <input id="fun_id" class="filter_structure_id" name="fun_id" />
+                <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+                <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+                <div class="heading">Filter View</div>*@
+            <div style="float:left;">
+
+                <div class="heading">Case Details</div>
+
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.CaseNo, "Case No :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.CaseNo, new { @class = "popup-content-textbox must" })
+                </div>
+
+
+
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.CaseOpeningDate, "CaseOpening Date :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.CaseOpeningDate, new { @class = "popup-content-textbox must" })
+                </div>
+
+
+
+
+            </div>
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,398 @@
+﻿@{
+    ViewBag.Title = "Suspension-Policy";
+}
+@model Payroll.SuspensionSalPolicy
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create SuspensionSalPolicy">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmSuspensionSalPolicy", name = "frmSuspensionSalPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.PolicyName, "Policy Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PolicyName, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EffectiveDate, "Effective Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">
+                <div id="DayRangelist_old"></div>
+                @Html.LabelFor(m => m.DayRange, "Day Range:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="DayRangelist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup DayRange" class="  popup-content-icon-lookup" id="Lookup-DayRange-SuspensionSalPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create DayRange" class="popup-content-icon-create" id="Create-DayRange-SuspensionSalPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit DayRange" class="popup-content-icon-edit" id="Edit-DayRange-SuspensionSalPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove DayRange" class="popup-content-icon-remove" id="Remove-DayRange-SuspensionSalPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="SuspensionWageslist_old"></div>@Html.LabelFor(m => m.SuspensionWages, "Suspension wages:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="SuspensionWageslist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup SuspensionWages Details" class="  popup-content-icon-lookup" id="Lookup-SuspensionWages-SuspensionSalPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create SuspensionWages Details" class="popup-content-icon-create" id="Create-SuspensionWages-SuspensionSalPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit SuspensionWages Details" class="popup-content-icon-edit" id="Edit-SuspensionWages-SuspensionSalPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                     <button data-p2btooltip="Remove SuspensionWages Details" class="  popup-content-icon-remove" id="Remove-SuspensionWages-SuspensionSalPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        // $('#Name').MaxLength(50);
+        $('#PolicyName').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['PolicyName', 'Id'];
+        ColNames = ['PolicyName', 'Id'];
+        SortName = 'Id';
+        Caption = 'Suspension Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+      
+        $('#EffectiveDate').P2BDatePicker();
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#PolicyName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmSuspensionSalPolicy').trigger("reset");
+            $('#EffectiveDate').P2BDatePicker();
+            $("#EffectiveDate").datetimepicker({ }).attr('readonly', false);
+        
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Suspension  Policy', 'open', '@Url.Action("Create")', '#frmSuspensionSalPolicy', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#SuspensionWageslist,#DayRangelist', "", function (data) { });
+            $('#EffectiveDate').attr('readonly', 'readonly');
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Suspension Policy Data", '#frmSuspensionSalPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#SuspensionWageslist,#SuspensionWageslist', "", function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    //$('#EffectiveDate').prop('disabled',true);27/11/2023
+                     $('#EffectiveDate').P2BDatePicker();
+                 //   $('#EffectiveDate').prop('readonly', 'readonly');
+                   // $("#EffectiveDate").datetimepicker({ minDate: -1, maxDate: -2 }).attr('readonly', 'readonly');
+                    if (k.EffectiveDate != null) { $('#EffectiveDate').val(DateConvert(k.EffectiveDate)); }
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#SuspensionWageslist').P2BLookUpEncapsulate('#SuspensionWageslist', 'SuspensionWageslist', k.SuspensionWages_Id, k.SuspensionWages_fullDetails, 'SuspensionWageslist', '#Remove-SuspensionWages-SuspensionSalPolicy', 'N');
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#DayRangelist').P2BLookUpEncapsulate('#DayRangelist', 'DayRangelist', k.DayRange_Id, k.Dayrange_FullDetails, 'DayRangelist', '#Remove-DayRange-SuspensionSalPolicy', 'A');
+                });
+
+               // $("#EffectiveDate").datetimepicker({ minDate: -1, maxDate: -2 }).attr('readonly',false);
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Suspension Policy', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                
+                    if (k.EffectiveDate != null) { $('#EffectiveDate').val(DateConvert(k.EffectiveDate)); }
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#SuspensionWageslist').P2BLookUpEncapsulate('#SuspensionWageslist', 'SuspensionWageslist', k.SuspensionWages_Id, k.SuspensionWages_fullDetails, 'SuspensionWageslist', 'view', 'N');
+           });
+
+                $.each(data[1], function (i, k) {
+                    $('#DayRangelist').P2BLookUpEncapsulate('#DayRangelist', 'DayRangelist', k.DayRange_Id, k.Dayrange_FullDetails, 'DayRangelist', 'view', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+      
+
+        @*$('#Lookup-SuspensionWages-SuspensionSalPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "Wages")', '', 'LookupDiv', 'Suspension Wages Look Up Data', '#SuspensionWageslist', 'SuspensionWageslist', 5, 'SuspensionWageslist', '#frmSuspensionSalPolicy', 'N', '#Remove-SuspensionWages-SuspensionSalPolicy', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+        });*@
+
+
+    
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-SuspensionWages-SuspensionSalPolicy').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmWages', '#Edit-RateMaster-Wages,#Remove-RateMaster-Wages', function (data) {
+                $('#SuspensionWageslist').P2BLookUpEncapsulate('#SuspensionWageslist', 'SuspensionWageslist', data[0], data[1], 'SuspensionWageslist', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+        //Wages Edit
+
+        $('#Edit-SuspensionWages-SuspensionSalPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#SuspensionWageslist').P2BGetTableDataonSelectedRow('#SuspensionWageslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', '@Url.Action("edit", "Wages")', b, '@Url.Action("Editsave", "Wages")', 'Edit Wages', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSuspensionSalPolicy', '#SuspensionWageslist', 'SuspensionWageslist', 'SuspensionWageslist', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+         
+                $.each(data[0], function (i, k) {
+                   
+                    $('#frmWages').trigger("reset");
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                   
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages', 'A');
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+
+
+    
+        $('#Lookup-SuspensionWages-SuspensionSalPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "Wages")', '', 'LookupDiv', 'Suspension Wages Look Up Data', '#SuspensionWageslist', 'SuspensionWageslist', 5, 'SuspensionWageslist', '#frmSuspensionSalPolicy', 'N', '#Remove-SuspensionWages-SuspensionSalPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+     
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-DayRange-SuspensionSalPolicy').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "Range")', 'Create Range', 'open', '@Url.Action("Create", "Range")', '#frmRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmSuspensionSalPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#DayRangelist').P2BLookUpEncapsulate('#DayRangelist', 'DayRangelist', data[0], data[1], 'DayRangelist', '#Edit-DayRange-SuspensionSalPolicy,#Remove-DayRange-SuspensionSalPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-DayRange-SuspensionSalPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#DayRangelist').P2BGetTableDataonSelectedRow('#DayRangelist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "Range")', '@Url.Action("Edit", "Range")', b, '@Url.Action("EditSave", "Range")', 'Edit Range Details', '#frmRange', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSuspensionSalPolicy', '#DayRangelist', 'DayRangelist', 'DayRangelist', 'A', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmRange').trigger('reset');
+                    $('#RangeFrom').val(k.RangeFrom);
+                  //  $('#RangeFrom').attr('readonly', 'readonly');
+                    $('#RangeTo').val(k.RangeTo);
+                    $('#txtCeilingMin').val(k.EmpShareAmount);
+                    $('#txtCeilingMax').val(k.EmpSharePercentage);
+                    $('#Percentage').val(k.CompShareAmount);
+                    $('#Amount').val(k.CompSharePercentage);
+                });
+
+            });
+            event.preventDefault();
+        });
+        @*$('#Edit-SuspensionWages-SuspensionSalPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#SuspensionWageslist').P2BGetTableDataonSelectedRow('#SuspensionWageslist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', '@Url.Action("edit", "Wages")', b, '@Url.Action("Editsave", "Wages")', 'Edit Wages', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmSuspensionSalPolicy', '#SuspensionWageslist', 'SuspensionWageslist', 'SuspensionWageslist', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data, function (i, k) {
+                    $('#frmWages').trigger("reset");
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.rate_id, k.RateCode, 'RateMasterlist', '#Remove-RateMaster-Wages', 'N');
+
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });*@
+
+
+        $('#Lookup-DayRange-SuspensionSalPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "Range")', '', 'LookupDiv', 'Suspension Range Look Up Data', '#DayRangelist', 'DayRangelist', 5, 'DayRangelist', '#frmSuspensionSalPolicy', 'A', '#Remove-DayRange-SuspensionSalPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+      
+
+        $('#Remove-SuspensionWages-SuspensionSalPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#SuspensionWageslist').P2BGetTableDataonSelectedRow('#SuspensionWageslist', 0);
+            //b = a[0];
+           
+            var selectedRows = [];
+            selectedRows = $('#SuspensionWageslist').P2BGetTableDataonSelectedRow('#SuspensionWageslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SuspensionWageslist', $('#SuspensionWageslist').val(), 200, 200, '#frmSuspensionSalPolicy', '#SuspensionWageslist', '');
+            event.preventDefault();
+        });
+        $('#Remove-DayRange-SuspensionSalPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#DayRangelist').P2BGetTableDataonSelectedRow('#DayRangelist', 0);
+            //b = a[0];
+          
+            var selectedRows = [];
+            selectedRows = $('#DayRangelist').P2BGetTableDataonSelectedRow('#DayRangelist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DayRangelist', $('#DayRangelist').val(), 200, 200, '#frmSuspensionSalPolicy', '#DayRangelist', '');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

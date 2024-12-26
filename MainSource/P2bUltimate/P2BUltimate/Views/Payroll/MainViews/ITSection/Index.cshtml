@@ -1,0 +1,379 @@
+﻿@model Payroll.ITSection
+@{
+    ViewBag.Title = "IT Section";
+}
+
+<style>
+    .itsec_icon-row {
+        position: relative;
+        left: 88px;
+        top: -150px;
+    }
+
+    .it_row1 {
+        width: 500px;
+    }
+    .it_popup-content-label {
+        width: 133px;
+        display: block;
+        float: left;
+    }
+
+    .row1 {
+        width: 166px;
+    }
+
+    .it_popup-content-textbox {
+        min-width: 110px;
+    }
+
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $("button").button();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var btndisnameITInvestments = '#Edit-ITInvestments-ITSection,#Remove-ITInvestments-ITSection';
+        var btndisnameITSection10 = '#Edit-ITSection10-ITSection,#Remove-ITSection10-ITSection';
+        var btndisnameLoanAdvHead = '#Edit-LoanAdvHead-ITSection,#Remove-LoanAdvHead-ITSection';
+        var btndisnameITRebate = '#Edit-ITRebate-ITSection,#Remove-ITRebate-ITSection';
+
+        var btndisname = btndisnameITInvestments + ',' + btndisnameITSection10 + ',' + btndisnameLoanAdvHead + ',' + btndisnameITRebate;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['ITSectionList', 'ITSectionListType', 'ExemptionLimit', 'Id'];
+        ColNames = ['ITSectionList', 'ITSectionListType', 'ExemptionLimit', 'Id'];
+        SortName = 'Id';
+        Caption = 'IT Section';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#ExemptionLimit').val(0).ForceAmount().MaxLength(20);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmITSection').trigger("reset");
+            $('#ITSectionList_ddl').prop("disabled", false);
+            $('#ITSectionListType_ddl').prop("disabled", false);
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create It Section', 'open', '@Url.Action("Create", "Itsection")', '#frmITSection', 'Message :', 'Request Falied :', '#JqGrid', 600, 556, '#ITRebatelist,#ITSection10list,#ITInvestmentslist,#LoanAdvHeadlist', btndisname, function (data) {
+                $('#ITSectionList_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")',410, "");
+                $('#ITSectionListType_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 411, "");
+            });
+        });
+      
+        $('#Edit').on('click', function () {
+            AssignData();
+            //$('#frmITSection').trigger("reset");
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit It Section Data", '#frmITSection', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 556, '', '', function (data) {
+                    $('#frmITSection').trigger("reset");
+                    $('#ITSectionList_ddl').prop("disabled", true);
+                    $('#ITSectionListType_ddl').prop("disabled", true);
+                $.each(data[0], function (i, k) {
+                    $('#ExemptionLimit').val(k.ExemptionLimit);
+                    $('#ITSectionList_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 410, k.ITSectionList_Id);
+                    $('#ITSectionListType_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 411, k.ITSectionListType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                  //  $('#ITInvestmentslist').P2BLookUpEncapsulate('#ITInvestmentslist', 'ITInvestmentslist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentslist', '#Remove-ITInvestments-ITSection', 'A');
+                    $('#ITInvestmentslist').P2BLookUpEncapsulate('#ITInvestmentslist', 'ITInvestmentslist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentslist', '#Remove-ITInvestments-ITSection', 'A');
+                  //  $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.ITStandardITRebate_Id, k.ITStandardITRebate_Val, 'ITRebatelist', '#Remove-ITRebate-ITSection', 'A');
+                    $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.ITStandardITRebate_Id, k.ITStandardITRebate_Val, 'ITRebatelist', '#Remove-ITRebate-ITSection', 'A');
+                   // $('#LoanAdvHeadlist').P2BLookUpEncapsulate('#LoanAdvHeadlist', 'LoanAdvHeadlist', k.LoanAdvanceHead_Id, k.LoanAdvanceHead_Val, 'LoanAdvHeadlist', '#Remove-LoanAdvHead-ITSection', 'A');
+                    $('#LoanAdvHeadlist').P2BLookUpEncapsulate('#LoanAdvHeadlist', 'LoanAdvHeadlist', k.LoanAdvanceHead_Id, k.LoanAdvanceHead_Val, 'LoanAdvHeadlist', '#Remove-LoanAdvHead-ITSection', 'A');
+                    //$('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.ITSection10_Id, k.ITSection10_Val, 'ITSection10list', '#Remove-ITSection10-ITSection', 'A');
+                    $('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.ITSection10_Id, k.ITSection10_Val, 'ITSection10list', '#Remove-ITSection10-ITSection', 'A');
+                });
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ITSection Data', '', '', 600, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                @*$.each(data[0], function (i, k) {
+                    $('#frmITSection').trigger("reset");
+                    $('#ExemptionLimit').val(k.ExemptionLimit);
+                    $('#ITSectionList_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 410, k.ITSectionList_Id);
+                    $('#ITSectionListType_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 411, k.ITSectionListType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ITInvestmentslist').P2BLookUpEncapsulate('#ITInvestmentslist', 'ITInvestmentslist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentslist', '', 'N');
+                    $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.ITStandardITRebate_Id, k.ITStandardITRebate_Val, 'ITRebatelist', '', 'N');
+                    $('#LoanAdvHeadlist').P2BLookUpEncapsulate('#LoanAdvHeadlist', 'LoanAdvHeadlist', k.LoanAdvanceHead_Id, k.LoanAdvanceHead_Val, 'LoanAdvHeadlist', '', 'N');
+                    $('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.ITSection10_Id, k.ITSection10_Val, 'ITSection10list', '', 'N');
+                });*@
+
+                $.each(data[0], function (i, k) {
+                    $('#frmITSection').trigger("reset");
+                    $('#ExemptionLimit').val(k.ExemptionLimit);
+                    $('#ITSectionList_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 410, k.ITSectionList_Id);
+                    $('#ITSectionListType_ddl').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 411, k.ITSectionListType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    //  $('#ITInvestmentslist').P2BLookUpEncapsulate('#ITInvestmentslist', 'ITInvestmentslist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentslist', '#Remove-ITInvestments-ITSection', 'A');
+                    $('#ITInvestmentslist').P2BLookUpEncapsulate('#ITInvestmentslist', 'ITInvestmentslist', k.ITInvestment_Id, k.ITInvestment_Val, 'ITInvestmentslist', 'view', 'A');
+                    //  $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.ITStandardITRebate_Id, k.ITStandardITRebate_Val, 'ITRebatelist', '#Remove-ITRebate-ITSection', 'A');
+                    $('#ITRebatelist').P2BLookUpEncapsulate('#ITRebatelist', 'ITRebatelist', k.ITStandardITRebate_Id, k.ITStandardITRebate_Val, 'ITRebatelist', 'view', 'A');
+                    // $('#LoanAdvHeadlist').P2BLookUpEncapsulate('#LoanAdvHeadlist', 'LoanAdvHeadlist', k.LoanAdvanceHead_Id, k.LoanAdvanceHead_Val, 'LoanAdvHeadlist', '#Remove-LoanAdvHead-ITSection', 'A');
+                    $('#LoanAdvHeadlist').P2BLookUpEncapsulate('#LoanAdvHeadlist', 'LoanAdvHeadlist', k.LoanAdvanceHead_Id, k.LoanAdvanceHead_Val, 'LoanAdvHeadlist', 'view', 'A');
+                    //$('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.ITSection10_Id, k.ITSection10_Val, 'ITSection10list', '#Remove-ITSection10-ITSection', 'A');
+                    $('#ITSection10list').P2BLookUpEncapsulate('#ITSection10list', 'ITSection10list', k.ITSection10_Id, k.ITSection10_Val, 'ITSection10list', 'view', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                //if ($("#Autho").hasClass('auto_active')) {
+                //    if (data[2] != null) {
+                //        $('#ExemptionLimit').oldVal(data[2].ExemptionLimit);
+                //        $('#ITSectionList_ddl_old').oldLookupVal(data[2].ITSectionList_Val);
+                //        $('#ITSectionListType_old').oldLookupVal(data[2].ITSectionListType_Val);
+                //    }
+                //}
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        @*$('#Lookup-ITInvestments-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITInvestmentLKDetails", "ITSection")', '', 'LookupDiv', 'It Investment Look Up Data', '#ITInvestmentslist', 'ITInvestmentslist', 5, 'ITInvestmentslist', '#frmITSection', 'A', '#Remove-ITInvestments-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+      
+        @*$('#Lookup-ITInvestments-ITSection').button().on('click', function (event) {
+            $('.dialog_ITSection').P2BLookUpModal('@Url.Action("GetITInvestmentLKDetails", "ITSection")', '', 'lookupdiv_ITSection', 'ItInvestment Look Up Data', '#ITInvestmentslist', 'ITInvestmentslist', 5, 'ITInvestmentslist', '#frmITSection', 'A', '#Remove-ITInvestments-ITSection', 'Lookup_table', 'pageNavPosition_ITSection');
+            event.preventDefault();
+        });*@
+        $('#Lookup-ITInvestments-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITInvestmentLKDetails", "ITSection")', '', 'LookupDiv', 'It Investment Look Up Data', '#ITInvestmentslist', 'ITInvestmentslist', 5, 'ITInvestmentslist', '#frmITSection', 'A', 'Remove-ITInvestments-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-ITSection10-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITSection10LKDetails", "ITSection")', '', 'LookupDiv', 'It Section 10 Look Up Data', '#ITSection10list', 'ITSection10list', 5, 'ITSection10list', '#frmITSection', 'A', '#Remove-ITSection10-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        @*$('#Lookup-ITSection10-ITSection').on('click', function (e) {
+            $('.dialog_ITSection').P2BLookUpModal('@Url.Action("GetITSection10LKDetails", "ITSection")', '', 'lookupdiv_ITSection', 'ItSection10 Look Up Data', '#ITSection10list', 'ITSection10list', 5, 'ITSection10list', '#frmITSection', 'A', '', 'Lookup_table', 'pageNavPosition_ITSection');
+            e.preventDefault();
+        });*@
+        $('#Lookup-LoanAdvHead-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLoanAdvHeadLKDetails", "ITSection")', '', 'LookupDiv', 'Loan Advance Head Look Up Data', '#LoanAdvHeadlist', 'LoanAdvHeadlist', 5, 'LoanAdvHeadlist', '#frmITSection', 'A', '#Remove-LoanAdvHead-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        @*$('#Lookup-LoanAdvHead-ITSection').on('click', function (e) {
+            $('.dialog_ITSection').P2BLookUpModal('@Url.Action("GetLoanAdvHeadLKDetails", "ITSection")', '', 'lookupdiv_ITSection', 'LoanAdvanceHead Look Up Data', '#LoanAdvHeadlist', 'LoanAdvHeadlist', 5, 'LoanAdvHeadlist', '#frmITSection', 'A', '#Remove-LoanAdvHead-ITSection', 'Lookup_table', 'pageNavPosition_ITSection');
+            e.preventDefault();
+        });*@
+
+        $('#Lookup-ITRebate-ITSection').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITRebateLKDetails", "ITSection")', '', 'LookupDiv', 'Standard IT Rebate Look Up Data', '#ITRebatelist', 'ITRebatelist', 5, 'ITRebatelist', '#frmITSection', 'A', '#Remove-ITRebate-ITSection', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        @*$('#Lookup-ITRebate-ITSection').on('click', function (e) {
+            $('.dialog_ITSection').P2BLookUpModal('@Url.Action("GetITRebateLKDetails", "ITSection")', '', 'lookupdiv_ITSection', 'StandardITRebate Look Up Data', '#ITRebatelist', 'ITRebatelist', 5, 'ITRebatelist', '#frmITSection', 'A', '', 'Lookup_table', 'pageNavPosition_ITSection');
+            e.preventDefault();
+        });*@
+
+        $('#Remove-ITInvestments-ITSection').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITInvestmentslist').P2BGetTableDataonSelectedRow('#ITInvestmentslist', 0);
+            //b = a[0];
+            
+            var selectedRows = [];
+            selectedRows = $('#ITInvestmentslist').P2BGetTableDataonSelectedRow('#ITInvestmentslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITInvestmentslist', $('#ITInvestmentslist').val(), 200, 200, '#frmITSection', '#ITInvestmentslist', '');
+            event.preventDefault();
+        });
+        //$('#Remove-ITInvestments-ITSection').button().on('click', function (event) {
+            
+        //    var a = [], b;
+        //    a = $('#ITInvestmentslist').P2BGetTableDataonSelectedRow('#ITInvestmentslist', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITInvestmentslist', $('#ITInvestmentslist').val(), 200, 200, '#frmITSection', '#ITInvestmentslist');
+        //    event.preventDefault();
+        //});
+
+        $('#Remove-LoanAdvHead-ITSection').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITLoanlist').P2BGetTableDataonSelectedRow('#LoanAdvHeadlist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ITLoanlist').P2BGetTableDataonSelectedRow('#LoanAdvHeadlist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LoanAdvHeadlist', $('#LoanAdvHeadlist').val(), 200, 200, '#frmITSection', '#LoanAdvHeadlist');
+            event.preventDefault();
+        });
+
+        $('#Remove-ITRebate-ITSection').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITRebatelist').P2BGetTableDataonSelectedRow('#ITRebatelist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ITRebatelist').P2BGetTableDataonSelectedRow('#ITRebatelist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITRebatelist', $('#ITRebatelist').val(), 200, 200, '#frmITSection', '#ITRebatelist');
+            event.preventDefault();
+        });
+
+        $('#Remove-ITSection10-ITSection').button().on('click', function (event) {
+           // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ITSection10list').P2BGetTableDataonSelectedRow('#ITSection10list', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ITSection10list').P2BGetTableDataonSelectedRow('#ITSection10list', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSection10list', $('#ITSection10list').val(), 200, 200, '#frmITSection', '#ITSection10list');
+            event.preventDefault();
+        });
+
+        //$("#ITSectionList_ddl").on("selectmenuchange", function () {
+        //    alert($(this).val());
+        //    if ($(this).val() == "64") {
+        //        $('#hideDivdetails').fadeIn();
+
+        //    }
+        //    else {
+        //        $('#hideDivdetails').fadeOut();
+        //    }
+
+
+        //});
+
+        $('.drop').selectmenu().selectmenu('menuWidget').addClass('overflow');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+<html>
+<head>
+    <title></title>
+</head>
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div Id="Grid_Form">
+                    <div>
+                        <table Id="JqGrid"></table>
+                        <div Id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div Id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmITSection", name = "frmITSection" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+         
+            <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.ITSectionList, "IT Section List :", new { @class = "it_popup-content-label must" })
+                <select class="drop must" id="ITSectionList_ddl" name="ITSectionList_ddl" style="width:140px;"></select>
+        </div>
+            <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.ITSectionListType, "IT Section List Type :", new { @class = "it_popup-content-label must" })
+                <select class="drop must" id="ITSectionListType_ddl" name="ITSectionListType_ddl" style="width:120px;"><option></option></select>
+        </div>
+            <div class="it_row1 content_margine">@Html.LabelFor(m => m.ExemptionLimit, "Exemption Limit :", new { @class = "it_popup-content-label must" })@Html.TextBoxFor(m => m.ExemptionLimit, new { @class = "it_popup-content-textbox must" })</div>
+            
+            <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.ITInvestments, "IT Investments :", new { @class = "it_popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" Id="ITInvestmentslist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+                <div class="icon-row itsec_icon-row">
+                    <button data-p2btooltip="LookUp ITInvestments" class="popup-content-icon-lookup" id="Lookup-ITInvestments-ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" Id="Create-ITInvestments-ITSection"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" Id="Edit-ITInvestments-ITSection"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove ITInvestments" class="popup-content-icon-remove" id="Remove-ITInvestments-ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+        </div>
+
+           <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.ITSection10, "IT Section 10 :", new { @class = "it_popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" Id="ITSection10list">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+               <div class="icon-row itsec_icon-row">
+                   <button data-p2btooltip="Select IT Section 10" class="popup-content-icon-lookup" id="Lookup-ITSection10-ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                   @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" Id="Create-ITSection10-ITSection"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" Id="Edit-ITSection10-ITSection"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                   <button data-p2btooltip="Remove IT Section 10" class="popup-content-icon-remove" id="Remove-ITSection10-ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+               </div>
+        </div>
+            <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.LoanAdvanceHead, "Loan Advance Head:", new { @class = "it_popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" Id="LoanAdvHeadlist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+                <div class="icon-row itsec_icon-row">
+                    <button data-p2btooltip="Select Loan Advance Head" class="popup-content-icon-lookup" id="Lookup-LoanAdvHead-ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" Id="Create-ITLoan-ITSection"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" Id="Edit-ITLoan-ITSection"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove Loan Advance Head" class="popup-content-icon-remove" id="Remove-LoanAdvHead-ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+        </div>
+            <div class="it_row1 content_margine">
+                @Html.LabelFor(m => m.ITStandardITRebate, "IT Rebate :", new { @class = "it_popup-content-label" }) <div class="popup-content-table">
+                <table class="lookuptableselected" Id="ITRebatelist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+                <div class="icon-row itsec_icon-row">
+                    <button data-p2btooltip="Select IT Rebate" class="popup-content-icon-lookup" id="Lookup-ITRebate-ITSection"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" Id="Create-ITRebate-ITSection"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" Id="Edit-ITRebate-ITSection"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Remove IT Rebate" class="popup-content-icon-remove" id="Remove-ITRebate-ITSection"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+        </div>
+            
+            
+        }
+    </div>
+</body>
+
+
+</html>

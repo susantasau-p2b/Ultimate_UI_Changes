@@ -1,0 +1,598 @@
+﻿@{
+    ViewBag.Title = "Salaray Arrear Transaction";
+}
+
+@model Payroll.SalaryArrearT
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 61px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 115px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 430px;
+    }
+
+    .row9 {
+        width: 386px;
+        display: inline-flex;
+        float: right;
+        margin-top: -32px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .date-picker {
+        z-index: 999;
+    }
+
+    .employeeselectiondiv {
+        float: left;
+    }
+
+    .addons {
+        height: 246px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+    
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+</style>
+
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+        ColModel = ['Code', 'Name', 'PayMonth', 'FromDate', 'ToDate', 'TotalDays', 'ArrearType', 'Id'];
+        ColNames = ['Code', 'Name', 'Pay Month', 'From Date', 'To Date', 'Total Days', 'Arrear Type', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = "Salary Arrear Transaction"
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Incrload').hide();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#pay_id').val(data.PayStruct);
+                    //$('#fun_id').val(data.FunStruct);
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+          
+            //console.log($('#FormFilter')[0]);
+        });
+       
+        $('#Create').on("click", function (event) {
+          
+            $('#frmSalaryArrearT').trigger("reset");
+            $('#Empl_list_h').fadeIn();
+            //$.LoadEmpByDefault();
+          
+            $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+
+            $('#list-employee').P2BCreateDialog('', '', '', '', 'Create Salary Arrear Transaction', 'open', '@Url.Action("Create")', '#frmSalaryArrearT', 'Message :', 'Request Falied :', '#JqGrid', 600, 850, '', '', function (data) { });
+            $('#arrears_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 417, "");
+
+            event.preventDefault();
+        });
+
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            // $.LoadEmpByDefault();
+            $('#Empl_list_h').fadeOut();
+            $('#list-employee').P2BEditModalDialog('@Url.Action("Edit")?param=' + dt.Code, dt.Id, '@Url.Action("EditSave")?param=' + dt.Code, "Edit Employee Arrear days Information->" + JSON.stringify(dt) + "", '#frmSalaryArrearT', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 300, 1050, '', '', function (data) {
+                //  $.each(data[0], function (i, k) {
+                if (data[0].IsStatus == "0") {
+                    alert(" Salary has released for employee. You can't Delete this Record. ");
+                }
+                else if (data[0].IsStatus == "1") {
+                    alert(" Salary has processed for employee. First delete salary and try again ");
+                };
+                $('#frmSalaryArrearT').trigger('reset');
+                    $('#FromDate').val(data[0].FromDate);
+                    $('#ToDate').val(data[0].ToDate);
+                    $('#TotalDays').val(data[0].TotalDays);
+                    $('#PayMonth').val(data[0].PayMonth);
+                    $('[name="IsPaySlip"]').val([data[0].IsPaySlip]).button().button("refresh");
+                    $('[name="IsAuto"]').val([data[0].IsAuto]).button().button("refresh");
+                    $('#arrears_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "SalaryArrearT")", "", data[0].ArrearType_id);
+               
+                // if ($('#arrears_drop option:selected').text() == "LWP")
+                if (data[0].ArrearType_details == "LWP")
+                {
+                    $('#dvRecovery').show();
+                    $('[name="IsRecovery"]').val([data[0].IsRecovery]).button().button("refresh");
+                }
+                else
+                {
+                    $('#dvRecovery').hide();
+                };
+                  
+              //  });
+                                              
+
+            });
+            e.preventDefault();
+        });
+
+        $('#View').on('click', function (e) {
+           
+            AssignData();
+            $.LoadEmpByDefault();
+
+            $('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View Employee Arrear days Information->" + JSON.stringify(dt) + "", '#frmSalaryArrearT', '',400, 1050, '', '', '',  '', '','','','', function (data) {
+                         
+             
+                $('#frmSalaryArrearT').trigger('reset');
+                $('#FromDate').val(data[0].FromDate);
+                $('#ToDate').val(data[0].ToDate);
+                $('#TotalDays').val(data[0].TotalDays);
+                $('#PayMonth').val(data[0].PayMonth);
+                $('[name="IsPaySlip"]').val([data[0].IsPaySlip]).button().button("refresh");
+                $('[name="IsAuto"]').val([data[0].IsAuto]).button().button("refresh");
+                $('#arrears_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "SalaryArrearT")", "", data[0].ArrearType_id);
+               
+                // if ($('#arrears_drop option:selected').text() == "LWP")
+                if (data[0].ArrearType_details == "LWP")
+                {
+                    $('#dvRecovery').show();
+                    $('[name="IsRecovery"]').val([data[0].IsRecovery]).button().button("refresh");
+                }
+                else
+                {
+                    $('#dvRecovery').hide();
+                };
+              
+                $('#Empl_list_h').fadeOut();
+
+            });
+          
+            e.preventDefault();
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+        $('#Delete').on("click", function (event) {
+            var newdia = $("<div id='newDia'>If You Want to change data Please click on Edit..!<br/> else click on Delete to remove..!</div>");
+            newdia.dialog({
+                autoOpen: false,
+                height: 200,
+                width: 350,
+                title: "Confirm Box",
+                model: true,
+                beforeclose: function () {
+                    diahtml.remove(); RemoveErrTag();
+                },
+                buttons: {
+                    Edit: function () {
+                        //   newdia.dialog("close");
+                        //debugger
+                        var a = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                        var empcodes = a.Code;
+                        var iddel = a.Id;
+
+                        $.ajax({
+                            method: "POST",
+                            url: "@Url.Action("Delete")",
+                            data: { data: iddel, param: empcodes ,types:0},
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        success: function (data) {
+                            newdia.dialog("close");
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                        },
+                        error: function (data) {
+                            $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                            newdia.dialog("close");
+                        }, complete: function (data) {
+                            $('#JqGrid').trigger('reloadGrid');
+                            $('.ajax_loder').remove();
+                            newdia.dialog("close");
+
+                        }
+                    });
+                            
+            //    $('#list-employee').P2BDeleteModalDialog('@@Url.Action("Delete")?param=' + dt.Code + '&types=0', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+
+            e.preventDefault();
+        },
+            Delete: function () {
+                // newdia.dialog("close");
+                //debugger
+                var a = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var empcodes = a.Code;
+                var iddel = a.Id;
+
+                $.ajax({
+                    method: "POST",
+                    url: "@Url.Action("Delete")",
+                    data: { data: iddel, param: empcodes ,types:1},
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    newdia.dialog("close");
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                },
+                error: function (data) {
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                    newdia.dialog("close");
+                    $('#emp_Id').val("");
+                }, complete: function (data) {
+                    $('#JqGrid').trigger('reloadGrid');
+                    $('.ajax_loder').remove();
+                    newdia.dialog("close");
+
+                }
+            });
+
+        e.preventDefault();
+    }
+    }
+    });
+    newdia.dialog('open');
+    event.preventDefault();
+
+    });
+        $("#arrears_drop").on("selectmenuchange", function () {
+            if ($('#arrears_drop :selected').text() == "LWP") {
+                $('#dvRecovery').show();
+            }
+            else {
+                $('#dvRecovery').hide();
+            }
+            if ($('#arrears_drop :selected').text().toUpperCase() == "INCREMENT") {
+                $('#Incrload').show();
+            }
+            else {
+                $('#Incrload').hide();
+            }
+        });
+
+        $('#list-employee').P2BGridDialog();
+        $('#edit_model_dialog').P2BGridDialog();
+
+
+        $('#ToDate').change(function () {
+            var a = $('#FromDate').datepicker('getDate').getTime(),
+                b = $('#ToDate').datepicker('getDate').getTime(),
+                c = 24 * 60 * 60 * 1000,
+                diffDays = Math.round(Math.abs((a - b) / (c))) + 1;
+
+            $('#TotalDays').val(diffDays);
+        });
+        var ReturnStructIds1 = function (filterid, returnfun) {
+            $.ajax({
+                method: "Get",
+                url: "Transcation/ByDefaultLoadEmp",
+                success: function (data) {
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var data = {
+                        GeoStruct: $('#geo_id').val() || null,
+                        PayStruct: $('#pay_id').val() || null,
+                        FunStruct: $('#fun_id').val() || null,
+                        Filter: filterid || null,
+                    };
+                    returnfun(data);
+                }
+            });
+        };
+
+        $.LoadEmpByDefaultLoad = function (single, filterid) {
+            single = single || false;
+            ReturnStructIds1(filterid, function (data) {
+                var forwarddata = JSON.stringify(data);
+                $('#Employee-Table').find('td').remove();
+                $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', 'SalaryArrearT/Get_Employelist?geo_id=' + forwarddata + '', "", single);
+            });
+
+        };
+
+        $('#Incrload').on('click', function () {
+            var aa = "";
+            aa = $('#FromDate').val().toString();
+            aa += "," + $('#ToDate').val().toString();
+            console.log("dfdfds    " + aa);
+            if (aa == "") {
+                alert("Kindly select from date, to date");
+            } else {
+                if ($('#arrears_drop :selected').text().toUpperCase() == "INCREMENT") {
+                    $.LoadEmpByDefaultLoad(false, aa);
+                }
+                else {
+                    $.LoadEmpByDefault();
+                }
+            }
+        });
+
+        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        $('#FromDate').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#ToDate').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+
+
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left">
+                @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
+                <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Add</button>
+            <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+               @*<button class="button" id="Autho">Authorized</button>*@
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmSalaryArrearT", name = "frmSalaryArrearT" }))
+    {
+        
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+      
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+            </div>
+        <div class="section_Method">
+            <div class="heading">Salary Arrear Trasaction Details</div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ArrearType, "Arrear Type:", new { @class = "popup-content-label must" })
+                <select id="arrears_drop" class="drop must" name="arrears_drop" style="width:157px;"><option value="0">-Select-</option></select>
+            </div>
+
+            <div class="row9 content_margine">
+                <div>
+                    @Html.LabelFor(m => m.PayMonth, "Pay Month:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox datepicker must" })
+                </div>
+
+            </div>
+                        
+            <div class="row3 content_margine">
+                <div>
+                    @Html.LabelFor(m => m.FromDate, "From Date:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox datepicker must" })
+                </div>
+
+            </div>
+            <div class="row9 content_margine">
+                <div>
+                    @Html.LabelFor(m => m.ToDate, "To Date:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox datepicker must" })
+                    <input type="button" id="Incrload" name="Incrload" value="Load Emp" />
+                </div>
+
+            </div>
+            <div class="row3 content_margine">
+                <div>
+                    @Html.LabelFor(m => m.TotalDays, "Total Days:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.TotalDays, new { @class = "popup-content-textbox datepicker must" })
+                </div>
+
+            </div>
+            <div class="row9 content_margine">
+                @Html.LabelFor(m => m.IsPaySlip, "PaySlip:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsPaySlip_radio1" name="IsPaySlip" value="true" checked="checked" /><label for="IsPaySlip_radio1">Yes</label>
+                    <input type="radio" id="IsPaySlip_radio2" name="IsPaySlip" value="false" /><label for="IsPaySlip_radio2">No</label>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsAuto, "Auto:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsAuto_radio1" name="IsAuto" value="true" checked="checked" /><label for="IsAuto_radio1">Yes</label>
+                    <input type="radio" id="IsAuto_radio2" name="IsAuto" value="false" /><label for="IsAuto_radio2">No</label>
+                </div>
+            </div>
+            <div class="row9 content_margine" style="display:none" id="dvRecovery">
+                @Html.LabelFor(m => m.IsRecovery, "Recovery:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsRecovery_radio1" name="IsRecovery" value="true" /><label for="IsRecovery_radio1">Yes</label>
+                    <input type="radio" id="IsRecovery_radio2" name="IsRecovery" value="false" checked="checked" /><label for="IsRecovery_radio2">No</label>
+                </div>
+            </div>
+        </div>
+        <div class="section_Method" id="Empl_list_h" >
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+                    @*<span class="btn-span1" aria-hidden="true">
+                            <button id="load_emp" class="loan-btn">Load Employee</button>
+                        </span>*@
+                </div>
+                @*<input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />*@
+            </div>
+        </div>
+    }
+</div>
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+        <div class="emplist_row">
+            <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+            <input type="text" style="display:none" id="payscaleagreement_id" name="payscaleagreement_id" />
+            <input type="text" id="payscaleagreement" name="payscaleagreement" />
+        </div>
+        <div class="emplist_row">
+            <label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date" />
+        </div>
+        <div>
+            <table id="inline_JqGrid"></table>
+            <div id="inline_pager"></div>
+        </div>
+    }
+</div>

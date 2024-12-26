@@ -1,0 +1,915 @@
+﻿@{
+    ViewBag.Title = "Yearly Payment T";
+}
+@model Payroll.YearlyPaymentT
+<html>
+
+<head>
+
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+                columnname: ["Code", "Name", "Id"],
+                htmurl: "@Url.Action("partial", "YearlyPaymentT")",
+                childheader: ["TDSAmount", "AmountPaid", "OtherDeduction", "SalaryHead", "FromPeriod", "ToPeriod", "ProcessMonth", "ReleaseDate", "ReleaseFlag", "PayMonth", "Id"],
+                childurl: "@Url.Action("Get_YearlyPayment", "YearlyPaymentT")",
+                tableheader: "Yearly Payment transaction",
+                childurlColumnNo: "3"
+            });
+
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                // console.log($(init).parents('tr:eq(0)'));
+                var parent_element = $(init).parents('td:last').parent().prev();
+                //var element = $(init).parents('tr:eq(0)');
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                //   console.log(element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frm-YearlyPaymentT-partial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("EditGridDetails", "YearlyPaymentT")",
+                        submiturl: "@Url.Action("GridEditSave", "YearlyPaymentT")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data.data, function (i, k) {
+                                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                                //$('#yearlypayment-Narration').val(k.NarrationP);
+                            });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+
+
+                    $.get("@Url.Action("EditGridDetails", "YearlyPaymentT")", { data: id }, function (data) {
+                        ////debugger;
+                        if (data.ReleaseFlagP == true) {
+                            alert("You can not Edit this Record because this payment has Released");
+                        } else if (data.LvencashId != "") {
+                            alert("You can  Edit this Record From LeaveEncashPayment Form");
+                        }
+                        else {
+                            $('<div></div>').PartialCreateDialog({
+                                height: 'auto',
+                                width: '35%',
+                                form: "#Edit-YearlyPaymentT",
+                                title: "Edit YearlyPaymentT",
+                                htmlurl: htmurl,
+                                state: "open",
+                                mode: "Edit",
+                                editurl: "@Url.Action("EditGridDetails", "YearlyPaymentT")",
+                                submiturl: "@Url.Action("GridEditSave", "YearlyPaymentT")",
+                                editdata: id,
+                                forwarddata: id,
+                                returndatafunction: function (data) {
+                                    $('#AmountPaid-edit').val(data.AmountPaidP);
+                                    $('#TDSAmount-edit').val(data.TDSAmountP);
+                                    $('#OtherDeduction-edit').val(data.OtherDeductionP);
+                                },
+                                submitfun: function (data) {
+                                    var row = dt.row(parent_element);
+                                    if (row.child.isShown()) {
+                                        parent_element.removeClass('details');
+                                        row.child.hide();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                else if ($(init).hasClass('ui-icon-trash')) {
+                    $.get("@Url.Action("EditGridDetails", "YearlyPaymentT")", { data: id }, function (data) {
+                        if (data.ReleaseFlagP == true) {
+                            alert("You can not Delete this Record because this payment has Released");
+                        } else if (data.LvencashId != "") {
+                            alert("You can  Delete this Record From LeaveEncashPayment Form");
+                        }
+                        else {
+                            $('<div></div>').PartialCreateDialog({
+                                state: "open",
+                                mode: "Delete",
+                                submiturl: "@Url.Action("GridDelete")",
+                                forwarddata: id,
+                                submitfun: function (data) {
+                                    var row = dt.row(parent_element);
+                                    if (row.child.isShown()) {
+                                        parent_element.removeClass('details');
+                                        row.child.hide();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            };
+
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            //-------------------------Release Grid----------------------------------------//
+
+            var ColNames_release = [];
+            var ColModel_release = [];
+            var SortName_release, Caption_release, url_release, width_release, height_release;
+
+            ColNames_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
+            ColModel_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
+            SortName_release = 'Id';
+            Caption_release = 'Yearly Payment T';
+            url_release = '@Url.Action("P2BGridRelease")';
+            width_release = 1000;
+            height_release = 150;
+
+            //  a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
+            $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+
+            $('#JqGrid_release').on('click', function () {
+                $('#JqGrid').GridUnload();
+                var dt_release = $('#JqGrid_release').P2BGrid.P2BEdDelV('#JqGrid_release', 'Id');
+
+                // alert(dt_release.Id);
+
+                $('#emp_Id').val(dt_release.Id);
+
+                $.get("@Url.Action("Edit")", { data: dt_release.Id }, function (data) {
+                    $.each(data[0], function (i, k) {
+                        ////debugger;
+                        console.log(k.AmountPaid);
+                        // $('#txtFromPeriod').val(k.FromPeriod);
+                        if (k.FromPeriod != null) { $('#txtFromPeriod').val(DateConvert(k.FromPeriod)); }
+                        if (k.ToPeriod != null) { $('#txtToPeriod').val(DateConvert(k.ToPeriod)); }
+                        //  $('#txtToPeriod').val(k.ToPeriod);
+                        $('#txtAmountPaidRelease').val(k.AmountPaid);
+                        $('#txtProcessmonth').val(k.ProcessMonth);
+                        $('#PayMonth').val(k.PayMonth);
+                        $('#txtTDSAmountRelease').val(k.TDSAmount);
+                        $('#txtOtherDeductionRelease').val(k.OtherDeduction);
+                        $('#txtNarrationRelease').val(k.Narration);
+                        $('#SalaryHeadReleaselist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", k.Salaryhead_Id);
+                        if (k.Salaryhead_Id == "1") {
+
+                            $('#HideDiv').fadeIn();
+                        }
+                        else {
+                            $('#HideDiv').fadeOut();
+                        }
+                    });
+
+                    console.log(data);
+                });
+
+            });
+            //$('#txtProcessmonth').on('change', function () {
+
+            //    var from = $("#txtProcessmonth").val().split("/");
+            //    // alert(from);
+            //    var convertedStartDate = new Date(from[1], from[0] - 1);
+            //     alert(convertedStartDate);
+            //    var newdate = new Date(convertedStartDate);
+
+            //    newdate.setDate(newdate.getDate() + 1);
+            //    // alert(newdate);
+            //    var dd = newdate.getDate();
+            //    // alert("date" + dd);
+            //    var mm = newdate.getMonth() + 2;
+            //    var yyyy = newdate.getFullYear();
+            //    if (dd < 10) {
+            //        dd = '0' + dd;
+            //    }
+
+            //    if (mm < 10) {
+            //        mm = '0' + mm;
+            //    }
+            //    today = dd + '/' + mm + '/' + yyyy;
+            //    document.getElementById("ResumeDate").value = today;
+
+            //});
+
+            // $.LoadEmpByDefault();
+            $('#FromPeriod').P2BDatePicker();
+            $('#ToPeriod').P2BDatePicker();
+            $('#ReleaseDate').P2BDatePicker();
+            $('#filSterShow').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#MyTable').DataTable().ajax.url("@Url.Action("EmpLoad")").load();
+
+                        @*$('#JqGrid').PostGridData({
+                            url: "@Url.Action("P2BGrid")",
+                            filter: forwarddata,
+                        });*@
+                    }
+                });
+            });
+
+            $('#loademp').on('click', function () {
+                $('#MyTable').DataTable().ajax.url("@Url.Action("EmpLoad")").load();
+            });
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#pay_id').val(data.PayStruct);
+                        //$('#fun_id').val(data.FunStruct);
+                    }, hierarchy: true,
+                    renderat: "#FormFilter",
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+            $('#ReleaseDate').prop("disabled", true);
+            $('input[name="ProcessFlag"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#ReleaseDate').prop("disabled", true);
+                    $('#ReleaseDate').val("");
+                }
+                else {
+                    $('#ReleaseDate').prop("disabled", false);
+                }
+            });
+
+
+            $('#ProcessTax').fadeOut();
+            $('#ProcTypeListDiv').fadeOut();
+            $('#newdiv').fadeOut();
+            $('input[name="AmountProcessFlag"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#ProcessTax').fadeOut();
+                    $('#ProcTypeListDiv').fadeOut();
+                    $('#newdiv').fadeOut();
+                }
+                else {
+                    $('#ProcessTax').fadeIn();
+                    $('#ProcTypeListDiv').fadeIn();
+                    $('#newdiv').fadeIn();
+                }
+            });
+
+            $('#SalaryHeadlist').on('selectmenuopen', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                if (a == null || a.length == 0) {
+                    alert('Select Employee...');
+                }
+            });
+            $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+                //  $('input[type="checkbox"]').not(this).prop("checked", false);
+                if (this.checked) {
+                    //  alert($(this).val());
+                    var id = $(this).val();
+                    $('#emp').val(id);
+                    $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", ""); // To bind dropdown on page load
+
+                    $('#SalaryHeadlist').on('selectmenuchange', function () {
+                        //console.log("dasd");
+                        $.get("@Url.Action("getCalendar", "YearlyPaymentT")", function (data) {
+                            // $('#dispcalender').val(data.Lvcalendardesc);
+                            $('#FromPeriod').val(data.Fromperiod);
+                            $('#ToPeriod').val(data.Toperiod);
+                        });
+
+
+
+                    });
+                } else {
+                    $('#emp').val('');
+                }
+            });
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#CreateRelease_dialog').P2BCreateDialog();
+            //Create Function
+            $('#add').on("click", function (event) {
+                //$.LoadEmpByDefault(); $('#frmYearlyPaymentT').trigger("reset");
+                $.LoadEmpByDefaultWOGeoId(false, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Yearly Payment', 'open', '@Url.Action("Create")', '#frmYearlyPaymentT', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '#AddressList,#ContactDetailsList', '', function (data) { }, { datatablename: "#MyTable" });
+                @*$('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", ""); // To bind dropdown on page load*@
+                $('#FromPeriod').attr('readonly', true);
+                $('#AmountPaid').ForceOnlyNumeric().MaxLength(15);
+                $('#OtherDeduction').ForceOnlyNumeric().MaxLength(15);
+                $('#TDSAmount').ForceOnlyNumeric().MaxLength(15);
+                event.preventDefault();
+            });
+
+            $('#HideDiv').hide();
+            $('#HideDivRelease').hide();
+
+            $("#SalaryHeadlist").on("selectmenuchange", function () {
+                $.get("@Url.Action("GetSalHead", "YearlyPaymentT")", { data: $(this).val() }, function (data) {
+                    if (data == true)
+                        $('#HideDiv').fadeIn();
+                    else
+                        $('#HideDiv').fadeOut();
+                });
+
+                $.get("@Url.Action("GetSalHeadProcessmonth", "YearlyPaymentT")", { data: $(this).val() }, function (data) {
+                    if (data == true)
+                        $('#HideDivProcessMonth').fadeIn();
+                    else
+                        // process month will come only which salaryhead process type fixedmonth
+                        var now = new Date();
+                    // Format date as mm/yyyy
+                    var month = String(now.getMonth() + 1).padStart(2, '0'); // Get month and pad with leading zero if needed
+                    var year = now.getFullYear(); // Get full year
+                    var formattedDate = month + '/' + year;
+                  
+                    // Set the formatted date to the element with ID 'ProcessMonth'
+                    $('#ProcessMonth').val(formattedDate);
+
+                    $('#HideDivProcessMonth').fadeOut();
+                });
+
+
+            });
+            $("#SalaryHeadReleaselist").on("selectmenuchange", function () {
+
+                if ($(this).val() == "1") {
+
+                    $('#HideDivRelease').fadeIn();
+                }
+                else {
+                    $('#HideDivRelease').fadeOut();
+                }
+
+            });
+            $('#PayMonth').prop("readonly", true);
+            $('#txtNarrationRelease').prop("disabled", true);
+            $('#txtOtherDeductionRelease').prop("disabled", true);
+            $('#txtAmountPaidRelease').prop("disabled", true);
+            $('#txtProcessmonth').prop("disabled", true);
+            $('#txtToPeriod').prop("disabled", true);
+            $('#txtFromPeriod').prop("disabled", true);
+            $('#txtTDSAmountRelease').prop("disabled", true);
+            $('#SalaryHeadReleaselist').prop("disabled", true);
+
+            $('#release').on("click", function (event) {
+
+                $('#JqGrid_release').trigger('reloadGrid');
+                $('#SalaryHeadReleaselist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", "");
+
+                // $('#CreateRelease_dialog').P2BCreateDialog('', '', '', '', 'Create Release Yearly Payment', 'open', '@@Url.Action("Create")', '#frmYearlyPaymentT', 'Message :', 'Request Falied :', '#JqGrid', 600, 850, '#AddressList,#ContactDetailsList', btndisablenames, function (data) { });
+
+                $('#frmYearlyPaymentTRelease').trigger('reset');
+
+                $('#CreateRelease_dialog').P2BGridDialog({
+                    maindialogtitle: "Create Release Yearly Payment",
+                    submiturl: "@Url.Action("EditSave")",
+                    form: "#frmYearlyPaymentTRelease",
+                    height: 555,
+                    width: 1100,
+                    state: "open",
+                    gridname: "#JqGrid_release",
+                    gridfunction: "GetGridSelctedvalue",
+                });
+                // To bind dropdown on page load
+                $('#ProcTypeList').P2BSelectMenuAppend1('@Url.Action("Polulate_ProcTypeChk", "YearlyPaymentT")', "", ""); // To bind dropdown on page load
+
+            });
+
+            $('#Lookup-LvEncashReq-YearlyPaymentT').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetlvencashreqDetails", "YearlyPaymentT")', '', 'LookupDiv', 'EncashReq Look Up Data', '#LvEncashReqlist', 'LvEncashReqlist', 5, 'LvEncashReqlist', '#frmYearlyPaymentT', 'N', '#Remove-LvEncashReq-YearlyPaymentT', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-LvEncashReq-YearlyPaymentT').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#LvEncashReqlist').P2BGetTableDataonSelectedRow('#LvEncashReqlist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvEncashReqlist', $('#LvEncashReqlist').val(), 200, 200, '#frmYearlyPaymentT', '#LvEncashReqlist', '');
+                event.preventDefault();
+            });
+            // Main page edit
+            $('#Edit').on('click', function () {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Corporate Data", '#frmCorporate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        console.log(k.Code);
+                        $('#Code').val(k.Code);
+                        $('#Code').attr('readonly', 'readonly');
+                        $('#Name').val(k.Name);
+                        $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 402, k.BusinessType_Id); // Dropdown bind
+                    });
+
+                    //partial page bind
+                    $.each(data[1], function (i, k) {
+                        $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                        $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                    // }, 2000);
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Corporate Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#Code').val(k.Code);
+                        $('#Name').val(k.Name);
+                        $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 304, k.BusinessType_Id);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '', 'N');
+                        $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '', 'N');
+                    });
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[2] != null) {
+                            $('#Name').oldVal(data[2].Name);
+                            $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                            $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                        }
+                    }
+                    //}, 2000);
+                });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+            $('#Remove-Address-Corporate').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmCorporate', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+
+
+            $('#Lookup-ContactDetails-Corporate').button().on('click', function (event) {
+                @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+                $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'Lookup_table', 'PageNavPosition');
+                // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 10, 'ContactDetailsList', '#frmCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+                event.preventDefault();
+            });
+            $('#ProcessMonth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                stepMonths: true,
+
+                dateFormat: 'mm/yy',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).val($.datepicker.formatDate('mm/yy', new Date(year, month, 1)));
+                }
+            });
+
+            $('#PayMonth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                stepMonths: true,
+
+                dateFormat: 'mm/yy',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).val($.datepicker.formatDate('mm/yy', new Date(year, month, 1)));
+                }
+            });
+
+            $('#Btn-Upload-Data').on('click', function (e) {
+                ////debugger;
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+
+
+            $('#ProcTypeList').selectmenu().selectmenu("menuWidget");
+            $('.popup_radio_button').controlgroup();
+            $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+            $('#SalaryHeadReleaselist').selectmenu().selectmenu("menuWidget");
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        });
+    </script>
+    <style>
+        .icon-row {
+            position: absolute;
+            left: 39px;
+            top: 114px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 280px;
+            display: inline-flex;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+        .section1_YearlyPT {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 539px;
+            width: 417px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 647px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 300px;
+            width: 581px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="add">Add</button>
+                <button class="button" id="release">Release</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Container" class="container">
+
+        <div id="Demo">
+            <table id="MyTable" class="datatable-inline" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>DD</th>
+                        <th>Employee Code</th>
+                        <th>Employee Name</th>
+                        <th>ID</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>DD</th>
+                        <th>Employee Code</th>
+                        <th>Employee Name</th>
+                        <th>ID</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Yearly payment T">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmYearlyPaymentT", name = "frmYearlyPaymentT" }))
+        {
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            @*<input id="emp_Id" class="filter_structure_id" name="emp_Id" />*@
+            <div class="section1_Leave">
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                        @*<span class="btn-span1" aria-hidden="true">
+                                <button id="load_emp" class="loan-btn">Load Employee</button>
+                            </span>*@
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+
+            <div class="section2_Leave">
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label must" })<select id="SalaryHeadlist" name="SalaryHeadlist" class="must" style="width:159px;"><option value="0">-Select-</option></select></div>
+                <div id="HideDivProcessMonth">
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessMonth, "Process Month:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ProcessMonth, new { @class = "popup-content-textbox " })</div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.FromPeriod, "Period From:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FromPeriod, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ToPeriod, "Period To:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.AmountPaid, "Amount Paid:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.AmountPaid, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDS Amount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OtherDeduction, "Other Deduction:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OtherDeduction, new { @class = "popup-content-textbox must" })</div>
+                <div id="HideDiv">
+                    <div class="row3 content_margine" style="margin-left:97px">
+                        <div id="LvEncashReqlist_old"></div>
+                        @*@Html.LabelFor(m => m.LvEncashReq, "Leave Encash Req:", new { @class = "popup-content-label1" })*@
+                        <label style="margin-left:-95px"> Leave Encash Req: </label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvEncashReqlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row" style="margin-left:20px">
+                            <button data-p2btooltip="Select encash" class="  popup-content-icon-lookup" id="Lookup-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="remove encash" class="popup-content-icon-remove" id="Remove-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox " })</div>
+            </div>
+
+        }
+    </div>
+
+    <div id="CreateRelease_dialog" title="Create  Yearly payment T Release">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmYearlyPaymentTRelease", name = "frmYearlyPaymentTRelease" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+            <div class="Release_grid">
+
+                <div id="Grid_Form_release">
+                    <div>
+                        <table id="JqGrid_release"></table>
+                        <div id="pager2_release"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="FormRelaseYearlypymentt">
+                <div class="row3 content_margine">
+                    @*@Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label" })*@
+                    <label id="lblSalaryheadRelease" class="popup-content-label">Salary Head:</label>
+                    <select id="SalaryHeadReleaselist" name="SalaryHeadReleaselist" style="width:157px;"><option value="0">-Select-</option></select>
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblFromPeriodRelease" class="popup-content-label">From Period:</label>
+                    <input type="text" id="txtFromPeriod" name="txtFromPeriod" class="popup-content-textbox must" />
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblToPeriodRelease" class="popup-content-label">To Period:</label>
+                    <input type="text" id="txtToPeriod" name="txtToPeriod" class="popup-content-textbox must" />
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblProcessMonthRelease" class="popup-content-label">Process Month:</label>
+                    <input type="text" id="txtProcessmonth" name="txtProcessmonth" class="popup-content-textbox must" />
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblAmountPaidRelease" class="popup-content-label">Amount Paid:</label>
+                    <input type="text" id="txtAmountPaidRelease" name="txtAmountPaidRelease" class="popup-content-textbox must" />
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblTDSAmountRelease" class="popup-content-label">TDS Amount:</label>
+                    <input type="text" id="txtTDSAmountRelease" name="txtTDSAmountRelease" class="popup-content-textbox must" />
+                </div>
+                <div class="row3 content_margine">
+                    <label id="lblOtherDeductionRelease" class="popup-content-label">Other Deduction:</label>
+                    <input type="text" id="txtOtherDeductionRelease" name="txtOtherDeductionRelease" class="popup-content-textbox must" />
+                </div>
+                <div id="HideDivRelease">
+                    <div class="row3 content_margine">
+                        <div id="LvEncashReqlistRelease_old"></div>
+                        <label id="lblOtherDeductionRelease" class="popup-content-label">LvEncashReq:</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvEncashReqreleaselist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select Address" class="  popup-content-icon-lookup" id="lookuprelease-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="removerelease-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PayMonth, "Pay Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must", @id = "PayMonth" })</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ReleaseFlag, "Release Flage:", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ProcessFlag_radio1" name="ProcessFlag" value="true" /><label for="ProcessFlag_radio1">Yes</label>
+                        <input type="radio" id="ProcessFlag_radio2" name="ProcessFlag" value="false" checked="checked" /><label for="ProcessFlag_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ReleaseDate, "Release Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ReleaseDate, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">
+                    <label id="lblNarrationRelease" class="popup-content-label">Narration:</label>
+                    <input type="text" id="txtNarrationRelease" name="txtNarrationRelease" class="popup-content-textbox must" />
+                </div>
+
+                @*////////////////new*@
+
+                <br />
+                <div class="row3 content_margine">
+                    <label id="lblReleaseTaxAmount" class="popup-content-label">Release Tax Amount:</label>
+                    <div class="popup_radio_button">
+                        <input type="radio" id="AmountProcessFlag_radio1" name="AmountProcessFlag" value="true" /><label for="AmountProcessFlag_radio1">Yes</label>
+                        <input type="radio" id="AmountProcessFlag_radio2" name="AmountProcessFlag" value="false" checked="checked" /><label for="AmountProcessFlag_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    <div id="ProcTypeListDiv" class="row3 content_margine">
+                        <label id="lblProcType" class="popup-content-label must">Tax Calculation On:</label>
+                        @*<select class="must" id="ProcTypeList" name="ProcTypeList" style="width: 157px">*@
+                        <select id="ProcTypeList" name="ProcTypeList" style="width: 157px">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="newdiv" id="newdiv">
+                    <label class="popup-content-label" style="color:red;width:auto">This income will include for finding Tax percentage.</label>
+                </div>
+            </div>
+
+
+        }
+    </div>
+
+</body>
+</html>

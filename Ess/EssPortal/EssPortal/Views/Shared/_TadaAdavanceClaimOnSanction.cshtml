@@ -1,0 +1,298 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.TADAAdvanceClaim
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+
+    .hide_textbox {
+        display: none;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            @*var dataemp = $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+
+            $('button').button();
+
+            $('.popup_radio_button').buttonset();
+            $('#autho').makeDisable('#create,#edit,#delete');
+            $('.drop').selectmenu().selectmenu('menuWidget');
+            $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+            $('#Categorylist').selectmenu().selectmenu("menuWidget");
+            $('#CountryList').selectmenu().selectmenu("menuWidget");
+            $('#StateList').selectmenu().selectmenu("menuWidget");
+            $('#CityList').selectmenu().selectmenu("menuWidget");
+            $('#Type_Nomines').selectmenu().selectmenu("menuWidget");
+
+            $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+            $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+
+
+            var btndisablenames = "#edit-Address-BenefitNominees,#remove-HotelEligibilityPolicy,#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees";
+            $("#handicapRemarkdiv").fadeOut();
+            $('#lvexcludeleavediv').fadeOut();
+
+
+
+
+            function AssignData() {
+                dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+
+            }
+
+
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+
+            var a = $('#EmpCode').val();
+
+
+            $('#Sanlookup_Incharge').on('click', function (e) {
+                var emp = $('#Employee').text().split(" ");
+
+                $('.dialog').AddDataToTextbox({
+                    appendTo: "#SantxtIncharge",
+                    appendToId: "#SanIncharge_id",
+                    lookupurl: "@Url.Action("GetLookupIncharge", "ELMS")?data=" + emp[0],
+                    NoOfRecordToShow: "10",
+                    setnameofthelookupbyppage: "txtIncharge_FName-lookup",
+                    lookupdiv: "lookupdiv",
+                    lookuppagename: "lookup",
+                    pagename: "pageNavPosition",
+                    readonly: true,
+                    height: 200,
+                });
+                e.preventDefault();
+            });
+
+
+
+
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "MySelf".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+            }
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Sanction".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').hide();
+                $('#Sanction-div').show();
+            }
+            if ($.LocalStorageHelper.Get("Whois").toUpperCase() == "Approval".toUpperCase()) {
+                $('#authority').val($.LocalStorageHelper.Get("Whois"));
+                $('#Approval-div').show();
+                $('#Sanction-div').hide();
+            }
+
+            $('button').button();
+
+
+
+
+
+
+
+
+
+        });
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    @*<div id="create_dialog" title="Create LvNewReq">*@
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTadaAdavacneClaimonSanction", name = "frmTadaAdavacneClaimonSanction" }))
+    {
+        <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+        <input type="hidden" name="Lvnewreqid_User" id="Lvnewreqid_User" value="" />
+        <input type="hidden" name="Lvnewreqid_User_Empcode" id="Lvnewreqid_User_Empcode" value="" />
+        <input type="text" class="hide_textbox" name="authority" id="authority" />
+        <input type="text" class="hide_textbox" name="isClose" id="isClose" />
+        <input type="text" class="hide_textbox" name="TrClosed" id="TrClosed" />
+        <input type="text" class="hide_textbox" name="LvId" id="LvId" />
+        <div class="section2_Leave">
+
+            <div class="row2 select_div content_margine">@Html.LabelFor(m => m.TADAType, "TADA Type :", new { @class = "popup-content-label must" })<select id="TADATypelist" name="TADATypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>
+
+            <div class="row2 content_margine">@Html.LabelFor(m => m.DateOfAppl, "Requisition Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DateOfAppl, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine">@Html.LabelFor(m => m.TravelStartDate, "Travel Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelStartDate, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine">@Html.LabelFor(m => m.TravelEndDate, "Travel End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelEndDate, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine">@Html.LabelFor(m => m.ProposedPlace, "Proposed Place :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProposedPlace, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine">@Html.LabelFor(m => m.EligibleAmt, "TADA Eligible Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EligibleAmt, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row2 content_margine" id="TADAAdvAmt" style="float:left;">
+                @Html.LabelFor(m => m.AdvAmt, "TADA Advance Amount :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.AdvAmt, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row2 content_margine">
+                @Html.LabelFor(m => m.SanctionedAmt, "TADA Sanctioned Amount :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.SanctionedAmt, new { @class = "popup-content-textbox must" })
+            </div>
+
+            <div class="row2 content_margine" id="TADARem" style="float:left;">
+                @Html.LabelFor(m => m.Remark, "Remark :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must" })
+            </div>
+
+
+        </div>
+        <br><br>
+        <div id="Sanction-div">
+            <div class="heading">Sanction Authority Views</div>
+            <div class="row3 content_margine " id="yes_no_div">
+                <label class="popup-content-label">
+                    Sanction Status:
+                </label>
+                <span class="popup_radio_button">
+                    <span><input type="radio" id="radio1" name="Sanction" value="true" /> <label for="radio1">Yes</label></span>
+                    <span><input type="radio" id="radio2" name="Sanction" value="false" /> <label for="radio2">No</label></span>
+                </span>
+            </div>
+
+            <div class="row3 content_margine">
+                <label class="popup-content-label must">
+                    Reason:
+                </label>
+                <input type="text" name="ReasonSanction" id="ReasonSanction" class="popup-content-textbox" />
+            </div>
+
+            @*<div class="row3 content_margine">
+                    <label class="popup-content-label ">Incharge:</label>
+                    <input name="SantxtIncharge" type="text" id="SantxtIncharge" class="date-picker" style="width: 243px" />
+                    <input type="text" id="SanIncharge_id" name="SanIncharge_id" class="filter_structure_id" />
+                    <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="Sanlookup_Incharge"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>*@
+        </div>
+
+        <div class="section_Method hide-div" id="Approval-div">
+            <div id="ApprovalDiv" class="row1 content_margine">
+                <div class="heading">Approval Authority View</div>
+                <label class="popup-content-label">
+                    Approval Status:
+                </label>
+                <div class="popup_radio_button">
+                    <input type="radio" name="Approval" value="true" id="rdo3" /><label for="rdo3">Yes</label>
+                    <input type="radio" name="Approval" id="rdo4" value="false" /><label for="rdo4">No</label>
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label must">Reason :</label>
+                    <input type="text" id="Grid-ReasonApproval" name="ReasonApproval" />
+                </div>
+                @*<div class="row1 content_margine">
+                        <label class="popup-content-label ">Incharge:</label>
+                        <input name="ApptxtIncharge" type="text" id="ApptxtIncharge" class="date-picker" style="width: 243px" />
+                        <input type="text" id="AppIncharge_id" name="AppIncharge_id" class="filter_structure_id" />
+                        <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="Applookup_Incharge"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                    </div>*@
+
+            </div>
+        </div>
+
+
+
+
+    }
+    @*</div>*@
+</body>
+</html>
+

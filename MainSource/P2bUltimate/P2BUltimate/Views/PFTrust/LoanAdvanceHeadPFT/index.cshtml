@@ -1,0 +1,390 @@
+﻿@model P2B.PFTRUST.LoanAdvanceHeadPFT
+@{
+    ViewBag.Title = "Loan Advance Head PFT";
+}
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<script>
+    $(document).ready(function (e) {
+        $('#LoanAdvanceHeadPFTCode').MaxLength(10);
+        $('#LoanAdvanceHeadPFTName').MaxLength(50);
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-LoanAdvanceHead-LoanAdvanceHead,#Remove-LoanAdvanceHead-LoanAdvanceHead,#Edit-ContactDetails-LoanAdvanceHead,#Remove-ContactDetails-LoanAdvanceHead";
+        ColModel = ['Code', 'Name', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Loan Advance Head PFT';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmLoanAdvanceHeadPFT').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Loan Advance Head PFT', 'open', '@Url.Action("Create")', '#frmLoanAdvanceHeadPFT', 'Message :', 'Request Falied :', '#JqGrid', 600, 620, '#WagesList,#ContactDetailsList,#LoanAdvancePolicylist', "", function (data) { });
+            $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateSalHeadDropDownList", "LoanAdvanceHeadPFT")', "", ""); // To bind dropdown on page load
+            @*$('#PerkHeadlist').P2BSelectMenuAppend('@Url.Action("PopulatePerkHeadDropDownList", "LoanAdvanceHeadPFT")', "", "");*@ // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        @*$('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit LoanAdvanceHead Data", '#frmLoanAdvanceHead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', "", function (data) {
+
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "LoanAdvanceHead")", "", k.SalaryHead_Id); // Dropdown bind
+                    $('#ITLoanlist').P2BLookUpEncapsulate('#ITLoanlist', 'ITLoanlist', k.ITLoan_Id, k.ITLoan_FullDetails, 'ITLoanlist', '#Remove-ITLoan-LoanAdvanceHead', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    //$('#LoanAdvancePolicylist').P2BLookUpEncapsulate('#LoanAdvancePolicylist', 'LoanAdvancePolicylist', k.LoanAdvancePolicy_Id, k.LoanAdvancePolicy_FullDetails, 'LoanAdvancePolicylist', '#Remove-LoanAdvancePolicy-LoanAdvanceHead', 'A');
+
+                    //$('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', k.ITSection_Id, k.ITsection_FullDetails, 'ITSectionlist', '#Remove-ITSection-LoanAdvanceHead', 'A');
+                });
+               //Compulsory for authorisation
+
+                 //Compulsory for authorisation
+            });
+        });*@
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Loan Advance Head Data", '#frmLoanAdvanceHeadPFT', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', "", function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "LoanAdvanceHead")", "", k.SalaryHead_Id); // Dropdown bind
+                    $('#PerkHeadlist').P2BSelectMenuAppend("@Url.Action("PopulatePerkHeadDropDownList", "LoanAdvanceHead")", "", k.PerkHead_Id); // Dropdown bind
+                   /* $('#ITLoanList').P2BLookUpEncapsulate('#ITLoanList', 'ITLoanList', k.ITLoan_Id, k.ITLoan_FullDetails, 'ITLoanList', '#Remove-ITLoan-LoanAdvanceHead', 'A');*/
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#LoanAdvancePolicylist').P2BLookUpEncapsulate('#LoanAdvancePolicylist', 'LoanAdvancePolicylist', k.LoanAdvancePolicyPFT_Id, k.LoanAdvancePolicyPFT_FullDetails, 'LoanAdvancePolicylist', '#Remove-LoanAdvancePolicy-LoanAdvanceHead', 'A');
+                    $('#ITLoanList').P2BLookUpEncapsulate('#ITLoanList', 'ITLoanList', k.ITLoan_Id, k.ITLoan_FullDetails, 'ITLoanList', '#Remove-ITLoan-LoanAdvanceHead', 'N');
+                    $('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', k.ITSection_Id, k.ITLoan_FullDetails, 'ITSectionlist', '#Remove-ITSection-LoanAdvanceHead', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Loan Advance Head Data', '#WagesList,#ContactDetailsList', '#Lookup-LoanAdvanceHead-LoanAdvanceHead,#Create-LoanAdvanceHead-LoanAdvanceHead,#Edit-LoanAdvanceHead-LoanAdvanceHead,#Remove-LoanAdvanceHead-LoanAdvanceHead,#Lookup-ContactDetails-LoanAdvanceHead,#Create-ContactDetails-LoanAdvanceHead,#Edit-ContactDetails-LoanAdvanceHead,#Remove-ContactDetails-LoanAdvanceHead', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("PopulateSalHeadDropDownList", "LoanAdvanceHead")", "", k.SalaryHead_Id); // Dropdown bind
+                    $('#PerkHeadlist').P2BSelectMenuAppend("@Url.Action("PopulatePerkHeadDropDownList", "LoanAdvanceHead")", "", k.PerkHead_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#LoanAdvancePolicylist').P2BLookUpEncapsulate('#LoanAdvancePolicylist', 'LoanAdvancePolicylist', k.LoanAdvancePolicyPFT_Id, k.LoanAdvancePolicyPFT_FullDetails, 'LoanAdvancePolicylist', '#Remove-LoanAdvancePolicy-LoanAdvanceHead', 'A');
+                    $('#ITLoanList').P2BLookUpEncapsulate('#ITLoanList', 'ITLoanList', k.ITLoan_Id, k.ITLoan_FullDetails, 'ITLoanList', '#Remove-ITLoan-LoanAdvanceHead', 'N');
+                    $('#ITSectionlist').P2BLookUpEncapsulate('#ITSectionlist', 'ITSectionlist', k.ITSection_Id, k.ITSection_FullDetails, 'ITSectionlist', '#Remove-ITSection-LoanAdvanceHead', 'A');
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Code').oldVal(data[2].Code);
+                        $('#Name').oldVal(data[2].Name);
+                        $('#SalaryHeadlist').oldDropval(data[2].SalHead_Val);
+                        $('#PerkHeadlist').oldDropval(data[2].PerkHead_Val);
+
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* LoanAdvanceHead button click*/     
+
+        $('#Lookup-ITSection-LoanAdvanceHead').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITSectionLKDetails", "LoanAdvanceHead")', '', 'LookupDiv', 'ITSection Look Up Data', '#ITSectionlist', 'ITSectionlist', 5, 'ITSectionlist', '#frmLoanAdvanceHeadPFT', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-ITSection-LoanAdvanceHead').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#ITSectionlist').P2BGetTableDataonSelectedRow('#ITSectionlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITSectionlist', $('#ITSectionlist').val(), 200, 200, '#frmLoanAdvanceHead', '#ITSectionlist', '#Remove-ITSection-LoanAdvanceHead');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-LoanAdvancePolicy-LoanAdvanceHead').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLoanAdvPolicyLKDetails", "LoanAdvanceHeadPFT")', '', 'LookupDiv', 'LoanAdvancePolicy Look Up Data', '#LoanAdvancePolicylist', 'LoanAdvancePolicylist', 5, 'LoanAdvancePolicylist', '#frmLoanAdvanceHeadPFT', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-ITLoan-LoanAdvanceHead').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetITLoanLKDetails", "LoanAdvanceHead")', '', 'LookupDiv', 'ITLoan Look Up Data', '#ITLoanList', 'ITLoanList', 5, 'ITLoanList', '#frmLoanAdvanceHead', 'N', '#Remove-ITLoan-LoanAdvanceHead', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LoanAdvancePolicy-LoanAdvanceHead').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var selectedRow = [];
+            selectedRow = $('#LoanAdvancePolicylist').P2BGetTableDataonSelectedRow('#LoanAdvancePolicylist', 0);            
+            //var a = [], b;
+            //a = $('#LoanAdvancePolicylist').P2BGetTableDataonSelectedRow('#LoanAdvancePolicylist', 0);
+            //b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LoanAdvancePolicylist', $('#LoanAdvancePolicylist').val(), 200, 200, '#frmLoanAdvanceHeadPFT', '#LoanAdvancePolicylist', '#Remove-LoanAdvancePolicy-LoanAdvanceHead');
+            event.preventDefault();
+        });
+
+
+        
+
+       
+
+        $('#Remove-ITLoan-LoanAdvanceHead').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var selectedRow = [];
+            selectedRow = $('#ITLoanList').P2BGetTableDataonSelectedRow('#ITLoanList', 0);
+            //var a = [], b;
+            //a = $('#LoanAdvancePolicylist').P2BGetTableDataonSelectedRow('#LoanAdvancePolicylist', 0);
+            //b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRow, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITLoanList', $('#ITLoanList').val(), 200, 200, '#frmLoanAdvanceHeadPFT', '#ITLoanList', '#Remove-LoanAdvancePolicy-LoanAdvanceHead');
+            event.preventDefault();
+        });
+
+        
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-LoanAdvancePolicy-LoanAdvanceHead').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "LoanAdvanceHeadPFT")', 'Create Loan Advance Policy', 'open', '@Url.Action("Create", "LoanAdvancePolicyPFT")', '#frmLoanAdvancePolicy', 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '', '', '', '#frmLoanAdvanceHeadPFT', '', function (data) {
+                // to show data which is created in partial page
+                //$('#NomineeNamelist').P2BLookUpEncapsulate('#NomineeNamelist', 'NomineeNamelist', data[0], data[1], 'NomineeNamelist', '#Edit-NomineeName-BenefitNominees,#Remove-NomineeName-BenefitNominees', 'N');
+                //$('#WagesList').P2BLookUpEncapsulate('#LoanAdvancePolicyList', 'LoanAdvancePolicyList', data[0], data[1], 'LoanAdvancePolicyList', '#LoanAdvancePolicy-LoanAdvanceHead', 'A');
+                $('#LoanAdvancePolicylist').P2BLookUpEncapsulate('#LoanAdvancePolicylist', 'LoanAdvancePolicylist', data[0], data[1], 'LoanAdvancePolicylist', '#Remove-ITLoan-LoanAdvanceHead', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-LoanAdvancePolicy-LoanAdvanceHead').button().on("click", function (event) {
+
+            var a = [], b;
+            a = $('#LoanAdvancePolicylist').P2BGetTableDataonSelectedRow('#LoanAdvancePolicylist', 0);
+          
+            b = a[0];
+          
+            // url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "LoanAdvanceHeadPFT")', '@Url.Action("EditLoanAdvancePolicyPFT_partial", "LoanAdvanceHeadPFT")', b, '@Url.Action("EditsaveLoanAdvancePolicyPFT", "LoanAdvanceHeadPFT")', 'Edit Loan Advance Policy', '#frmLoanAdvancePolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '#frmLoanAdvanceHeadPFT', '#LoanAdvancePolicylist', 'LoanAdvancePolicylist', 'LoanAdvancePolicylist', 'N', '#Edit-LoanAdvancePolicy-LoanAdvanceHead,#Remove-LoanAdvancePolicy-LoanAdvanceHead', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                   
+                   // console.log(DateConvert(k.EffectiveDate));
+                    $('#frmLoanAdvancePolicy').trigger("reset");                   
+                    $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    $('#YrsOfServ').val(k.YrsOfServ);
+                    $('[name="IsLoanLimit"]').val([k.IsLoanLimit]).button().button("refresh");
+                    $('[name="IsFixAmount"]').val([k.IsFixAmount]).button().button("refresh");
+                    $('#MaxLoanAmount').val(k.MaxLoanAmount);
+                    $('[name="IsOnWages"]').val([k.IsOnWages]).button().button("refresh");
+                   // $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', k.LoanSanctionWages, k.LoanSanctionWages, 'WagesList', '#Remove-Wages-LoanAdvancePolicy,#Edit-Wages-LoanAdvancePolicy', 'N');
+                    $('[name="IntAppl"]').val([k.IntAppl]).button().button("refresh");
+                    $('#InterestTpyelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, k.InterestType_Id);
+                    $('#IntRate').val(k.IntRate);
+                    $('[name="IsPerkOnInt"]').val([k.IsPerkOnInt]).button().button("refresh");
+                    $('#GovtIntRate').val(k.GovtIntRate);
+                    $('[name="IsPFTContibution"]').val([k.IsPFTContibution]).button().button("refresh");
+                    $('[name="IsOwnContibution"]').val([k.IsOwnContibution]).button().button("refresh");
+                    $('[name="IsOwnerContibution"]').val([k.IsOwnerContibution]).button().button("refresh");
+                    $('#PFLoanType').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 510, k.PFLoanType_Id);
+                    $('[name="IsOwnerIntContibution"]').val([k.IsOwnerIntContibution]).button().button("refresh");
+                    $('[name="IsOwnIntContibution"]').val([k.IsOwnIntContibution]).button().button("refresh");
+                    $('[name="IsVPFIntContibution"]').val([k.IsVPFIntContibution]).button().button("refresh");
+                    $('[name="IsPFIntContibution"]').val([k.IsPFIntContibution]).button().button("refresh");
+                    $('#PFTContibutionPercent').val(k.PFTContibutionPercent);
+                    $('#OwnContibutionPercent').val(k.OwnContibutionPercent);
+                    $('#OwnerContibutionPercent').val(k.OwnerContibutionPercent);
+                    $('#OwnerIntContibutionPercent').val(k.OwnerIntContibutionPercent);
+                    $('#OwnIntContibutionPercent').val(k.OwnIntContibutionPercent);
+                    $('#VPFIntContibutionPercent').val(k.VPFIntContibutionPercent);
+                    $('#PFIntContibutionPercent').val(k.PFIntContibutionPercent);
+                    $('#NoOfTimesPFTContribution').val(k.NoOfTimesPFTContribution);
+                    $('#NameId').val(k.Name);
+                    
+                });
+                $.each(data[1], function (i, k) {
+                    $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', k.Wagesid, k.LoanSanctionWages, 'WagesList', '#Remove-Wages-LoanAdvancePolicy,#Edit-Wages-LoanAdvancePolicy', 'N');
+                });
+            });
+
+        });
+
+        $('#Create-ITLoan-LoanAdvanceHead').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("ITpartial", "LoanAdvanceHead")', 'Create IT Loan', 'open', '@Url.Action("Create", "ITLoan")', '#frmitloan', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLoanAdvanceHead', '', function (data) {
+                // to show data which is created in partial page
+                $('#ITLoanList').P2BLookUpEncapsulate('#ITLoanList', 'ITLoanList', data[0], data[1], 'ITLoanList', '#Remove-ITLoan-LoanAdvanceHead', 'N');
+            });
+            event.preventDefault();
+        });
+        $('.popup_radio_button').controlgroup();
+        $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#PerkHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+
+</script>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+        </div>
+    </div>
+
+    <div id="Create_Dialog">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLoanAdvanceHeadPFT", name = "frmLoanAdvanceHeadPFT" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "LoanAdvanceHeadPFTCode", @maxlength = "10" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", @id = "LoanAdvanceHeadPFTName", @maxlength = "50" })</div>
+            <div class="dropdown_row1 row3 content_margine"><label class="popup-content-label">SalaryHead</label><select id="SalaryHeadlist" name="SalaryHeadlist" style="width:161px;"><option></option></select></div>
+
+            <div class="row3 content_margine">
+                <div id="ITLoanlist_old"></div><label class="popup-content-label">IT Loan</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ITLoanList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select ITLoan" class="  popup-content-icon-lookup" id="Lookup-ITLoan-LoanAdvanceHead"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create ITLoan" class="  popup-content-icon-create" id="Create-ITLoan-LoanAdvanceHead"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ITLoan" class="  popup-content-icon-remove" id="Remove-ITLoan-LoanAdvanceHead"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="LoanAdvancePolicylist_old"></div>@Html.LabelFor(m => m.LoanAdvancePolicyPFT, "Loan Advance Policy :", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="LoanAdvancePolicylist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select LoanAdvancePolicy" class="  popup-content-icon-lookup" id="Lookup-LoanAdvancePolicy-LoanAdvanceHead"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create LoanAdvancePolicy" class="  popup-content-icon-create" id="Create-LoanAdvancePolicy-LoanAdvanceHead"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit LoanAdvancePolicy" class="  popup-content-icon-edit" id="Edit-LoanAdvancePolicy-LoanAdvanceHead"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove LoanAdvancePolicy" class="  popup-content-icon-remove" id="Remove-LoanAdvancePolicy-LoanAdvanceHead"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>

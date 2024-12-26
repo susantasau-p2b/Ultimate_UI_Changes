@@ -1,0 +1,414 @@
+﻿@{
+    ViewBag.Title = "LWFMaster";
+}
+
+@model Payroll.LWFMaster
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 142px;
+        top: -150px;
+    }
+
+    .popup-content-labelLWF {
+        width: 183px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textboxLWF {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 403px;
+    }
+</style>
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+        ColModel = ['WagesMaster', 'State', 'Id', ];
+        ColNames = ['WagesMaster', 'State', 'Id', ];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = "Labour Welfare Fund Master";
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+
+        //----------------------------------------------------CREATE MAiN----------------------//
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#EffectiveDate').P2BDatePicker();
+        $('#EndDate,#RegDate').P2BDatePicker();
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').button().on("click", function (event) {
+            $('#frmLWFMaster').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog(' ', '', '', '', 'Create Labour Welfare Fund Master', 'open', '@Url.Action("Create")', '#frmLWFMaster', 'Message :', 'Request Falied :', '#JqGrid', 600, 700, '#LWFWagesRangelist,#StateList,#StatutoryEffectiveMonthsList,#WagesMasterList', ' ', function (data) {
+                event.preventDefault();
+            });
+        });
+
+        //-----------------------ENDCREATE--------------------//
+
+        // Main page edit
+        @*$('#Edit').on('click', function (e) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit LWF Master", '#frmLWFMaster', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 510, 1008, '#LWFWagesRangelist,#StateList,#StatutoryEffectiveMonthsList,#WagesMasterList', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#frmLWFMaster').trigger("reset");
+                    if (k.EffectiveDate != null)
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    else
+                        $('#EffectiveDate').val();
+                    if (k.EndDate != null)
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    else
+                        $('#EndDate').val();
+                    $('#Stateslist').P2BLookUpEncapsulate('#Stateslist', 'Stateslist', k.State_Id, k.State_Details, 'Stateslist', '#Remove-States-LWFMaster', 'N');
+                    $('#WagesMasterList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', k.WagesMaster_Id, k.WagesMaster_FullDetails, 'WagesMasterList', '#Remove-PTWagesMaster', 'N');
+                });
+                $.each(data[1], function (i, k) {
+
+                    $('#StatutoryEffectiveMonthslist').P2BLookUpEncapsulate('#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', k.StatutoryEffectiveMonths_Id, k.StatutoryEffectiveMonths_Details, 'StatutoryEffectiveMonthslist', '#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+                });
+                $('#Autho_Allow').val(data[3]);
+            });
+            e.preventDefault();
+        });*@
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit", "LWFMaster")', dt.Id, '@Url.Action("EditSave", "LWFMaster")', "Edit Labour Welfare Fund Master Data", '#frmLWFMaster', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 700, '#LWFWagesRangelist,#StateList,#StatutoryEffectiveMonthsList,#WagesMasterList', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    if (k.EffectiveDate != null)
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    else
+                        $('#EffectiveDate').val();
+                    if (k.EndDate != null)
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    else
+                        $('#EndDate').val();
+                    $('#WagesMasterList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', k.WagesMaster_Id, k.WagesMaster_FullDetails, 'WagesMasterList', '#Remove-WagesMaster-LWFMaster', 'N');
+                    $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', k.State_Id, k.State_Details, 'StateList', '#Remove-States-LWFMaster', 'N');
+
+                });
+                //partial page bind
+                //$.each(data[1], function (i, k) {
+                //    $('#WagesMasterList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', k.WagesMaster_Id, k.WagesMaster_FullDetails, 'WagesMasterList', '#Remove-WagesMaster-LWFMaster', 'A');
+                //    $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', k.State_Id, k.State_Details, 'StateList', '#Remove-States-LWFMaster', 'A');
+                //});
+
+                $.each(data[1], function (i, k) {
+
+                    $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', k.StatutoryEffectiveMonths_Id, k.StatutoryEffectiveMonths_Details, 'StatutoryEffectiveMonthsList', '#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[4]); //Compulsory for authorisation
+                // }, 2000);
+            });
+            event.preventDefault();
+
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Labour Welfare Fund Master Data', '#WagesMasterList,#StatutoryEffectiveMonthsList,#StateList', '', 500, 700, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    if (k.EffectiveDate != null)
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    else
+                        $('#EffectiveDate').val();
+                    if (k.EndDate != null)
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    else
+                        $('#EndDate').val();
+                    $('#WagesMasterList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', k.WagesMaster_Id, k.WagesMaster_FullDetails, 'WagesMasterList', 'view', 'N');
+                    $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', k.State_Id, k.State_Details, 'StateList', 'view', 'N');
+
+                });
+
+                //$.each(data[1], function (i, k) {
+                //    $('#WagesMasterList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', k.WagesMaster_Id, k.WagesMaster_FullDetails, 'WagesMasterList', '#Remove-WagesMaster-LWFMaster', 'A');
+                //    $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', k.State_Id, k.State_Details, 'StateList', '#Remove-States-LWFMaster', 'A');
+                //});
+
+                $.each(data[1], function (i, k) {
+
+                    $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', k.StatutoryEffectiveMonths_Id, k.StatutoryEffectiveMonths_Details, 'StatutoryEffectiveMonthsList', 'view', 'A');
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').oldVal(data[2].Name);
+                    $('#Code').oldVal(data[2].Code);
+                    $('#LevelList_old').oldLookupVal(data[2].Level_Val);
+                }
+            });
+            event.preventDefault();
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+         $('#Create-StatutoryEffectiveMonths-LWFMaster').on("click", function (event) {
+             $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("StatutoryEffectiveMonthspartial", "LWFMaster")', 'Create StatutoryEffectiveMonths', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+
+                 $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', data[0], data[1], 'StatutoryEffectiveMonthsList', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+             });
+             event.preventDefault();
+         });*@
+        //------------WagesRange
+        $('#Lookup-LWFWagesRange-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesRangeLKDetails", "WagesRange")', '', 'LookupDiv', ' Look Up Data', '#LWFWagesRangelist', 'LWFWagesRangelist', 5, 'LWFWagesRangelist', '#frmLWFMaster', 'A', '#Edit-LWFWagesRange-LWFMaster,#Remove-LWFWagesRange-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Create-LWFWagesRange-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("WagesRangepartial", "LWFMaster")', 'Create Wages Range', 'open', '@Url.Action("CreateSave", "WagesRange")', '#frmWagesRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#LWFWagesRangelist').P2BLookUpEncapsulate('#LWFWagesRangelist', 'LWFWagesRangelist', data[0], data[1], 'LWFWagesRangelist', '#Remove-LWFWagesRange-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-LWFWagesRange-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LWFWagesRangelist').P2BGetTableDataonSelectedRow('#LWFWagesRangelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LWFWagesRangelist', $('#LWFWagesRangelist').val(), 200, 200, '#frmLWFMaster', '#LWFWagesRangelist', '');
+            event.preventDefault();
+        });
+        //----------StateList----------------------------------------------//
+        $('#Lookup-States-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetState", "LWFMaster")', '', 'LookupDiv', ' Look Up Data', '#StateList', 'StateList', 5, 'StateList', '#frmLWFMaster', 'A', '#Remove-States-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-States-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "State")', 'Create State ', 'open', '@Url.Action("CreateState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', data[0], data[1], 'StateList', '#Remove-States-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-States-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#StateList').P2BGetTableDataonSelectedRow('#StateList', 0);
+            //b = a[0];
+           
+            var selectedRows = [];
+            selectedRows = $('#StateList').P2BGetTableDataonSelectedRow('#StateList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StateList', $('#StateList').val(), 200, 200, '#frmLWFMaster', '#StateList', '');
+            event.preventDefault();
+        });
+
+        //------------------Statutoryeffectivemonths-------------------------------//
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-StatutoryEffectiveMonths-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("StatutoryEffectiveMonthspartial", "LWFMaster")', 'Create Statutory Effective Months', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                // to show data which is created in partial page
+                $("#Gender").removeClass("must");
+                $("#Gender_drop").removeClass("must");
+                $('#dvGender').hide();
+                $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', data[0], data[1], 'StatutoryEffectiveMonthsList', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-StatutoryEffectiveMonths-LWFMaster').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetStatutoryEffectiveMonths", "StatutoryEffectiveMonths")', '', 'LookupDiv', 'Look Up Data', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 5, 'StatutoryEffectiveMonthsList', '#frmLWFMaster', 'A', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-StatutoryEffectiveMonths-LWFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("StatutoryEffectiveMonthspartial", "LWFMaster")', '@Url.Action("Edit", "StatutoryEffectiveMonths")', b, '@Url.Action("EditSave", "StatutoryEffectiveMonths")', 'Edit StatutoryEffectiveMonths Details', '#frmStatutoryEffectiveMonths', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLWFMaster', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'A', ' ', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmStatutoryEffectiveMonths').trigger('reset');
+                    $('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 200, k.EffectiveMonth_Id); // Dropdown bind
+                    $('#dvGender').hide();
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#Remove-Level-Grade').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteLevel", "Level")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Postion_List', $('#Postion_List').val(), 200, 200, '#frmJob', '#Postion_List');
+            event.preventDefault();
+        });*@
+        $('#Remove-StatutoryEffectiveMonths-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            //b = a[0];
+            
+            var selectedRows = [];
+            selectedRows = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StatutoryEffectiveMonthsList', $('#StatutoryEffectiveMonthsList').val(), 200, 200, '#frmLWFMaster', '#StatutoryEffectiveMonthsList', '');
+            event.preventDefault();
+        });
+        //----------------------Wages Master
+
+        $('#Lookup-WagesMaster-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#WagesMasterList', 'WagesMasterList', 5, 'WagesMasterList', '#frmLWFMaster', 'N', '#Edit-WagesMaster-LWFMaster,#Remove-WagesMaster-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-WagesMaster-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCPIRuleDetails', '', function (data) {
+                $('#StateList').P2BLookUpEncapsulate('#WagesMasterList', 'WagesMasterList', data[0], data[1], 'WagesMasterList', '#Remove-WagesMaster-LWFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-WagesMaster-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#WagesMasterList').P2BGetTableDataonSelectedRow('#WagesMasterList', 0);
+            //b = a[0];
+           
+            var selectedRows = [];
+            selectedRows = $('#WagesMasterList').P2BGetTableDataonSelectedRow('#WagesMasterList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WagesMasterList', $('#WagesMasterList').val(), 200, 200, '#frmLWFMaster', '#WagesMasterList', '');
+            event.preventDefault();
+        });
+        ///end WagesMaster
+        $('#Code').MaxLength(10).ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $("#EffectiveDate,#RegDate").keypress(function (event) { event.preventDefault(); });
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create Grade">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmLWFMaster", name = "frmLWFMaster" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row2 content_margine">@Html.LabelFor(m => m.EffectiveDate, "Effective Date:", new { @class = "popup-content-labelLWF must" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textboxLWF must" })</div>
+        @*<div class="row2 content_margine">@Html.LabelFor(m => m.EndDate, "EndDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox must" })</div>*@
+        <div class="row2 content_margine">
+            <div id="StateList_old"></div>
+            @Html.LabelFor(m => m.LWFStates, "States:", new { @class = "popup-content-labelLWF must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="StateList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup States Details" class="button popup-content-icon-lookup" id="Lookup-States-LWFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create States Details" class="button popup-content-icon-create" id="Create-States-LWFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit States Details" class="button popup-content-icon-edit" id="Edit-States-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove States Details" class="button popup-content-icon-remove" id="Remove-States-LWFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+
+        <div class="row2 content_margine">
+            <div id="WagesMasterList_old"></div>
+            @Html.LabelFor(m => m.WagesMaster, "Wages Master:", new { @class = "popup-content-labelLWF must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="WagesMasterList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup WagesMaster Details" class="button popup-content-icon-lookup" id="Lookup-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create WagesMaster Details" class="button popup-content-icon-create" id="Create-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove WagesMaster Details" class="button popup-content-icon-remove" id="Remove-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+        <div class="row2 content_margine">
+            <div id="StatutoryEffectiveMonthsList_old"></div>
+            @Html.LabelFor(m => m.LWFStatutoryEffectiveMonths, "Labour Welfare Fund Statutory Effective Months:", new { @class = "popup-content-labelLWF must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="StatutoryEffectiveMonthsList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Statutory EffectiveMonths Details" class="button popup-content-icon-lookup" id="Lookup-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Statutory EffectiveMonths Details" class="button popup-content-icon-create" id="Create-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit Statutory EffectiveMonths Details" class="button popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove Statutory EffectiveMonths Details" class="button popup-content-icon-remove" id="Remove-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+    }
+</div>

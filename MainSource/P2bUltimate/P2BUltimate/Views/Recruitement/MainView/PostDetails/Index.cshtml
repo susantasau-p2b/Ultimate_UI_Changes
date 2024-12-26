@@ -1,0 +1,709 @@
+﻿@model  Recruitment.PostDetails
+@{
+    ViewBag.Title = "Manpower Post Creation";
+}
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 58px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 98px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-3 {
+            width: 40px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 360px;
+            display: inline-block;
+        }
+
+        .row7 {
+            width: 360px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        #Lookup_FinancialYear_Calendar {
+            left: 350px;
+            top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+
+                <div style="float: left; width: 345px;">
+
+                    <label id="lblPayMonth" class="popup-content-label must">Recruitment Year:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" style="width:215px" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+
+                </div>
+                <span>
+                    <button class="button" id="Load">Load</button>
+                    <button class="button" id="Create">Create</button>
+                    <button class="button" id="View">View</button>
+                    <button class="button" id="Edit">Edit</button>
+                    <button class="button" id="Delete">Delete</button>
+                    <button class="button" id="Autho">Authorised</button>
+                </span>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Post Details">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPostDetails", name = "frmPostDetailsEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+            @*<div class="row6 content_margine">    @Html.LabelFor(m => m.PostSourceType, "Source Type :", new { @class = "popup-content-label " })<select id="PostSourceTypelist" name="PostSourceTypelist" class=" " style="width:161px;"><option></option></select>     </div>*@
+            <div class="section6">
+                <div class="row6 content_margine"> @Html.LabelFor(m => m.PostCode, "PostCode :", new { @class = "popup-content-label   must" })@Html.TextBoxFor(m => m.PostCode, new { @class = "popup-content-textbox   must " })  </div>
+                <div class="row6 content_margine"> @Html.LabelFor(m => m.CreationDate, "CreationDate :", new { @class = "popup-content-label   must" })@Html.TextBoxFor(m => m.CreationDate, new { @class = "popup-content-textbox   must " })  </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="JobPositionM_old"></div>
+                @*@Html.LabelFor(m => m.FuncStruct.JobPosition, "Job Position :", new { @class = "popup-content-label-2" })*@
+                <label class="popup-content-label-2">Job Position :</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="JobPositionMlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="Lookup-JobPosition-PostDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove " class="popup-content-icon-remove" id="Remove-JobPosition-PostDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            @* <div class="row6 content_margine"> @Html.LabelFor(m => m.FuncStruct.JobPosition, "Job Position :", new { @class = "popup-content-label   " })@Html.TextBoxFor(m => m.FuncStruct.JobPosition, new { @class = "popup-content-textbox   " })  </div>*@
+            <div class="row6 content_margine"> @Html.LabelFor(m => m.RequestVacancies, "Vacancies :", new { @class = "popup-content-label   must" })@Html.TextBoxFor(m => m.RequestVacancies, new { @class = "popup-content-textbox   must " })  </div>
+
+            @*<div class="row2 content_margine">
+                     <label>Experiance</label><br />
+                 </div>
+
+                     <div class="row6 content_margine">@Html.LabelFor(m => m.ExpFilter, "Experiance Criteria :", new { @class = "popup-content-label" })<select id="ExpFilterlist" name="ExpFilterlist" class=" " style="width:161px;"><option></option></select>    </div>
+                    <br />
+                      <div class="row6 content_margine"> @Html.LabelFor(m => m.ExpYearFrom, "From :", new { @class = "popup-content-label  " })@Html.TextBoxFor(m => m.ExpYearFrom, new { @class = "popup-content-textbox    " })        </div>
+                     <br />
+                       <div class="row6 content_margine"> @Html.LabelFor(m => m.ExpYearTo, "To :", new { @class = "popup-content-label    " })@Html.TextBoxFor(m => m.ExpYearTo, new { @class = "popup-content-textbox    " })          </div>
+                <br />*@<br />
+            <div class="row6 content_margine">     @Html.LabelFor(m => m.ExpFilter, "Experience Criteria :", new { @class = "popup-content-label" })<select id="ExpFilterlist" name="ExpFilterlist" class=" " style="width:161px;"><option></option></select>    </div>
+            <div class="section6">
+
+                <div class="row6 content_margine">     @Html.LabelFor(m => m.ExpYearFrom, "From :", new { @class = "popup-content-label must " })@Html.TextBoxFor(m => m.ExpYearFrom, new { @class = "popup-content-textbox   must " })        </div>
+                <div class="row6 content_margine">     @Html.LabelFor(m => m.ExpYearTo, "To :", new { @class = "popup-content-label-3   must " })@Html.TextBoxFor(m => m.ExpYearTo, new { @class = "popup-content-textbox   must " })          </div>
+            </div>
+
+
+            <div class="row6 content_margine">    @Html.LabelFor(m => m.RangeFilter, "Age Criteria :", new { @class = "popup-content-label " })<select id="RangeFilterlist" name="RangeFilterlist" class=" " style="width:161px;"><option></option></select>     </div>
+            <div class="section6">
+
+                <div class="row6 content_margine">     @Html.LabelFor(m => m.AgeFrom, "From :", new { @class = "popup-content-label   must " })@Html.TextBoxFor(m => m.AgeFrom, new { @class = "popup-content-textbox   must " })        </div>
+                <div class="row6 content_margine">     @Html.LabelFor(m => m.AgeTo, "To :", new { @class = "popup-content-label-3   must " })@Html.TextBoxFor(m => m.AgeTo, new { @class = "popup-content-textbox   must " })          </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="QualificationlistM_old"></div>
+                @Html.LabelFor(m => m.Qualification, "Qualification :", new { @class = "popup-content-label-2" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="QualificationlistM">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="Lookup-Qualification-PostDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create " class="popup-content-icon-create" id="Create-Qualification-PostDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit " class="popup-content-icon-edit" id="Edit-Qualification-PostDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove " class="popup-content-icon-remove" id="Remove-Qualification-PostDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <br />
+            <div class="row3 content_margine">
+                <div id="SkillList_old"></div>@Html.LabelFor(m => m.Skill, "Skills :", new { @class = "popup-content-label-2" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="SkillList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="lookUp-Skill-PostDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create " class="  popup-content-icon-create" id="Create-Skill-PostDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit " class="  popup-content-icon-edit" id="Edit-Skill-PostDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove " class="  popup-content-icon-remove" id="Remove-Skill-PostDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+
+            <div class="row6 content_margine">   @Html.LabelFor(m => m.Gender, "Gender :", new { @class = "popup-content-label " })<select id="Gender_drop" name="Gender_drop" @*class="must"*@ style="width:161px;"><option></option></select>    </div>
+            <br />
+            <div class="row6 content_margine">   @Html.LabelFor(m => m.MaritalStatus, "Maratial Status :", new { @class = "popup-content-label " })<select id="MaritalStatus_drop" name="MaritalStatus_drop" @*class="must"*@ style="width:161px;"><option></option></select>    </div>
+
+            <br />
+            <div class="row3 content_margine">
+                <div id="CategoryPostlist_old"></div>@Html.LabelFor(m => m.CategoryPost, " CategoryPost :", new { @class = "popup-content-label-2" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="CategoryPostlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="Lookup-CategoryPost-PostDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create " class="  popup-content-icon-create" id="Create-CategoryPost-PostDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit " class="  popup-content-icon-edit" id="Edit-CategoryPost-PostDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove " class="  popup-content-icon-remove" id="Remove-CategoryPost-PostDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">
+                <div id="CategorySplPostlist_old"></div>@Html.LabelFor(m => m.CategorySplPost, "Special Categories :", new { @class = "popup-content-label-2" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="CategorySplPostlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup " class="  popup-content-icon-lookup" id="Lookup-CategorySpl-PostDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create " class="  popup-content-icon-create" id="Create-CategorySpl-PostDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit " class="  popup-content-icon-edit" id="Edit-CategorySpl-PostDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove " class="  popup-content-icon-remove" id="Remove-CategorySpl-PostDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div> <br />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label-2 " })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox " })</div>
+
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+
+        //$('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        //$('#Code').MaxLength(10);
+        //// $('#Name').ForceOnlyAlpha();
+        //// $('#Name').MaxLength(50);
+        $('#NoOfVacancies').ForceOnlyNumeric().MaxLength(3);
+        $('#ExpYearFrom').ForceOnlyNumeric().MaxLength(3);
+        $('#ExpYearTo').ForceOnlyNumeric().MaxLength(3);
+        $('#AgeFrom').ForceOnlyNumeric().MaxLength(3);
+        $('#AgeTo').ForceOnlyNumeric().MaxLength(3);
+        $('#Narration').MaxLength(50);
+        $('#PostRequestDate').P2BDatePicker();
+
+        //$('#Name').ValidateTextBox({ maxlength: 50, name: true });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Remove-JobPosition-PostDetails,#Edit-CategoryPost-PostDetails,#Remove-CategoryPost-PostDetails,#Edit-CategorySplPost-PostDetails,#Remove-CategorySplPost-PostDetails,#Edit-Skill-PostDetails,#Remove-Skill-PostDetails,#Edit-Qualification-PostDetails,#Remove-Qualification-PostDetails";
+        var namelookuptable = '#JobPositionMlist,#QualificationlistM,#SkillList,#CategoryPostlist,#CategorySplPostlist';
+        ColModel = ['PostCode', 'Jobdescription', 'NoOfVacancies', 'Id'];
+        ColNames = ['PostCode', 'Job description', 'NoOfVacancies', 'Id'];
+        SortName = 'Id';
+        Caption = 'Manpower Post Creation';
+        url = '@Url.Action("P2BGrid")';
+        width = 1100;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#CreationDate').P2BDatePicker();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#ExpYearTo').attr('disabled', 'disabled');
+        $('#AgeTo').attr('disabled', 'disabled');
+        $("#ExpFilterlist").on('selectmenuchange', function () {
+            if ($('option:selected', this).text() == "BETWEEN") {
+                $('#ExpYearTo').removeAttr('disabled');
+            }
+            if ($('option:selected', this).text() == "GREATER THAN" || $('option:selected', this).text() == "LESS EQUAL" ||
+                 $('option:selected', this).text() == "LESS THAN" || $('option:selected', this).text() == "EQUAL TO" || $('option:selected', this).text() == "GREATER EQUAL") {
+                $('#ExpYearTo').attr('disabled', 'disabled');
+                $('#ExpYearTo').removeClass('must');
+                $('#ExpYearTo').text("");
+            }
+
+        });
+
+        $("#RangeFilterlist").on('selectmenuchange', function () {
+            if ($('option:selected', this).text() == "BETWEEN") {
+                $('#AgeTo').removeAttr('disabled');
+            }
+            if ($('option:selected', this).text() == "GREATER THAN" || $('option:selected', this).text() == "LESS EQUAL" ||
+                 $('option:selected', this).text() == "LESS THAN" || $('option:selected', this).text() == "EQUAL TO" || $('option:selected', this).text() == "GREATER EQUAL") {
+                $('#AgeTo').attr('disabled', 'disabled');
+                $('#AgeTo').removeClass('must');
+                $('#AgeTo').val("");
+            }
+
+        });
+
+        $('#Load').on('click', function (e) {
+            // alert($('#Financial_id').val());
+
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Recruitment Year.");
+                return false;
+            }
+            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Recruitment Year.");
+                return false;
+            }
+            $('#frmPostDetails').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Manpower Post Creation', 'open', '@Url.Action("Create")', '#frmPostDetails', 'Message :', 'Request Falied :', '#JqGrid', 550, 810, namelookuptable, btndisablenames, function (data) { });
+            $('#ExpFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1061, ""); // To bind dropdown on page load
+            $('#RangeFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1058, "");
+            $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, "");
+            $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, "");
+            $('#PostSourceTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, "");
+
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Manpower Post Creation Data", '#frmPostDetails', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 810, '', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#RequestVacancies').val(k.Vaccancy);
+                    $('#NoOfVacancies').attr('readonly', 'readonly');
+                    $('#ExpYearFrom').val(k.ExpYearFrom);
+                    $('#ExpYearTo').val(k.ExpYearTo);
+                    $('#AgeFrom').val(k.AgeFrom);
+                    $('#AgeTo').val(k.AgeTo);
+                    $('#Narration').val(k.Narration);
+                    $('#PostCode').val(k.PostCode);
+                    if (k.CreationDate != null) {
+                        $('#CreationDate').val(DateConvert(k.CreationDate));
+                    }
+
+                    @*$('#RangeFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1058, k.AgeCriteria);
+                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 10588, k.MaritalStatus_Id);
+                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 10589, k.Gender_Id);
+                    $('#ExpFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1061, k.ExpCriteria_Id);*@
+
+                    $('#RangeFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1058, k.RangeFilter_Id);
+                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
+                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
+                    $('#ExpFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1061, k.ExpFilter_Id);
+                    $('#PostSourceTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, "");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#JobPositionMlist').P2BLookUpEncapsulate('#JobPositionMlist', 'JobPositionMlist', k.JobPos_Id, k.JobPos_FullAddress, 'JobPositionMlist', '#Edit-JobPosition-PostDetails,#Remove-JobPosition-PostDetails', 'N');
+                    //});
+                    //$.each(data[2], function (i, k) {
+
+                    $('#QualificationlistM').P2BLookUpEncapsulate('#QualificationlistM', 'QualificationlistM', k.QualificationDetails_Id, k.QualificationDetails_val, 'QualificationlistM', '#Edit-Qualification-PostDetails,#Remove-Qualification-PostDetails', 'A');
+                    $('#SkillList').P2BLookUpEncapsulate('#SkillList', 'SkillList', k.SkillDetails_Id, k.SkillDetails_val, 'SkillList', '#Edit-Skill-PostDetails,#Remove-Skill-PostDetails', 'A');
+                    $('#CategoryPostlist').P2BLookUpEncapsulate('#CategoryPostlist', 'CategoryPostlist', k.CategoryDetails_Id, k.CategoryDetails_val, 'CategoryPostlist', '#Edit-CategoryPost-PostDetails,#Remove-CategoryPost-PostDetails', 'A');
+                    $('#CategorySplPostlist').P2BLookUpEncapsulate('#CategorySplPostlist', 'CategorySplPostlist', k.CategorySplDetails_Id, k.CategorySplDetails_val, 'CategorySplPostlist', '#Edit-CategorySpl-PostDetails,#Remove-CategorySpl-PostDetails', 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[2]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Manpower Post Creation Data', '#JobPositionMlist,#QualificationlistM,#SkillList,#CategoryPostlist,#CategorySplPostlist', '', 500, 810, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.each(data[0], function (i, k) {
+
+                    $('#RequestVacancies').val(k.Vaccancy);
+                    $('#NoOfVacancies').attr('readonly', 'readonly');
+                    $('#ExpYearFrom').val(k.ExpYearFrom);
+                    $('#ExpYearTo').val(k.ExpYearTo);
+                    $('#AgeFrom').val(k.AgeFrom);
+                    $('#AgeTo').val(k.AgeTo);
+                    $('#Narration').val(k.Narration);
+                    $('#PostCode').val(k.PostCode);
+                    if (k.CreationDate != null) {
+                        $('#CreationDate').val(DateConvert(k.CreationDate));
+                    }
+
+                    $('#RangeFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1058, k.RangeFilter_Id);
+                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
+                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
+                    $('#ExpFilterlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1061, k.ExpFilter_Id);
+                    $('#PostSourceTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, "");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#JobPositionMlist').P2BLookUpEncapsulate('#JobPositionMlist', 'JobPositionMlist', k.JobPos_Id, k.JobPos_FullAddress, 'JobPositionMlist', 'view', 'N');
+                    //});
+                    //$.each(data[2], function (i, k) {
+                    $('#QualificationlistM').P2BLookUpEncapsulate('#QualificationlistM', 'QualificationlistM', k.QualificationDetails_Id, k.QualificationDetails_val, 'QualificationlistM', 'view', 'N');
+                    $('#SkillList').P2BLookUpEncapsulate('#SkillList', 'SkillList', k.SkillDetails_Id, k.SkillDetails_val, 'SkillList', 'view', 'A');
+                    $('#CategoryPostlist').P2BLookUpEncapsulate('#CategoryPostlist', 'CategoryPostlist', k.CategoryDetails_Id, k.CategoryDetails_val, 'CategoryPostlist', 'view', 'A');
+                    $('#CategorySplPostlist').P2BLookUpEncapsulate('#CategorySplPostlist', 'CategorySplPostlist', k.CategorySplDetails_Id, k.CategorySplDetails_val, 'CategorySplPostlist', 'view', 'A');
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[2]); //Compulsory for authorisation
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        // --------------- Qualification lookup start ----------
+
+        //To get data in Lookup
+        $('#Lookup-Qualification-PostDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetQualificationDetailLKDetails", "PostDetails")', '', 'LookupDiv', 'Look Up Data', '#QualificationlistM', 'QualificationlistM', 10, 'QualificationlistM', '#frmPostDetails', 'A', '#Edit-Qualification-PostDetails,#Remove-Qualification-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Qualification-PostDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Qualification")', 'Create Qualification ', 'open', '@Url.Action("Create", "Qualification")', '#frmQualification', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#frmPostDetails', '', function (data) {
+                // to show data which is created in partial page
+                $('#QualificationlistM').P2BLookUpEncapsulate('#QualificationlistM', 'QualificationlistM', data[0], data[1], 'QualificationlistM', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-Qualification-PostDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#QualificationlistM').P2BGetTableDataonSelectedRow('#QualificationlistM', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Qualification")', '@Url.Action("edit", "Qualification")', b, '@Url.Action("Editsave", "Qualification")', 'Edit Qualification', '#frmQualification', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPostDetails', '#QualificationlistM', 'QualificationlistM', 'QualificationlistM', 'N', '#Remove-Qualification-PostDetails,#Edit-Qualification-PostDetails', function (data) {
+                console.log(data[0]);
+                //$.each(data[0], function (i, k) {
+                var k = data[0]
+                $('#frmQualification').trigger("reset");
+                $('#QualificationShortName').val(k.QualificationShortName);
+                $('#QualificationDesc').val(k.QualificationDesc);
+                $('#Qualificationlist1').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 314, k.BusinessType_Id);
+                //});
+            });
+            event.preventDefault();
+        });
+
+
+        //partial page delete
+        $('#Remove-Qualification-PostDetails').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#QualificationlistM').P2BGetTableDataonSelectedRow('#QualificationlistM', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#QualificationlistM').P2BGetTableDataonSelectedRow('#QualificationlistM', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#QualificationlistM', $('#QualificationlistM').val(), 200, 200, '#frmPostDetails', '#QualificationlistM');
+            event.preventDefault();
+        });
+        // --------------- Qualification lookup end ----------
+
+        //----------Skill Details-start----
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Skill-PostDetails').on("click", function (event) {
+            //  alert('create Hobby');
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Skill")', 'Create Skill', 'open', '@Url.Action("Create", "Skill")', '#frmSkill', 'Message :', 'Request Falied :', '#JqGrid', 207, 365, '', '', '', '#frmPostDetails', '', function (data) {
+                //alert(data[0]);
+                $('#SkillList').P2BLookUpEncapsulate('#SkillList', 'SkillList', data[0], data[1], 'SkillList', '#Remove-Skill-PostDetails,#Edit-Skill-PostDetails', 'A');
+            });
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+
+        @*$('#lookUp-Skill-PostDetails').on('click', function (event) {
+            //alert ('Show Hobby')
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSkillLKDetails", "PostDetails")', '', 'LookupDiv', 'Look Up Data', '#SkillList', 'SkillList', 5, 'SkillList', '#frmPostDetails', 'A', '#Remove-Skill-PostDetails,#Edit-Skill-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('#lookUp-Skill-PostDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSkillLKDetails", "PostDetails")', '', 'LookupDiv', ' Look Up Data', '#SkillList', 'SkillList', 5, 'SkillList', '#frmPostDetails', 'A', '#Remove-Skill-PostDetails,#Edit-Skill-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-Skill-PostDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#SkillList').P2BGetTableDataonSelectedRow('#SkillList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Skill")', '@Url.Action("edit", "Skill")', b, '@Url.Action("EditSave", "Skill")', 'Edit Skill ', '#frmSkill', b, 'Message :', 'Request Falied :', '#JqGrid', 207, 365, '#frmPostDetails', '#SkillList', 'SkillList', 'SkillList', 'N', '#Remove-Skill-PostDetails,#Edit-Skill-PostDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmSkill').trigger("reset");
+                    $('#Name').val(k.Name);
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-Skill-PostDetails').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#SkillList').P2BGetTableDataonSelectedRow('#SkillList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#SkillList').P2BGetTableDataonSelectedRow('#SkillList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SkillList', $('#SkillList').val(), 200, 200, '#frmPostDetails', '#SkillList');
+            event.preventDefault();
+        });
+
+        //----------Skill Details-end----
+
+        //-----------CategoryPost Start----------------
+        $('#Lookup-CategoryPost-PostDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCategoryDetails", "PostDetails")', '', 'LookupDiv', 'Look Up Data', '#CategoryPostlist', 'CategoryPostlist', 10, 'CategoryPostlist', '#frmPostDetails', 'A', '#Edit-CategoryPost-PostDetails,#Remove-CategoryPost-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-CategoryPost-PostDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "CategoryPost")', 'Create CategoryPost Details', 'open', '@Url.Action("Create", "CategoryPost")', '#frmCategoryP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPostDetails', '', function (data) {
+                // to show data which is created in partial page
+                $('#CategoryPostlistP').P2BLookUpEncapsulate('#CategoryPostlist', 'CategoryPostlist', data[0], data[1], 'CategoryPostlist', '#Edit-CategoryPost-PostDetails,#Remove-CategoryPost-PostDetails', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-CategoryPost-PostDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CategoryPostlist').P2BGetTableDataonSelectedRow('#CategoryPostlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CategoryPost")', '@Url.Action("edit", "CategoryPost")', b, '@Url.Action("Editsave", "CategoryPost")', 'Edit CategoryPost', '#frmCategoryP', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPostDetails', '#CategoryPostlist', 'CategoryPostlist', 'CategoryPostlist', 'N', '#Remove-CategoryPost-PostDetails,#Edit-CategoryPost-PostDetails', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmCategory').trigger("reset");
+                    $('#txtNoOfVacCategory').val(k.NoOfVacancies);
+                    $('#txtNoOfAgeCategory').val(k.RelaxationAge);
+                    $('#CategoryPostListP').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1, k.CategoryType_Id); // Dropdown bind
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-CategoryPost-PostDetails').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#CategoryPostlist').P2BGetTableDataonSelectedRow('#CategoryPostlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CategoryPostlist').P2BGetTableDataonSelectedRow('#CategoryPostlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CategoryPostlist', $('#CategoryPostlist').val(), 200, 200, '#frmPostDetails', '#CategoryPostlist');
+            event.preventDefault();
+        });
+
+
+        //-----------CategoryPost End-----------------
+
+        //----------- Special CategoryPost Start----------------
+        $('#Lookup-CategorySpl-PostDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCategorySplDetails", "PostDetails")', '', 'LookupDiv', 'Look Up Data', '#CategorySplPostlist', 'CategorySplPostlist', 10, 'CategorySplPostlist', '#frmPostDetails', 'A', '#Edit-CategorySpl-PostDetails,#Remove-CategorySpl-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-CategorySpl-PostDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "CategorySplPost")', 'Create Special CategoryPost Details', 'open', '@Url.Action("Create", "CategorySplPost")', '#frmCategorySpl', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPostDetails', '', function (data) {
+                $('#CategorySplPostlist').P2BLookUpEncapsulate('#CategorySplPostlist', 'CategorySplPostlist', data[0], data[1], 'CategorySplPostlist', '#Edit-CategorySpl-PostDetails,#Remove-CategorySpl-PostDetails', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-CategorySpl-PostDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CategorySplPostlist').P2BGetTableDataonSelectedRow('#CategorySplPostlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CategorySplPost")', '@Url.Action("edit", "CategorySplPost")', b, '@Url.Action("Editsave", "CategorySplPost")', 'Edit CategoryPost Spl', '#frmCategorySpl', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPostDetails', '#CategorySplPostlist', 'CategorySplPostlist', 'CategorySplPostlist', 'N', '#Remove-CategorySpl-PostDetails,#Edit-CategorySpl-PostDetails ', function (data) {
+                $.each(data[0], function (i, k) {
+                    console.log(k);
+                    $('#frmCategorySpl').trigger("reset");
+                    $('#txtNoOfVacCategorySpl').val(k.NoOfVacancies);
+                    $('#txtNoOfAgeCategorySpl').val(k.RelaxationAge);
+                    $('#CategorySplPostlistP').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 514, k.CategorySplType_Id); // Dropdown bind
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-CategorySpl-PostDetails').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#CategorySplPostlist').P2BGetTableDataonSelectedRow('#CategorySplPostlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CategorySplPostlist').P2BGetTableDataonSelectedRow('#CategorySplPostlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CategorySplPostlist', $('#CategorySplPostlist').val(), 200, 200, '#frmPostDetails', '#CategorySplPostlist');
+            event.preventDefault();
+        });
+        //----------- Special CategoryPost End-----------------
+
+        //------------- JobPosition CategoryPost Start--------------------
+        $('#Lookup-JobPosition-PostDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetJobPositionDetails", "PostDetails")', '', 'LookupDiv', 'Look Up Data', '#JobPositionMlist', 'JobPositionMlist', 10, 'JobPositionMlist', '#frmPostDetails', 'N', '#Edit-JobPosition-PostDetails,#Remove-JobPosition-PostDetails', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-JobPosition-PostDetails').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#JobPositionMlist').P2BGetTableDataonSelectedRow('#JobPositionMlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#JobPositionMlist').P2BGetTableDataonSelectedRow('#JobPositionMlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JobPositionMlist', $('#JobPositionMlist').val(), 200, 200, '#frmPostDetails', '#JobPositionMlist');
+            event.preventDefault();
+        });
+        //------------- JobPosition CategoryPost end--------------------
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "postdetails")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        @*$('#Lookup_BatchNameP').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtBatchNameP",
+                appendToId: "#BatchNameP_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "postdetails")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "txtBatchNameP",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();*@
+
+
+        $('.popup_radio_button').controlgroup();
+
+        $('#Gender_drop').selectmenu().selectmenu("menuWidget");
+        $('#MaritalStatus_drop').selectmenu().selectmenu("menuWidget");
+        $('#RangeFilterlist').selectmenu().selectmenu("menuWidget");
+        $('#ExpFilterlist').selectmenu().selectmenu("menuWidget");
+        $('#PostSourceTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

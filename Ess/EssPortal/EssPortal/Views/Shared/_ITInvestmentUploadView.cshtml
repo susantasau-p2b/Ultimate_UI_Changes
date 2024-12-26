@@ -1,0 +1,261 @@
+﻿@{
+    Layout = null;
+}
+@model EssPortal.Models.FileModel
+
+<html>
+<head>
+<title></title>
+<style>
+    .popup-content-label {
+        width: 164px;
+        display: block;
+        float: left;
+    }
+
+    .row3 {
+        width: 635px;
+        display: inline-block;
+    }
+
+    .hide_textbox {
+        display: none;
+    }
+
+    .container_div {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 554px;
+        width: 610px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+
+    .hide-div {
+        display: none;
+    }
+
+    .header-title {
+        display: block;
+        height: 315px;
+        width: 610px;
+    }
+
+    .heading {
+        background: rgba(207, 207, 207, 0.91) none repeat scroll 0 0;
+        color: #424242;
+        display: block;
+        font-size: 1em;
+        font-weight: bold;
+        height: 15px;
+        margin: 3px auto;
+        padding: 2px 0 1px 2px;
+        width: 99%;
+    }
+
+    .hide-div {
+        display: none;
+    }
+
+    .lv-label {
+        width: 162px;
+        font-size: 11px;
+        padding: 1px;
+        position: relative;
+        float: left;
+    }
+
+    .lb-data {
+        font-weight: bold;
+        font-size: 11px;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+</style>
+</head>
+
+<body>
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmITInvestmentUpload", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="HiddenInvestmentid" id="HiddenInvestmentid" value="" />
+        <input type="hidden" name="HiddenSubinvestment_Id" id="HiddenSubinvestment_Id" value="" />
+
+        <div class="row3  content_margine">
+            <label class="lv-label">ITInvestmentPayment:</label>
+            <div id="ItInvestmentid" class="lb-data" style="width:391px;"></div>
+        </div>
+        @*<div class="row3  content_margine">
+                <label class="lv-label">ItsubInvestmentPayment:</label>
+                <div id="ItSubInvestmentid" class="lb-data"></div>
+            </div>*@
+        <div class="form-horizontal">
+            @*<div class="form-group content_margine" id="FileBrowes_id">*@
+            @*@Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label popup-content-label" })*@
+            @*<div class="col-md-10">*@
+            @*@Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" })*@ @*<button id="Upload_btn" name="Upload_btn">Upload</button>*@ @*<button id="Download_File" name="Download_File">Download</button>*@
+            @*</div>*@
+            @*</div>*@
+            @*<div id="element"></div>*@
+            <div class="row3 content_margine" id="FileDownload_id">
+                <label class="popup-content-label">View File:</label><input type="text" class="popup-content-textbox" id="filepathid" /> <button id="Download_btn" name="Download_btn">View</button>
+            </div>
+            <div style="height:500px;width:620px;overflow:auto;" id="user_investment" class="content_margine"></div>
+            <canvas id="pdfViewer"></canvas>
+        </div>
+    }
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.popup_radio_button').buttonset();
+        $('#filepathid').attr('disabled', 'disabled');
+        $.fn.doval = function () {
+            return true;
+        };
+        $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        @*$('#Upload_btn').on("click", function (event) {
+            debugger;
+            var vidFileLength = $("#files")[0].files.length;
+            if (vidFileLength === 0) {
+                alert("No file selected.");
+                return false;
+            }
+            var form = $("#frmITInvestmentUpload").serialize();
+            var tempExcel = new FormData($("#frmITInvestmentUpload")[0]);
+            $.post({
+                url: "@Url.Action("ITnvestmentUpload", "ITInvestmentPayment")",
+                data: tempExcel,
+                datatype: "json",
+                method: "POST",
+                data: tempExcel,
+                cache: false,
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                processData: false,
+                success: function (data) {
+                    if (data.success) {
+                        alert("File Upload Successfully");
+                        return false;
+                    }
+                },
+                complete: function (data) {
+                    //$('#lblloader').hide();
+                }
+            });
+            event.preventDefault();
+        });*@
+        $('#Download_btn').on("click", function (event) {
+            var filepath = $('#filepathid').val();
+            if (filepath != null) {
+                $.post("@Url.Action("Filename", "ITInvestmentPayment")?filepath=" + filepath, function (data) {
+                    if (data != null && data != "") {
+                        window.open('@Url.Action("PDFFlyer", "ITInvestmentPayment")?filepath=' + data.data);
+                    }
+                    else {
+                        alert("Data Null");
+                    }
+                })
+            }
+            event.preventDefault();
+        });
+        var imagesPreview = function (input, placeToInsertImagePreview) {
+            debugger;
+            if (input.files) {
+                var filesAmount = input.files.length;
+                $(placeToInsertImagePreview).empty();
+                for (i = 0; i < filesAmount; i++) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (event) {
+                        $($.parseHTML('<img>')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                    }
+
+                    reader.readAsDataURL(input.files[i]);
+                }
+            }
+
+        };
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+        $("#files").on("change", function (e) {
+            debugger;
+            var file = e.target.files[0]
+            //$('#element').empty()
+            //var file = URL.createObjectURL(event.target.files[0]);
+            //$('#element').append('<a href="' + file + '" target="_blank">' + event.target.files[0].name + '</a><br>');
+            if (file.type == "application/pdf") {
+                $("#user_investment").hide();
+                $("#pdfViewer").show();
+                var fileReader = new FileReader();
+                fileReader.onload = function () {
+                    var pdfData = new Uint8Array(this.result);
+                    // Using DocumentInitParameters object to load binary data.
+                    var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                    loadingTask.promise.then(function (pdf) {
+                        console.log('PDF loaded');
+
+                        // Fetch the first page
+                        var pageNumber = 1;
+
+                        pdf.getPage(pageNumber).then(function (page) {
+                            console.log('Page loaded');
+
+                            var scale = 1.5;
+                            var viewport = page.getViewport({ scale: scale });
+
+                            // Prepare canvas using PDF page dimensions
+                            var canvas = $("#pdfViewer")[0];
+                            var context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            // Render PDF page into canvas context
+                            var renderContext = {
+                                canvasContext: context,
+                                viewport: viewport
+                            };
+                            var renderTask = page.render(renderContext);
+                            renderTask.promise.then(function () {
+                                console.log('Page rendered');
+                            });
+                        });
+                    }, function (reason) {
+                        // PDF loading error
+                        console.error(reason);
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            } if (file.type == "image/jpeg" || file.type == "image/png") {
+                $("#user_investment").show();
+                $("#pdfViewer").hide();
+                imagesPreview(this, '#user_investment')
+            }
+        });
+
+    });
+
+</script>

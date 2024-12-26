@@ -1,0 +1,287 @@
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model CMS_SPS.SuccessionPostAction
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .lookup {
+        margin-left: 155px;
+    }
+
+    .Daterecord {
+        margin-left: 315px;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Code', 'Name', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Successionpostaction';
+        @*url = '@Url.Action("P2BGrid")';*@
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmSuccessionpostaction').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Successionpostaction', 'open', '@Url.Action("create")', '#frmSuccessionpostaction', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });
+            $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            $('#TrainingCloseDate').prop('disabled', true);
+            $('#TransferCloseDate').prop('disabled', true);
+            $('#OfficiatingCloseDate').prop('disabled', true);
+            $('#PromotionCloseDate').prop('disabled', true);
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('input[name="IsTrainingComplete"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#TrainingCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#TrainingCloseDate').prop('disabled', false);
+            }
+        });
+        $('input[name="IsTransferComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#TransferCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#TransferCloseDate').prop('disabled', false);
+            }
+        });
+        $('input[name="IsOfficiatingComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#OfficiatingCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#OfficiatingCloseDate').prop('disabled', false);
+            }
+        });
+
+        $('input[name="IsPromotionComplete"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $('#PromotionCloseDate').prop('disabled', true);
+            }
+            else {
+
+                $('#PromotionCloseDate').prop('disabled', false);
+            }
+        });
+
+        $('#Lookup-TrainingLookuplist').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTrainingCategory", "SuccessionPostAction")', '', 'LookupDiv', 'LvDependPolicy Look Up Data', '#TrainingLookuplist', 'TrainingLookuplist', 5, 'TrainingLookuplist', '#frmSuccessionpostaction', 'A', '#Edit-LvDependPolicy-SalaryHead,#Remove-LvDependPolicy-SalaryHead', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-TrainingLookuplist').button().on('click', function (event) {
+
+            //var a = [], b;
+            //a = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingLookuplist', $('#TrainingLookuplist').val(), 200, 200, '#frmSuccessionpostaction', '#TrainingLookuplist', '');
+            event.preventDefault();
+        });
+        $('#TrainingCloseDate').P2BDatePicker();
+        $('#TransferCloseDate').P2BDatePicker();
+        $('#OfficiatingCloseDate').P2BDatePicker();
+        $('#PromotionCloseDate').P2BDatePicker();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        //$('.popup_radio_button').controlgroup();
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmSuccessionpostaction", name = "frmSuccessionpostaction" }))
+    {
+
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+        <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsTrainingRecommend, "IsTrainingRecommend :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio11" name="IsTrainingRecommend" value="true" /><label for="radio11">Yes</label>
+                    <input type="radio" id="radio12" name="IsTrainingRecommend" value="false" checked="checked" /><label for="radio12">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsTransferRecomment, "IsTransferRecomment :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio17" name="IsTransferRecomment" value="true" /><label for="radio17">Yes</label>
+                    <input type="radio" id="radio18" name="IsTransferRecomment" value="false" checked="checked" /><label for="radio18">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsPromotionRecomment, "IsPromotionRecomment :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio15" name="IsPromotionRecomment" value="true" /><label for="radio15">Yes</label>
+                    <input type="radio" id="radio16" name="IsPromotionRecomment" value="false" checked="checked" /><label for="radio16">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsOfficiatingRecomment, "IsOfficiatingRecomment :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio13" name="IsOfficiatingRecomment" value="true" /><label for="radio13">Yes</label>
+                    <input type="radio" id="radio14" name="IsOfficiatingRecomment" value="false" checked="checked" /><label for="radio14">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsTrainingComplete, "IsTrainingComplete :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="IsTrainingComplete" value="true" /><label for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="IsTrainingComplete" value="false" checked="checked" /><label for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <label class="popup-content-label">TrainingCloseDate :</label>
+            <input type="text" id="TrainingCloseDate" name="TrainingCloseDate" class="popup-content-textbox" />
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsTransferComplete, "IsTransferComplete :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio5" name="IsTransferComplete" value="true" /><label for="radio5">Yes</label>
+                    <input type="radio" id="radio6" name="IsTransferComplete" value="false" checked="checked" /><label for="radio6">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <label class="popup-content-label">TransferCloseDate :</label>
+            <input type="text" id="TransferCloseDate" name="TransferCloseDate" class="popup-content-textbox ex" />
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.OfficiatingCloseDate, "OfficiatingCloseDate :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio7" name="OfficiatingCloseDate" value="true" /><label for="radio7">Yes</label>
+                    <input type="radio" id="radio8" name="OfficiatingCloseDate" value="false" checked="checked" /><label for="radio8">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <label class="popup-content-label">OfficiatingCloseDate :</label>
+            <input type="text" id="OfficiatingCloseDate" name="OfficiatingCloseDate" class="popup-content-textbox ex" />
+        </div>
+        <div class="row3  content_margine">
+            @Html.LabelFor(m => m.IsPromotionComplete, "IsPromotionComplete:", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio9" name="IsPromotionComplete" value="true" /><label for="radio9">Yes</label>
+                    <input type="radio" id="radio10" name="IsPromotionComplete" value="false" checked="checked" /><label for="radio10">No</label>
+                </span>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            <label class="popup-content-label">PromotionCloseDate :</label>
+            <input type="text" id="PromotionCloseDate" name="PromotionCloseDate" class="popup-content-textbox ex" />
+        </div>
+
+        <div class="row3 content_margine">
+            <label for="TrainingLookuplist" class="popup-content-label must">TrainingLookuplist</label><br>
+            <div class="popup-content-table lookup">
+                <table class="lookuptableselected" id="TrainingLookuplist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select TrainingLookuplist" class="popup-content-icon-lookup" id="Lookup-TrainingLookuplist"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create TrainingLookuplist" class="popup-content-icon-create" id="Create-TrainingLookuplist"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit TrainingLookuplist " class="popup-content-icon-edit" id="Edit-TrainingLookuplist"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove TrainingLookuplist" class="popup-content-icon-remove" id="Remove-TrainingLookuplist"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+</div>

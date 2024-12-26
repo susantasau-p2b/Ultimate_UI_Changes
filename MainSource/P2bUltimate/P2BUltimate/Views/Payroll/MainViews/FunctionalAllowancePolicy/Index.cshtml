@@ -1,0 +1,151 @@
+﻿<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model Payroll.FunctionalAllowancePolicy
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['MinDays', 'MaxDays', 'SalaryHead', 'PaymonthConcept',  'Id'];
+        ColNames = ['MinDays', 'MaxDays', 'SalaryHead', 'PaymonthConcept', 'Id'];
+        SortName = 'Id';
+        Caption = 'Functional Allowance Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmFunctionalAllowancePolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Functional Allowance Policy', 'open', '@Url.Action("create")', '#frmFunctionalAllowancePolicy', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+            $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("SalaryheadCode", "FunctionalAllowancePolicy")', '', '');
+            $('#PaymonthConceptlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550,'');
+        });
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Functional Allowance Policy', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {             
+                   $.each(data[0], function (i, k) {
+                    $('#frmFunctionalAllowancePolicy').trigger("reset");
+                    $('#MinDays').val(k.MinDays);
+                    $('#MaxDays').val(k.MaxDays);
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("SalaryheadCode", "FunctionalAllowancePolicy")", "", k.SalaryHead_Id, '');
+                    $('#PaymonthConceptlist').P2BSelectMenuAppend('@Url.Action("PaymonthConcept", "FunctionalAllowancePolicy")', 550, k.PaymonthConcept_Id);
+                });
+               
+            });
+        });
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Functional Allowance Policy", '#frmFunctionalAllowancePolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmFunctionalAllowancePolicy').trigger("reset");
+                    $('#MinDays').val(k.MinDays);
+                    $('#MaxDays').val(k.MaxDays);
+                    $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("SalaryheadCode", "FunctionalAllowancePolicy")", "", k.SalaryHead_Id, '');
+                    $('#PaymonthConceptlist').P2BSelectMenuAppend('@Url.Action("PaymonthConcept", "FunctionalAllowancePolicy")', 550, k.PaymonthConcept_Id);
+                });
+
+            });
+
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+
+<div class="Button_Container">
+    <button class="button" id="Create">Create</button>
+    <button class="button" id="View">View</button>
+    <button class="button" id="Edit">Edit</button>
+    <button class="button" id="Delete">Delete</button>
+    <div id="Grid_Form">
+        <div>
+            <table id="JqGrid"></table>
+            <div id="pager2"></div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmFunctionalAllowancePolicy", name = "frmFunctionalAllowancePolicy" }))
+    {
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.SalaryHead, "SalaryHead:", new { @class = "popup-content-label must" })
+            <select class="drop musr" style="width:120px;" name="SalaryHeadlist" id="SalaryHeadlist"><option></option></select>
+        </div>
+        <div class="row1 content_margine" style="width: 420px;">
+            @Html.LabelFor(m => m.PaymonthConcept, "PaymonthConcept :", new { @class = "popup-content-label must" })
+            <select class="drop must" style="width:120px;" name="PaymonthConceptlist" id="PaymonthConceptlist">
+                <option></option>
+            </select>
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.MinDays, "MinDays :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.MinDays, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.MaxDays, "MaxDays :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.MaxDays, new { @class = "popup-content-textbox must" })
+        </div>
+      
+    }
+</div>
+

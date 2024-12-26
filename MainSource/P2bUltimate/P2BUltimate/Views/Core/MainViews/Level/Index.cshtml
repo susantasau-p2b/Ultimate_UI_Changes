@@ -1,0 +1,236 @@
+﻿@{
+    ViewBag.Title = "level";
+}
+
+@model P2b.Global.Level
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 100px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 403px;
+    }
+</style>
+
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create Grade">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmlevelMain", name = "frmlevelMain" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row3 content_margine">@Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.Code, new { @class = "Popup-content-textbox must", @id = "Level_Code", @maxlength = "10" })</div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.Name, new { @class = "Popup-content-textbox must", @id = "Level_Name", @maxlength = "50" })</div>
+
+    }
+</div>
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('#Level_Code').MaxLength(10);
+        $('#Level_Code').ForceOnlyAlphaNumeric();
+        $('#Level_Name').MaxLength(50);
+         $('button').button();
+
+         var ColNames = [];
+         var ColModel = [];
+         var SortName, Caption, url, width, height;
+         var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+         ColModel = ['Code', 'Name', 'Id'];
+         ColNames = ['Code', 'Name', 'Id'];
+         url = '@Url.Action("P2BGrid")';
+    	 Caption = 'Level';
+         width = 1000;
+         height = 150;
+         $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+         function AssignData() {
+             dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+         }
+
+         $('#Create_Dialog').P2BCreateDialog();
+         $('#Create').button().on("click", function () {
+             $('#frmlevelMain').trigger("reset");
+             $('#Create_Dialog').P2BCreateDialog('@Url.Action("Index", "Level")', 0, '', '', 'Create Level', 'open', '@Url.Action("CreateSave","Level")', '#frmlevelMain', 'Message :', 'Request Falied :', '#JqGrid', 249, 381, '#Levellist', '#Edit-Level-Grade,#Remove-Level-Grade', function (data) {
+                 event.preventDefault();
+             });
+         });
+
+        // Main page edit
+         $('#Edit').on('click', function () {
+             AssignData();
+             $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit","Level")', dt.Id, '@Url.Action("EditSave","Level")', "Edit Level Data", '#frmlevelMain', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 249, 381, '#Levellist', btndisablenames, function (data) {
+
+                 $.each(data[0], function (i, k) {
+                     $('#Level_Code').val(k.Code);
+                     $('#Level_Code').attr('readonly', 'readonly');
+                     $('#Level_Name').val(k.Name);
+
+                 });                 //partial page bind
+
+                 //alert(data[3]);
+                 $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                 // }, 2000);
+             });
+         });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Level Data', '#Levellist', '#Lookup-Level-Grade,#Create-Level-Grade,#Edit-Level-Grade,#Remove-Level-Grade', 249, 381, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Level_Code').val(k.Code);
+                    $('#Level_Name').val(k.Name);
+                });
+
+
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Level_Name').oldVal(data[2].Name);
+                    $('#Level_Code').oldVal(data[2].Code);
+
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("DeleteLevel")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+         $('<div></div>').P2BPartialCreateModalDialog();
+         $('#Create-Level-Grade').on("click", function (event) {
+             //$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "Medicine")', 'Create Medicine Details', 'open', '@Url.Action("Create", "Medicine")', '#frmMedicine', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmAllergy', '', function (data) {
+             @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "TrainingInstitute")', 'Create ContactDetails Details', 'open', '@Url.Action("Create", "ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmTrainingInstitute', '', function (data) {
+                 $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Disease,#Remove-ContactDetails-Disease', 'A');*@
+             $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("LevelPartial", "Grade")', 'Create Level', 'open', '@Url.Action("CreateSave", "Level")', '#frmLevel', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmGrade', '', function (data) {
+
+                 $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', data[0], data[1], 'Levellist', '#Edit-Level-Grade,#Remove-Level-Grade', 'A');
+             });
+             event.preventDefault();
+         });
+
+
+        $('#loookup-Level-Grade').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLevel", "Grade")', '', 'LookupDiv', 'Look Up Data', '#Levellist', 'Levellist', 5, 'Levellist', '#frmGrade', 'A', '#Edit-Level-Corporate,#Remove-Level-Corporate', 'Lookup_table', 'PageNavPosition');
+             event.preventDefault();
+         });
+
+        @*$('#Edit-Level-Grade').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("LevelPartial", "Grade")', '@Url.Action("EditLevel_partial", "Level")', b, '@Url.Action("EditSave", "Level")', 'Edit Level', '#frmLevel', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmGrade', '#Edit-Level-Grade,#Remove-Level-Grade', '#Levellist', 'Levellist', 'Levellist', function (data) {
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        $('#frmLevel').trigger('reset');
+                        $('#Level_Name').val(k.Name);
+                        $('#Level_Code').val(k.Code);
+                        $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', k.Id, k.Name,k.Code, 'Levellist');
+                    })
+                }, 2000);
+            });
+        });*@
+
+        $('#Edit-Level-Grade').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("LevelPartial", "Grade")', '@Url.Action("Edit", "Level")', b, '@Url.Action("EditSave", "Level")', 'Edit Level Details', '#frmLevel', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmGrade', '#Levellist', 'Levellist', 'Levellist', 'A', '#Edit-Level-Grade,#Remove-Level-Grade', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmLevel').trigger('reset');
+                    $('#Level_Code').val(k.Name);
+                    $('#Level_Name').val(k.Code);
+
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#Remove-Level-Grade').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteLevel", "Level")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Postion_List', $('#Postion_List').val(), 200, 200, '#frmJob', '#Postion_List');
+            event.preventDefault();
+        });*@
+        $('#Remove-Level-Grade').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Levellist', $('#Levellist').val(), 200, 200, '#frmGrade', '#Levellist', '');
+            event.preventDefault();
+        });
+
+        $('#Level_Code').MaxLength(10).ForceOnlyAlphaNumeric();
+        $('#Level_Name').MaxLength(50);
+        $('#Level_Code').ValidateTextBox({ maxlength: 5, alphanum: true });
+        $('#Level_Name').ValidateTextBox({ maxlength: 50, name: true });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

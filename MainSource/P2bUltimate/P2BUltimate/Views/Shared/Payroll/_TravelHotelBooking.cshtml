@@ -1,0 +1,317 @@
+﻿@model  Payroll.TravelHotelBooking
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        //$('#Date-edit,#DateOfCloser-edit,#DateOfMaturity-edit').P2BDatePicker();
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#StartDate,#EndDate').P2BDatePicker();
+        $('#NoOFDays-edit').attr('readonly', 'readonly');
+    });
+    $('<div></div>').P2BPartialCreateModalDialog();
+    //partial page delete
+    $('.drop').selectmenu().selectmenu('menuWidget').css({ "height": "200px" });
+    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", "", '#StateList');
+    $('#CountryList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "state")", '#StateList', "");
+    $('#StateList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "StateRegion")", "#StateRegionList", "");
+
+
+
+    $('#Lookup-Rent-HRATransTPartial').on('click', function (event) {
+        $('.dialog').P2BLookUpModal('@Url.Action("GetLookupRent", "HRATransT")', '', 'LookupDiv', 'Rent Look Up Data', '#Rent_ListPartial-edit', 'Rent_ListPartial-edit', 5, 'Rent_ListPartial-edit', '#frmHRATransTGridPartial', 'A', '#Remove-Rent-HRATransTPartial', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+
+    $('<div></div>').P2BPartialCreateModalDialog();
+
+    $('#Create-Rent-HRATransTPartial').on("click", function (event) {
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "HRATransT")', 'Create Rent', 'open', '@Url.Action("CreateSave", "Rent")', '#frmRent', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmHRATransTGridPartial', '', function (data) {
+            // to show data which is created in partial page
+            $('#Rent_ListPartial-edit').P2BLookUpEncapsulate('#Rent_ListPartial-edit', 'Rent_ListPartial-edit', data[0], data[1], 'Rent_ListPartial-edit', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', 'A');
+        });
+        event.preventDefault();
+    });
+    $('#Edit-HotelEligibilityPolicy-TravelHotelBooking').button().on("click", function (event) {
+        var a = [], b;
+        a = $('#HotelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#HotelEligibilityPolicyList', 0);
+        b = a[0];
+
+        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial_HotelEligibilityPolicy", "TravelHotelBooking")', '@Url.Action("getHoteleligibilitypolicydata", "HotelEligibilitypolicy")', b, '@Url.Action("EditSave", "HotelEligibilitypolicy")', 'Edit HotelEligibilityPolicy Details', '#frmHotelEligibilityPolicyDetailsPartial', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTravelHotelBookingDetails', '#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', 'N', '#Edit-JourneyObject-JourneyDetails,#Remove-JourneyObject1-JourneyDetails', function (data) {
+            // $.each(data[0], function (i, k) {
+            $('#frmHotelEligibilityPolicyDetailsPartial').trigger('reset');
+            $('#HotelEligibilityCode-edit').val(data.HotelEligibilityCode);
+            $('#Lodging_Eligible_Amt_PerDay-edit').val(data.Lodging_Eligible_Amt_PerDay);
+            $('#Food_Eligible_Amt_PerDay-edit').val(data.Food_Eligible_Amt_PerDay);
+            $('#HotelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3003, data.HotelType);
+            $('#RoomTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3004, data.RoomType);
+            //$('#travelmodelist').val(data.TravelMode);
+            //$('#classoftravellist').val(data.ClassOfTravel);
+            //});
+
+        });
+        event.preventDefault();
+
+    });
+    $('#Remove-HotelEligibilityPolicy-TravelHotelBooking').button().on('click', function (event) {
+        //var a = [], b;
+        //a = $('#HotelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#HotelEligibilityPolicyList', 0);
+        //b = a[0];
+        var selectedRows = [];
+        selectedRows = $('#HotelEligibilityPolicyList').P2BGetTableDataonSelectedRow('#HotelEligibilityPolicyList', 0);
+        $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HotelEligibilityPolicyList', $('#HotelEligibilityPolicyList').val(), 200, 200, '#frmTravelHotelBookingDetails', '#HotelEligibilityPolicyList', '#Remove-CandidateDocuments-Candidate');
+        event.preventDefault();
+    });
+    $('#Edit-Rent-HRATransTPartial').button().on("click", function (event) {
+        var a = [], b;
+        a = $('#Rent_ListPartial-edit').P2BGetTableDataonSelectedRow('#Rent_ListPartial-edit', 0);
+        b = a[0];
+        console.log(b);
+        event.preventDefault();
+        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HRATransT")', '@Url.Action("Edit", "Rent")', b, '@Url.Action("EditSave", "Rent")', 'Edit Rent Numbers', '#frmRent', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmHRATransTGridPartial', '#Rent_ListPartial-edit', 'Rent_ListPartial-edit', 'Rent_ListPartial-edit', 'A', '#Edit-Rent-HRATransTPartial,#Remove-Rent-HRATransTPartial', function (data) {
+
+            $.each(data, function (i, k) {
+                $('#frmRent').trigger('reset');
+                $('#RentFromDate').val(k.RentFromDate);
+                $('#RentToDate').val(k.RentToDate);
+                $('#RentAmt').val(k.RentAmount);
+            });
+        });
+
+    });
+
+    $('#Remove-Rent-HRATransTPartial').button().on('click', function (event) {
+        //var a = [], b;
+        //a = $('#Rent_ListPartial-edit').P2BGetTableDataonSelectedRow('#Rent_ListPartial-edit', 0);
+        //b = a[0];
+        var selectedRows = [];
+        selectedRows = $('#Rent_ListPartial-edit').P2BGetTableDataonSelectedRow('#Rent_ListPartial-edit', 0);
+
+        $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Rent_ListPartial-edit', $('#Rent_ListPartial-edit').val(), 200, 200, '#frmHRATransTGridPartial', '#Rent_ListPartial-edit', '#Remove-Rent-HRATransTPartial');
+        event.preventDefault();
+    });
+
+</script>
+<style>
+    .row2 {
+        width: 400px;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: 26px;
+        top: -49px;
+    }
+    /*.popup-content-textbox {
+        margin-bottom: 1px;
+        width: 275px;
+    }*/
+</style>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTravelHotelBookingDetails", Name = "frmTravelHotelBookingDetails" }))
+    {
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.HotelEligibilityPolicy, "Hotel Eligibility Policy Details :", new { @class = "popup-content-label must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="HotelEligibilityPolicyList">
+                    <tr>
+                        <th>ID</th>
+                        <th>LookUp Selected Description</th>
+                    </tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select HotelEligibilityPolicy Details" class="popup-content-icon-lookup" id="Lookup-HotelEligibilityPolicy-TravelHotelBooking"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create HotelEligibilityPolicy Details" class="popup-content-icon-create" id="Create-HotelEligibilityPolicy-TravelHotelBooking"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit HotelEligibilityPolicy Details" class="popup-content-icon-edit" id="Edit-HotelEligibilityPolicy-TravelHotelBooking"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Delete HotelEligibilityPolicy Details" class="popup-content-icon-remove" id="Remove-HotelEligibilityPolicy-TravelHotelBooking"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+        <div class="row1 content_margine">@Html.LabelFor(m => m.StartDate, "StartDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.StartDate, new { @class = "popup-content-textbox" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.EndDate, "EndDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.HotelName, "HotelName :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.HotelName, new { @class = "popup-content-textbox", @id = "HotelName-edit" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.HotelDesc, "HotelDesc :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.HotelDesc, new { @class = "popup-content-textbox", @id = "HotelDesc-edit" })</div>
+
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Country, "Country :", new { @class = "popup-content-label must" })
+            <select id="CountryList" name="CountryList" class="drop must" style="min-width:180px;">
+                <option value="0">-Select-</option>
+            </select>
+            <div class="add_icon-row">
+                <button data-p2btooltip="Create Country" class="popup-content-icon-create" id="create_country">
+                    <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row1 content_margine ">
+            @Html.LabelFor(m => m.State, "State :", new { @class = "popup-content-label must" })
+            <select id="StateList" name="StateList" class="drop must" style="width:180px;">
+                <option value="0">-Select-</option>
+            </select>
+            <div class="add_icon-row">
+                <button data-p2btooltip="Create State" class="popup-content-icon-create" id="create_state">
+                    <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.City, "City :", new { @class = "popup-content-label must" })
+            <select id="CityList" name="CityList" class="drop" style="width:180px;">
+                <option value="0">-Select-</option>
+            </select>
+            <div class="add_icon-row">
+                <button data-p2btooltip="Create City" class="popup-content-icon-create" id="create_city">
+                    <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                </button>
+            </div>
+        </div>
+
+         <div class="row1 content_margine">@Html.LabelFor(m => m.NoOfRooms, "No Of Rooms :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.NoOfRooms, new { @class = "popup-content-textbox", @id = "NoOfRooms-edit" })</div>
+         <div class="row1 content_margine">@Html.LabelFor(m => m.BillNo, "Bill No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BillNo, new { @class = "popup-content-textbox", @id = "BillNo-edit" })</div>
+         <div class="row1 content_margine">@Html.LabelFor(m => m.RatePerDay, "Rate Per Day :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.RatePerDay, new { @class = "popup-content-textbox", @id = "RatePerDay-edit" })</div>
+          <div class="row1 content_margine">@Html.LabelFor(m => m.Taxes, "Taxes :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Taxes, new { @class = "popup-content-textbox", @id = "Taxes-edit" })</div>
+         <div class="row1 content_margine">@Html.LabelFor(m => m.StdDiscount, "Std Discount :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.StdDiscount, new { @class = "popup-content-textbox", @id = "StdDiscount-edit" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Elligible_BillAmount, "Elligible BillAmount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Elligible_BillAmount, new { @class = "popup-content-textbox", @id = "Elligible_BillAmount-edit" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.BillAmount, "Bill Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BillAmount, new { @class = "popup-content-textbox", @id = "BillAmount-edit" })</div>
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Sanction_BillAmount, "Sanction BillAmount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Sanction_BillAmount, new { @class = "popup-content-textbox", @id = "Sanction_BillAmount-edit" })</div>
+        
+        <div class="row1 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox", @id = "Narration-edit" })</div>
+
+
+    }
+</div>
+<script>
+    $('.popup_radio_button').controlgroup();
+    $('#Lookup-HotelEligibilityPolicy-TravelHotelBooking').on('click', function (event) {
+        var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+        if (a.val == "" || a.length == 0) {
+            alert("Please select Employee");
+            return false;
+        }
+        
+        $('.dialog').P2BLookUpModal('@Url.Action("GetHotelEligibilityPolicyDetails", "LTCSettlementClaim")?Empid=' + a, '', 'LookupDiv', ' Look Up Data', '#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', 5, 'HotelEligibilityPolicyList', '#frmTravelHotelBookingDetails', 'N', '#Remove-HotelEligibilityPolicy-TravelHotelBooking', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+
+    $('#Create-HotelEligibilityPolicy-TravelHotelBooking').on("click", function (event) {
+
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_HotelEligibilityPolicy", "TravelHotelBooking")', 'Create HotelEligibilityPolicyDetails Master', 'open', '@Url.Action("Create", "HotelEligibilitypolicy")', '#frmHotelEligibilityPolicyDetailsPartial', 'Message :', 'Request Falied :', '#JqGrid', 250, 450, '', '', '#Edit-HotelEligibilityPolicy-TravelHotelBooking', '#frmTravelHotelBookingDetails', '', function (data) {
+            $('#HotelEligibilityPolicyList').P2BLookUpEncapsulate('#HotelEligibilityPolicyList', 'HotelEligibilityPolicyList', data[0], data[1], 'HotelEligibilityPolicyList', '#Remove-HotelEligibilityPolicy-TravelHotelBooking', 'N');
+        });
+        event.preventDefault();
+    });
+
+    //#BillAmount-edit,#Sanction_BillAmount-edit
+    $('#BillAmount-edit').keyup(function () {
+        //alert('ok');
+        //var a = $('#TAElligibleAmtid').val();
+        //alert(a);
+        $.post('', { id: 0 }, function (data) {
+            if (data != null && data != "") {
+                var elg = $('#Elligible_BillAmount-edit').val();
+                var clm = $('#BillAmount-edit').val();
+                var setl = $('#Sanction_BillAmount-edit').val();
+                elg = parseFloat(elg);
+                clm = parseFloat(clm);
+                setl = parseFloat(setl);
+                //if (elg != 0 && clm != null && clm != "")
+                //{
+
+                //    if (clm > elg) {
+
+                //        $('#Sanction_BillAmount-edit').val(elg);
+                //    }
+                //    else if (clm <= elg) {
+
+                //        $('#Sanction_BillAmount-edit').val(clm)
+                //    }
+                //}
+                //else {
+
+
+                    $('#Sanction_BillAmount-edit').val(clm)
+              //  }
+            }
+            else {
+                alert("Data Null");
+            }
+        });
+    });
+
+    $('#create_country').on("click", function (e) {
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "country")', 'Create Country', 'open', '@Url.Action("Create","Country")', '#frmCountry', 'Message :', 'Request Falied :', '#JqGrid', 217, 339, '', '#CountryList', 'change', '', '', function (data) {
+            $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", data[0], '#StateList');
+
+        });
+        e.preventDefault();
+    });
+    function ajaxloaderv2(cameform) {
+        $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+    };
+    $('#NoOfRooms-edit').on('change', function () {
+   // $('#NoOfRooms').TextChanged(function () {
+      
+        var e = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+        //  alert(e);
+        var h = [];
+        var j = [];
+        var l = [];
+      
+        $.ajax({
+            url: '@Url.Action("GetELGAmount", "LTCSettlementClaim")',
+            method: "POST",
+            //beforeSend: function () {
+            //    //$('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);" aria-hidden="true"></i></div>').appendTo($(newDiv1).parent());
+            //},
+            data: $('#frmTravelHotelBookingDetails').serialize() + '&data=' + e,
+            beforeSend: function () {
+                ajaxloaderv2('body');
+            },
+            success: function (data) {
+                $.each(data, function (i, k) {
+
+                    $("#Elligible_BillAmount-edit").val(k.Elligible_BillAmount);
+                
+                });
+
+            },
+            complete: function () {
+                $('.ajax_loder').remove();
+            }
+        });
+
+    });
+
+    $('#create_state').on("click", function (e) {
+        if ($('#CountryList option:selected').val() == null || $('#CountryList option:selected').val() == 0 || $('#CountryList option:selected').val() == "-Select-") {
+            alert('Kindly select  "Country"  first');
+            return false;
+        }
+        else {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "state") ', 'Create State', 'open', '@Url.Action("Create", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, $("#CountryList option:selected").val(), '#CountryList', 'change', '', '', function (data) {
+                $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", data[0], '#StateRegionList');
+            });
+            e.preventDefault();
+        }
+    });
+
+
+    $('#create_city').on("click", function (e) {
+
+        $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "city") ', 'Create City', 'open', '@Url.Action("Create","City")', '#frmCity', 'Message :', 'Request Falied :', '#JqGrid', 200, 300, $("#TalukaList option:selected").val(), '#TalukaList', 'change', '', '', function (data) {
+            $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", data[0], '#AreaList');
+        });
+        e.preventDefault();
+
+    });
+
+    $('#CityList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCity", "HotelBookingRequest")', "", "");
+
+    $('#NoOfRooms-edit,#BillNo-edit,#RatePerDay-edit,#Taxes-edit,#StdDiscount-edit,#Elligible_BillAmount-edit,#BillAmount-edit,#Sanction_BillAmount-edit').ForceAmount();
+    $('#NoOfRooms-edit,#BillNo-edit,#RatePerDay-edit,#Taxes-edit,#StdDiscount-edit,#Elligible_BillAmount-edit').val("0");
+
+
+</script>

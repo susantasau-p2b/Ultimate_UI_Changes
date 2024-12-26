@@ -1,0 +1,222 @@
+﻿@model P2b.Global.CurrencyConversion
+@{
+    ViewBag.Title = "CurrencyConversion";
+}
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 44%;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 108px;
+        }
+
+        .large_label {
+            width: 94px;
+        }
+
+        .row3 {
+            width: 323px;
+        }
+
+        #LeaveHead-button, #FromStat-button, #ToStat-button {
+            font-size: 9px;
+        }
+
+        .horizontal_row3, .radio_button_div_3 {
+            display: inline-block;
+        }
+
+        .horizontal_row2, .radio_button_div_2 {
+            display: inline-block;
+        }
+
+        .checkbox_label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 108px;
+        }
+
+        .horizontal_row3 {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCurrencyConversion", name = "frmCurrencyConversion" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox-short must", id = "Name" })</div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.BaseCountry, "Base Country :", new { @class = "popup-content-label  must" })
+                <select id="BaseCountrylist" name="BaseCountrylist" class="drop must" style="width:161px;"><option value="0">-Select-</option></select>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ConvertCountry, "Convet Country :", new { @class = "popup-content-label must" })
+                <select id="ConvertCountrylist" name="ConvertCountrylist" class="drop must" style="width:161px;"><option value="0">-Select-</option></select>
+            </div>
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        $('#Name').MaxLength(50);
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+
+        var dt;
+        var btndisablenames  = "";
+
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Name', 'Id'];
+        ColNames = ['Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Currency Conversion';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            $('#frmCurrencyConversion').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Currency Conversion', 'open', '@Url.Action("create") ', '#frmCurrencyConversion', 'Message :', 'Request Falied :', '#JqGrid', 234, 433, '#BaseCountrylist,#ConvertCountrylist', btndisablenames, function (data) { });
+
+        });
+        $('#BaseCountrylist').on("selectmenuopen", function () {
+            $('#BaseCountrylist').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+            $.post("@Url.Action("PopulateDropDownListBC", "CurrencyConversion")", {
+                data: "",
+                data2: ""
+            }, function (data) {
+                $.each(data, function (i, k) {
+                    $('#BaseCountrylist').append($("<option>", {
+                        value: k.Value,
+                        text: k.Text,
+                        selcted: k.Selected
+                    }));
+                });
+                jQuery('#BaseCountrylist').selectmenu('refresh').selectmenu("menuWidget");
+            });
+        });
+
+        $('#ConvertCountrylist').on("selectmenuopen", function () {
+            $('#ConvertCountrylist').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+            $.post("@Url.Action("PopulateDropDownListCC", "CurrencyConversion")", {
+                data: "",
+                data2: ""
+            }, function (data) {
+                $.each(data, function (i, k) {
+                    $('#ConvertCountrylist').append($("<option>", {
+                        value: k.Value,
+                        text: k.Text,
+                        selcted: k.Selected
+                    }));
+                });
+                jQuery('#ConvertCountrylist').selectmenu('refresh').selectmenu("menuWidget");
+            });
+        });
+
+
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmCurrencyConversion').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            @*$('#frmbasicscale').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmbasicscale', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#BSCALEDETAILS_List', '', function (data) {*@
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#FormAddress', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Currency Conversion", '#frmCurrencyConversion', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 234, 433, '', '', function (data) {
+
+               $.each(data[0], function (i, k) {
+                   $('#frmCurrencyConversion').trigger('reset');
+                   $('#Name').val(k.Name);
+
+                   $('#BaseCountrylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListBC", "CurrencyConversion")", "", k.BaseCountry_Id);
+                   $('#ConvertCountrylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListCC", "CurrencyConversion")", "", k.ConvertCountry_Id);
+
+               });
+
+               $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+           });
+           });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Currency Conversion', '', '', 234, 433, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('#Name').val([k.Name]);
+                        $('#BaseCountrylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListBC", "CurrencyConversion")", "", k.BaseCountry_Id);
+                        $('#ConvertCountrylist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListCC", "CurrencyConversion")", "", k.ConvertCountry_Id);
+                    });
+
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        alert([data[2].Name]);
+                        $('#Name').oldVal([data[2].Name]);
+                        $('#BaseCountrylist').StickNote([data[2].BaseCountry_Val]);
+                        $('#ConvertCountrylist').StickNote([data[2].ConvertCountry_Val]);
+                    }
+                });
+                });
+
+
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script> 

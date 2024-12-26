@@ -1,0 +1,284 @@
+﻿@{
+    Layout = null;
+}
+<style>
+
+</style>
+<form id="frmupdate" name="frmupdate" method="post">
+    <div id="div2">
+        <div>
+            <label id="lblPayMonth" class="popup-content-label must" style="margin-top:13px">PayMonth :</label>
+            <input name="txtmonth" type="text" id="txtmonth" class="date-picker" style="margin-top:10px" readonly />
+        </div>
+        <div class="employeeselectiondiv">
+            <div><label>Employee Code & Name </label><input type="text" id="empcode" style="width: 300px;" readonly /></div>
+            <input type="text" id="SalaryID" hidden />
+            <br />
+            <div>
+                <table class="tbl" style="width:108%">
+                    <tr>
+                        <td class="td1">
+                            <label><center><b >Earning</b></center></label>
+                        </td>
+                        <td class="td1">
+                            <label><center><b style="margin-left: -543px;">Deduction</b></center></label>
+                        </td>
+                        <td class="td1">
+                            <label><center><b style="margin-left: -933px; ">Principle</b></center></label>
+                        </td>
+                        <td class="td1">
+                            <label><center><b style="margin-left: -724px;">Interest</b></center></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td1" style="padding:10px;">
+                            <ul id="Earn1" float:left"></ul>
+                        </td>
+                        <td class="td1">
+                            <ul id="ded1" float:left" style="margin-top: -562px;"></ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button class="ui-button-text" data-typeofbtn="save" id="Calculate">Calculate</button>
+                            <button class="ui-button-text" data-typeofbtn="save" id="save">Save</button>
+                            <button class="ui-button-text" data-typeofbtn="save" id="Lock">Lock</button>
+                        </td>
+                        <td></td>
+                    </tr>
+                    @*<tr></tr>*@
+                </table>
+                <div>
+                    <label>Gross Earn </label><input type="text" id="empgross" style="width: 80px;" readonly />
+                    <label>Net Salary </label><input type="text" id="empnet" style="width: 80px;" readonly />
+
+                    <label>Deduction</label><input type="text" id="empded" style="width: 80px;" readonly />
+                    <label>Percentage On Gross </label><input type="text" id="empperc" style="width: 80px;" readonly />
+
+                    <label>Excess Value </label><input type="text" id="excessval" style="width: 80px;" readonly />
+                </div><br />
+                <div>
+                    <label>New Deduction</label><input type="text" id="newempded" style="width: 80px;" readonly />
+                    <label>New Excess</label><input type="text" id="newexcessval" style="width: 80px;" readonly />
+
+
+                    <label>New Net Salary </label><input type="text" id="newempnet" style="width: 100px;" readonly />
+                </div>
+                    @*<tr>
+                        <td class="td1">
+                            <label>Gross Earn </label><input type="text" id="empgross" style="width: 80px;" readonly />
+                            <label>Net Salary </label><input type="text" id="empnet" style="width: 80px;" readonly />
+                        </td>
+                        <td class="td1">
+                            <label>Deduction</label><input type="text" id="empded" style="width: 80px;" readonly />
+                            <label>Percentage On Gross </label><input type="text" id="empperc" style="width: 80px;" readonly />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td1">
+                            <label>Excess Value </label><input type="text" id="excessval" style="width: 80px;" readonly />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td1">
+                            <label>New Deduction</label><input type="text" id="newempded" style="width: 80px;" readonly />
+                            <label>New Excess</label><input type="text" id="newexcessval" style="width: 80px;" readonly />
+                        </td>
+                        <td class="td1">
+                            <label>New Net Salary </label><input type="text" id="newempnet" style="width: 100px;" readonly />
+                        </td>
+                    </tr>*@
+            </div>
+        </div>
+
+    </div>
+
+</form>
+<script >
+    $(document).ready(function (e) {
+        $('#Lock').on("click", function (e) {
+            var dedtextbox = $('.dedamt').toArray();
+            var JsonObj = [];
+            $.each(dedtextbox, function (i, j) {
+                var k = $(j);
+                if (k.attr("data-val") != k.val()) {
+                    var putJson = { Id: null, val: null, SalId: null };
+                    putJson.Id = k.attr("name");
+                    putJson.val = k.val();
+                    putJson.SalId = $('#SalaryID').val();
+                    JsonObj.push(putJson);
+                    console.log("----------------");
+                    console.log(putJson);
+                    console.log("----------------");
+                }
+            });
+            var stringify_JsonObj = JSON.stringify(JsonObj);
+            console.log(stringify_JsonObj);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("LockNegData", "SalaryT")',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: stringify_JsonObj,
+                success: function (data) {
+                    if (data.success == true) {
+                        alert(data.responseText);
+                    } else {
+                        alert(data.responseText);
+                    }
+                }, error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+
+        $('#save').on("click", function (e) {
+            var JsonObj = [];
+            $("#ded1 li").each(function (index, element) {
+              
+                var putJson = { Id: null, val: null, val2: null, val3: null, SalId: null };
+                var val1 = null; var val2 = null; var val3 = null;
+                var dedtextbox = $(element).find('input[type=text]');
+
+                $.each(dedtextbox, function (i, j) {
+                    var k = $(j);
+                    // if (k.attr("data-val") != k.val()) {
+
+                    putJson.Id = k.attr("name");
+                    if (val1 != null && val2 != null && val3 == null) {
+                        val3 = k.val();
+                    }
+                    if (val1 != null && val2 == null) {
+                        val2 = k.val();
+                    }
+                    if (val1 == null && val2 == null && val3 == null) {
+                        val1 = k.val();
+                    }
+
+
+                    //}
+                });
+
+
+                putJson.val = val1;
+                putJson.val2 = val2;
+                putJson.val3 = val3;
+                putJson.SalId = $('#SalaryID').val();
+                JsonObj.push(putJson);
+                console.log("----------------");
+                console.log(putJson);
+                console.log("----------------");
+                console.log('out');
+            });
+
+            //var checkboxes = $('#ded1 li input[type=text]')
+
+            //checkboxes.each(function (e) {
+            //    console.log($(this).attr('name'));
+            //});
+
+            //var dedtextbox = $('.dedamt').toArray();
+            //console.log(dedtextbox);
+            //var JsonObj = [];
+            //$.each(dedtextbox, function (i, j) {
+            //    var k = $(j);
+            //    if (k.attr("data-val") != k.val()) {
+            //        var putJson = { Id: null, val: null, val2: null, val3: null, SalId: null };
+            //        putJson.Id = k.attr("name");
+            //        putJson.val = k.val();
+            //        putJson.SalId = $('#SalaryID').val();
+            //        JsonObj.push(putJson);
+            //        console.log("----------------");
+            //        console.log(putJson);
+            //        console.log("----------------");
+            //    }
+            //});
+            var stringify_JsonObj = JSON.stringify(JsonObj);
+            console.log(stringify_JsonObj);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("editdata", "SalaryT")',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: stringify_JsonObj,
+                success: function (data) {
+                    if (data.success == true) {
+                        $("#empnet").val(data.grossearn);
+                        $("#empgross").val(data.totearn);
+                        $("#empded").val(data.totded);
+                        alert(data.responseText);
+                    } else {
+                        alert(data.responseText);
+                    }
+                }, error: function () {
+
+                }
+            });
+            e.preventDefault();
+        });
+        $('#Calculate').on("click", function (e) {
+            ////debugger;
+            var dedtextbox = $('.dedamt').toArray();
+            var excess = parseInt($("#excessval").val());
+            var empded = parseInt($("#empded").val());
+
+            var TGross = parseInt($("#empgross").val());
+
+            var excess1 = excess;
+            var JsonObj = [];
+            var Newnet = 0;
+            $.each(dedtextbox, function (i, j) {
+                var k = $(j);
+                var old = k.attr("data-val");
+                if (old != k.val()) {
+                    var chkO = 0;
+                    var chkN = 0;
+                    var chkTOT = 0;
+
+
+                    chkO = parseInt(old);
+                    chkN = parseInt(k.val());
+                    chkTOT = chkO - chkN;
+                    excess = excess + chkTOT;
+                    console.log(excess);
+
+                    empded = empded + excess1;
+
+
+                    Newnet = TGross - empded;
+
+
+                }
+            });
+
+
+            if (excess >= 0) {
+                alert("correct");
+                $("#newexcessval").val(excess);
+                $("#newempded").val(empded);
+                $("#newempnet").val(Newnet);
+
+            } else {
+                alert("Please deduct " + excess + " more in deduction ");
+                $("#newexcessval").val(excess);
+                $("#newempded").val(empded);
+                $("#newempnet").val(Newnet);
+
+            }
+
+            e.preventDefault();
+        });
+    });
+  </script>
+    @*<script>
+    $('#ITInvestmentPayment-DeclaredInvestment').ForceOnlyNumeric();
+    $('#ITInvestmentPayment-DeclaredInvestment').MaxLength(8);
+    $('#ITInvestmentPayment-ActualInvestment').ForceOnlyNumeric();
+    $('#ITInvestmentPayment-ActualInvestment').MaxLength(8);
+   // $('#ITSection24-Narration').ValidateTextBox({ maxlength: 30, name: true });
+</script>*@

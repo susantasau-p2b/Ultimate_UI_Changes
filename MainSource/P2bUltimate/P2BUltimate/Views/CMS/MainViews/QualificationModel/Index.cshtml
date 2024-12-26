@@ -1,0 +1,315 @@
+@{
+    ViewBag.Title = "QualificationModel";
+}
+@model CMS_SPS.QualificationModel
+<html>
+<head>
+    <title></title>
+    <style>
+        .popup-content-label {
+            width: 170px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row3, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 477px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+
+        .popup-content-table {
+            right: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="30" width="1000">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ModelCode</th>
+                                <th>ModelName</th>
+                                <th>ModelDescription</th>
+                                <th>CreatedDate</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmQualificationModel", name = "frmQualificationModel" }))
+        {
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Code, "Model Code :", new { @class = "popup-content-label must", @maxlength = "10" })
+                @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelName, "Model Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelName, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelDescription, "Model Description :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelDescription, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.CreatedDate, "Created Date :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.CreatedDate, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.QualificationModelObject, "Qualification Object :", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="QualificationModelObjectList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup QualificationModelObject" class=" popup-content-icon-lookup" id="Lookup-QualificationModelObject"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create QualificationModelObject " class=" popup-content-icon-create" id="Create-QualificationModelObject"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit QualificationModelObject" class=" popup-content-icon-edit" id="Edit-QualificationModelObject"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Delete QualificationModelObject" class=" popup-content-icon-remove" id="Remove-QualificationModelObject"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#Code').ValidateTextBox({ maxlength: 10 });
+        $('#ModelName').ValidateTextBox({ maxlength: 25 });
+        $('#ModelDescription').ValidateTextBox({ maxlength: 50 });
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("QualificationModel_Grid")",
+            columnname: ["Code", "ModelName", "ModelDescription", "CreatedDate", "Id",],
+            childheader: ["QualificationModel", "EvaluationModel", "Id"],
+            childurl: "@Url.Action("A_QualificationModel_Grid", "QualificationModel")",
+            tableheader: "Qualification Model",
+            childurlColumnNo: "5"
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };*@
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmQualificationModel');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Qualification Model Object', 'open', '@Url.Action("Create")', '#frmQualificationModel', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#CreatedDate').TodayDate();
+            $('#CreatedDate').attr("readonly", "readonly");
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            $('#frmQualificationModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Appraisal Qualification Model Object", '#frmQualificationModel', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmQualificationModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#QualificationModelObjectList').P2BLookUpEncapsulate('#QualificationModelObjectList', 'QualificationModelObjectList', k.QualificationModelObject_Id, k.QualificationObject_FullDetails, 'QualificationModelObjectList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+        $('#View').on('click', function () {
+            $('#frmQualificationModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Appraisal Qualification Model Object', '#QualificationModelObjectList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmQualificationModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#QualificationModelObjectList').P2BLookUpEncapsulate('#QualificationModelObjectList', 'QualificationModelObjectList', k.QualificationModelObject_Id, k.QualificationObject_FullDetails, 'QualificationModelObjectList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmQualificationModel');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Create-QualificationModelObject').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("QualificationModelPartial", "QualificationModel")', 'Qualification Model Object', 'open', '@Url.Action("Create", "QualificationModelObject")', '#frmQualificationModelObject', 'Message :', 'Request Falied :', '#JqGrid', 300, 550, '', '', '', '#frmQualificationModel', '', function (data) {
+                @*$('#QualificationModelList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, "");*@
+                $('#QualificationModelList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "QualificationModelObject")', '', "");
+                $('#QualificationModelObjectList').P2BLookUpEncapsulate('#QualificationModelObjectList', 'QualificationModelObjectList', data[0], data[1], 'QualificationModelObjectList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+
+        
+        $('#Lookup-QualificationModelObject').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupQualificationModelObject", "QualificationModel")', '', 'LookupDiv', 'QualificationModel Look Up Data', '#QualificationModelObjectList', 'QualificationModelObjectList', 5, 'QualificationModelObjectList', '#frmQualificationModel', 'A', '#Remove-Witness-Witness', 'Lookup_table', 'PageNavPosition');          
+            event.preventDefault();
+        });
+        $('#Edit-QualificationModelObject').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#QualificationModelObjectList').P2BGetTableDataonSelectedRow('#QualificationModelObjectList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("QualificationModelPartial", "QualificationModel")', '@Url.Action("Edit", "QualificationModelObject")', b, '@Url.Action("Editsave", "QualificationModelObject")', 'Edit Qualification Model Object', '#frmQualificationModelObject', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmQualificationModel', '#QualificationModelObjectList', 'QualificationModelObjectList', 'QualificationModelObjectList', 'N', '', function (data) {
+              $.each(data[0], function (i, k) {
+                    $('#QualificationModelList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "QualificationModelObject")", "", k.QualificationModel_Id, '');
+                    $('#CompetencyEvaluationModelList').P2BLookUpEncapsulate('#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', k.CompetencyEvaluationModel_Id, k.CompetencyEvaluationModelDetails, 'CompetencyEvaluationModelList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-QualificationModelObject').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#QualificationModelObjectList').P2BGetTableDataonSelectedRow('#QualificationModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#QualificationModelObjectList').P2BGetTableDataonSelectedRow('#QualificationModelObjectList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#QualificationModelObjectList', $('#QualificationModelObjectList').val(), 200, 200, '#frmQualificationModel', '#QualificationModelObjectList');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+    });
+</script>

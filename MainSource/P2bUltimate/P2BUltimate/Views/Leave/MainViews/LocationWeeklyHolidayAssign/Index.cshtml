@@ -1,0 +1,745 @@
+﻿@{
+    ViewBag.Title = "LocationWeeklyHolidayAssign";
+}
+@model P2b.Global.Location
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 859px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+
+    <title></title>
+
+    <script>
+    $(document).ready(function (e) {
+        var dia;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Advance-Filter-Symbol').on('click', function (e) {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/GeoLocationListWoHo?geo_id=' + forwarddata + '', "");
+                },
+            renderat: "#FormFilter", hierarchy: true,
+            });
+        e.preventDefault();
+    });
+        $('button').button();
+
+
+        //Create Function
+       
+        $('#Create').on("click", function (event) {
+            $.FormReset('#FormWeeklyHolidayAssignLocation');
+            $.LoadLocationByDefault();
+            
+            $('.section1_Leave').show();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Requisition', 'open', '@Url.Action("EditSave")', '#FormWeeklyHolidayAssignLocation', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+
+            event.preventDefault();
+        });
+
+        $("#Employee-Search").on('keypress', function (eve) {
+            const inputString = $("#Employee-Search").val();
+            if (eve.keyCode == 13) {
+                console.log("Search_String :: "+inputString);
+                return false;
+            }
+        });
+       
+
+        $('#Edit').on('click', function () {
+            $('#FormWeeklyHolidayAssignLocation').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            if (a == null) {
+                alert('Kindly select the location')
+            }
+            //data('datatable_selectedrow');
+            console.log(a.Id);
+            $('.section1_Leave').hide();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit", "LocationWeeklyHolidayAssign")', a.Id, '@Url.Action("EditSaveEdit", "LocationWeeklyHolidayAssign")', "Edit LocationWeeklyHolidayAssign", '#FormWeeklyHolidayAssignLocation', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar ', "", function (data) {
+                $.each(data[1], function (i, k) {
+                    $('#HOCalendarList').P2BLookUpEncapsulate('#HOCalendarList', 'HOCalendarList', k.HO_Id, k.HO_FullDetails, 'HOCalendarList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+
+                });
+                $.each(data[2], function (i, k) {
+                    $('#WOCalendarList').P2BLookUpEncapsulate('#WOCalendarList', 'WOCalendarList', k.WO_Id, k.WO_val, 'WOCalendarList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'A');
+                });
+
+                $('#Autho_Allow').val(data[3]);
+            }, { datatablename: "#MyTable" });
+
+        });
+
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+
+        $('#Lookup-HOCalendar-Location').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsHolliday", "Location")', '', 'LookupDiv', 'Holliday Look Up Data', '#HOCalendarList', 'HOCalendarList', 5, 'HOCalendarList', '#FormWeeklyHolidayAssignLocation', 'A', '#Edit-HOCalendar-Location,#Remove-HOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-WOCalendar-Location').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWOCalendar", "Location")', '', 'LookupDiv', 'WOCalendar Look Up Data', '#WOCalendarList', 'WOCalendarList', 5, 'WOCalendarList', '#FormWeeklyHolidayAssignLocation', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Edit-WOCalendar-Location').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "WeeklyOffCalendar")', '@Url.Action("Edit", "WeeklyOffCalendar")', b, '@Url.Action("EditSave", "WeeklyOffCalendar")', 'Edit WeeklyOffList Details', '#FormParWeeklyOffCalendar', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormWeeklyHolidayAssignLocation', '#WOCalendarList', 'WOCalendarList', 'WOCalendarList', 'N', '#Remove-WeeklyOffList-WeeklyOffCalendar,#Edit-WeeklyOffList-WeeklyOffCalendar', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#FormParWeeklyOffCalendar').trigger('reset');
+                    $('#WOCalendar_DDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "WeeklyOffCalendar")', "", k.WOCalendar_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#WeeklyOffListList').P2BLookUpEncapsulate('#WeeklyOffListList', 'WeeklyOffListList', k.WeeklyoffList_Id, k.WeeklyoffList_val, 'WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'N');
+                });
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-HOCalendar-Location').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#HOCalendarList').P2BGetTableDataonSelectedRow('#HOCalendarList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HolidayCalendar")', '@Url.Action("Edit", "HolidayCalendar")', b, '@Url.Action("EditSave", "HolidayCalendar")', 'Edit Holiday Details', '#FormHoliCalendar', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormWeeklyHolidayAssignLocation', '#HOCalendarList', 'HOCalendarList', 'HOCalendarList', 'N', '#Remove-HolidayList-HolidayCalendar1,#Edit-HolidayList-HolidayCalendar1', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#FormHoliCalendar').trigger('reset');
+                    $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", k.Holicalendar_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#HolidayListList').P2BLookUpEncapsulate('#HolidayListList', 'HolidayListList', k.HolidayList_Id, k.HolidayList_val, 'HolidayListList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                });
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-HOCalendar-Location').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#HOCalendarList').P2BGetTableDataonSelectedRow('#HOCalendarList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#HOCalendarList').P2BGetTableDataonSelectedRow('#HOCalendarList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HOCalendarList', $('#HOCalendarList').val(), 200, 200, '#FormWeeklyHolidayAssignLocation', '#HOCalendarList', '#Edit-HOCalendar-Location,#Remove-HOCalendar-Location');
+            event.preventDefault();
+        });
+
+        $('#Remove-WOCalendar-Location').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WOCalendarList', $('#WOCalendarList').val(), 200, 200, '#FormWeeklyHolidayAssignLocation', '#WOCalendarList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location');
+            event.preventDefault();
+        });
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //partial page delete
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "LocationWeeklyHolidayAssign")",
+            htmurl: "@Url.Action("GridPartial", "LocationWeeklyHolidayAssign")",
+            columnname: ["Code", "Name", "Id"],
+            childheader: ["FullDetails", "Id"],
+            childurl: "@Url.Action("Get_HolidayWeeklyOffDetails", "LocationWeeklyHolidayAssign")",
+            tableheader: "HolidayWeeklyOff Details LocationWise",
+            childurlColumnNo: "3"
+
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#LvNewReqGridPartial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData","lvnewreq")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            $('#Grid-ReqDate').val(k.ReqDate);
+                            $('#Grid-FromDate').val(k.FromDate);
+                            $('#Grid-ToDate').val(k.ToDate);
+                            $('#Grid-TotalDays').val(k.TotalDays);
+                            $('#Grid-Reason').val(k.Reason);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRepaymentT")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRepaymentT")",
+                    submiturl: "@Url.Action("GridEditsave", "LoanAdvRepaymentT")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            //console.log(k.MonthlyInstallmentAmount);
+                            $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                            //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('fa fa-upload')) {
+                var chk = $($(init)).closest('tr');
+                //  var SubId = $(chk).find('td:eq(6)').html();
+                var testnew = $('<div></div>').P2BConfidentialModelDialog({
+                    htmlurl: "@Url.Action("UploadLeaveCertificate", "LvNewReq")",
+                    submiturl: "@Url.Action("LeaveCertificateUpload", "LvNewReq")?Id=" + id,
+                    form: '#FormUploadInvestment',
+                    height: "500",
+                    type: "FILE",
+                    width: "800",
+                    title: "DocumentUpload",
+                    BeforeSendurl: "@Url.Action("CheckLeveCertificateUpload", "LvNewReq")?Id=" + id,
+                    returnfun: function (data) {
+                        //  window.location.href = "" + data + "";
+                    },
+                });
+            }
+            else if ($(init).hasClass('ui-icon-image')) {
+                ////debugger;
+                var chk = $($(init)).closest('tr');
+                // var SubId = $(chk).find('td:eq(6)').html();
+                $.post("@Url.Action("CheckUploadLeaveFile", "LvNewReq")?Id=" + id, function (data) {
+                    ////debugger;
+                    if (data.success == false) {
+
+                        alert("File Not Found");
+                        return false;
+                    } else if (data.fileextension == ".pdf") {
+                        window.location = "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id;
+                    }
+                    else {
+                        $('<div></div>').PartialCreateDialog({
+                            height: '500',
+                            width: '500',
+                            form: "#FormImageViewer",
+                            htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                            state: "open",
+                            mode: "View",
+                            editurl: "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id,
+                            editdata: id,
+                            forwarddata: id,
+                            returndatafunction: function (data) {
+                                ////debugger;
+                                console.log(data);
+                                if (data.status == "pdf") {
+                                    $("#PDFLoad").attr('src', "data:application/pdf;base64," + data.data + "");
+                                }
+                                else if (data.status == ".png") {
+                                    $("#Dashboard-Investment-Viewer").attr('src', "data:image/png;base64," + data.data + "");
+                                } else if (data.status == ".jpg") {
+                                    $("#Dashboard-Investment-Viewer").attr('src', "data:image/jpg;base64," + data.data + "");
+                                } else {
+                                    alert("First Upload the File");
+                                }
+                            }
+                        });
+                    }
+                })
+
+            }
+        };
+
+    });
+    </script>
+
+    <style>
+        #lvdata {
+            float: right;
+            width: 52%;
+        }
+
+        #brandata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 805px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 57px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 810px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                        <label id="LabelCalendar" class="emplist_label">Calendar:</label>
+                        <select id="Calendar_DDL" name="Calendar_DDL" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                    </div>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>LocationCode</th>
+                                <th>LocationDesc</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>LocationCode</th>
+                                <th>LocationDesc</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+       
+        <div class="filter-div">
+            <label class="advance_filter_label">
+                Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                </span>
+            </label>
+            <div id="FormFilter"></div>
+        </div>
+
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormWeeklyHolidayAssignLocation", name = "FormWeeklyHolidayAssignLocation" }))
+        {
+
+            <div class="section1_Leave">
+                <div class="heading">Location List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="Employee-Search" style="width: 425px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr>
+                                <th><input type="checkbox" id="Case-Employee" /></th>
+                                <th>Location</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @*<div class="heading">Filter View</div>*@
+            <div class="section2_Leave">
+
+                <div class="heading">HolidayWeeklyOff Calendar Details</div>
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.HolidayCalendar, "Holiday Calendar Details :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="HOCalendarList">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Holiday Calendar Details" class="popup-content-icon-lookup" id="Lookup-HOCalendar-Location"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @* <button data-p2btooltip="Create Holiday Calendar Details" class="popup-content-icon-create" id="Create-HOCalendar-Location"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Edit Holiday Calendar Details" class="popup-content-icon-edit" id="Edit-HOCalendar-Location"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Holiday Calendar Details" class="popup-content-icon-remove" id="Remove-HOCalendar-Location"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+                <div class="content_margine">
+                    @Html.LabelFor(m => m.WeeklyOffCalendar, "Weekly Off Calendar Details :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="WOCalendarList">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Weekly Off Calendar Details" class="popup-content-icon-lookup" id="Lookup-WOCalendar-Location"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @* <button data-p2btooltip="Create Weekly Off Calendar Details" class="popup-content-icon-create" id="Create-WOCalendar-Location"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Edit Weekly Off Calendar Details" class="popup-content-icon-edit" id="Edit-WOCalendar-Location"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Weekly Off Calendar Details" class="popup-content-icon-remove" id="Remove-WOCalendar-Location"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</body>
+</html>

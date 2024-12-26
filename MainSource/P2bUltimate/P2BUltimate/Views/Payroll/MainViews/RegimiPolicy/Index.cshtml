@@ -1,0 +1,223 @@
+﻿
+@model Payroll.RegimiPolicy
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#SpanPeriodInDays').MaxLength(3).ForceOnlyNumeric();
+            
+    });
+
+
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        //ColModel = ['Id', 'Code', 'Name', 'OnAttend', 'OnLeave', 'RoundDigit', 'InITax'];
+        //ColNames = ['Id', 'Code', 'Name', 'OnAttend', 'OnLeave', 'RoundDigit', 'InITax'];
+
+        ColModel = ['FinancialYear', 'StartDate', 'SpanPeriodInDays', 'Id'];
+        ColNames = ['FinancialYear', 'StartDate', 'SpanPeriodInDays', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Regime Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#create_dialog').P2BCreateDialog();
+        $('#create').button().on("click", function () {
+            $('#lookup-Rpolicy-RegimiPolicy').show();
+            $('#remove-Rpolicy-RegimiPolicy').show();
+            $('#frmRigimiPolicy').trigger("reset");
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create Regime Policy', 'open', '@Url.Action("Create")', '#frmRigimiPolicy', 'Message :', 'Request Falied :', '#jqgrid', 400, 600, '', '', '', function (data) { });
+            $('#FinancialYear').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.Frequency_Id);
+
+          
+            event.preventDefault();
+        });
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+       
+
+        $('#view').button().click(function (event) {
+          
+            AssignData();
+            $('#remove-Rpolicy-RegimiPolicy').hide();
+            $('#create_dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Regime Policy', '', '', 500, 620, '#autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#jqgrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    @*$('#FinancialYear').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.FinancialYear_Id);*@
+                    $('#FinancialYear').P2BLookUpEncapsulate('#RegimiPolicyList', 'RegimiPolicyList', k.FinancialYearId, k.FinancialYearfulldeatils, 'RegimiPolicyList', '', 'N');
+                    $('#StartDate').val(DateConvert(k.StartDate));
+                    $('#SpanPeriodInDays').val(k.SpanPeriodInDays);
+                });
+
+              
+            });
+        });
+
+
+
+        $('#delete').button().click(function () {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'ID');
+            $('#create_dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#jqgrid', 200, 200);
+        });
+
+        
+
+
+
+        $('#edit').on('click', function () {
+          
+            AssignData();
+            $('#lookup-Rpolicy-RegimiPolicy').hide();
+            $('#remove-Rpolicy-RegimiPolicy').hide();
+            $('#create_dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Regime Policy Data", '#frmRigimiPolicy', dt.Id, 'Message : ', 'Request Falied :', '#jqgrid', 400, 600, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    @*$('#FinancialYear').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, k.Id);*@
+                   
+                    $('#FinancialYear').P2BLookUpEncapsulate('#RegimiPolicyList', 'RegimiPolicyList', k.FinancialYearId, k.FinancialYearfulldeatils, 'RegimiPolicyList', '', 'N');
+                    $('#StartDate').val(DateConvert(k.StartDate));
+                    $('#SpanPeriodInDays').val(k.SpanPeriodInDays);
+                   
+                });
+
+
+                event.preventDefault();
+            });
+        });
+       
+        $('#StartDate').P2BDatePicker();
+        //To get data in Lookup
+        $('#lookup-Rpolicy-RegimiPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsRegimi", "RegimiPolicy")', '', 'lookupdiv', 'Financial Year Look Up Data', '#RegimiPolicyList', 'RegimiPolicyList', 5, 'RegimiPolicyList', '#frmRigimiPolicy', 'N', '#edit-LvDependPolicy-SalaryHead,#remove-LvDependPolicy-SalaryHead', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#remove-Rpolicy-RegimiPolicy').button().on('click', function (event) {
+            var selecetdRows = [];
+            selecetdRows = $('#RegimiPolicyList').P2BGetTableDataonSelectedRow('#RegimiPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selecetdRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RegimiPolicyList', $('#RegimiPolicyList').val(), 200, 200, '#frmRigimiPolicy', '#RegimiPolicyList', '');
+            event.preventDefault();
+        });
+
+
+     
+
+      
+    });
+</script>
+
+<div class="form_bg">
+    <div class="form_input">
+        <div class="button_container">
+            <button class="button" id="create">Create</button>
+            <button class="button" id="view">View</button>
+            <button class="button" id="edit">Edit</button>
+            <button class="button" id="delete">Delete</button>
+            @*<button class="button" id="autho">Authorized</button>*@
+            <div id="grid_form">
+                <div>
+                    <table id="jqgrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="lookupdiv"></div>
+    </div>
+    <div id="pageNavPosition">
+
+    </div>
+</div>
+<div id="create_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmRigimiPolicy", name = "frmRigimiPolicy" }))
+    {
+
+        <input id="autho_action" type="hidden" name="autho_action" />
+        <input id="autho_allow" type="hidden" name="autho_allow" />
+        @*<input  id="autho_action" style="display:none" value="c"/>*@
+
+        <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.FinancialYear, "Financial Year :", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="RegimiPolicyList">
+                            <tr>
+                                <th>ID</th>
+                                <th>LookUp Selected Description</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select Regimi Policy Details" class="popup-content-icon-lookup" id="lookup-Rpolicy-RegimiPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Regimi Policy Details" class="popup-content-icon-create" id="create-Rpolicy-RegimiPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Regimi Policy Details" class="popup-content-icon-edit" id="edit-Rpolicy-RegimiPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete Regimi Policy Details" class="popup-content-icon-remove" id="remove-Rpolicy-RegimiPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+          </div>
+
+    <div class=" row3 content_margine">
+        @*@Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "popup-content-label must" })       
+        <input type="text" name="Start_Date" id="select_date" />*@
+        @Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.StartDate, new { @class = "popup-content-textbox must" })
+    </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.SpanPeriodInDays, "Span Period In Days :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.SpanPeriodInDays, new { @class = "popup-content-textbox must" })
+        </div>
+     
+        
+        
+        
+    }
+</div>

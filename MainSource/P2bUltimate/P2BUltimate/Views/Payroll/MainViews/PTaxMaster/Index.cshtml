@@ -1,0 +1,344 @@
+﻿@{
+	ViewBag.Title = "PTaxMaster";
+}
+@model Payroll.PTaxMaster
+
+<script>
+	$(document).ready(function (e) {
+		$('button').button();
+		var dt;
+		var ColNames = [];
+		var ColModel = [];
+		var SortName, Caption, url, width, height;
+		var btndisablenames = "";
+		ColModel = ['StateList', 'PTWagesMaster', 'Id'];
+		ColNames = ['Stateslist(Code-Name)', 'PTWagesMasterlist', 'Id'];
+		SortName = 'Id';
+		Caption = 'PTax Master';
+		url = '@Url.Action("P2BGrid","PTaxMaster")';
+		width = 1000;
+		height = 150;
+		$('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+		$('#Create_Dialog').P2BCreateDialog();
+
+		function AssignData() {
+			dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+		}
+
+		function DateConvert(JsonDate) {
+		    var date = new Date(parseInt(JsonDate.substr(6)));
+		    var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+		    return displayDate;
+		};
+		$('#Create').on("click", function (event) {
+			$('#frmPTaxMaster').trigger("reset");
+			$('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PTax Master', 'open', '@Url.Action("Create")', '#frmPTaxMaster', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '#StatutoryEffectiveMonthslist,#PTWagesMasterlist,#Stateslist', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+			$('#ProcessTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Lookup")", 416, "");
+		    $('#EffectiveDate').attr('readonly', true);
+		    event.preventDefault();
+		});
+	  
+		$('#Edit').on('click', function (e) {
+			AssignData();
+			$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit PTax Master", '#frmPTaxMaster', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 510, 1008, '#PTWagesMasterlist,#StatutoryEffectiveMonthslist,#Stateslist', '', function (data) {
+
+				$.each(data[0], function (i, k) {
+				    $('#EffectiveDate').val(k.EffectiveDate);
+				    $('#EndDate').val(k.EndDate);
+				    $('#ProcessTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Lookup")", 416, k.ProcessType_id);
+				});
+				$.each(data[1], function (i, k) {
+					$('#Stateslist').P2BLookUpEncapsulate('#Stateslist', 'Stateslist', k.State_Id, k.States_Name, 'Stateslist', '#Remove-States', 'N');
+					$('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', k.PTWagesMaster_Id, k.PTWagesMaster_FullDetails, 'PTWagesMasterlist', '#Remove-PTWagesMaster', 'N');
+					$('#StatutoryEffectiveMonthslist').P2BLookUpEncapsulate('#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', k.Effectivemonth_id, k.effective_data, 'StatutoryEffectiveMonthslist', '#Remove-StatutoryEffectiveMonths', 'A');
+				});
+				$('#Autho_Allow').val(data[3]);
+			});
+			e.preventDefault();
+		});
+
+		$('#View').button().click(function (event) {
+			AssignData();
+			$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit","PTaxMaster")', dt.Id, 'View PTax Master Data', '#PTWagesMasterlist,#StatutoryEffectiveMonthslist,#Stateslist', '#Lookup-PTWageRange,#Create-PTWageRange,#Lookup-PTWagesMaster,#Create-PTWagesMaster,#Lookup-StatutoryEffectiveMonths,#Create-StatutoryEffectiveMonths', 600, 1020, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+				$.each(data[0], function (i, k) {
+				$('#frmPTaxMaster').trigger("reset");
+					$('#EffectiveDate').val(k.EffectiveDate);
+					$('#EndDate').val(k.EndDate);
+					$('#ProcessTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Lookup")", 416, k.ProcessType_id);
+
+				});
+
+				$.each(data[1], function (i, k) {
+					$('#Stateslist').P2BLookUpEncapsulate('#Stateslist', 'Stateslist', k.State_Id, k.States_Name, 'Stateslist', 'view', 'N');
+					$('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', k.PTWagesMaster_Id, k.PTWagesMaster_FullDetails, 'PTWagesMasterlist', 'view', 'N');
+					$('#StatutoryEffectiveMonthslist').P2BLookUpEncapsulate('#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', k.Effectivemonth_id, k.effective_data, 'StatutoryEffectiveMonthslist', 'view', 'A');
+
+				});
+				//To bind old data if authorisation is true
+				if ($("#Autho").hasClass('auto_active')) {
+					if (data[2] != null) {
+						$('#Stateslist').oldDropval(data[2].State_Val);
+						$('#ProcessTypeList').oldDropval(data[2].Process_Val);
+						$('#PTWageRangelist_old').oldLookupVal(data[2].PTWageRange_Val);
+						$('#PTWagesMasterlist_old').oldLookupVal(data[2].PTWagesMaster_Val);
+						$('#StatutoryEffectiveMonthslist_old').oldLookupVal(data[2].StatutoryEffectiveMonths_Val);
+					}
+				}
+			});
+			event.preventDefault();
+		});
+
+		$('#Lookup-PTWageRange').on('click', function (event) {
+			$('.dialog').P2BLookUpModal('@Url.Action("GetProcessPTWageRangeDetails", "PTaxMaster")', '', 'LookupDiv', 'Range Look Up Data', '#PTWageRangelist', 'PTWageRangelist', 5, 'PTWageRangelist', '#frmPTaxMaster', 'N', '', 'Lookup_table', 'PageNavPosition');
+			event.preventDefault();
+		});
+		$('#Lookup-States').on('click', function (event) {
+			$('.dialog').P2BLookUpModal('@Url.Action("GetState", "PTaxMaster")', '', 'LookupDiv', 'Look Up Data', '#Stateslist', 'Stateslist', 5, 'Stateslist', '#frmPTaxMaster', 'N', '', 'Lookup_table', 'PageNavPosition');
+			event.preventDefault();
+		});
+
+		$('#Lookup-PTWagesMaster').on('click', function (event) {
+			$('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "wages")', '', 'LookupDiv', 'Wage Master Look Up Data', '#PTWagesMasterlist', 'PTWagesMasterlist', 5, 'PTWagesMasterlist', '#frmPTaxMaster', 'N', '', 'Lookup_table', 'PageNavPosition');
+			event.preventDefault();
+		});
+
+		$('#Lookup-StatutoryEffectiveMonths').on('click', function (event) {
+			$('.dialog').P2BLookUpModal('@Url.Action("GetStatutoryEffectiveMonths", "PTaxMaster")', '', 'LookupDiv', 'Statutory Effective', '#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', 5, 'StatutoryEffectiveMonthslist', '#frmPTaxMaster', 'A', btndisablenames, 'Lookup_table', 'PageNavPosition');
+			event.preventDefault();
+		});
+
+		$('<div></div>').P2BPartialCreateModalDialog();
+		$('#Create-States').on("click", function (event) {
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "state")', 'Create State', 'open', '@Url.Action("CreateState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPTaxMaster', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+				// to show data which is created in partial page
+			    $('#Stateslist').P2BLookUpEncapsulate('#Stateslist', 'Stateslist', data[0], data[1], 'Stateslist', '#Remove-States', 'N');
+			});
+			event.preventDefault();
+		});
+
+		$('#Create-PTWagesMaster').on("click", function (event) {
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create wages', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPTaxMaster', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+				// to show data which is created in partial page
+				$('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', data[0], data[1], 'PTWagesMasterlist', '#Remove-PTWagesMaster', 'N');
+			});
+			event.preventDefault();
+		});
+
+		$('#Create-StatutoryEffectiveMonths').on("click", function (event) {
+		    $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "StatutoryEffectiveMonths")', 'Create Statutory Effective Months', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 350, 600, '', '', '', '#frmPTaxMaster', '', function (data) {
+		        $('#StatutoryEffectiveMonthslist').P2BLookUpEncapsulate('#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', data[0], data[1], 'StatutoryEffectiveMonthslist', '#Remove-StatutoryEffectiveMonths', 'A');
+		        $('#dvGender').show();
+		    });
+		   
+			event.preventDefault();
+		});
+
+
+	    $('#Edit-PTWagesMaster').button().on("click", function (event) {
+			var a = [], b;
+			a = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+			b = a[0];
+	        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit Pt Wages Master Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPTaxMaster', '#PTWagesMasterlist', 'PTWagesMasterlist', 'PTWagesMasterlist', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+				$.each(data[0], function (i, k) {
+				    $('#frmWages').trigger('reset');
+				    $('#WagesName').val(k.WagesName);
+				    $('#Percentage').val(k.Percentage);
+				    $('#WagesCeilingMin').val(k.CeilingMin);
+				    $('#WagesCeilingMax').val(k.CeilingMax);
+				});
+				$.each(data[1], function (i, k) {
+				    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+				});
+			});
+			event.preventDefault();
+		});
+
+	    $('#Edit-StatutoryEffectiveMonths').button().on("click", function (event) {
+	        var a = [], b;
+	        a = $('#StatutoryEffectiveMonthslist').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthslist', 0);
+	        b = a[0];
+
+	        $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "StatutoryEffectiveMonths")', '@Url.Action("Edit", "StatutoryEffectiveMonths")', b, '@Url.Action("EditSave", "StatutoryEffectiveMonths")', 'Edit StatutoryEffectiveMonths Details', '#frmStatutoryEffectiveMonths', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPTaxMaster', '#StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', 'StatutoryEffectiveMonthslist', 'N', '#Remove-Range-StatutoryEffectiveMonths', function (data) {
+	            $.each(data[0], function (i, k) {
+	                
+	                $('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 437, k.EffectiveMonth_Id);
+	                $('#Gender_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 129, k.Gender_Id);
+	                $('#dvGender').show();
+	            });
+	            $.each(data[1], function (i, k) {
+	                $('#StatutoryWageRangelist').P2BLookUpEncapsulate('#StatutoryWageRangelist', 'StatutoryWageRangelist', k.StatutoryEffectiveMonthsWagesRange_Id, k.StatutoryEffectiveMonthsWagesRange_Fulldetails, 'StatutoryWageRangelist', '#Remove-Range-StatutoryEffectiveMonths', 'A');
+	            });
+	            $('Gender_drop').show();
+	        });
+	        event.preventDefault();
+	    });
+
+		//$('<div></div>').P2BPartialCreateModalDialog();
+		@*$('#Create-EmpOff-PayProcessGroup').on("click", function (e) {
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payprocessgroup_partial", "Payprocessgroup")', 'Create Payprocess Group', 'open', '@Url.Action("Create", "Payprocessgroup")', '#frmPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 250, 355, '', '', '', '#frmPTaxMaster', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+
+				$('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', data[0], data[1], 'PayProcessGrouplist');
+			});
+			e.preventDefault();
+		});*@
+
+		$('#Delete').button().click(function (event) {
+			AssignData();
+			$('#frmPTaxMaster').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+		});
+
+		$('#Remove-StatutoryEffectiveMonths').button().on('click', function (event) {
+			//a = $('#StatutoryEffectiveMonthslist').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthslist', 0);
+			//b = a[0];
+			
+			var selectedRows = [];
+            selectedRows = $('#StatutoryEffectiveMonthslist').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StatutoryEffectiveMonthslist', $('#StatutoryEffectiveMonthslist').val(), 200, 200, '#frmPTaxMaster', '#StatutoryEffectiveMonthslist');
+			event.preventDefault();
+		});
+		$('#Remove-States').button().on('click', function (event) {
+			//a = $('#Stateslist').P2BGetTableDataonSelectedRow('#Stateslist', 0);
+			//b = a[0];
+			
+			var selectedRows = [];
+            selectedRows = $('#Stateslist').P2BGetTableDataonSelectedRow('#Stateslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Stateslist', $('#Stateslist').val(), 200, 200, '#frmPTaxMaster', '#Stateslist');
+			event.preventDefault();
+		});
+		$('#Remove-PTWagesMaster').button().on('click', function (event) {
+			//a = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+			//b = a[0];
+			
+            var selectedRows = [];
+            selectedRows = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PTWagesMasterlist', $('#PTWagesMasterlist').val(), 200, 200, '#frmPTaxMaster', '#PTWagesMasterlist');
+			event.preventDefault();
+		});
+		$('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+		$('.popup_radio_button').controlgroup();
+		$('#Autho').makeDisable('#Create,#Edit,#Delete');
+		$('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+	    $('#EffectiveDate').P2BDatePicker();
+
+	});
+</script>
+<html>
+<head>
+	<title></title>
+	<style>
+		.icon-row {
+			position: relative;
+			left: 120px;
+			top: -149px;
+		}
+
+		.row1 {
+			width: 459px;
+		}
+
+		.popup-content-textbox {
+			min-width: 122px;
+		}
+
+		.popup-content-label {
+			display: block;
+			margin: 1px;
+			float: left;
+			width: 157px;
+		}
+	</style>
+</head>
+<body>
+	<div class="Form_Bg">
+		<div class="Form_Input">
+			<div class="Button_Container">
+				<button class="button" id="Create">Create</button>
+				<button class="button" id="View">View</button>
+				<button class="button" id="Edit">Edit</button>
+				<button class="button" id="Delete">Delete</button>
+				<button class="button" id="Autho">Authorised</button>
+				<div id="Grid_Form">
+					<div>
+						<table id="JqGrid"></table>
+						<div id="pager2"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="dialog">
+		<div title="LookUp Data">
+			<div class="LookupDiv"></div>
+		</div>
+		<div id="PageNavPosition">
+
+		</div>
+	</div>
+	<div id="Create_Dialog">
+		@using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPTaxMaster", name = "frmPTaxMaster" }))
+		{
+			<input id="Autho_Action" type="hidden" name="Autho_Action" />
+			<input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+			<div class="row1  content_margine ">
+				@Html.LabelFor(m => m.EffectiveDate, "Effective Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(e => e.EffectiveDate, new { @class = "popup-content-textbox-short must", @readonly = true })
+			</div>
+			@*<div class="row1  content_margine ">
+				@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(e => e.EndDate, new { @class = "popup-content-textbox date must", @readonly = true })
+			</div>*@
+			<div class="row1  content_margine ">
+				@Html.LabelFor(m => m.States, "States :", new { @class = "popup-content-label must" })
+				<div class="popup-content-table">
+					<div id="PTWagesMasterlist_old"></div>
+					<table class="lookuptableselected" id="Stateslist">
+						<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+					</table>
+				</div>
+				<div class="icon-row">
+					<button data-p2btooltip="Select PTWagesMaster Details" class="popup-content-icon-lookup" id="Lookup-States"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Create PTWagesMaster Details" class="popup-content-icon-create" id="Create-States"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+					@*<button data-p2btooltip="Edit PTWagesMaster Details" style="left: 227px" class="popup-content-icon-edit" id="Edit-PTWagesMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+					<button data-p2btooltip="Remove PTWagesMaster Details" class="popup-content-icon-remove" id="Remove-States"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+				</div>
+			</div>
+			<div class="row1 content_margine">
+				@Html.LabelFor(m => m.Frequency, "Frequency", new { @class = "popup-content-label must" })
+                <select id="ProcessTypeList" name="ProcessTypeList" class="selectmenu must" style="width: 173px; left: 86px">
+                    <option value="0">-Select-</option>
+                </select>
+			</div>
+			<div class="row1 content_margine">
+				@Html.LabelFor(m => m.PTWagesMaster, "PT Wages Master:", new { @class = "popup-content-label must" })
+				<div class="popup-content-table">
+					<div id="PTWagesMasterlist_old"></div>
+					<table class="lookuptableselected" id="PTWagesMasterlist">
+						<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+					</table>
+				</div>
+				<div class="icon-row">
+					<button data-p2btooltip="Select PTWagesMaster Details" class="popup-content-icon-lookup" id="Lookup-PTWagesMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Create PTWagesMaster Details" class="popup-content-icon-create" id="Create-PTWagesMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Edit PTWagesMaster Details"  class="popup-content-icon-edit" id="Edit-PTWagesMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Remove PTWagesMaster Details" class="popup-content-icon-remove" id="Remove-PTWagesMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+				</div>
+			</div>
+			<div class="row1 content_margine">
+				@Html.LabelFor(m => m.PTStatutoryEffectiveMonths, "Statutory Effective Months:", new { @class = "popup-content-label must" })
+				<div class="popup-content-table">
+					<div id="StatutoryEffectiveMonthslist_old"></div>
+					<table class="lookuptableselected" id="StatutoryEffectiveMonthslist">
+						<tr><th>ID</th><th>LookUp Selected Description</th></tr>
+					</table>
+				</div>
+				<div class="icon-row">
+					<button data-p2btooltip="Select StatutoryEffectiveMonths Details" class="popup-content-icon-lookup" id="Lookup-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Create StatutoryEffectiveMonths Details" class="popup-content-icon-create" id="Create-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Edit StatutoryEffectiveMonths Details"  class="popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+					<button data-p2btooltip="Remove StatutoryEffectiveMonths Details" class="popup-content-icon-remove" id="Remove-StatutoryEffectiveMonths"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+				</div>
+			</div>
+
+
+		}
+	</div>
+</body>
+</html>

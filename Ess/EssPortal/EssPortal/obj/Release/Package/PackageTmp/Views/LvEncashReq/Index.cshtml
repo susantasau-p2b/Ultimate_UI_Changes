@@ -1,0 +1,189 @@
+﻿@{
+    Layout = null;
+}
+@model Leave.LvEncashReq
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            @*var dataemp = $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+
+
+
+            $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+            $('#Code').MaxLength(10);
+            //$('#Name').ForceOnlyAlphaNumeric();
+            $('#Name').MaxLength(50);
+
+            $('#dispcalender').attr('readonly', 'readonly');
+
+            //change
+            $('#FromPeriodenc').P2BDatePicker();
+           // $('#FromPeriodenc').attr('readonly', 'readonly');
+            //change
+
+            $('#ToPeriod').P2BDatePicker();
+           // $('#ToPeriod').attr('readonly', 'readonly');
+            $('#EncashDays').ForceOnlyNumeric().MaxLength(5);
+            $('#Narration').MaxLength(30);
+            $('button').button();
+           $('.drop').selectmenu().selectmenu("menuWidget");
+            $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+
+            $('#LeaveHead_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownLvHeadList", "LvEncashReq")', "", $('#Emp').val());
+
+            $('#LeaveHead_drop').SelectMenuOnChange("@Url.Action("PopulateDropDownLvReq", "LvEncashReq")", "#LvNewReqlist", $('#Emp').val(), "", function (data) {
+                debugger
+                //console.log("dasd");
+                $.get("@Url.Action("getCalendar", "LvEncashReq")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+                    $('#FromPeriodenc').val(data.Fromperiod);
+                    $('#ToPeriod').val(data.Toperiod);
+                });
+                $.get("@Url.Action("GetLeaveReq", "LvEncashReq")", { data: $('#LeaveHead_drop').val(), data2: $('#LeaveHead_drop').val() }, function (data) {
+                    //   alert('test');
+                    if (data.sucess == false)
+                    {
+                        $('#LVreq').hide();
+                    }
+                    else
+                    {
+                        $('#LVreq').show();
+                    }
+                });	 
+
+                $.getJSON("@Url.Action("GetLeaveBalance", "LvEncashReq")", { LvHeadId: $('#LeaveHead_drop').val(), EmpId: $('#Emp').val() }, function (data) {
+                    if (data != null) {
+
+                        if ($('div#lvdata')[0]) {
+                            $('div#lvdata').remove();
+                        }
+                        var a = "<div id='lvdata'>LvOpening :" + data.LvOpening + " LvDebit :" + data.LvOccurances + " LvClosing :" + data.LvClosing + "</div>";
+                        // var a = "<div id='lvdata'>LvOpening :" + data.LvClosing + " LvOccurances :" + data.LvOccurances + "</div>";
+                        $('#LeaveHead_drop').parent('div').append(a);
+                        $('#DebitDays').val('');
+                    }
+                    else {
+                        $('div#lvdata').remove();
+                    }
+                });
+            });
+            
+            $('.popup_radio_button').buttonset();
+            $('#LvNewReqlist').selectmenu().selectmenu("menuWidget");
+        });
+
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvEncashReq", name = "frmLvEncashReq" }))
+        {
+            <input type="text" id="Emp" name="employee-table" class="filter_structure_id" />
+            <div class="section2_Leave"> 
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old"></div>
+                    @Html.LabelFor(m => m.LvHead, "Leave Head:", new { @class = "popup-content-label must" })
+                    @*<select class="drop" name="LvHeadlist" id="LeaveHead_drop" style="width:200px"></select>*@
+                    <select id="LeaveHead_drop" name="LeaveHead_drop" class="drop" style="width:250px;">
+                        @*<option value="0">-Select-</option>*@
+                    </select>
+                </div>
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old"></div>
+                    <label>Leave Calendar :</label>
+                    <input type="text" readonly id="dispcalender" style="width:250px" />
+
+                </div>
+
+                <div class="row3 content_margine" id="LVreq">
+                    @Html.LabelFor(m => m.LvNewReq, "Leave Requsition:", new { @class = "popup-content-label must" })
+                    <select id="LvNewReqlist" name="LvNewReqlist" class="" style="width:161px;"><option></option></select>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.FromPeriod, "From Period:", new {  @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FromPeriod, new { @class = "popup-content-textbox must", @id = "FromPeriodenc" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ToPeriod, "To Period:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.EncashDays, "Encash Days:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EncashDays, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+        }
+    </div>
+</body>
+</html>

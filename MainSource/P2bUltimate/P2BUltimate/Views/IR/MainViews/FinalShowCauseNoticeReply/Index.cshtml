@@ -1,0 +1,239 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.FinalShowCauseNoticeReply
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'NoticeReplyRecdDate', 'ReplyDetails', 'IsReplyStudied', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'NoticeReplyRecdDate', 'ReplyDetails', 'IsReplyStudied', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Final Show Cause Notice Reply';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Lookup-ShowCauseNotice-FinalShowCauseNoticeReply').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "FinalShowCauseNoticeReply")', '', 'LookupDiv', 'ShowCauseNoticedoc Look Up Data', '#ShowCauseNoticeList', 'ShowCauseNoticeList', 4, 'ShowCauseNoticeList', '#frmFinalShowCauseNoticeReply', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Create').button().on("click", function () {
+            $('#frmFinalShowCauseNoticeReply').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Final Show Cause Notice Reply ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmFinalShowCauseNoticeReply', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+        });
+        $('#Delete').on('click', function () {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View FinalShowCauseNoticeReply', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id,  "view FinalShowCauseNoticeReply", '#frmFinalShowCauseNoticeReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmFinalShowCauseNoticeReply').trigger("reset");
+                    $('#ReplyDetails').val(k.ReplyDetails);
+                    if (k.NoticeReplyRecdDate != null)
+                        $('#NoticeReplyRecdDate').val(DateConvert(k.NoticeReplyRecdDate));
+                    else
+                        $('#NoticeReplyRecdDate').val();
+                    $('[name="IsReplyStudied"]').val([k.IsReplyStudied]).button().button("refresh");
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ShowCauseNoticeList').P2BLookUpEncapsulate('#ShowCauseNoticeList', 'ShowCauseNoticeList', k.Showcausenotice_Id, k.Sshowcausenoticefulldetails, 'ShowCauseNoticeList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit FinalShowCauseNoticeReply", '#frmFinalShowCauseNoticeReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmFinalShowCauseNoticeReply').trigger("reset");
+                    $('#ReplyDetails').val(k.ReplyDetails);
+                    if (k.NoticeReplyRecdDate != null)
+                        $('#NoticeReplyRecdDate').val(DateConvert(k.NoticeReplyRecdDate));
+                    else
+                        $('#NoticeReplyRecdDate').val();
+                    $('[name="IsReplyStudied"]').val([k.IsReplyStudied]).button().button("refresh");
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ShowCauseNoticeList').P2BLookUpEncapsulate('#ShowCauseNoticeList', 'ShowCauseNoticeList', k.Showcausenotice_Id, k.Sshowcausenoticefulldetails, 'ShowCauseNoticeList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+
+        $('#Remove-ShowCauseNotice-FinalShowCauseNoticeReply').button().on('click', function (event) {
+
+            //a = $('#ShowCauseNoticeList').P2BGetTableDataonSelectedRow('#ShowCauseNoticeList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ShowCauseNoticeList').P2BGetTableDataonSelectedRow('#ShowCauseNoticeList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ShowCauseNoticeList', $('#ShowCauseNoticeList').val(), 200, 200, '#frmFinalShowCauseNoticeReply', '#ShowCauseNoticeList');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ShowCauseNotice-FinalShowCauseNoticeReply').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#ShowCauseNoticeList').P2BLookUpEncapsulate('#ShowCauseNoticeList', 'ShowCauseNoticeList', data.Id, data.Val, 'ShowCauseNoticeList', '', 'A');
+                },
+            });
+            event.preventDefault();
+
+        });
+        $('#NoticeReplyRecdDate').P2BDatePicker();
+        //$('.popup-radio-button ').controlgroup();
+    });
+        </script>
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>Index</title>
+</head>
+<body>
+    <div class="form-bg">
+        <div class="form-input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmFinalShowCauseNoticeReply", name = "frmFinalShowCauseNoticeReply" }))
+        {
+             <div class="row3 content_margine">
+        @Html.LabelFor(m => m.NoticeReplyRecdDate, "Notice Reply Recd Date:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.NoticeReplyRecdDate, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+        @Html.LabelFor(m => m.ReplyDetails, "Reply Details:", new { @class = "popup-content-label must" })
+        @Html.TextAreaFor(m => m.ReplyDetails, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsReplyStudied, "Is Reply Studied :", new { @class = "popup-content-label must" })
+                 <div class="popup-radio-button radio-button-div1">
+                     <span class="popup-rdaio-button radio-button-div1">
+                         <input type="radio" id="radio1" name="IsReplyStudied" value="true" /><label for="radio1">YES</label>
+                         <input type="radio" id="radio2" name="IsReplyStudied" value="false" /><label for="radio2">NO</label>
+                     </span>
+                 </div>
+                 </div>
+             <div class=" row3 content_margine">
+                             @Html.LabelFor(m => m.ShowCauseNotice, "Supporting Documents :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ShowCauseNoticeList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding ShowCauseNotice" class=" popup-content-icon-lookup" id="Lookup-ShowCauseNotice-FinalShowCauseNoticeReply"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ShowCauseNotice " class=" popup-content-icon-create" id="Create-ShowCauseNotice-FinalShowCauseNoticeReply"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                             @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete ShowCauseNotice" class=" popup-content-icon-remove" id="Remove-ShowCauseNotice-FinalShowCauseNoticeReply"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+        }
+        </div>
+</body>
+</html>

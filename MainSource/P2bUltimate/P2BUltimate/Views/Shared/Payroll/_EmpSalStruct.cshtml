@@ -1,0 +1,167 @@
+﻿@{
+    Layout = null;
+}
+
+@model Payroll.EmpSalStruct
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+</style>
+
+
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+
+        @*<div class="emplist_row">
+                <label for="payscaleagreement_drop" class="emplist_label">PayScale Agreement :</label>
+                <input type="text" style="display:none" id="payscaleagreement_id" name="payscaleagreement_id" />
+                <input type="text" id="payscaleagreement" name="payscaleagreement" />
+
+            </div>*@
+        @*<div class="emplist_row">
+            @*<label class="emplist_label">Effective Date :</label><input type="text" name="Effective_Date" id="select_date" />*@
+        @*<button id="Update_Struct">Update Structure</button>
+            </div>*@
+        <div>
+            <table id="inline_JqGridemp"></table>
+            <div id="inline_JqGridemp_pager"></div>
+        </div>
+        <div>
+            <button type="button" id="Btn_Sal">Submit</button>
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var Emp_info_id = localStorage.getItem('Emp_info_id');
+        var PayMonth_id = localStorage.getItem('PayMonth_id');
+        var FrmDate_id = localStorage.getItem('FrmDate_id');
+        var ToDate_id = localStorage.getItem('ToDate_id');
+        var Main_id = localStorage.getItem('Main_id');
+
+        //  var alldata = localStorage.getItem('MyTable_selected');
+
+        // var jsonj = JSON.parse(alldata);
+        // console.log(jsonj);
+
+        //var Main_id = jsonj.Id;
+        //var Emp_info_id = jsonj.Code;
+        //var PayMonth_id = jsonj.PayMonth_id;
+        //var FrmDate_id = jsonj.FromDate;
+        //var ToDate_id = jsonj.ToDate;
+
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['SalaryHead', 'Amount', 'Frequency', 'Type', 'SalHeadOperationType', 'Editable', 'SalaryHeadId', 'Id'];
+        inline_ColNames = ['SalaryHead', 'Amount', 'Frequency', 'Type', 'SalHeadOperationType', 'Editable', 'SalaryHeadId', 'Id'];
+        inline_SortName = 'Id';
+        inline_Caption = 'List';
+        inline_url = "@Url.Action("P2BInlineGrid")";
+        inline_width = 1100;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+        $('#select_date').P2BDatePicker();
+
+        $('#inline_JqGridemp').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: "@Url.Action("P2BInlineGridManunal")",
+            tablename: '#inline_JqGridemp',
+            eddelurl: '@Url.Action("edit")',
+            forwarddata: Emp_info_id,
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            LocalStorageId: "EditClickSalAttendance",
+            EditableCol: ["Amount"],
+        });
+
+        $('#inline_JqGridemp').setGridParam({ url: "@Url.Action("P2BInlineGridManunal")", postData: { id: "", filter: Emp_info_id }, page: 1 }).trigger("reloadGrid");
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#Btn_Sal').on('click', function () {
+
+            var a = $('#inline_JqGridemp').InlineGridEdittedData.GetData();
+            if (a == null) {
+                alert("Kindly update at least 1 record");
+            } else {
+                var b = JSON.stringify(a);
+                console.log(b);
+                $.ajax({
+                    method: "post",
+                    url: "@Url.Action("EditSave1", "EmpSalStruct")",
+                    datatype: "Json",
+                    data: { data: b, MainId: Main_id, Empid: Emp_info_id, Paymonth: PayMonth_id, FromDt: FrmDate_id, ToDt: ToDate_id },
+                    beforeSend: function () {
+                        ajaxloaderv2('body');
+                    },
+                    success: function (data) {
+
+                        console.log(data);
+                        console.log(data.sucess);
+                        if (data.sucess==true) {
+                            alert(data.responseText);
+                            location.reload(true);
+                        } else {
+
+                            alert(data.responseText);
+                            location.reload(true);
+                        }
+                    },
+                    complete: function () {
+                        $('.ajax_loder').remove();
+                    }
+                });
+            }
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#payscaleagreement_dropview').P2BSelectMenuAppend('@Url.Action("Polulate_payscale_agreement", "EmpSalStruct")', "", ""); // To bind dropdown on page load
+    });
+
+
+</script>

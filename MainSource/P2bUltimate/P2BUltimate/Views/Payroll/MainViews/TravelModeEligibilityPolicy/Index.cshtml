@@ -1,0 +1,215 @@
+﻿@{
+    ViewBag.Title = "TravelMode Eligibility Policy";
+}
+@model Payroll.TravelModeEligibilityPolicy
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        // $("#PayMonth").val($.datepicker.formatDate("mm/yy", new Date()));
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['TA_TM_Elligibilty_Code', 'Classoftravel', 'TravelMode', 'Id'];
+        ColNames = ['TA_TM_Elligibilty_Code', 'Classoftravel', 'TravelMode', 'Id'];
+        SortName = 'Id';
+        Caption = 'TravelMode Eligibility Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        @*$('#travelmodelist').on('selectmenuchange', function () {
+            $('#classoftravellist').P2BSelectMenuAppend('@Url.Action("ClassOffTravelList", "TravelModeEligibilityPolicy")', $(this).val(), "", "0");
+        });*@
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmtravelmodeeligibility').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create TravelMode Eligibility Policy', 'open', '@Url.Action("Create")', '#frmtravelmodeeligibility', 'Message :', 'Request Falied :', '#JqGrid', 271, 400, '', '', function (data) { });
+            $('#travelmodelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3001, "");
+            $('#classoftravellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3002,""); // Dropdown bind
+            // $('[name="Default"]').button().button("refresh");
+            event.preventDefault();
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit TravelMode Eligibility Policy Data", '#frmtravelmodeeligibility', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 271, 400, '#AddressList,#ContactDetailsList', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('#TA_TM_Elligibilty_Code').val(k.Name);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                    $('#classoftravellist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 3002, k.ClassofTravel); // Dropdown bind
+                    $('#travelmodelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 3001, k.travelmode); // Dropdown bind
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'N');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View TravelMode Eligibility Policy Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 271, 400, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Code').val(k.Code);
+                    $('#Name').val(k.Name);
+                    $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 402, k.BusinessType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', 'view', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', 'view', 'N');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        // $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#PayProcessGroupList').selectmenu().selectmenu("menuWidget");
+        // $('#AmountList').selectmenu().selectmenu("menuWidget");
+        $('#ProcTypeList').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-labelT {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 120px;
+        }
+
+        .row3 {
+            width: 627px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .date-picker {
+            z-index: 999;
+        }
+
+
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" data-typeofbtn="process" id="View">View</button>
+                <button class="button" data-typeofbtn="release" id="Edit">Edit</button>
+                <button class="button" data-typeofbtn="delete" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmtravelmodeeligibility", name = "frmtravelmodeeligibility" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TA_TM_Elligibilty_Code, "TA_TM_Elligibilty_Code :", new { @class = "popup-content-labelT must" })
+                @Html.TextBoxFor(m => m.TA_TM_Elligibilty_Code, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.TravelMode, "TravelMode:", new { @class = "popup-content-labelT must" })
+                <select class="drop" style="width:140px;" name="travelmodelist" id="travelmodelist"><option></option></select>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.ClassOfTravel, "ClassOfTravel:", new { @class = "popup-content-labelT must" })
+                <select class="drop" style="width:140px;" name="classoftravellist" id="classoftravellist"><option></option></select>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>

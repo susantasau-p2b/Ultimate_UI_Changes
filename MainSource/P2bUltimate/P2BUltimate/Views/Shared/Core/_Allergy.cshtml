@@ -1,0 +1,145 @@
+﻿@{
+    Layout = null;
+}
+@model P2b.Global.Allergy
+
+
+
+
+<style>
+
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+</style>
+
+<html>
+<body>
+
+
+    <div class="dialog1">
+        <div title="LookUp Data">
+            <div class="lookupdiv1"></div>
+        </div>
+        <div id="pageNavPosition1">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Allergy">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAllergy" }))
+        {
+            @*<div class="all_row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "all_popup-content-label" })@Html.TextBoxFor(m => m.Name, new { @class = "all_popup-content-textbox", @maxlength = "50" })</div>*@
+             <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Details, "Details :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Details, new { @class = "popup-content-textbox must" })</div>
+         
+
+               <div class="row3 content_margine">
+                <div id="ContactDetailsList_Old"></div>@Html.LabelFor(m => m.AllergyMedicine, "Medicine :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="Medicinelist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Medicine Details" class="popup-content-icon-lookup" id="Lookup-Medicine-Allergy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Crate Medicine Details" class="popup-content-icon-create" id="Create-Medicine-Allergy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Medicine Details" class="popup-content-icon-edit" id="Edit-Medicine-Allergy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Medicine Details" class="popup-content-icon-remove" id="Remove-Medicine-Allergy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Lookup-Medicine-Allergy').button().on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
+            $('.dialog1').P2BLookUpModal('@Url.Action("GetMedicineDetails", "Allergy")', '', 'lookupdiv1', 'Look Medicine Details', '#Medicinelist', 'Medicinelist', 5, 'Medicinelist', '#frmAllergy', 'A', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', 'Lookup_table', 'pageNavPosition1');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Medicine-Allergy').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "Medicine")', 'Create Medicine Details', 'open', '@Url.Action("Create", "Medicine")', '#frmMedicine', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmAllergy', '', function (data) {
+
+                $('#Medicinelist').P2BLookUpEncapsulate('#Medicinelist', 'Medicinelist', data[0], data[1], 'Medicinelist', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-Medicine-Allergy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Medicinelist').P2BGetTableDataonSelectedRow('#Medicinelist', 0);
+            b = a[0];
+
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "Allergy")', '@Url.Action("Edit", "Medicine")', b, '@Url.Action("EditSave", "Medicine")', 'Edit Medicine', '#frmMedicine', b, 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '#frmAllergy','#Medicinelist', 'Medicinelist', 'Medicinelist','A', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy',  function (data) {
+
+                    $.each(data[0], function (i, k) {
+                        $('#frmMedicine').trigger('reset');
+                     //   $('#Name').val(k.Name);
+                        $('#MedicalName').val(k.MedicalName);
+                        $('#MedPower').val(k.MedPower);
+                        $('#Manufacturer').val(k.Manufacturer);
+                    });
+
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Remove-Medicine-Allergy').button().on('click', function (event) {
+           // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#Medicinelist').P2BGetTableDataonSelectedRow('#Medicinelist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Medicinelist').P2BGetTableDataonSelectedRow('#Medicinelist', 0);
+         /*   console.log(b);*/
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "Medicine")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#Medicinelist').val(), 200, 200, '#frmAllergy', '#Medicinelist');
+            event.preventDefault();
+        });
+
+
+
+        $(document).ready(function () {
+            $('#Name').ForceOnlyAlphaNumeric();
+            $('#Name').MaxLength(50);
+            $('#Details').ForceOnlyAlphaNumeric();
+            $('#Details').MaxLength(50);
+
+        });
+
+
+        $('.drop').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+    });
+</script>

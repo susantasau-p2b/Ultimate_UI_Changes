@@ -1,0 +1,338 @@
+﻿@{
+    ViewBag.Title = "HRAExemptionMaster";
+}
+
+@model Payroll.HRAExemptionMaster
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@*<link href="~/Content/insurance/insurance.css" rel="stylesheet" />*@
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+@*<link rel="stylesheet" type="text/css" href="~/Content/mb-ui.css" />*@
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 63px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 105px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+
+
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#ComCode').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        //$('#Code').MaxLength(10);
+        $('#Name').MaxLength(50);
+    });
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Formula_Grid", "HRAExemptionMaster")",
+            editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+        htmurl: "@Url.Action("partial", "SalHeadFormula")",
+        submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",
+            columnname: ["CityTypePercentage", "RentPercentage", "Id"],
+            childheader: ["CityName", "CityType", "Id"],
+        childurl: "@Url.Action("Get_CityDetails", "HRAExemptionMaster")",
+            tableheader: "HRAExemption Master",
+            childurlColumnNo: "3"
+    });
+        $('#Ctypeper').val(0).ForceAmount().MaxLength(20);
+        $('#RentPer').val(0).ForceAmount().MaxLength(20);
+    $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+        // console.log($(init).parents('tr:eq(0)'));
+        var parent_element = $(init).parents('td:last').parent().prev();
+        //var element = $(init).parents('tr:eq(0)');
+        console.log(id);
+        console.log(htmurl);
+        console.log(parent_element);
+        //   console.log(element);
+        var dt = $('#MyTable').DataTable();
+        var htmlcomponant = {
+            init: init,
+            Id: id,
+            idx: parentid,
+            htmurl: htmurl,
+            editurl: editurl,
+            submiturl: submiturl,
+        };
+        //if ($(init).hasClass('ui-icon-newwin')) {
+        //    $('<div></div>').PartialCreateDialog({
+        //        height: 'auto',
+        //        width: 'auto',
+        //        form: "#frm-YearlyPaymentT-partial",
+        //        htmlurl: htmurl,
+        //        state: "open",
+        //        mode: "View",
+        //        editurl: editurl,
+        //        submiturl: submiturl,
+        //        editdata: id,
+        //        forwarddata: id,
+        //        returndatafunction: function (data) {
+        //            $.each(data.data, function (i, k) {
+        //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+        //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+        //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+        //                $('#yearlypayment-Narration').val(k.NarrationP);
+        //            });
+        //        }
+        //    });
+        //}
+        //else if ($(init).hasClass('ui-icon-pencil')) {
+        //    $('<div></div>').PartialCreateDialog({
+        //        height: 'auto',
+        //        width: 'auto',
+        //        form: "#frm-YearlyPaymentT-partial",
+        //        htmlurl: htmurl,
+        //        state: "open",
+        //        mode: "Edit",
+        //        editurl: editurl,
+        //        submiturl: submiturl,
+        //        editdata: id,
+        //        forwarddata: id,
+        //        returndatafunction: function (data) {
+        //            $.each(data.data, function (i, k) {
+        //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+        //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+        //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+        //                $('#yearlypayment-Narration').val(k.NarrationP);
+        //            });
+        //        },
+        //        submitfun: function (data) {
+        //            var row = dt.row(parent_element);
+        //            if (row.child.isShown()) {
+        //                parent_element.removeClass('details');
+        //                row.child.hide();
+        //            }
+        //        }
+        //    });
+        //}
+        @*else if ($(init).hasClass('ui-icon-trash')) {
+            console.log(id);
+            $('<div></div>').PartialCreateDialog({
+                state: "open",
+                mode: "Delete",
+                submiturl: "@Url.Action("GridDelete")",
+                forwardata: id,
+            submitfun: function (data) {
+                var row = dt.row(parent_element);
+                if (row.child.isShown()) {
+                    parent_element.removeClass('details');
+                    row.child.hide();
+                }
+            }
+        });
+    }*@
+    };
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmHraexemptionmaster').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create HRAExemptionMaster', 'open', '@Url.Action("Create")', '#frmHraexemptionmaster', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) { }, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+        $('#Lookup-City').on('click', function (event) {
+            //$.fn.P2BLookUpModal = function (lookupurl, lookupdata, LookupDiv, lookuptitle, tablename, nameoftable, dataontable, nameofthelist, classoridoftheonwhichpopupderived, multipleallowedornot, nameidclassofbuttontodisable, setnameofthelookupbyppage, pagename) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCity", "HRAExemptionMaster")', '', 'LookupDiv', 'Look Up Data', '#CityDetails', 'CityDetails', 5, 'CityDetails', '#frmHraexemptionmaster', 'A', '#Edit-Address-Insurance,#Remove-Address-Insurance', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-Insurance').on("click", function () {
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Insurance_Partial", "Insurance")', 'Create Insurance Products', 'open', '@Url.Action("CreateSave", "InsuranceProduct")', '#frmHraexemptionmasterProductus', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmHraexemptionmaster', '', function (data) {
+                $('#CityDetails').P2BLookUpEncapsulate('#CityDetails', 'CityDetails', data[0], data[1], 'CityDetails', '', 'A');
+            });
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+           // AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit HRAExemptionMaster Data", '#frmHraexemptionmaster', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#CityDetails', '', function (data) {
+                ////debugger;
+                $.each(data[0], function (i, k) {
+                    console.log(k.CompCode);
+                    $('#Ctypeper').val(k.CityTypeper);
+                    $('#RentPer').val(k.rentper);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#CityDetails').P2BLookUpEncapsulate('#CityDetails', 'CityDetails', k.Cityid, k.CityFulldetails, 'CityDetails', '#Remove-Insurance', 'A');
+                });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            }, { datatablename: "#MyTable" });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            //AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View HRAExemptionMaster Data', '#CityDetails,#ContactDetailsList', '#Lookup-Address-Insurance,#Create-Address-Insurance,#Edit-Address-Insurance,#Remove-Address-Insurance,#Lookup-ContactDetails-Insurance,#Create-ContactDetails-Insurance,#Edit-ContactDetails-Insurance,#Remove-ContactDetails-Insurance', 500, 620, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Ctypeper').val(k.CityTypeper);
+                    $('#RentPer').val(k.rentper);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#CityDetails').P2BLookUpEncapsulate('#CityDetails', 'CityDetails', k.Cityid, k.CityFulldetails, 'CityDetails', 'view', 'A');
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#CityDetails_old').oldLookupVal(data[2].Insurance_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Remove-Insurance').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#CityDetails').P2BGetTableDataonSelectedRow('#CityDetails', 0);
+            //b = a[0];
+            var selectedRows = [];  
+            selectedRows = $('#CityDetails').P2BGetTableDataonSelectedRow('#CityDetails', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CityDetails', $('#CityDetails').val(), 200, 200, '#frmHraexemptionmaster', '#CityDetails', '#Remove-Insurance');
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#ItCategoryList').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <div id="Container" class="container">
+                        <div id="Demo">
+                            <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>DD</th>
+                                        <th>CityTypePercentage</th>
+                                        <th>RentPercentage</th>
+                                        <th>ID</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+
+<div id="Create_Dialog">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmHraexemptionmaster" }))
+    {
+
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.City, "CityName:", new { @class = "popup-content-label" }) <div class="popup-content-table">
+                <table class="lookuptableselected" id="CityDetails">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select City" class="popup-content-icon-lookup" id="Lookup-City"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*  <button data-p2btooltip="Create CityDetails" class="popup-content-icon-create" id="Create-Insurance"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-Insurance"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove CityDetails" class="popup-content-icon-remove" id="Remove-Insurance"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.Ctypeper, "CityTypePer :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Ctypeper, new { @class = "popup-content-textbox must" })
+        </div>
+
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.RentPer, "Rent Per :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.RentPer, new { @class = "popup-content-textbox must" })
+        </div>
+    }
+</div>

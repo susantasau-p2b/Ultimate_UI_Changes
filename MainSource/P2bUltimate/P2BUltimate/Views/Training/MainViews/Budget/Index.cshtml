@@ -1,0 +1,763 @@
+﻿@{
+    ViewBag.Title = "Budget Allocation";
+}
+@model Training.Budget
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    #Lookup_FinancialYear_Calendar {
+        left: 290px;
+        top: 20px;
+    }
+
+    Lookup_FinancialYear_Calendar1 {
+        left: 280px;
+        top: 20px;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .popup-content-icon-lookup {
+        height: 20px;
+        left: 400px;
+        margin: auto;
+        position: absolute;
+        width: 20px;
+    }
+
+
+    .namepush {
+        margin-right: 2px;
+    }
+
+    .radiopush {
+        margin-right: 94px;
+    }
+
+    .lblwidth {
+        width: 100px;
+    }
+
+    .Clblwidth {
+        width: 97px;
+    }
+
+    .radiowidth {
+        width: 94px;
+    }
+
+    .Cnamepush {
+        margin-right: 127px;
+    }
+
+    #LvHeadOprationTypelist {
+        width: 158px;
+        margin-left: -37px;
+    }
+
+    #Create-load {
+        left: 185px;
+        top: -23px;
+    }
+
+    #Create-load1 {
+        left: 185px;
+        top: -23px;
+    }
+</style>
+
+<script>
+    var firstClick = true;
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+
+        var urlnew = "";
+        var a = "CATEGORY";
+        /////disable button
+
+        $('#filterdivhide').fadeOut();
+        $('#BudgetCredithide').fadeOut();
+        $('#Create-load').fadeOut();
+        $('#Create-load1').fadeOut();
+
+
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        var btndisablenames = "#Edit-empdetails,#Remove-empdetails";
+        ColModel = ['Category', 'SubCategory', 'ProgramList', 'BudgetAmt', 'PaybleDays', 'LWPDays', 'PayProcessGroup_Id', 'Id'];
+        ColNames = [ 'Category', 'SubCategory', 'ProgramList', 'BudgetAmt', 'PaybleDays', 'LWPDays', 'PayProcessGroup_Id','Id'];
+        url = '@Url.Action("P2BInlineGrid")';
+
+
+
+        $('#formfilter').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+        });
+
+
+
+        inline_ColModel = ['Category', 'ProgramList', 'Location', 'Job', 'BudgetAmt', 'Editable', 'Id' ];
+        inline_ColNames = [ 'Category', 'ProgramList', 'Location', 'Job', 'BudgetAmt', 'Editable', 'Id'];
+        inline_SortName = 'Id';
+        inline_Caption = 'Training Budget Allocation';
+        inline_url = '@Url.Action("P2BInlineGrid")';
+        inline_width = 1200;
+        inline_height = 150;
+        $('#JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#JqGrid',
+            eddelurl: '',
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            EditableCol: ["BudgetAmt"],
+            LocalStorageId: "EditClickSalAttendanceT",
+            onEditClick: true,
+        });
+        $("#JqGrid").jqGrid('hideCol', "PayProcessGroup_Id").trigger('reloadGrid');
+
+
+
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Financial_id').val() });
+        });
+
+        $('#txtPayMonth').MonthYearPicker();
+        $('#Create_PayableDays').val(0).ForceAmount().MaxLength(8);
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+
+
+        //   $("#JqGrid").jqGrid('hideCol', "Editable").trigger('reloadGrid');
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $.get("@Url.Action("GetPayprocessgroup")", { data: dt.PayProcessGroup_Id }, function (data) {
+                $('#payprocessgroup_id').val(data.Id);
+                $('#payprocessgroup').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            $('#PayMonth').val(dt.PayMonth);
+            $('#Edit_PaybleDays').val(dt.PaybleDays);
+            $('#LWPDays').val(dt.LWPDays);
+        };
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#Create').button().on("click", function (event) {
+            if (!$("#Financial_id").val()) {
+
+                alert("Please Select Training Year.")
+                return false;
+            }
+
+            $('#frmEmpList').trigger('reset');
+
+            var Id = "";
+            $.ajax({
+                method: "POST",
+                url: "@Url.Action("getParameter")",
+                data: { forwardata: Id },
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                   
+                   
+                    if (data == "IsCategory") {
+                        $('#IsAdvFilterAppl').hide();
+                        $('#IsProgramAppl').hide();
+                        $('#IsCategoryAppl').show();
+                    }
+                    else if (data == "IsProgram") {
+                        $('#IsAdvFilterAppl').hide();
+                        $('#IsCategoryAppl').hide();
+                        $('#IsProgramAppl').show();
+                    }
+                    else {
+                        $('#IsCategoryAppl').hide();
+                        $('#IsProgramAppl').hide();
+                        $('#IsAdvFilterAppl').show();
+                    }
+                },
+                error: function (data) {
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                }, complete: function (data) {
+                    $('.ajax_loder').remove();
+                }
+
+            });
+
+
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create Budget entry ",
+                submiturl: "@Url.Action("create")?TrainingYear=" + $('#Financial_id').val(),
+                form: "#frmEmpList",
+                height: 475,
+                width: 850,
+                state: "open",
+                gridname: "#JqGridNew11",
+                gridreloadname: "#JqGrid",
+                returnToGrid: "#JqGrid",
+                title: "Budget Allocation ",
+                //gridfunction: "GetGridSelctedvalue",
+            });
+
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#edit_model_dialog').P2BGridDialog();
+        $.LocalStorageHelper("EditClickSalAttendanceT", false);
+        $('#cancle,#Save').hide();
+        $('#Edit').makeDisable1('#Load,#Create,#Delete');
+        //  $.LocalStorageHelper("EditClickSalAttendance", "0");
+        $('#Edit').on('click', function (e) {
+            $("#PayMonthEdit").val($('#txtPayMonth').val());
+            var aa = $('#JqGrid').jqGrid('getGridParam', 'selrow');
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            if (aa != null) {
+                $('#Edit').ProcessConfirmation1({
+                    confirmurl: "@Url.Action("ChkProcess")",
+                    month: "#txtPayMonth",
+                    EmpCode: dt.Id,
+                    msg: "Are you sure, you want to edit??",
+                    status: function (data) {
+                        if (data == true) {
+
+                            if (aa != null) {
+                                $('#Load,#Create,#Delete,#Edit').button("disable").css("background-color", "rgba(241, 241, 241, 0.66)");
+                                $('#cancle,#Save').fadeIn();
+                                $.LocalStorageHelper("EditClickSalAttendanceT", true);
+                            }
+                            //else {
+                            //    alert('Please Select Row..!');
+                            //}
+                            $('#PayMonth').val($('#txtPayMonth').val());
+                        }
+                        else {
+                            $('#cancle,#Save').fadeOut();
+                            $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                        }
+                    }
+                });
+            }
+            else {
+                $('#cancle,#Save').fadeOut();
+                $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                // alert('Please Select Row..!');
+            }
+        });
+        $(document).on('click', '#Save', function (e) {
+            var a = $('#JqGrid').InlineGridEdittedData.GetData();
+            if (a != null) {
+                var b = JSON.stringify(a);
+                $.post({
+                    url: '@Url.Action("EditSave", "Budget")',
+                    data: { PayMonth: $("#PayMonthEdit").val(), forwarddata: b },
+                    success: function (data) {
+                        if (data != null) {
+                            alert(data[2]);
+                            $('#JqGrid').InlineGridEdittedData.Empty();
+                            $('#JqGrid').trigger('reloadGrid');
+                            $.LocalStorageHelper("EditClickSalAttendanceT", false);
+                        }
+                    }
+                });
+            } else {
+                $('#JqGrid').trigger('reloadGrid');
+                $.LocalStorageHelper("EditClickSalAttendanceT", false);
+            }
+            //$(this).text("Edit");
+            $('#cancle,#Save').fadeOut();
+            $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+        });
+
+
+
+        //$('#cancle').hide();
+        $('#cancle').on('click', function (e) {
+            location.reload();
+        });
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#list-employee').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#View').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit attendance entry ",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+
+            var month = dt.getMonth() + 1;
+
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+
+        }
+
+
+        var monthyear1 = $('#Create_Paymonth').MonthYearPicker();
+        $("#Create_Paymonth").on("change", function () {
+            var monthyear = $("#Create_Paymonth").val();
+            $.ajax(
+                {
+                    type: "Post",
+                    data: { 'monthyear': monthyear },
+
+                    url: "@Url.Action("getdays", "SalAttendanceT")",
+                    success: function (data) {
+
+                        $("#Create_PayableDays").val(data)
+                    }
+                });
+        });
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth1",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "Budget")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "txtPayMonth1",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#Lookup_FinancialYear_Calendar1').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#dispcalender",
+                appendToId: "#dispcalender_id ",
+                lookupurl: "@Url.Action("GetCalendarDetails", "Budget")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#Lookup_FinancialYear').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "Budget")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmeditinlinegrid', 'N', '#remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-load').on('click', function (e) {
+            $('#emplist_rowhide').fadeIn();
+            if (!firstClick) {
+                $("#JqGridNew11").jqGrid('setGridParam', {
+                    url: "@Url.Action("LoadCategory", "Budget")",
+                    datatype: "json"
+                }).trigger("reloadGrid");
+            }
+
+            firstClick = false;
+
+            var inline_ColNames1 = [];
+            var inline_ColModel1 = [];
+            var inline_SortName1, inline_Caption1, inline_url1, inline_width1, inline_height1;
+            inline_ColModel1 = ['Category', 'BudgetAmt', 'Editable', 'Id'];
+            inline_ColNames1 = [ 'Category', 'BudgetAmt', 'Editable', 'Id'];
+            inline_SortName1 = 'Id';
+            inline_Caption1 = 'Categorywise Budget Allocation';
+            inline_url1 = 0;
+            inline_width1 = 800;
+            inline_height1 = 200;
+            $('#JqGridNew11').InlineEditGrid({
+                ColNames: inline_ColNames1,
+                ColModel: inline_ColModel1,
+                SortName: inline_SortName1,
+                Caption: inline_Caption,
+                url: "@Url.Action("LoadCategory", "Budget")",
+                tablename: '#JqGridNew11',
+                eddelurl: '',
+                width: inline_width1,
+                height: inline_height1,
+                CheckCol: "Editable",
+                EditableCol: ["BudgetAmt"],
+                LocalStorageId: "EditClickSalAttendanceT",
+                onEditClick: true,
+            });
+            $("#JqGridNew11").jqGrid('hideCol', "PayProcessGroup_Id").trigger('reloadGrid');
+            $.LocalStorageHelper("EditClickSalAttendanceT", true);
+
+
+
+            e.preventDefault();
+
+        });
+
+        $('#Create-load1').on('click', function (e) {
+            $('#emplist_rowhide1').fadeIn();
+            if (!firstClick) {
+                $("#JqGridNew12").jqGrid('setGridParam', {
+                    url: "@Url.Action("LoadProgramList", "Budget")",
+                    datatype: "json"
+                }).trigger("reloadGrid");
+            }
+
+            firstClick = false;
+
+
+            var inline_ColNames1 = [];
+            var inline_ColModel1 = [];
+            var inline_SortName1, inline_Caption1, inline_url1, inline_width1, inline_height1;
+            inline_ColModel1 = ['ProgramList', 'BudgetAmt', 'Editable', 'Id' ];
+            inline_ColNames1 = [ 'ProgramList', 'BudgetAmt', 'Editable', 'Id'];
+            inline_SortName1 = 'Id';
+            inline_Caption1 = 'Programwise Budget Allocation';
+            inline_url1 = 0;
+            inline_width1 = 800;
+            inline_height1 = 200;
+            $('#JqGridNew12').InlineEditGrid({
+                ColNames: inline_ColNames1,
+                ColModel: inline_ColModel1,
+                SortName: inline_SortName1,
+                Caption: inline_Caption,
+                url: "@Url.Action("LoadProgramList", "Budget")",
+                tablename: '#JqGridNew12', eddelurl: '',
+                width: inline_width1,
+                height: inline_height1,
+                CheckCol: "Editable",
+                EditableCol: ["BudgetAmt"],
+                LocalStorageId: "EditClickSalAttendanceT",
+                onEditClick: true,
+            });
+            $("#JqGridNew12").jqGrid('hideCol', "PayProcessGroup_Id").trigger('reloadGrid');
+            $.LocalStorageHelper("EditClickSalAttendanceT", true);
+            e.preventDefault();
+
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                GeoUrl: "Transcation/Get_Geoid_Single",
+                FunUrl: "Transcation/Get_Funid_Single",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        alert(data.FunStruct);
+                        $('#fun_id').val(data.FunStruct);
+
+                    }
+                },
+                renderat: "#FormFilter",
+            });
+        });
+
+
+        $('input[name="IsAdvFilterAppl"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#filterdivhide').fadeOut();
+                $('#BudgetCredithide').fadeOut();
+                $('#IsCategoryAppl').fadeIn();
+                $('#IsProgramAppl').fadeIn();
+            }
+            else {
+                $('#filterdivhide').fadeIn();
+                $('#BudgetCredithide').fadeIn();
+                $('#IsCategoryAppl').fadeOut();
+                $('#IsProgramAppl').fadeOut();
+            }
+        });
+
+        $('input[name="IsCategory"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#Create-load').fadeOut();
+                $('#emplist_rowhide').fadeOut();
+                $('#IsAdvFilterAppl').fadeIn();
+                $('#IsProgramAppl').fadeIn();
+            }
+            else {
+                $('#Create-load').fadeIn();
+                $('#IsAdvFilterAppl').fadeOut();
+                $('#IsProgramAppl').fadeOut();
+
+            }
+        });
+
+        $('input[name="IsProgram"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#Create-load1').fadeOut();
+                $('#emplist_rowhide1').fadeOut();
+                $('#IsAdvFilterAppl').fadeIn();
+                $('#IsCategoryAppl').fadeIn();
+
+            }
+            else {
+                $('#Create-load1').fadeIn();
+                $('#IsAdvFilterAppl').fadeOut();
+                $('#IsCategoryAppl').fadeOut();
+            }
+        });
+
+
+
+    });
+
+
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+
+            <div style="float:left;width:293px">
+                <label id="lblPayMonth" class="popup-content-label must">Training Year:</label>
+                <input name="txtPayMonth1" type="text" id="txtPayMonth1" class="date-picker" />
+                <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            </div>
+            <span>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Save">Save</button>
+                <button class="button" id="cancle">Cancel</button>
+                <button class="button" id="Delete">Delete</button>
+            </span>
+
+
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="JqGrid_pager"></div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv" id="Lookup"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    {
+        <div class="row4 content_margine " id="IsAdvFilterAppl">
+
+            <label class="popup-content-label">IsAdvFilterAppl :</label>
+            <div class="popup_radio_button ">
+                <span> <input type="radio" id="IsAdvFilterAppl_radio1" name="IsAdvFilterAppl" value="true" /><label for="IsAdvFilterAppl_radio1">Yes</label></span>
+                <span> <input type="radio" id="IsAdvFilterAppl_radio2" name="IsAdvFilterAppl" value="false" checked="checked" /><label for="IsAdvFilterAppl_radio2">No</label></span>
+
+            </div>
+
+            <div class="row4 content_margine" id="filterdivhide">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+                <input name="geo_id" id="geo_id" class="filter_structure_id" />
+                <input name="pay_id" id="pay_id" class="filter_structure_id" />
+                <input name="fun_id" id="fun_id" class="filter_structure_id" />
+            </div>
+            <br />
+            <div class="row1 content_margine" id="BudgetCredithide">@Html.LabelFor(m => m.BudgetCredit, "BudgetCredit:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BudgetCredit, new { @class = "popup-content-textbox must", @id = "BudgetCredit", @Value = "0" })</div>
+        </div>
+
+
+
+        <br />
+        <div class="row4 content_margine " id="IsCategoryAppl">
+
+            @Html.LabelFor(m => m.Category, "IsCategoryAppl:", new { @class = "popup-content-label " })
+            <div class="popup_radio_button ">
+                <span> <input type="radio" id="IsCategory_radio1" name="IsCategory" value="true" /><label for="IsCategory_radio1">Yes</label></span>
+                <span> <input type="radio" id="IsCategory_radio2" name="IsCategory" value="false" checked="checked" /><label for="IsCategory_radio2">No</label></span>
+
+            </div>
+            <button id="Create-load" class="Create-button" name="Create-load">Load</button>
+        </div>
+        <div class="row4 content_margine " id="IsProgramAppl">
+            @Html.LabelFor(m => m.ProgramList, "IsProgramAppl:", new { @class = "popup-content-label " })
+            <div class="popup_radio_button">
+                <input type="radio" id="IsProgram_radio1" name="IsProgram" value="true" /><label for="IsProgram_radio1">Yes</label>
+                <input type="radio" id="IsProgram_radio2" name="IsProgram" value="false" checked="checked" /><label for="IsProgram_radio2">No</label>
+
+            </div>
+            <button id="Create-load1" class="Create-button" name="Create-load1">Load</button>
+        </div>
+
+
+
+        <div class="emplist_row">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew"></table>
+                    <div id="pager221"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="emplist_row" id="emplist_rowhide">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew11"></table>
+                    <div id="JqGridNew12_pager"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="emplist_row" id="emplist_rowhide1">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew12"></table>
+                    <div id="JqGridNew12_pager"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="date-picker" />
+        <div class="emplist_row">
+
+            <label for="payprocessgroup_drop" class="emplist_label">Pay Process Group :</label>
+            <input type="text" style="display:none" id="payprocessgroup_id" name="payprocessgroup_id" />
+            <input type="text" id="payprocessgroup" name="payprocessgroup" />
+        </div>
+
+        @*<div class="emplist_row">
+                <div class="emplist_row">
+                    <label id="lblpaymonth" class="emplist_label">Pay Month :</label>
+                    <input type="text" id="PayMonth" name="PayMonth" class="popup-content-textbox-rowfirst must" />
+                </div>
+            </div>*@
+        <div class="section2_Leave">
+            <div class="heading">Training Year Selection</div>
+            <div class="row3 content_margine">
+
+                <div id="FinancialYearList_old"></div>
+                @*@Html.LabelFor(m => m., "Financial year:", new { @class = "popup-content-label" })*@
+                <label id="lblcreatepaymonth" class="popup-content-label must">Financial year :</label>
+                <input type="text" hidden id="dispcalender_id" name="FinancialYearList" />
+                <input type="text" readonly id="dispcalender" name="" style="width:270px" />
+
+            </div>
+            <br />
+
+        </div>
+        <div>
+            <table id="inline_JqGrid"></table>
+            <div id="inline_pager"></div>
+        </div>
+    }
+</div>

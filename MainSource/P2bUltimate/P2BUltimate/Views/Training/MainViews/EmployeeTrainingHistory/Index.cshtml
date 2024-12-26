@@ -1,0 +1,474 @@
+﻿@{
+    ViewBag.Title = "Employee Training History";
+}
+@model Training.TrainingProgramCalendar
+
+<html>
+
+<head>
+
+    <title>
+
+    </title>
+
+    <script>
+        $(document).ready(function (e) {
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#dob').P2BDatePicker();
+            $('button').button();
+
+            
+            $('.popup_radio_button').controlgroup();
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "EmployeeTrainingHistory")",
+                htmurl: "@Url.Action("partial", "EmployeeTrainingHistory")",
+                columnname: ["Code", "Name", "Id" ],
+                childheader: ["BatchName", "StartDate", 'EndDate', 'ProgramList', "Id" ],
+                childurl: "@Url.Action("Get_EmpTrHist", "EmployeeTrainingHistory")",
+                tableheader: "Employee Training History",
+                //childdata: $('#TrainingProgramCalendarlist').val(),
+                childurlColumnNo: "3"
+            });
+
+            $('#Load').on('click', function (e) {
+
+                var v2 = [];
+                if ($("#TrainingProgramCalendarlist tr input").length > 0) {
+                    $("#TrainingProgramCalendarlist tr input").each(function () {
+                        v2.push($(this).val());
+                    });
+                } else {
+                    alert("Please select Yearly Program List");
+                    return false;
+                }
+
+                $('#MyTable').DataTable().ajax.url('./EmployeeTrainingHistory/Emp_Grid?y=' + v2).load();
+
+            });
+
+            @*$('#Delete').button().click(function (event) {
+                $('#frmTrainingHistory').trigger("reset");
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                //$('#Create_Dialog').P2BDeleteModalDialog('@@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+                $('#frmTrainingHistory').P2BDeleteModalDialog('@Url.Action("Delete", "EmployeeTrainingHistory")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '', 200, 200, { datatablename: "#MyTable" });
+            });*@
+
+
+
+            $('#Lookup-TrainingProgramCalendar-EmployeeTrainingHistory').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetTrainingProgramCalendarLKDetails", "EmployeeTrainingHistory")', '', 'LookupDiv', 'TrainingProgramCalendar Look Up Data', '#TrainingProgramCalendarlist', 'TrainingProgramCalendarlist', 5, 'TrainingProgramCalendarlist', '#frmTrainingHistory', 'A', '#Edit-TrainingProgramCalendar-EmployeeTrainingHistory', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+
+            $('#Remove-TrainingProgramCalendar-EmployeeTrainingHistory').button().on('click', function (event) {
+                //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+                //var a = [], b;
+                //a = $('#TrainingProgramCalendarlist').P2BGetTableDataonSelectedRow('#TrainingProgramCalendarlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#TrainingProgramCalendarlist').P2BGetTableDataonSelectedRow('#TrainingProgramCalendarlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingProgramCalendarlist', $('#TrainingProgramCalendarlist').val(), 200, 200, '.Form_Bg', '#TrainingProgramCalendarlist', '');
+                event.preventDefault();
+            });
+            $.LocalStorageHelper("LoanAdvRequest_LoadEmp", "");
+
+            
+               
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frmSubCategoryP",
+                        htmlurl: "@Url.Action("GridPartial", "SubCategory")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData", "SubCategory")",
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data[0], function (i, k) {
+                                $('#Code').val(k.Code);
+                                $('#Code').attr('readonly', 'readonly');
+                                $('#Details').val(k.Details);
+
+                            });
+                            $.each(data[1], function (i, k) {
+                                $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                            });
+
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 500,
+                        width: 600,
+                        form: "#frmSubCategoryP",
+                        htmlurl: "@Url.Action("Partial", "SubCategory")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "SubCategory")",
+                        submiturl: "@Url.Action("EditSave", "SubCategory")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            console.log("dnfkjsndf");
+                            console.log(data);
+                            console.log("dnfkjsndf");
+                            console.log(data.data);
+                            $.each(data[0], function (i, k) {
+                                $('#Code').val(k.Code);
+                                $('#Code').attr('readonly', 'readonly');
+                                $('#Details').val(k.Details);
+
+                            });
+                            $.each(data[1], function (i, k) {
+                                $('#ProgramListlistS').P2BLookUpEncapsulate('#ProgramListlistS', 'ProgramListlistS', k.ProgramList_Id, k.ProgramList_val, 'ProgramListlistS', '', 'A');
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                      return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete", "EmployeeTrainingHistory")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            // $.FormReset('#frmServiceSecurity');
+
+        });
+    </script>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 50%;
+            float: left;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 350px;
+            display: inline-flex;
+            margin-left: -89px;
+        }
+
+        .loader {
+            width: 299px;
+            display: inline-flex;
+            margin-left: -89px;
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 4px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            /*! position: absolute; */
+            float: left;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 621px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+
+        .form-of-element {
+            display: block;
+            border: #DEDEDE solid 0.1px;
+            width: auto;
+            height: 351px;
+            padding: 5px 2px;
+            margin-top: 3px;
+        }
+
+        .select_div {
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+
+                <div class="row3 content_margine">
+                    <div id="TrainingProgramCalendarlist_old"></div>
+                    <label class="popup-content-label">Yearly Program List :</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="TrainingProgramCalendarlist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup TrainingProgramCalendar Details" class="  popup-content-icon-lookup" id="Lookup-TrainingProgramCalendar-EmployeeTrainingHistory"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create YearlyProgramCalendar Details" class="  popup-content-icon-create" id="Create-YearlyProgramCalendar-TrainingHistory"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit YearlyProgramCalendar Details" class="  popup-content-icon-edit" id="Edit-YearlyProgramCalendar-TrainingHistory"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove TrainingProgramCalendar Details" class="  popup-content-icon-remove" id="Remove-TrainingProgramCalendar-EmployeeTrainingHistory"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+                @*<button class="button" id="Create">Create</button>*@
+
+                <button class="button" id="Load">Load</button>
+                @*<button class="button" id="Delete">Delete</button>*@
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form" style="margin-top: 134px;">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>ID</th>
+
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="LV Cancel Req">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTrainingHistory", name = "frmTrainingHistory" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            @*<div class="row3 content_margine">@Html.LabelFor(m => m.Code, " Code", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "CodeM" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Details, "Details", new { @class = "popup-content-label must" })@Html.TextAreaFor(m => m.Details, new { @class = "popup-content-textbox must", @id = "DetailsM" })</div>
+
+                <div class="row3 content_margine">
+                    <div id="SubCategorylist_old"></div>@Html.LabelFor(m => m.SubCategory, "SubCategory :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="SubCategorylist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup SubCategory Details" class="  popup-content-icon-lookup" id="Lookup-SubCategory-Category"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create SubCategory Details" class="  popup-content-icon-create" id="Create-SubCategory-Category"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit SubCategory Details" class="  popup-content-icon-edit" id="Edit-SubCategory-Category"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove SubCategory Details" class="  popup-content-icon-remove" id="Remove-SubCategory-Category"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+
+        }
+    </div>
+
+
+</body>
+</html>

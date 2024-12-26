@@ -1,0 +1,236 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.EnquiryPanel
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        
+        ColModel = ['EnquiryPanelTypeName', 'PanelName', 'Id'];
+        ColNames = ['EnquiryPanelTypeName', 'PanelName', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Enquiry Panel';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').button().on("click", function () {
+            $('#frmEnquiryPanel').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Enquiry Panel ', 'open', '@Url.Action("Create")', '#frmEnquiryPanel', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+            $('#EnquiryPanelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3041);
+            $('#EnquiryRepresentativeTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 2012);
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {          
+            $('#frmEnquiryPanel').trigger("reset");
+            $('#EnquiryRepresentativeTypelist').prop("disabled", true);
+            AssignData();           
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit EnquiryPanel", '#frmEnquiryPanel', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#PanelName').val(k.Name);
+                    $('#EnquiryPanelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3041, k.EnquiryPanelType_Id);
+                    $('#EnquiryRepresentativeTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 2012, k.EnquiryRepresentativeType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#EmployeeList').P2BLookUpEncapsulate('#EmployeeList', 'EmployeeList', k.WitnessEmp_Id, k.WitnessEmp_Val, 'EmployeeList', '', 'A');
+                    $('#ExtEmployeeList').P2BLookUpEncapsulate('#ExtEmployeeList', 'ExtEmployeeList', k.WitnessExt_Id, k.WitnessExt_Val, 'ExtEmployeeList', '', 'A');
+                });
+            });
+
+            event.preventDefault();
+        });
+       
+        $('#View').button().click(function (event) {
+            $('#frmEnquiryPanel').trigger("reset");
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Enquirypanel', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {                  
+                    $('#PanelName').val(k.Name);
+                    $('#EnquiryPanelTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3041, k.EnquiryPanelType_Id);
+                    $('#EnquiryRepresentativeTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 2012, k.EnquiryRepresentativeType_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmployeeList').P2BLookUpEncapsulate('#EmployeeList', 'EmployeeList', k.WitnessEmp_Id, k.WitnessEmp_Val, 'EmployeeList', 'view', 'A');
+                    $('#ExtEmployeeList').P2BLookUpEncapsulate('#ExtEmployeeList', 'ExtEmployeeList', k.WitnessExt_Id, k.WitnessExt_Val, 'ExtEmployeeList', 'view', 'A');
+                });               
+            });
+            event.preventDefault();
+        });
+
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-Employee-Employee').on('click', function (event) {
+             var Type1 = $("#EnquiryRepresentativeTypelist option:selected").text();           
+            $('.dialog').P2BLookUpModal('@Url.Action("GetEmployeeDetails", "EnquiryPanel")?expression=' + Type1, '', 'LookupDiv', 'EnquiryPanel Look Up Data', '#EmployeeList', 'EmployeeList', 5, 'EmployeeList', '#frmEnquiryPanel', 'A', '#Remove-Employee-Employee', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();            
+        });
+
+        $('#Remove-Employee-Employee').button().on('click', function (event) {
+            //a = $('#EmployeeList').P2BGetTableDataonSelectedRow('#EmployeeList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EmployeeList').P2BGetTableDataonSelectedRow('#EmployeeList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmployeeList', $('#EmployeeList').val(), 200, 200, '#frmEnquiryPanel', '#EmployeeList');
+            event.preventDefault();
+        });
+
+        $('#Lookup-ExtEmployee-ExitEmployee').on('click', function (event) {
+            var Type2 = $("#EnquiryRepresentativeTypelist option:selected").text();
+            $('.dialog').P2BLookUpModal('@Url.Action("GetExitEmployee", "EnquiryPanel")?expression=' + Type2, '', 'LookupDiv', 'EnquiryPanel Look Up Data', '#ExtEmployeeList', 'ExtEmployeeList', 5, 'ExtEmployeeList', '#frmEnquiryPanel', 'A', '#Remove-Employee-Employee', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-ExitEmployee-ExtEmployee').button().on('click', function (event) {
+
+            //a = $('#ExtEmployeeList').P2BGetTableDataonSelectedRow('#ExtEmployeeList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ExtEmployeeList').P2BGetTableDataonSelectedRow('#ExtEmployeeList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ExtEmployeeList', $('#ExtEmployeeList').val(), 200, 200, '#frmEnquiryPanel', '#ExtEmployeeList');
+            event.preventDefault();
+        });
+        
+        $('#EnquiryPanelTypelist').selectmenu().selectmenu("menuWidget");
+        $('#EnquiryRepresentativeTypelist').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEnquiryPanel", name = "frmEnquiryPanel" }))
+        {
+
+            <div class="row1 content_margine" style="width: 420px;">
+                @Html.LabelFor(m => m.EnquiryPanelType, "Panel Type  :", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="EnquiryPanelTypelist" id="EnquiryPanelTypelist">
+                    <option></option>
+                </select>
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.PanelName, " Panel Name  :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PanelName, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row1 content_margine" style="width: 420px;">
+                @Html.LabelFor(m => m.EnquiryRepresentativeType, "Representative Type  :", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="EnquiryRepresentativeTypelist" id="EnquiryRepresentativeTypelist">
+                    <option></option>
+                </select>
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Witness, "Internal Panel Member :", new { @class = "popup-content-label " })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="EmployeeList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup corresponding Employee" class=" popup-content-icon-lookup" id="Lookup-Employee-Employee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete Employee" class=" popup-content-icon-remove" id="Remove-Employee-Employee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Witness, "External Panel Member :", new { @class = "popup-content-label " })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ExtEmployeeList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup corresponding Exit Employee" class=" popup-content-icon-lookup" id="Lookup-ExtEmployee-ExitEmployee"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete Exit Employee" class=" popup-content-icon-remove" id="Remove-ExitEmployee-ExtEmployee"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

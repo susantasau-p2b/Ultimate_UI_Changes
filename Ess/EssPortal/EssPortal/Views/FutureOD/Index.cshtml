@@ -1,0 +1,157 @@
+﻿@{
+    Layout = null;
+}
+@model Attendance.FutureOD
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 85px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+
+            $('button').button();
+            $('#FromDate').P2BDatePicker();
+            $('#ToDate').P2BDatePicker();
+            $('#Reasonlist').selectmenu().selectmenu("menuWidget");
+            $('#Reason').MaxLength(100);
+            $('#Reason').val("");
+           
+
+            $('#Reasonlist').on('selectmenuchange', function () {
+                if ($('#Reasonlist').val() != 0) {
+                    if ($('#Reasonlist :selected').text().toUpperCase() == 'OTHERS' || $('#Reasonlist :selected').text().toUpperCase() == 'OTHER') {
+                        $('#Reason').val('');
+                        $('#Reason').removeAttr('Readonly');
+                    }
+                    else {
+                        $('#Reason').val($('#Reasonlist :selected').text());
+                        $('#Reason').attr('Readonly', 'Readonly');
+                    }
+                }
+                else {
+                    alert('Please Select or enter Reason..!');
+                    $('#Reason').val('');
+                }
+            })
+            $('#ReqDate').TodayDate(); 
+            $('#ReqDate').attr('readonly', true);
+            $('.popup_radio_button').buttonset();
+
+            $('#Reasonlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 453, "");
+            $('#ReqDate').TodayDate();
+
+        });
+     
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmFutureODReq", name = "frmFutureODReq"}))
+        {
+            <div class="section2_Leave">  
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.ReqDate, "ReqDate:", new { @class = "popup-content-label must" }) 
+                    @Html.TextBoxFor(m => m.ReqDate, new { @class = "popup-content-textbox must" }) 
+                </div>
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.FromDate, "FromDate:", new { @class = "popup-content-label must" }) 
+                    @Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox must" }) 
+                </div>
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.ToDate, "ToDate:", new { @class = "popup-content-label must" }) 
+                    @Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox must" }) 
+                </div>
+                <div class="row5 content_margine">
+                    @Html.LabelFor(m => m.Reason, "Reason:", new { @class = "popup-content-label must" })
+                    <select class="must" id="Reasonlist" name="Reasonlist" style="width:160px;"><option value="0">-Select-</option></select>
+                    @Html.TextBoxFor(m => m.Reason, new { @class = "popup-content-textbox1  must" })
+                </div>
+                 
+               
+            </div>
+        }
+    </div>
+</body>
+</html>

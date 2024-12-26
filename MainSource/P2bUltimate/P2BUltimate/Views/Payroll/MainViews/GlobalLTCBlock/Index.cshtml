@@ -1,0 +1,268 @@
+﻿@{
+    ViewBag.Title = "Global LTC Block";
+}
+
+@model Payroll.GlobalLTCBlock
+
+<style>
+    .popup-content-label {
+        width: 123px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 108px;
+    }
+</style>
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Calendar">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmGlobalLTCBlock", name = "frmGlobalLTCBlock" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            @*<div class="row1 content_margine">
+                    @Html.LabelFor(m => m.Name, "Calendar Name :", new { @class = "popup-content-label must" })
+                    <select id="Name_drop" name="Name_drop" class="drop must"></select>
+                    @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox" })
+                </div>*@
+
+            <div class="row1 content_margine">@Html.LabelFor(m => m.BlockStart, "Block Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BlockStart, new { @class = "popup-content-textbox must", @id = "BlockStart" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.BlockEnd, "Block End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BlockEnd, new { @class = "popup-content-textbox must", @id = "BlockEnd" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.BlockYear, "Block Year:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BlockYear, new { @class = "popup-content-textbox" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.NoOfTimes, "No. Of time Taken:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.NoOfTimes, new { @class = "popup-content-textbox" })</div>
+
+            @*<div class="look_value_row1 horizontal_row1 content_margine ">
+                    @Html.LabelFor(m => m.Default, "Default Year :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <div id="radioset">
+                            <span><input type="radio" id="radio1" name="Default" value="true" /> <label for="radio1">Yes</label></span>
+                            <span><input type="radio" id="radio2" name="Default" value="false" /> <label for="radio2">No</label></span>
+                        </div>
+                    </div>
+                </div>*@
+        }
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+        //  $('#BlockYear').attr('readonly', true);
+        $("#BlockStart,#BlockEnd").keypress(function (event) { event.preventDefault(); });
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = [ 'BlockStart', 'BlockEnd', 'BlockYear', 'NoOfTimes','Id'];
+        ColNames = [ 'BlockStart', 'BlockEnd', 'BlockYear', 'NoOfTimes','Id'];
+        SortName = 'Id';
+        Caption = 'Global LTC Block';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        // $('[name="Default"]').val([k.Default]).button().button("refresh");
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#BlockStart').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#BlockEnd').datepicker({ dateFormat: 'dd/mm/yy' });
+        //$("#BlockStart").datetimepicker({
+        //    lang: 'en',
+        //    timepicker: false,
+        //    format: 'd/m/Y',
+        //    formatDate: 'dd/MM/yyyy',
+        //    yearEnd: 2080
+        //});
+
+        //$("#BlockEnd").datetimepicker({
+        //    lang: 'en',
+        //    timepicker: false,
+        //    format: 'd/m/Y',
+        //    formatDate: 'dd/MM/yyyy',
+        //    yearEnd: 2080
+        //});
+        $('#BlockEnd').change(function () {
+            var a = $('#BlockStart').datepicker('getDate').getTime(),
+                b = $('#BlockEnd').datepicker('getDate').getTime(),
+                c = 24 * 60 * 60 * 1000,
+                diffDays = Math.round((Math.round(Math.abs((a - b) / (c))) + 1)/365);
+
+            $('#BlockYear').val(diffDays);
+        });
+
+        //  $('#BlockStart,#BlockEnd').P2BDatePicker();
+        //$("#BlockEnd").datetimepicker({
+
+        //    onSelectDate: function () {
+        //        myfunc();
+        //    }
+        //});
+        //function myfunc() {
+        //    ////debugger;
+        //    var BlockEnd = $('#BlockEnd').val();
+        //    alert(BlockEnd);
+
+        //    var now = new Date($("#BlockStart").val());
+        //    var past = new Date(BlockEnd);
+        //    var nowYear = now.getFullYear();
+        //    var pastYear = past.getFullYear();
+        //    var age = pastYear - nowYear;
+
+
+        //    if (isNaN(age)) {
+        //        $('#BlockYear').val(0);
+        //    }
+        //    else {
+        //        $('#BlockYear').val(age);
+        //    }
+           
+        //}
+
+      //  $('#BlockYear').ForceOnlyNumeric();
+        $('#NoOfTimes').ForceOnlyNumeric();
+        $('#BlockYear').attr('disable', 'disable');
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmGlobalLTCBlock').trigger("reset");
+            //  $('#BlockYear').attr('readonly', true);
+            // $('#Name_drop').prop('disabled', false);
+
+            $('#BlockYear').val('0');
+            $('#NoOfTimes').val('0');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Calendar', 'open', '@Url.Action("Create")', '#frmGlobalLTCBlock', 'Message :', 'Request Falied :', '#JqGrid', 271, 343, '', btndisablenames, function (data) { });
+            @*$('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Calendar")", 500, "", '#Name_drop');*@
+            // $('[name="Default"]').button().button("refresh");
+            event.preventDefault();
+        });
+        $('#Edit').on('click', function () {
+            $('#frmGlobalLTCBlock').trigger("reset");
+            //$('[name="Default"]').button().button("refresh");
+            // $('#BlockYear').attr('readonly', true);
+            AssignData();
+            // $('#BlockStart,#BlockEnd').prop('disabled', true);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Calendar", '#frmGlobalLTCBlock', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 271, 343, '', btndisablenames, function (data) {
+
+                $.each(data[0], function (i, k) {
+                    //  $('#ToDate').P2BDatePicker();
+                    @*$('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Calendar")", 500, k.Name);
+                    $('#Name_drop').prop('disabled', true);
+                    $('[name="Default"]').val([k.Default]).button().button("refresh");*@
+
+                    //  $('[name="Default"]').val([k.Default]).button().button("refresh");
+                    $('#BlockYear').val(k.BlockYear);
+                    $('#NoOfTimes').val(k.NoOfTimes);
+                    //  $('#BlockStart').prop("readonly", "readonly");
+                    if (k.BlockStart != null) {
+                        $('#BlockStart').val(DateConvert(k.BlockStart));
+                    }
+                    if (k.BlockEnd != null) {
+                        $('#BlockEnd').val(DateConvert(k.BlockEnd));
+                    }
+
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            //$('#FromDate,#ToDate').prop('disabled', true);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Calendar', '', '', 271, 343, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+
+                    @*$('#Name_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "Calendar")", 500, k.Name);
+                    $('[name="Default"]').val([k.Default]).button().button("refresh");*@
+
+                    $('#BlockYear').val(k.BlockYear);
+                    $('#NoOfTimes').val(k.NoOfTimes);
+                    if (k.BlockStart != null) {
+                        $('#BlockStart').val(DateConvert(k.BlockStart));
+                    }
+                    if (k.BlockEnd != null) {
+                        $('#BlockEnd').val(DateConvert(k.BlockEnd));
+                    }
+                });
+
+                //To bind old data if authorisation is true
+                //if ($("#Autho").hasClass('auto_active')) {
+                //    $('#Name').StickNote([data[2].Name]);
+                //    $('#radio2').StickNote([data[2].Default]);
+                //    //$('#IssuePlace').StickNote([data[2].IssuePlace]);
+                //    if (data[2].FromDate != null) { $('#FromDate').StickNote(DateConvert(data[2].FromDate)); }
+                //    if (data[2].ToDate != null) { $('#ToDate').StickNote(DateConvert(data[2].ToDate)); }
+
+                //}
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $("#Name").ForceOnlyAlpha();
+        $("#IssuePlace").ForceOnlyAlpha();
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        //  $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+

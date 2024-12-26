@@ -1,0 +1,89 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.ITInvestment
+<link href="~/Content/it_investment/itinvestment.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#Edit').on('click', function () {
+            $('#frmitinvestment').P2BEditModalDialog('@Url.Action("Edit", "ITInvestment")', dt.ID, '@Url.Action("EditSave")', "Edit Data", '#frmitinvestment', dt.ID, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#ITSubInvestmentlist', '#Address_Edit,#Address_remove', function (data) {
+                $.each(data, function (i, k) {
+                    $('#invest_name').val(k.ItInvestmentName);
+                    $('#MaxAmount').val(k.MaxAmount);
+                    $('#MaxPercentage').val(k.MaxPercentage);
+                    for (i = 0; i < k.subid.length && k.subname.length; i++) {
+                        $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', k.subid[i], k.subname[i], 'ITSubInvestmentlist');
+                    }
+                });
+            });
+        });
+        $('#Create-itsubinvestment').on("click", function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog({});
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("itsubinvestment_partial", "itsubinvestment")', 'Create It Sub Investment', 'open', '@Url.Action("Create", "itsubinvestment")', '#frmsubinvestment', 'Message :', 'Request Falied :', '#JqGrid', 152, 260, '', '', '', '#frmitinvestment', '', function (data) {
+                console.log(data);
+                $('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', data[0], data[1], 'ITSubInvestmentlist');
+            });
+                e.preventDefault();
+            });
+        $('#Lookup-itsubinvestment').button().on('click', function (e) {
+            $('.dialog_address_itinvestmenat').P2BLookUpModal('@Url.Action("GetLookupDetails", "itsubinvestment")', '', 'dialog_address_itinvestmenat', 'Look Up Data', '#ITSubInvestmentlist', 'ITSubInvestmentlist', 5, 'ITSubInvestmentlist', '#frmitinvestment', 'N', '#Basic_Edit,#Basic_remove', 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#frmitinvestment').P2BDeleteModalDialog('@Url.Action("Delete", "ITInvestment")', dt.ID, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#itsubinvestment_remove').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#frmitinvestment').P2BGetTableDataonSelectedRow('#frmitinvestment', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "ITInvestment")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#frmitinvestment', $('#frmitinvestment').val(), 200, 200, '#frmitinvestment', '#frmitinvestment');
+            event.preventDefault();
+        });
+        $('#start,#end').P2BDatePicker();
+    });
+</script>
+<style>
+    .itinvest_icon-row {
+        position: absolute;
+        left: 93px;
+        top: 80px;
+    }
+</style>
+
+<div>
+    <div class="dialog_address_itinvestmenat">
+        <div title="LookUp Data">
+            <div class="LookupDiv-itinvestment"></div>
+        </div>
+        <div id="PageNavPosition-itinvestment">
+
+        </div>
+    </div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmitinvestment", name = "frmitinvestment" }))
+    {
+
+    <div class="itin_row1 content_margine">@Html.LabelFor(m => m.ITInvestmentName, "Name :", new { @class = "itin_popup-content-label" })@Html.TextBoxFor(m => m.ITInvestmentName, new { id = "itinvest_name", @class = "itin_popup-content-textbox" })</div>
+    <div class="itin_row1 content_margine"> @Html.LabelFor(m => m.MaxAmount, " Max Amount :", new { @class = "itin_popup-content-label" })@Html.TextBoxFor(m => m.MaxAmount, new { @class = "itin_popup-content-textbox" })</div>
+    <div class="itin_row1 content_margine">@Html.LabelFor(m => m.MaxPercentage, " Max Percentage :", new { @class = "itin_popup-content-label" })@Html.TextBoxFor(m => m.MaxPercentage, new { @class = "itin_popup-content-textbox search" })<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" /></div>
+    <div class="itin_row1 content_margine">
+        @Html.LabelFor(m => m.ITSubInvestment, " Sub Investment :", new { @class = "itin_popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="ITSubInvestmentlist">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+        <div class="itinvest_icon-row">
+            <button data-p2btooltip="LookUp Contact Details" class="popup-content-icon-lookup" id="Lookup-itsubinvestment"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" id="Create-itsubinvestment"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-itsubinvestment"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Remove Contact Details" class="popup-content-icon-remove" id="delete-itsubinvestment`"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+        </div>
+    </div>
+    }
+</div>

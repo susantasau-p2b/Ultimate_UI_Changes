@@ -1,0 +1,268 @@
+﻿<html>
+<head>
+    <title></title>
+    <style>
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 500px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 397px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 47em;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        #monthTable {
+            /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #monthTable td, #monthTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        #monthTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+        /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+        #monthTable tr:hover {
+            background-color: #ddd;
+        }
+
+        #monthTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="form_bg">
+        <div class="form_input">
+            <div class="button_container">
+                <button class="button" id="load">Load</button> 
+                <h4 class="button" @*id="create"*@ style="width: 12%; margin-top: 1px;">Leave OpenBal Data</h4>   
+                @*<button class="button" id="edit">Edit</button>   
+                <button class="button" id="delete">Delete</button>*@                
+                <div id="grid_form">
+                    <div>
+                        <table id="jqgrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="dialog">
+            <div title="LookUp Data">
+                <div class="lookupdiv" id="lookup"></div>
+            </div>
+            <div id="pageNavPosition">
+
+            </div>
+        </div>*@
+    <div id="create_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvopenbalhistory", name = "frmLvopenbalhistory" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="advance-filter-symbol"></span></label>
+                    <div id="fromFilter"></div>
+                </div>
+            </div>
+
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="employee-search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table">
+                            <tr><th><input type="checkbox" id="case-employee" /></th><th>Employee</th></tr>
+                        </table>
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+            <div class="section2_Leave">
+                <label class="heading">Leave OpenBal Data</label>
+                <div>
+                    <table id="monthTable">
+                        <thead>
+                            <tr>
+                                <th data-name="Lvhead">Lvhead</th>
+                                <th data-name="OpenBal">OpenBal</th>
+                                <th data-name="Credit">Credit</th>
+                                <th data-name="Utilized">Utilized</th>
+                                <th data-name="Closing">Closing</th>
+                                <th data-name="LvLapsed">LvLapsed</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['EmpCode', 'EmpName', 'Id'];
+        ColNames = ['EmpCode', 'EmpName', 'Id'];
+        SortName = 'Id';
+        Caption = 'Emplyee Leave Data';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#create_dialog').P2BCreateDialog();
+        $('#advance-filter-symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#fromFilter", hierarchy: true,
+            });
+        });
+
+        $('#load').on("click", function (event) {
+            $.FormReset('#frmManuallvopenbalhistory');
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Load Data', 'open', '', '#frmLvopenbalhistory', 'Message :', 'Request Failed :', '#jqgrid', 554, 937, '', '', function (data) { }, {});
+            $.LoadEmpByDefault();
+            event.preventDefault();
+        });
+
+        $('#employee-table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                var empid = $(this).val();
+                $.get("@Url.Action("GetLVData", "Lvopenbalhistory")?EmpId=" + empid, function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "";
+                    $('#monthTable tr:gt(0)').remove();
+                    if (data.status == true) {
+                        $.each(data.data, function (l, k) {
+                            tempclass = "weeklyoffclass";
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + k.Lvhead + "</td><td>" + k.OpenBal + "</td><td>" + k.Credit + "</td><td>" + k.Utilized + "</td><td>" + k.Closing + "</td><td>" + k.Lapes + "</td>" + "</tr>";
+                            index++;
+                            tempclass = "";
+                        });
+                    }
+                    $('#monthTable tr:last').after(tr);
+                });
+            }
+            else {
+                $.get("@Url.Action("GetLVData", "Lvopenbalhistory")?EmpId=" + 0, function (data) {
+                    var tr = "";
+                    var index = 1;
+                    var tempclass = "";
+                    $('#monthTable tr:gt(0)').remove();
+                    if (data.status == true) {
+                        $.each(data.data, function (l, k) {
+                            tempclass = "weeklyoffclass";
+                            tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + k.Lvhead + "</td><td>" + k.OpenBal + "</td><td>" + k.Credit + "</td><td>" + k.Utilized + "</td><td>" + k.Closing + "</td><td>" + k.Lapes + "</td>" + "</tr>";
+                            index++;
+                            tempclass = "";
+                        });
+                    }
+                    $('#monthTable tr:last').after(tr);
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,105 @@
+﻿@{
+    Layout = null;
+}
+@model Attendance.RawData 
+
+<style>
+    .add_icon-row {
+        position: relative;
+        left: -53px;
+        top: -46px;
+    }
+
+    .add_popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 107px;
+    }
+
+    .add_popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 300px;
+    }
+
+    .add_row {
+        width: 448px;
+    }
+    .disable {
+        /* Note: pointer-events not supported by IE10 and under */
+        pointer-events: none;
+        opacity: 0.4;
+    }
+</style>
+<div>
+  
+     @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAttendanceDetails", name = "frmAttendanceDetails" }))
+    { 
+         
+          <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <th align="center"><u>Live Camera</u></th><td></td>
+            <th align="center"><u>Captured Picture</u></th>
+        </tr>
+        <tr>
+            <td><div id="webcam"></div></td><td></td>
+            <td><div><img id="imgCapture" /></div></td>
+        </tr>
+              <tr>
+
+              </tr>
+        <tr>
+            <td align="center">
+                <input type="button" style="width:80px" id="btnCapture" value="Capture" />
+            </td><td></td>
+            <td align="center">
+                <input type="button" style="width:80px" id="btnUpload" value="Save" disabled="disabled" />
+            </td>
+        </tr>
+               
+    </table>
+     }
+</div>
+
+ 
+<script type="text/javascript">
+   
+    //$(document).ready(function (e) {
+    //    $('button').button();
+    //    $('.drop').css({ "width": "182px" });
+    //    $('.drop').selectmenu().selectmenu('menuWidget').css({ "height": "200px" });
+     
+    //});
+
+    $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+    $(function () {
+        Webcam.set({
+            width:320,
+            height: 240,
+            image_format: 'jpeg',
+            jpeg_quality: 90
+        });
+        Webcam.attach('#webcam');
+        $("#btnCapture").click(function () {
+            Webcam.snap(function (data_uri) {
+                $("#imgCapture")[0].src = data_uri;
+                $("#btnUpload").removeAttr("disabled");
+            });
+        });
+        $("#btnUpload").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveCapture", "AttendanceDetails")",
+                data: "{data: '" + $("#imgCapture")[0].src + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    alert(r.responseText);                   
+                    $("#btnUpload").addClass("disable");
+                   
+                }
+            });
+        });
+    });
+</script>
+

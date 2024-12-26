@@ -1,0 +1,640 @@
+﻿@{
+    ViewBag.Title = "Training Evaluation";
+}
+@model Training.TrainingEvaluation
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+<style>
+    #Lookup_BatchNameM {
+        left: 280px;
+        top: 20px;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 101px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 141px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 100%;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section_Method1 {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        margin-left: 525px;
+        width: 357px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    #Lookup_BatchName {
+        left: 323px;
+    }
+
+    .popup-content-drop-icon-lookup {
+        height: 20px;
+        margin: auto;
+        width: 20px;
+        left: 4px;
+    }
+    #Lookup{
+        width: 500px;
+    }
+</style>
+
+
+<script>
+
+    $(document).ready(function (e) {
+        $('button').button();
+        ////$('#OpeningDate').P2BDatePicker();
+        //var ColNames = [];
+        //var ColModel = [];
+        //var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit_Venue_TrnSchedule,#Remove_Venue_TrnSchedule,#Edit_Session_TrnSchedule,#Remove_Session_TrnSchedule,#Edit_Expenses_TrnSchedule,#Remove_Expenses_TrnSchedule";
+        @*ColModel = ['Id', 'Written Score'];
+        ColNames = ['Id', 'Written Score'];
+        SortName = 'Id';
+        Caption = 'Training Evaluation';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);*@
+        var urlfilter = "@Url.Action("Emp_Grid", "TrainingEvaluation")?y=" + $('#BatchName_id').val();
+        $('#WrittenScore,#InterviewScore,#GDScore').ForceOnlyNumeric();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            var v11 = $("#Batch_Name").val();
+
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+
+                    console.log("-----------------------------------");
+                    console.log(data);
+                    console.log("-----------------------------------");
+
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './TrainingEvaluation/LaodEmp?databatch=' + v11 + '&geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter",
+                hierarchy: true,
+            });
+        });
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['ID', 'Category', 'SubCategory', 'MaxPoints', 'RatingPoints', 'Comments', 'Editable'];
+        inline_ColNames = ['ID', 'Category', 'SubCategory', 'MaxPoints', 'RatingPoints', 'Comments', 'Editable'];
+        inline_SortName = 'ID';
+        inline_Caption = 'Employee List';
+        inline_url = '@Url.Action("LoadEmp")';
+        inline_width = 800;
+        inline_height = 150;
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: urlfilter,
+            htmurl: "@Url.Action("partial1", "TrainingEvaluation")",
+            columnname: [ "Code", "Name", "Id" ],
+            childheader: ["BatchName", "FullDetails", "ProgramList", "GDScore", "InterviewScore", "WrittenScore", "EvaluationDetails", "Id" ],
+            childurl: "@Url.Action("Get_AppAssignData", "TrainingEvaluation")",
+            tableheader: "Employee Training Evaluation",
+            childurlColumnNo: "3"
+        });
+
+        $('#Load').on('click', function (e) {
+            var v1 = $("#BatchName_id").val();
+            if (v1 == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Batch!");
+                return false;
+            }
+            $('#MyTable').DataTable().ajax.url('./TrainingEvaluation/Emp_Grid?y=' + $('#BatchName_id').val()).load();
+
+        });
+
+
+        //parent = 0;
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            // console.log(parent_element.find('td:eq(1)'));
+            // var parentId = parent_element.find('td:eq(1)').html();
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frmtraingevaluEdit",
+                    htmlurl: "@Url.Action("partial", "TrainingEvaluation")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "TrainingEvaluation")",
+                    submiturl: "@Url.Action("GridEditSave", "TrainingEvaluation")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#WrittenScore').val(k.WrittenScore);
+                            $('#InterviewScore').val(k.InterviewScore);
+                            $('#GDScore').val(k.GDScore);
+                            $('#EvaluationDetails').val(k.EvaluationDetails);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                // alert(parentid);
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmtraingevaluEdit",
+                    htmlurl: "@Url.Action("partial", "TrainingEvaluation")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "TrainingEvaluation")?batch=" + $('#BatchName_id').val(),
+                    submiturl: "@Url.Action("GridEditSave", "TrainingEvaluation")",
+                    editdata: id,
+                    forwarddata: [id, parentid],
+                    returndatafunction: function (returndata) {
+                        console.log(returndata);
+                        ////debugger;
+                        $.each(returndata.returndata, function (i, k) {
+                            ////debugger;
+
+
+                            $('#WrittenScore1').val(k.WrittenScore);
+                            $('#InterviewScore1').val(k.InterviewScore);
+                            $('#GDScore1').val(k.GDScore);
+                            $('#EvaluationDetails1').val(k.EvaluationDetails);
+                            $('#batchname').val(k.Batchname);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                // alert(parentid);
+                // alert(id);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: [id, parentid],
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        //Create Function
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmtraingevalu').trigger("reset");
+            $('#Employee-Table>tbody>tr:gt(0)').remove();
+
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training Evaluation', 'open', '@Url.Action("Create")', '#frmtraingevalu', 'Message :', 'Request Falied :', '#JqGrid', 700, 920, '', btndisablenames, function (data) { });
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", "");
+            event.preventDefault();
+        });
+
+        $("#Loading").button().on('click', function () {
+            var v1 = $("#Batch_Name").val();
+
+
+            var v2 = $("#TrainingScheduleList1").val();
+
+            if (v1 == "" || v2 == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Training Session!");
+                return false;
+            }
+            else {
+                $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './TrainingEvaluation/Get_Employelist?databatch=' + v1 + '&session=' + v2 + '&geo_id=', "");
+            }
+        });
+
+        $(document).on('click', '#save', function (e) {
+            $.post({
+                url: '@Url.Action("Create", "TrainingEvaluation")',
+                data: $('#frmtraingevalu').serialize(),
+                method: "POST",
+                //data: forms + "&forwarddata=" + b,
+                success: function (data) {
+                    if (data.success == true) {
+                        alert(data.responseText[0]);
+                        var v1 = $("#Batch_Name").val();
+                        var v2 = $('#TrainingScheduleList1').val();
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './TrainingEvaluation/Get_Employelist?databatch=' + v1 + '&Session=' + v2 + '&geo_id=', "");
+                        $('#WrittenScore').val("");
+                        $('#InterviewScore').val("");
+                        $('#GDScore').val("");
+                        $('#EvaluationDetails').val("");
+                    }
+                    console.log(data);
+                }
+            });
+        });
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Training Evaluation", '#frmtraingevalu', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 700, 920, '#ExpensesList,#VenueList,#SessionList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmtraingevalu').trigger('reset');
+                    //console.log(k.Id);
+                    $('#InterviewScore').val(k.InterviewScore);
+                    $('#WrittenScore').val(k.WrittenScore);
+                    $('#GDScore').val(k.GDScore);
+                    $('#EvaluationDetails').val(k.EvaluationDetails);
+
+                });
+
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ', '#ExpensesList,#VenueList,#SessionList', btndisablenames, 700, 920, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmtraingevalu').trigger('reset');
+                    //console.log(k.Id);
+                    $('#InterviewScore').val(k.InterviewScore);
+                    $('#WrittenScore').val(k.WrittenScore);
+                    $('#GDScore').val(k.GDScore);
+                    $('#EvaluationDetails').val(k.EvaluationDetails);
+
+                });
+
+
+
+
+            });
+        });
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#Lookup_BatchName').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth",
+
+                lookupurl: "@Url.Action("GetBatchNameDetails1", "TrainingEvaluation")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "txtPayMonth",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#Batch_Name",
+                readonly: true,
+                pagename: "PageNavPosition",
+
+            });
+        });
+
+        $('#Lookup_BatchNameM').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtBatchName",
+                appendToId: "#BatchName_id",
+                lookupurl: "@Url.Action("GetBatchNameDetails", "TrainingFeedback")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "txtBatchName",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                readonly: true,
+                pagename: "PageNavPosition",
+
+            });
+        });
+
+        $('#Lookup-Session-TrainingEvaluation').on('click', function () {
+            if ($('#Batch_Name').val() == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Kindly Select Batch Name!");
+                return false;
+            }
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#dispcalender1",
+
+                lookupurl: '@Url.Action("GetLookupDetailsSession", "TrainingEvaluation")?ts=' + $('#Batch_Name').val(),
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "dispcalender1",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#TrainingScheduleList1",
+                readonly: true,
+                pagename: "PageNavPosition",
+
+            });
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+
+</script>
+
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+
+                <div style="float:left;width:290px">
+                    <label id="lblBatchName" class="popup-content-label must" style="width:90px">Batch Name:</label>
+                    <input name="txtBatchName" type="text" id="txtBatchName" class="date-picker" />
+                    <input type="text" id="BatchName_id" name="BatchName_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_BatchNameM"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                </div>
+                <span>
+
+                    <button class="button" id="Load">Load</button>
+                    <button class="button" id="Create">Create</button>
+                    @*<button class="button" id="View">View</button>*@
+                    @*<button class="button" id="Btn-Upload-Data">Upload</button>*@
+                    @*<button class="button" id="Delete">Delete</button>*@
+                    @*<button class="button" id="release">Release</button>*@
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                @*<th>StartDate</th>
+                                    <th>EndDate</th>
+                                    <th>ProgramList</th>*@
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                @*<th>StartDate</th>
+                                    <th>EndDate</th>
+                                    <th>ProgramList</th>*@
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <table id="JqGrid"></table>
+            <div id="pager2"></div>
+        </div>
+    </div>
+
+
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Training Evaluation">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmtraingevalu", name = "frmtraingevaluEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+
+
+            <div class="row3 content_margine">
+                <div>
+                    @*@Html.LabelFor(m => m.BatchName, "BatchName:", new { @class = "popup-content-label must" })*@
+                    @*<label>BatchName</label>
+                        <input type="text" name="BatchName" id="BatchName" class="popup-content-textbox">*@
+
+                    <label id="lblPayMonth" class="popup-content-label must">Batch Name:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" style="margin-left:-4%" />
+                    <input type="text" id="Batch_Name" name="Batch_Name" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Select BatchName" style="left:288px" class="button popup-content-icon-lookup" id="Lookup_BatchName"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*@Html.TextBoxFor(m => m.BatchName, new { @class = "popup-content-textbox  must" })*@
+
+
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                <div id="FinancialYearList_old"></div>
+                @*@Html.LabelFor(m => m.EvaluationDetails, "Training Session :", new { @class = "popup-content-label1" })*@
+                <label class="popup-content-label ">Training Session:</label>
+                <input type="text" hidden id="TrainingScheduleList1" name="TrainingScheduleList1" class="popup-content-textbox" />
+                <input type="text" readonly id="dispcalender1" class="popup-content-textbox" name="dispcalender1" style="width:220px" />
+
+                <button data-p2btooltip="Lookup TrainingSession" class="popup-content-drop-icon-lookup" id="Lookup-Session-TrainingEvaluation">
+                    <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                </button>
+
+
+            </div>
+            <div>
+                <input type="button" name="Loading" value="Load" id="Loading">
+            </div>
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+            </div>
+            @*<div class="section_Method">
+                    <div class="heading">Filter View</div>
+                    <div class="filter-div">
+                        <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                        <div id="FormFilter"></div>
+                    </div>
+                </div>*@
+
+            <div class="section_Method">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                        @*<span class="btn-span1" aria-hidden="true">
+                                <button id="load_emp" class="loan-btn">Load Employee</button>
+                            </span>*@
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+
+            <div class="section_Method1">
+                <div class="row1 content_margine">@Html.LabelFor(m => m.WrittenScore, " Written Score", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.WrittenScore, new { @class = "popup-content-textbox must" })</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.InterviewScore, "Interview Score", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.InterviewScore, new { @class = "popup-content-textbox must" })</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.GDScore, "GD Score", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.GDScore, new { @class = "popup-content-textbox must" })</div>
+                <div class="row1 content_margine">@Html.LabelFor(m => m.EvaluationDetails, "Details(Remark)", new { @class = "popup-content-label " })@Html.TextAreaFor(m => m.EvaluationDetails, new { @class = "popup-content-textbox " })</div>
+                <button style="float:right" id="save">Save</button>
+                @*<button style="float:right" id="cancel">Cancel</button>
+                    <button style="float:right" id="save">Save</button>*@
+
+            </div>
+
+
+
+        }
+    </div>
+</body>

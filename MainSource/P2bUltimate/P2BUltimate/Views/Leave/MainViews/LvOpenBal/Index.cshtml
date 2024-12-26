@@ -1,0 +1,561 @@
+﻿@{
+    ViewBag.Title = "Leave Open Balance";
+}
+@model Leave.LvOpenBal
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 859px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+   
+    <title></title>
+
+    <script>
+        $(document).ready(function (e) {
+            var dia;
+            $('#LvClosing').ForceOnlyNumeric();
+            $('#LvClosing').MaxLength(5);
+            $('#LvClosing').attr("value", "0");
+            
+            $('#LvBank').MaxLength(25);
+            $('#LvBank').attr("value", "0");
+            $('#LvBankOccuance').ForceOnlyNumeric();
+            $('#LvBankOccuance').MaxLength(5);
+            $('#LvBankOccuance').attr("value", "0");
+            $('#LVCount').ForceOnlyNumeric();
+            $('#LVCount').MaxLength(5);
+            $('#LVCount').attr("value", "0");
+            $('#LvEncash').ForceOnlyNumeric();
+            $('#LvEncash').MaxLength(5);
+            $('#LvEncash').attr("value", "0");
+            $('#LvLapseBal').ForceOnlyNumeric();
+            $('#LvLapseBal').MaxLength(5);
+            $('#LvLapseBal').attr("value", "0");
+            $('#LvOccurances').ForceOnlyNumeric();
+            $('#LvOccurances').MaxLength(5);
+            $('#LvOccurances').attr("value", "0");
+            $('#LvOpening').ForceOnlyNumeric();
+            $('#LvOpening').MaxLength(5);
+            $('#LvOpening').attr("value", "0");
+            $('#LvUtilized').ForceOnlyNumeric();
+            $('#LvUtilized').MaxLength(5);
+            $('#LvUtilized').attr("value", "0");
+            $('#MaxDays').ForceOnlyNumeric();
+            $('#MaxDays').MaxLength(5);
+            $('#MaxDays').attr("value", "0");
+            $('#PrefixCount').ForceOnlyNumeric();
+            $('#PrefixCount').MaxLength(5);
+            $('#PrefixCount').attr("value", "0");
+            $('#SufixCount').ForceOnlyNumeric();
+            $('#SufixCount').MaxLength(5);
+            $('#SufixCount').attr("value", "0");
+            $('#LvCredit').ForceOnlyNumeric();
+            $('#LvCredit').MaxLength(5);
+            $('#LvCredit').attr("value", "0");
+            $('#AboveServiceStepsCount').ForceOnlyNumeric();
+            $('#AboveServiceStepsCount').MaxLength(5);
+            $('#AboveServiceStepsCount').attr("value", "0");
+            $('#LvCreditDate').attr('readonly', 'readonly');
+            $('button').button();
+
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            $('#LvCreditDate').P2BDatePicker();
+            $('#Calendar_DDL').P2BSelectMenuAppend('@Url.Action("Polulate_LeaveCalendar", "LvOpenBal")', "", ""); // To bind dropdown on page load
+            $('#Create_Dialog').P2BCreateDialog();
+            // $.LoadEmpByDefault(true, "#dispcalender");
+            $.LoadEmpByDefaultWOGeoId(true, "#dispcalender");
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                        //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                        //$('#pay_id').val(data.PayStruct);
+                        //$('#fun_id').val(data.FunStruct);
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+            //console.log($('#FormFilter')[0]);
+        });
+        //Create Function
+            $('#Create').on("click", function (event) { 
+                $('#frmLeaveOpenBal').trigger("reset"); 
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave OpenBal  Details ', 'open', '@Url.Action("Create")', '#frmLeaveOpenBal', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+                $('#dispcalender').attr('readonly', 'readonly');
+                $('#LvCreditDate').attr('readonly', 'readonly');
+                $.get("@Url.Action("getCalendarL", "LvOpenBal")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+
+                    $('#dispcalender_id').val(data.Id);
+                    console.log(data);
+                });
+                event.preventDefault();
+            });
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#MyTable').DataTable({
+                            "ajax": {
+                                "url": "@Url.Action("Emp_Grid", "LoanAdvRepaymentT")",
+                                "type": "post",
+                                "data": forwarddata,
+                            }
+                        }).load();
+                    },
+                    renderat: "#FormFilter",
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+
+            $('#Lookup-LvCalendar-LvOpenBal').on('click', function (event) { 
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupCalendar", "LvOpenBal")', '', 'LookupDiv', 'Lv Calendar Look Up Data', '#LvCalendarlist', 'LvCalendarlist', 5, 'LvCalendarlist', '#frmLeaveOpenBal', 'N', '#Remove-LvCalendar-LvCalendar', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-LvCalendar-LvCalendar').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#LvCalendarlist').P2BGetTableDataonSelectedRow('#LvCalendarlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#LvCalendarlist').P2BGetTableDataonSelectedRow('#LvCalendarlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvCalendarlist', $('#LvCalendarlist').val(), 200, 200, '#frmLeaveOpenBal', '#LvCalendarlist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+                event.preventDefault();
+            });
+
+            $('#Lookup-LvHead-LvOpenBal').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHead", "LvOpenBal")', '', 'LookupDiv', 'LvCalendar Look Up Data', '#LvHeadlist', 'LvHeadlist', 5, 'LvHeadlist', '#frmLeaveOpenBal', 'N', '#Remove-LvHead-LvOpenBal', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#Remove-LvHead-LvOpenBal').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#LvHeadlist').P2BGetTableDataonSelectedRow('#LvHeadlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvHeadlist', $('#LvHeadlist').val(), 200, 200, '#frmLeaveOpenBal', '#LvHeadlist', '');
+                event.preventDefault();
+            });
+           
+
+     
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "LvOpenBal")",
+
+                htmurl: "@Url.Action("partial", "LvOpenBal")",
+
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["LvHead", "LvOpening", "LvCredit", "LvUtilized", "Id"],
+                childurl: "@Url.Action("Get_LvOpenBal", "LvOpenBal")",
+                tableheader: "Leave Open Balance",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvOpenBalGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "LvOpenBal")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData", "LvOpenBal")",
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                         //   $.each(data, function (i, k) {
+                            $('#Grid-LvOpening').val(data.LvOpening);
+                            $('#Grid-LvUtilized').val(data.LvUtilized);
+                            $('#Grid-LvCredit').val(data.LvCredit);
+                                
+                         //   });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvOpenBalGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "LvOpenBal")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "LvOpenBal")",
+                        submiturl: "@Url.Action("GridEditsave", "LvOpenBal")",
+                        editdata: id,
+                        forwarddata: [id, parentid],
+                        returndatafunction: function (data) {
+                            $('#Grid-LvOpening').val(data.LvOpening);
+                            $('#Grid-LvUtilized').val(data.LvUtilized);
+                            $('#Grid-LvCredit').val(data.LvCredit);
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: [id, parentid],
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+          
+
+            
+
+        });
+    </script>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                    <label id="LabelCalendar" class="emplist_label">Calendar:</label>
+                    <select id="Calendar_DDL" name="Calendar_DDL" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                </div>
+                <button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>  
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>  
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th> 
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LeaveOpenBal">
+     
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLeaveOpenBal", name = "frmLeaveOpenBal" }))
+        {    <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+            </div>
+
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                        </table>
+                        @*<span class="btn-span1" aria-hidden="true">
+                                <button id="load_emp" class="loan-btn">Load Employee</button>
+                            </span>*@
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+            <div class="section2_Leave">
+                <div class="heading">Leave Open Details</div>
+                @*<div class="row3 content_margine">
+                    <div id="lvCalendar_old"></div>
+                    @Html.LabelFor(m => m.LvCalendar, "Calendar :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="LvCalendarlist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select LvCalendar" class="  popup-content-icon-lookup" id="Lookup-LvCalendar-LvOpenBal"><span class=" ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove LvCalendar" class="popup-content-icon-remove" id="Remove-LvCalendar-LvOpenBal"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>*@
+
+                 <div class="row3 content_margine">
+
+                    <div id="FinancialYearList_old"></div>
+                    @Html.LabelFor(m => m.LvCalendar, "Calendar :", new { @class = "popup-content-label" })
+                    <input type="text" hidden id="dispcalender_id" name="FinancialYearList"  />
+                    <input type="text" readonly id="dispcalender" name="" style="width:250px" />
+                </div>         
+                <div class="row3 content_margine">
+                    <div id="LvHead_old"></div>
+                    @Html.LabelFor(m => m.LvHead, "Lv Head:", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="LvHeadlist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select LvHead" class="  popup-content-icon-lookup" id="Lookup-LvHead-LvOpenBal"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-LvNewReq-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove LvHead" class="popup-content-icon-remove" id="Remove-LvHead-LvOpenBal"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvOpening, "Lv Opening :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvOpening, new { @class = "popup-content-textbox" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvCredit, "Leave Credit :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvCredit, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvUtilized, "Leave Utilized :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvUtilized, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvLapseBal, "Leave LapseBal :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvLapseBal, new { @class = "popup-content-textbox" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvEncash, "Leave Encash :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvEncash, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvOccurances, "Leave Occurances :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvOccurances, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LVCount, "Leave Count :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LVCount, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvBank, "Leave Bank :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvBank, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvBankOccuance, "Lv Bank Occuance:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvBankOccuance, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvClosing, "Lv Closing:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvClosing, new { @class = "popup-content-textbox" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PrefixCount, "Prefix Count :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.PrefixCount, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SufixCount, "Sufix Count :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.SufixCount, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.LvCreditDate, "Leave CreditDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LvCreditDate, new { @class = "popup-content-textbox must" })</div>
+                <div class="pos_row3 content_margine">@Html.LabelFor(m => m.AboveServiceStepsCount, "Above Service Steps Count:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.AboveServiceStepsCount, new { @class = "popup-content-textbox" })</div>
+                <div class="pos_row3 content_margine">@Html.LabelFor(m => m.MaxDays, "Leave Max :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.MaxDays, new { @class = "popup-content-textbox" })</div>
+            </div>
+
+
+        }
+    </div>
+</body>
+</html>

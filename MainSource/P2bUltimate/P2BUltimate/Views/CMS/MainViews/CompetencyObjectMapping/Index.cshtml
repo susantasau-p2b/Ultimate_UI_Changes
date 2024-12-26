@@ -1,0 +1,396 @@
+@{
+    ViewBag.Title = "CompetencyObjectMapping";
+}
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 59px;
+            top: -126px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 102px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            width: 100px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 450px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 350px;
+            width: 437px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 43em;
+            /*left: 401px;*/
+        }
+
+        .section3_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            /*! height: 502px; */
+            width: 250px;
+            margin: 2px 2px;
+            position: absolute;
+            left: 920px;
+            top: 28px;
+            /*float: right;*/
+        }
+
+        #monthTable {
+            /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #monthTable td, #monthTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        .monthTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+        /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+        #monthTable tr:hover {
+            background-color: #ddd;
+        }
+
+        #monthTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+
+        .without-btn {
+            height: 216px;
+        }
+
+        .lookupbox {
+            margin-left: 100px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container" style="float:right; margin-right:81em;">             
+                <button class="button" id="Create">Create</button>              
+            </div>
+            <div id="models" style="float:left; margin-left:1em; margin-top:-3.6em;">
+                <div class="row3 content_margine">
+                    <select class="drop must" style="width:180px;" name="NewModelist" id="NewModelist">
+                        <option>--Select--</option>
+                        <option>AppraisalAttributeModel</option>
+                        <option>AppraisalBusinessAppraisalModel</option>
+                        <option>AppraisalKRAModel</option>
+                        <option>AppraisalPotentialModel</option>
+                        <option>ServiceModel</option>
+                        <option>QualificationModel</option>
+                        <option>PastExperienceModel</option>
+                        <option>TrainingModel</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>LookupVal</th>
+                                <th>LookupValData</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            <table id="JqGrid"></table>
+            <div id="pager2"></div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmCompetencyObjectMapping", name = "frmCompetencyObjectMapping" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="Division_id" type="hidden" name="Division_id" />
+
+            <div class="section1_Leave">
+                <div class="row3 content_margine">
+                    <select class="drop must" style="width:180px;" name="AppModelist" id="AppModelist">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="row3 content_margine">
+                    <div class="row3 content_margine ">
+                        <label for="ModelObjectList" class="popup-content-label">AppCategoryList</label><br>
+                        <div class="popup-content-table lookupbox">
+                            <table class="lookuptableselected" id="AppCategoryList">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup AppCategoryList" class="popup-content-icon-lookup " id="Lookup-AppCategoryList"><span class="ui-icon ui-icon-folder-open popup-content-iconmark "></span></button>
+                            <button data-p2btooltip="Remove AppCategoryList" class="popup-content-icon-remove " id="Remove-AppCategoryList"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="section2_Leave">
+                <div class="row3 content_margine">
+                    <label for="OBJMIDList" class="popup-content-label">OBJMIDList</label>
+                    <select class="drop must" style="width:180px;" name="OBJMIDList" id="OBJMIDList">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="row3 content_margine">
+                    <label for="MAPPIDList" class="popup-content-label">MAPPIDList</label>
+                    <select class="drop must" style="width:180px;" name="MAPPIDList" id="MAPPIDList">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        }
+    </div>
+
+
+</body>
+</html>
+<script>
+
+    $(document).ready(function (e) {
+        $('button').button();       
+        var urlfilter = "";
+        $('#NewModelist').on('selectmenuchange', function () {
+             
+            var newvalue = $("#NewModelist option:selected").text();
+            var urlfilter = "@Url.Action("CompetencyObjectMapping_Grid")?NewModellist=" + newvalue;
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: urlfilter,
+                editurl: "@Url.Action("EditGridDetails", "DivisionTargetSetting")",
+                htmurl: "@Url.Action("partial", "DivisionTargetSetting")",
+                submiturl: "@Url.Action("GridEditSave", "DivisionTargetSetting")",
+                columnname: ["LookupVal", "LookupValData", "Id", ],
+                //childheader: ["Category", "SubCategory", "Accounts", "Amount", "Compliance", "Id"],
+                //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+                childurl: "@Url.Action("Get_TargetSettingRequest")",
+                tableheader: "ObjectLookupMapping",
+                childurlColumnNo: "3"
+            });
+        });
+
+        var valueable = "--Select--";
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("CompetencyObjectMapping_Grid")?NewModellist=" + valueable,
+            editurl: "@Url.Action("EditGridDetails", "DivisionTargetSetting")",
+            htmurl: "@Url.Action("partial", "DivisionTargetSetting")",
+            submiturl: "@Url.Action("GridEditSave", "DivisionTargetSetting")",
+            columnname: ["LookupVal", "LookupValData", "Id", ],
+            //childheader: ["Category", "SubCategory", "Accounts", "Amount", "Compliance", "Id"],
+            //childheader: ["Id", "LoanAdvHead", "RequisitionDate", "EnforcementDate", "LoanAppliedAmt", "LoanSanctionedAmt", "MonthlyInstallmentAmt", "TotalInstallment", "LoanAccBranch", "LoanAccNo"],
+            @*childurl: "@Url.Action("Get_TargetSettingRequest")",*@
+            tableheader: "ObjectLookupMapping",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#LoanAdvanceHead-edit').val(k.LoanAdvanceHead);
+                            $('#TotalInstallment-edit').val(k.TotalInstallement);
+                            $('[name="IsActive"]').val([k.ISActive]).button().button("refresh");
+                            $('#CloserDate-edit').val(k.CloserDate);
+                            $('#LoanAccNo-edit').val(k.LoanAccNo);
+                            $('#Edit-LoanAccBranch').P2BSelectMenuAppend("@Url.Action("LoanAccBranchDrop")", "", k.LoanAccBranch);
+
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmObjectLookupMapping').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'ObjectLookupMapping', 'open', '@Url.Action("EditSave")', '#frmCompetencyObjectMapping', 'Message :', 'Request Falied :', '#JqGrid', 570, 1140, '', '', function (data) { }, {});
+            $('#AppModelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1069, "");
+            event.preventDefault();
+        });
+
+        $('#AppModelist').on('selectmenuchange', function () {
+            var value = $("#AppModelist option:selected").text();
+            $('#OBJMIDList').P2BSelectMenuAppend('@Url.Action("GetModelList", "CompetencyObjectMapping")?Apprlist=' + value, '', "");
+        });
+
+        $('#OBJMIDList').on('selectmenuchange', function () {
+            var value = $("#AppModelist option:selected").text();
+            var value1 = $("#OBJMIDList option:selected").text();
+            $('#MAPPIDList').P2BSelectMenuAppend('@Url.Action("GetModelObjList", "CompetencyObjectMapping")?Apprlist=' + value + '&Objmlist=' + value1, '', "");
+        });
+
+        $('#Lookup-AppCategoryList').button().on('click', function (event) {
+            var value = $("#AppModelist option:selected").val();
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAppCategory")?Apprlist=' + value, '', 'LookupDiv', 'Look Up Data', '#AppCategoryList', 'AppCategoryList', 5, 'AppCategoryList', '#frmCompetencyObjectMapping', 'N', '#Remove-Category-DivisionTargetSetting', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-AppCategoryList').button().on('click', function (event) {
+
+            a = $('#AppCategoryList').P2BGetTableDataonSelectedRow('#AppCategoryList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AppCategoryList', $('#AppCategoryList').val(), 200, 200, '#frmCompetencyObjectMapping', '#AppCategoryList');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#AppModelist').selectmenu().selectmenu("menuWidget");
+        $('#OBJMIDList').selectmenu().selectmenu("menuWidget");
+        $('#MAPPIDList').selectmenu().selectmenu("menuWidget");
+        $('#NewModelist').selectmenu().selectmenu("menuWidget");
+        $('#StartPeriod,#EndPeriod').P2BDatePicker();
+    });
+</script>

@@ -1,0 +1,222 @@
+﻿@{
+    ViewBag.Title = "MachineInterface";
+}
+
+@model Attendance.MachineInterface
+<style>
+    .icon-row {
+        position: relative;
+        left: 63px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 105px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['CardCode', 'DatabaseName', 'DatabaseType', 'DateField', 'InterfaceName', 'InTimeField', 'OutTimeField', 'TableName', 'UnitNoField', 'Id'];
+        ColNames = ['CardCode', 'DatabaseName', 'DatabaseType', 'DateField', 'InterfaceName', 'InTimeField', 'OutTimeField', 'TableName', 'UnitNoField', 'Id'];
+        SortName = 'Id';
+        Caption = 'Machine Interface';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').on("click", function (event) {
+            $('#frmMachineInterface').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create MachineInterface', 'open', '@Url.Action("Create")', '#frmMachineInterface', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#InsuranceProducts,#ContactDetailsList', btndisablenames, function (data) { });
+            $('#DatabaseType-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 610, ""); // To bind dropdown on page load
+            $('#InterfaceName-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1002, "");
+            event.preventDefault();
+        });
+
+        //To get data in Lookup
+        $('#Lookup-MachineInterface').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetInsruanceProdcutsDetails", "MachineInterface")', '', 'LookupDiv', 'Look Up Data', '#InsuranceProducts', 'InsuranceProducts', 5, 'InsuranceProducts', '#frmMachineInterface', 'N', '#Edit-Address-MachineInterface,#Remove-Address-MachineInterface', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit MachineInterface Data", '#frmMachineInterface', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#InsuranceProducts,#ContactDetailsList', btndisablenames, function (data) {
+                $.each(data[0], function (i, k) {
+                    //  console.log(k.CompCode);
+                    $('#CardCode').val(k.CardCode);
+                    $('#DatabaseName').val(k.DatabaseName);
+                    $('#TableName').val(k.TableName);
+                    $('#DateField').val(k.DateField);
+                    $('#InTimeField').val(k.InTimeField);
+                    $('#OutTimeField').val(k.OutTimeField);
+                    $('#UnitNoField').val(k.UnitNoField);
+
+                    $('#ServerName').val(k.ServerName);
+                    $('#UserId').val(k.UserId);
+                    $('#Password').val(k.Password);
+
+
+
+                    $('#DatabaseType-drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 610, k.DatabaseType);
+                    $('#InterfaceName-drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1002, k.InterfaceName); // Dropdown bind
+                });
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View MachineInterface Data', '#InsuranceProducts,#ContactDetailsList', '#Lookup-Address-MachineInterface,#Create-Address-MachineInterface,#Edit-Address-MachineInterface,#Remove-Address-MachineInterface,#Lookup-ContactDetails-MachineInterface,#Create-ContactDetails-MachineInterface,#Edit-ContactDetails-MachineInterface,#Remove-ContactDetails-MachineInterface', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#CardCode').val(k.CardCode);
+                    $('#DatabaseName').val(k.DatabaseName);
+                    $('#TableName').val(k.TableName);
+                    $('#DateField').val(k.DateField);
+                    $('#InTimeField').val(k.InTimeField);
+                    $('#OutTimeField').val(k.OutTimeField);
+                    $('#UnitNoField').val(k.UnitNoField);
+
+                    $('#ServerName').val(k.ServerName);
+                    $('#UserId').val(k.UserId);
+                    $('#Password').val(k.Password);
+
+                    $('#DatabaseType-drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 610, k.DatabaseType);
+                    $('#InterfaceName-drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1002, k.InterfaceName); // Dropdown bind
+                });
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+
+        //$('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+    </div>
+</div>
+
+<div id="Create_Dialog">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmMachineInterface" }))
+    {
+        <div class="dropdown_row1 row3 content_margine">
+            @Html.LabelFor(m => m.DatabaseType, "DatabaseType :", new { @class = "popup-content-label must" })
+            <select class="drop must" id="DatabaseType-drop" name="DatabaseType-drop" style="width:200px"></select>
+        </div>
+        <div class="dropdown_row1 row3 content_margine">
+            @Html.LabelFor(m => m.InterfaceName, "InterfaceName :", new { @class = "popup-content-label must" })
+            <select class="drop must" id="InterfaceName-drop" name="InterfaceName-drop" style="width:200px"></select>
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.CardCode, " CardCode :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.CardCode, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.DatabaseName, "DatabaseName :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.DatabaseName, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.DateField, " DateField :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.DateField, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.InTimeField, "InTimeField :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.InTimeField, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.OutTimeField, "OutTimeField :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.OutTimeField, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.UnitNoField, "UnitNoField :", new { @class = "popup-content-label  " })
+            @Html.TextBoxFor(m => m.UnitNoField, new { @class = "popup-content-textbox  " })
+        </div>
+
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.ServerName, " ServerName :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.ServerName, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.TableName, " TableName :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.TableName, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.UserId, " UserId :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.UserId, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row1 content_margine">
+            @Html.LabelFor(m => m.Password, " Password :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.Password, new { @class = "popup-content-textbox must" })
+        </div>
+
+    }
+</div>

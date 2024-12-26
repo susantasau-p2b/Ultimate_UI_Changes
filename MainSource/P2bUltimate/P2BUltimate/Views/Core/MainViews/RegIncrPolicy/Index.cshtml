@@ -1,0 +1,470 @@
+﻿@{
+    ViewBag.Title = "RegIncrPolicy";
+}
+@model P2b.Global.RegIncrPolicy
+
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);          
+        $('#CurMonStartDay ').MaxLength(5).ForceOnlyNumeric();
+        $('#IncrMonth      ').MaxLength(5).ForceOnlyNumeric();
+        $('#LWPMinCeiling  ').MaxLength(5).ForceOnlyNumeric();
+        $('#MidMonthLockDay').MaxLength(5).ForceOnlyNumeric();
+        $('#NextMonStartDay').MaxLength(5).ForceOnlyNumeric();
+    });
+
+</script>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['Id', 'IncrMonth', 'CurMonStartDay'];
+        ColNames = ['Id', 'IncrMonth', 'CurMonStartDay'];
+        SortName = 'Id';
+        Caption = 'Reg Incr Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmRegIncrPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Reg Incr Policy', 'open', '@Url.Action("Create")', '#frmRegIncrPolicy', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) { });
+
+            
+            $('#IncrMonth').prop("disabled", true);
+            $('input[name="IsFixMonth"]:radio').change(function () {
+                if (this.value == "false") {
+                    // $('#WorkingDays').prop("disabled", false);
+                    $('#IncrMonth').prop("disabled", true);
+                    
+
+                }
+                else {
+                    $('#IncrMonth').prop("disabled", false);
+                    // $('#WorkingDays').prop("disabled", true);
+
+                }
+            });
+
+            $('#MidMonthLockDay').prop("disabled", true);
+            $('#CurMonStartDay').prop("disabled", true);
+            $('#NextMonStartDay').prop("disabled", true);
+            $('input[name="IsMidMonthEffect"]:radio').change(function () {
+                if (this.value == "false") {
+                    $('#MidMonthLockDay').prop("disabled", true);
+                    $('#CurMonStartDay').prop("disabled", true);
+                    $('#NextMonStartDay').prop("disabled", true);
+
+
+                }
+                else {
+                    $('#MidMonthLockDay').prop("disabled", false);
+                    $('#CurMonStartDay').prop("disabled", false);
+                    $('#NextMonStartDay').prop("disabled", false);
+                    
+
+                }
+            });
+            
+            $('#LWPMinCeiling').prop("disabled", true);
+            $('input[name="IsLWPIncl"]:radio').change(function () {
+                if (this.value == "false") {
+                    // $('#WorkingDays').prop("disabled", false);
+                    $('#LWPMinCeiling').prop("disabled", true);
+
+
+                }
+                else {
+                    $('#LWPMinCeiling').prop("disabled", false);
+                    // $('#WorkingDays').prop("disabled", true);
+
+                }
+            });
+
+            
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Promo Policy Data", '#frmRegIncrPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    $('[name="CurrQuarterStart"]').val([k.CurrQuarterStart]).button().button("refresh");
+                    $('[name="IsConfirmDate"]').val([k.IsConfirmDate]).button().button("refresh");
+                    $('[name="IsFixMonth"]').val([k.IsFixMonth]).button().button("refresh");
+                    $('[name="IsJoiningDate"]').val([k.IsJoiningDate]).button().button("refresh");
+                    $('[name="IsLWPEffectDateAsIncrDate"]').val([k.IsLWPEffectDateAsIncrDate]).button().button("refresh");
+                    $('[name="IsLWPIncl"]').val([k.IsLWPIncl]).button().button("refresh");
+                    $('[name="IsMidMonthEffect"]').val([k.IsMidMonthEffect]).button().button("refresh");
+                    $('[name="IsMidQuarterEffect"]').val([k.IsMidQuarterEffect]).button().button("refresh");
+                    $('[name="NextQuarterStart"]').val([k.NextQuarterStart]).button().button("refresh");
+                    $('#CurMonStartDay').val(k.CurMonStartDay);
+                    $('#IncrMonth').val(k.IncrMonth);
+                    $('#LWPMinCeiling').val(k.LWPMinCeiling);
+                    $('#MidMonthLockDay').val(k.MidMonthLockDay);
+                    $('#NextMonStartDay').val(k.NextMonStartDay);
+
+                });
+
+                $('#IncrMonth').prop("disabled", true);
+                $('input[name="IsFixMonth"]:radio').change(function () {
+                    if (this.value == "false") {
+                        // $('#WorkingDays').prop("disabled", false);
+                        $('#IncrMonth').prop("disabled", true);
+
+
+                    }
+                    else {
+                        $('#IncrMonth').prop("disabled", false);
+                        // $('#WorkingDays').prop("disabled", true);
+
+                    }
+                });
+
+                $('#MidMonthLockDay').prop("disabled", true);
+                $('#CurMonStartDay').prop("disabled", true);
+                $('#NextMonStartDay').prop("disabled", true);
+                $('input[name="IsMidMonthEffect"]:radio').change(function () {
+                    if (this.value == "false") {
+                        $('#MidMonthLockDay').prop("disabled", true);
+                        $('#CurMonStartDay').prop("disabled", true);
+                        $('#NextMonStartDay').prop("disabled", true);
+
+
+                    }
+                    else {
+                        $('#MidMonthLockDay').prop("disabled", false);
+                        $('#CurMonStartDay').prop("disabled", false);
+                        $('#NextMonStartDay').prop("disabled", false);
+
+
+                    }
+                });
+
+                $('#LWPMinCeiling').prop("disabled", true);
+                $('input[name="IsLWPIncl"]:radio').change(function () {
+                    if (this.value == "false") {
+                        // $('#WorkingDays').prop("disabled", false);
+                        $('#LWPMinCeiling').prop("disabled", true);
+
+
+                    }
+                    else {
+                        $('#LWPMinCeiling').prop("disabled", false);
+                        // $('#WorkingDays').prop("disabled", true);
+
+                    }
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Reg Incr Policy Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                     $('[name="CurrQuarterStart"]').val([k.CurrQuarterStart]).button().button("refresh");
+                    $('[name="IsConfirmDate"]').val([k.IsConfirmDate]).button().button("refresh");
+                    $('[name="IsFixMonth"]').val([k.IsFixMonth]).button().button("refresh");
+                    $('[name="IsJoiningDate"]').val([k.IsJoiningDate]).button().button("refresh");
+                    $('[name="IsLWPEffectDateAsIncrDate"]').val([k.IsLWPEffectDateAsIncrDate]).button().button("refresh");
+                    $('[name="IsLWPIncl"]').val([k.IsLWPIncl]).button().button("refresh");
+                    $('[name="IsMidMonthEffect"]').val([k.IsMidMonthEffect]).button().button("refresh");
+                    $('[name="IsMidQuarterEffect"]').val([k.IsMidQuarterEffect]).button().button("refresh");
+                    $('[name="NextQuarterStart"]').val([k.NextQuarterStart]).button().button("refresh");
+                    $('#CurMonStartDay').val(k.CurMonStartDay);
+                    $('#IncrMonth').val(k.IncrMonth);
+                    $('#LWPMinCeiling').val(k.LWPMinCeiling);
+                    $('#MidMonthLockDay').val(k.MidMonthLockDay);
+                    $('#NextMonStartDay').val(k.NextMonStartDay);
+                });
+
+                $.each(data[1], function (i, k) {
+                    
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#IncrMonth').oldVal(data[2].IncrMonth);
+                        $('#MidMonthLockDay').oldVal(data[2].MidMonthLockDay);
+                        $('#LWPMinCeiling').oldVal(data[2].LWPMinCeiling);
+                        $('#NextMonStartDay').oldVal(data[2].NextMonStartDay);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });        
+       
+        //$.OnCheckMakeTextboxDisable("IsFixMonth", "#IncrMonth");
+        //$.RadioBtnGroup("IsJoiningDate", "IsConfirmDate");
+        $('.popup_radio_button').controlgroup();
+        //$('.regpoly_popup_radio_button').controlgroup();
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+    @*<link href="~/Content/Corporate/corporate.css" rel="stylesheet" />*@
+    @*<link href="~/Content/Regularincrementpolicy/RegularIncrementPolicy.css" rel="stylesheet" />*@
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .horizontal_row1, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .regpoly_popup-content-label {
+            width: 208px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .regpoly_regpoly_popup-content-textbox {
+            min-width: 100px;
+        }
+
+        regpoly_row1 {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create RegIncrPolicy">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmRegIncrPolicy", name = "frmRegIncrPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+           <div class="from_section from_section_box">
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsJoiningDate, "IsJoiningDate:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio1" name="IsJoiningDate" value="true" /><label for="RegIncrPolicy_radio1">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio2" name="IsJoiningDate" value="false" checked="checked" /><label for="RegIncrPolicy_radio2">No</label>
+
+                </div>
+
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsConfirmDate, "IsConfirmDate:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio3" name="IsConfirmDate" value="true" /><label for="RegIncrPolicy_radio3">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio4" name="IsConfirmDate" value="false" checked="checked" /><label for="RegIncrPolicy_radio4" >No</label>
+
+                </div>
+            </div>
+
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsFixMonth, "IsFixMonth:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio5" name="IsFixMonth" value="true" /><label for="RegIncrPolicy_radio5">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio6" name="IsFixMonth" value="false" checked="checked" /><label for="RegIncrPolicy_radio6">No</label>
+
+                </div>
+            </div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.IncrMonth, "IncrMonth:", new { @class = "regpoly_popup-content-label must" })@Html.TextBoxFor(m => m.IncrMonth, new { @class = "regpoly_popup-content-textbox must" })</div>
+        </div>
+        <div class="from_section from_section_box">
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsMidMonthEffect, "IsMidMonthEffect:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+                    <input type="radio" id="RegIncrPolicy_radio7" name="IsMidMonthEffect" value="true" /><label for="RegIncrPolicy_radio7">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio8" name="IsMidMonthEffect" value="false" checked="checked" /><label for="RegIncrPolicy_radio8">No</label>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.MidMonthLockDay, "MidMonthLockDay:", new { @class = "regpoly_popup-content-label must" })@Html.TextBoxFor(m => m.MidMonthLockDay, new { @class = "regpoly_popup-content-textbox must" })</div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.CurMonStartDay, "CurMonStartDay:", new { @class = "regpoly_popup-content-label must" })@Html.TextBoxFor(m => m.CurMonStartDay, new { @class = "regpoly_popup-content-textbox must" })</div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.NextMonStartDay, "NextMonStartDay:", new { @class = "regpoly_popup-content-label must" })@Html.TextBoxFor(m => m.NextMonStartDay, new { @class = "regpoly_popup-content-textbox must" })</div>
+
+        </div>
+
+
+
+
+        <div class="from_section from_section_box">
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsMidQuarterEffect, "IsMidQuarterEffect:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio9" name="IsMidQuarterEffect" value="true" /><label for="RegIncrPolicy_radio9">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio10" name="IsMidQuarterEffect" value="false" checked="checked" /><label for="RegIncrPolicy_radio10">No</label>
+
+                </div>
+            </div>
+
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.CurrQuarterStart, "CurrQuarterStart:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button">
+
+                    <input type="radio" id="RegIncrPolicy_radio11" name="CurrQuarterStart" value="true" /><label for="RegIncrPolicy_radio11">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio12" name="CurrQuarterStart" value="false" checked="checked" /><label for="RegIncrPolicy_radio12">No</label>
+
+                </div>
+            </div>
+
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.NextQuarterStart, "NextQuarterStart:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio13" name="NextQuarterStart" value="true" /><label for="RegIncrPolicy_radio13">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio14" name="NextQuarterStart" value="false" checked="checked" /><label for="RegIncrPolicy_radio14">No</label>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="from_section from_section_box">
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsLWPEffectDateAsIncrDate, "IsLWPEffectDateAsIncrDate:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+
+                    <input type="radio" id="RegIncrPolicy_radio15" name="IsLWPEffectDateAsIncrDate" value="true" /><label for="RegIncrPolicy_radio15">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio16" name="IsLWPEffectDateAsIncrDate" value="false" checked="checked" /><label for="RegIncrPolicy_radio16">No</label>
+
+                </div>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.IsLWPIncl, "IsLWPIncl:", new { @class = "regpoly_popup-content-label must" })
+                <div class="regpoly_popup_radio_button ">
+                    <input type="radio" id="RegIncrPolicy_radio111" name="IsLWPIncl" value="true" /><label for="RegIncrPolicy_radio111">Yes</label>
+                    <input type="radio" id="RegIncrPolicy_radio112" name="IsLWPIncl" value="false" checked="checked" /><label for="RegIncrPolicy_radio112">No</label>
+
+                </div>
+            </div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.LWPMinCeiling, "LWPMinCeiling:", new { @class = "regpoly_popup-content-label must" })@Html.TextBoxFor(m => m.LWPMinCeiling, new { @class = "regpoly_popup-content-textbox must" })</div>
+        </div>
+            
+            
+            
+            
+            
+        }
+    </div>
+
+</body>
+</html>

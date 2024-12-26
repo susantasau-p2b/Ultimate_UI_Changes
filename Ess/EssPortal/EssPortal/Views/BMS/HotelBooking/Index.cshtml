@@ -1,0 +1,411 @@
+﻿
+@{
+    Layout = null;
+}
+@model Payroll.HotelBookingRequest
+
+
+
+
+<!---//=============================================-->
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+</style>
+<html>
+
+<head>
+    <title></title>
+    <script>
+    $(document).ready(function (e) {
+        @*var dataemp = $('#Emp').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+        
+        $('button').button();
+        //$('#ResumeDate').P2BDatePicker();
+        // $('#ReqDate').P2BDatePicker();
+       
+        $('.drop').selectmenu().selectmenu("menuWidget");
+       
+        
+            $('#LeaveHead_drop').on('selectmenuchange', function () {
+                if ($(this).val() != 0) {
+                    var a = $('#EmpLvnereq_Id').val();
+                    console.log(a);
+                    if (a != null && a.length > 0) {
+                        $('#Reasonlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 451, "");
+                        $.getJSON("@Url.Action("GetLeaveBalance", "Elms")", { LvHeadId: $(this).val(), EmpId: a.toString() }, function (data) {
+                        if (data != null) {
+
+                            if ($('div#lvdata')[0]) {
+                                $('div#lvdata').remove();
+                            }
+                            var a = "<div id='lvdata'>LvOpening :" + data.LvOpening + " Balance :" + data.LvClosing + " Debit Days :" + data.LvOccurances + "</div>";
+                            $('#LeaveHead_drop').parent('div').append(a);
+                            $('#DebitDays').val('');
+                        }
+                        else {
+                            $('div#lvdata').remove();
+                        }
+                    });
+                } else {
+                    alert('Select Employee..!');
+                    $('#LeaveHead_drop').val(0).selectmenu('refresh');
+                }
+            } else {
+                $('div#lvdata').remove();
+            }
+        });
+        $('#ReqDate').TodayDate();
+        $('#ToDate').on('change', function () {
+
+            var from = $("#ToDate").val().split("/");
+            // alert(from);
+            var convertedStartDate = new Date(from[2], from[1] - 1, from[0]);
+            // alert(convertedStartDate);
+            var newdate = new Date(convertedStartDate);
+
+            newdate.setDate(newdate.getDate() + 1);
+            // alert(newdate);
+            var dd = newdate.getDate();
+            // alert("date" + dd);
+            var mm = newdate.getMonth() + 1;
+            var yyyy = newdate.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            today = dd + '/' + mm + '/' + yyyy;
+            document.getElementById("ResumeDate").value = today;
+
+        });
+        $('#lblloader').hide();
+        $('#ToStatlist,#FromStatlist').on('selectmenuchange', function () {
+            $('#DebitDays').val('');
+        });
+
+        $('#create-ContactNo-ContDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '', '', '', '#frmLvNewReq', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+                $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0], data[1], 'ContactNos_List', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', 'N');
+            });
+            event.preventDefault();
+        });
+        $('#lookup-ContactNo-ContDetails').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'lookupdiv', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#frmLvNewReq', 'A', '#remove-ContactNo-ContDetails', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#edit-ContactNo-ContDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            b = a[0];
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '#frmLvNewReq', '#ContactNos_List', 'ContactNos_List', 'ContactNos_List', 'N', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+
+                $.each(data, function (i, k) {
+                    $('#frmContactNo').trigger('reset');
+                    $('#MobileNo').val(k.MobileNo);
+                    $('#LandlineNo').val(k.LandlineNo);
+                    $('#STDCode').val(k.STD);
+                });
+            });
+
+        });
+
+        $('#remove-ContactNo-ContDetails').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#frmLvNewReq', '#ContactNos_List', '#remove-ContactNo-ContDetails');
+            event.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        
+       
+    });
+
+    $('#Reasonlist').on('selectmenuchange', function () {
+
+        if ($('#Reasonlist').val() != 0) {
+            if ($('#Reasonlist :selected').text().toUpperCase() == 'OTHERS' || $('#Reasonlist :selected').text().toUpperCase() == 'OTHER') {
+                $('#Reason').val('');
+                $('#Reason').removeAttr('Readonly');
+            }
+            else {
+                $('#Reason').val($('#Reasonlist :selected').text());
+                $('#Reason').attr('Readonly', 'Readonly');
+            }
+
+        }
+        else {
+            alert('Please Select or enter Reason..!');
+            $('#Reason').val('');
+        }
+    })
+    $('.popup_radio_button').buttonset();
+   
+   
+    </script>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmHotelBookingReq", name = "frmHotelBookingReq", enctype = "multipart/form-data" }))
+        {
+            <!----input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" /-->
+            <div class="section2_Leave">
+                
+                <div class="row3 content_margine">
+                    <label class="popup-content-label must">Hotel Name:</label>
+                    <input type="text" id="HotelName" class="popup-content-textbox must" name="HotelName">
+                </div>
+
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label must">Hotel Desc:</label>
+                    <input type="text" id="HotelDesc" class="popup-content-textbox must" name="HotelDesc">
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Country, "Country :", new { @class = "popup-content-label" })
+                    <select id="CountryList" name="CountryList" class="drop" style="width:180px;">
+                        <option value="0">-Select-</option>
+                    </select>
+                    <div class="add_icon-row">
+                        <button data-p2btooltip="Create Country" class="popup-content-icon-create" id="create_country">
+                            <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.State, "State :", new { @class = "popup-content-label" })
+                    <select id="StateList" name="StateList" class="drop must" style="width:180px;">
+                        <option value="0">-Select-</option>
+                    </select>
+                    <div class="add_icon-row">
+                        <button data-p2btooltip="Create State" class="popup-content-icon-create" id="create_state">
+                            <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="add_row content_margine">
+                    @Html.LabelFor(m => m.City, "City :", new { @class = "popup-content-label" })
+                    <select id="CityList" name="CityList" class="drop" style="width:180px;">
+                        <option value="0">-Select-</option>
+                    </select>
+                    <div class="add_icon-row">
+                        <button data-p2btooltip="Create City" class="popup-content-icon-create" id="create_city">
+                            <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                        </button>
+                    </div>
+                </div>
+
+                @*<div class="row3 content_margine">
+        <div id="HotelElligibilityPolicy_old"></div>
+        @Html.LabelFor(m => m.HotelEligibilityPolicy, "HotelEligibilityPolicy :", new { @class = "popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="Addresslist">
+                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+        <div class="icon-row">
+            <button data-p2btooltip="Lookup HotelEligibilityPolicy" class="  popup-content-icon-lookup" id="lookup-HotelEligibilityPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="create-Address-BenefitNominees"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="edit-Address-BenefitNominees"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button
+                <button data-p2btooltip="Remove HotelEligibilityPolicy" class="popup-content-icon-remove" id="remove-HotelEligibilityPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>*@
+
+                <div class="row3 content_margine ">
+                    @Html.LabelFor(m => m.IsFamilyIncl, " IsFamilyIncl:", new { @class = "popup-content-label" })
+                    <span class="popup_radio_button">
+                        <span><input type="radio" id="radio3" name="IsFamilyIncl" value="true" /> <label for="radio3">Yes</label></span>
+                        <span><input type="radio" id="radio4" name="IsFamilyIncl" value="false" /> <label for="radio4">No</label></span>
+                    </span>
+                </div>
+                <div id="FamilymemberDiv">
+                    <div class="row3 content_margine">
+                        <div id="Nomineeslist_old"></div>
+                        @Html.LabelFor(m => m.FamilyDetails, "Faimly Member Name :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="NomineeNamelist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Nomineename" class="  popup-content-icon-lookup" id="lookup-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Nomineename" class="popup-content-icon-create" id="create-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Nomineename" class="popup-content-icon-edit" id="edit-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Nomineename" class="popup-content-icon-remove" id="remove-NomineeName-BenefitNominees"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    <div id="Empdoclist_old"></div>
+                    @*@Html.LabelFor(m => m.EmployeeDocuments, "Document details :", new { @class = "popup-content-label add_label" })*@
+                    <label class="popup-content-label">Reference Document :</label>
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="CandidateDocumentslist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+
+                    </div>
+
+                    <div class="icon-Document icon-row">
+                        <button data-p2btooltip="Lookup Document Details" class=" popup-content-icon-lookup" id="lookup-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Document Details" class=" popup-content-icon-create" id="create-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Document Details" class=" popup-content-icon-edit" id="edit-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Delete Document Details" class=" popup-content-icon-remove" id="remove-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+
+
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BillNo, "Bill No :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BillNo, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.StartDate, "Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.StartDate, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.NoOfRooms, "No of Room :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.NoOfRooms, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TotFamilyMembers, "Total Family member :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotFamilyMembers, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TotalAdults, "Total Adults :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalAdults, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TotalChild, "Total Child :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalChild, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TotalInfant, "Total Infant :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalInfant, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.TotalSrCitizen, "Total Sr. Citizen :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.TotalSrCitizen, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.SpecialRemark, "SpecialRemark :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.SpecialRemark, new { @class = "popup-content-textbox must" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.RatePerDay, "Rate per day :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.RatePerDay, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.StdDiscount, "Std. Discount :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.StdDiscount, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Taxes, "Taxes :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Taxes, new { @class = "popup-content-textbox must" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BillAmount, "Bill Amount  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.BillAmount, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Eligible_BillAmount, "Eligible Bill Amount  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Eligible_BillAmount, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Narration, "Narration  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+                </div>
+
+
+
+                
+                
+            </div>
+        }
+    </div>
+</body>
+</html>
+
+

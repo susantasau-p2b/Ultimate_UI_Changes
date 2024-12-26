@@ -1,0 +1,553 @@
+﻿@{
+    ViewBag.Title = "Department";
+}
+@model P2b.Global.Department
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 62px;
+            top: -150px;
+        }
+
+        .row2 {
+            width: 449px;
+        }
+
+        .popup-content-label {
+            width: 104px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+/*            width: 63%;*/
+        }
+
+        .add_icon-row {
+            left:-80px;
+            top: -45px;
+            position: relative;
+        }
+
+        .popup-content-drop-icon-edit, .popup-content-drop-icon-create, .popup-content-drop-icon-lookup {
+            height: 20px;
+            margin: auto;
+            /*position: absolute;*/
+            width: 20px;
+            left: 0px;
+        }
+    </style>
+
+
+
+
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+        </div>
+    </div>
+
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "FormDepartment", name = "FormDepartment" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row2 content_margine  ">
+                <label class="popup-content-label must ">Department :</label>
+                <select id="Department_Obj_DDL" name="Department_Obj_DDL" class="drop must" style="width:250px;">
+                    <option value="0">-Select-</option>
+                </select>
+                <div class="add_icon-row">
+                    <button data-p2btooltip="Create Department" class="popup-content-icon-create" id="Create_Department">
+                        <span class="ui-icon ui-icon-newwin popup-content-iconmark"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.OpeningDate, "Opening Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OpeningDate, new { @class = "popup-content-textbox-short must", @onkeypress = "CheckDate(this)" })</div>
+            <label id="LabelIncharge" class="popup-content-label">Incharge :</label>
+            <input name="TextIncharge" type="text" id="TextIncharge" class="date-picker" style="width: 243px" />
+            <input type="text" id="Incharge_Id" name="Incharge_Id" class="filter_structure_id" />
+
+            <button data-p2btooltip="Lookup Incharge Name" class="popup-content-drop-icon-lookup" id="Lookup_Incharge"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+            <div class="row2 content_margine">
+                @Html.LabelFor(m => m.HolidayCalendar, "Holiday Calendar Details :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="HOCalendarsList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Holiday Calendar Details" class="popup-content-icon-lookup" id="Lookup-HOCalendar-Department"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Holiday Calendar Details" class="popup-content-icon-create" id="Create-HOCalendar-Department"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Holiday Calendar Details" class="popup-content-icon-edit" id="Edit-HOCalendar-Department"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Holiday Calendar Details" class="popup-content-icon-remove" id="Remove-HOCalendar-Department"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row2 content_margine">
+                @Html.LabelFor(m => m.WeeklyOffCalendar, "Weekly Off Calendar Details :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="WOCalendarList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Weekly Off Calendar Details" class="popup-content-icon-lookup" id="Lookup-WOCalendar-Department"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Weekly Off Calendar Details" class="popup-content-icon-create" id="Create-WOCalendar-Department"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Weekly Off Calendar Details" class="popup-content-icon-edit" id="Edit-WOCalendar-Department"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Weekly Off Calendar Details" class="popup-content-icon-remove" id="Remove-WOCalendar-Department"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+
+            <div class="row2 content_margine">
+                @Html.LabelFor(m => m.Address, "Address :", new { @class = "popup-content-label" })  <div class="popup-content-table">
+                    <table class="lookuptableselected" id="AddressList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Address" class="  popup-content-icon-lookup" id="Lookup-Address-Department"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-Address-Department"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-Address-Department"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="Remove-Address-Department"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row2 content_margine">
+                @Html.LabelFor(m => m.ContactDetails, "Contact Details :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ContactDetailsList">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Contact Details" class="popup-content-icon-lookup" id="Lookup-ContactDetails-Department"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Contact Details" class="popup-content-icon-create" id="Create-ContactDetails-Department"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-ContactDetails-Department"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Contact Details" class="popup-content-icon-remove" id="Remove-ContactDetails-Department"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+       $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        //$('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: 0 });
+        $('#DepartmentObj_DeptCode').MaxLength(10);
+        $('#DepartmentObj_DeptDesc').MaxLength(100);
+        $('#OpeningDate').P2BDatePicker();
+        $("#OpeningDate").keypress(function (event) { event.preventDefault(); });
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Department,#Remove-Address-Department,#Edit-ContactDetails-Department,#Remove-ContactDetails-Department";
+        ColModel = ['Code', 'Name', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Department';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#FormDepartment').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Department', 'open', '@Url.Action("Create")', '#FormDepartment', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList,#HOCalendarsList,#WOCalendarList', btndisablenames, function (data) { });
+            $('#Department_Obj_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "DepartmentObj")", "", "", '#Department_Obj_DDL');
+            //  $('#HolidayCalendar_DDL').P2BSelectMenuAppend("@@Url.Action("PopulateDropDownListHolidayCalendar", "Location")", "", "", '');
+            @*$('#Incharge_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListIncharge", "Location")", "", "", '');*@11/08/2023
+            //  $('#WeeklyOffCalendar_DDL').P2BSelectMenuAppend("@@Url.Action("PopulateDropDownListWeeklyOffCalendar", "Location")", "", "", '');
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Department Data", '#FormDepartment', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', btndisablenames, function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#DepartmentObj_DeptCode').val(k.Code);
+                    $('#DepartmentObj_DeptCode').attr('readonly', 'readonly');
+                    $('#DepartmentObj_DeptDesc').val(k.Name);
+                    if (k.OpeningDate != null)
+                        $('#OpeningDate').val(DateConvert(k.OpeningDate));
+                    else
+                        $('#OpeningDate').val();
+                    $('#Incharge_Id').val(k.Incharge_Id);
+
+                    $('#TextIncharge').val(k.Incharge);
+                    $('#Department_Obj_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "DepartmentObj")", "", k.DepartmentObj_Id, "#Department_Obj_DDL"); // Dropdown bind
+                    @*$('#Incharge_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListIncharge", "Location")", "", k.Incharge_Id);*@11/08/2023
+                    //       $('#HolidayCalendar_DDL').P2BSelectMenuAppend("@@Url.Action("PopulateDropDownListHolidayCalendar", "Location")", "", k.HolidayCalendar_Id);
+                    //      $('#WeeklyOffCalendar_DDL').P2BSelectMenuAppend("@@Url.Action("PopulateDropDownListWeeklyOffCalendar", "Location")", "", k.WeeklyOffCalendar_Id);
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Department,#Remove-Address-Department', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Remove-ContactDetails-Department,#Edit-ContactDetails-Department', 'N');
+
+                    if (k.UnitId != null)
+                        $('#UnitId').val((k.UnitId));
+                    else
+                        $('#UnitId').val();
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#HOCalendarsList').P2BLookUpEncapsulate('#HOCalendarsList', 'HOCalendarsList', k.Holly_Id, k.HollyFullDetails, 'HOCalendarsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'N');
+                    $('#WOCalendarList').P2BLookUpEncapsulate('#WOCalendarList', 'WOCalendarList', k.week_Id, k.WeeklyFullDetails, 'WOCalendarList', '#Remove-WOCalendar-Department,#Edit-WOCalendar-Department', 'N');
+                });
+                //$.each(data[1], function (i, k) {
+                //    $('#HOCalendarsList').P2BLookUpEncapsulate('#HOCalendarsList', 'HOCalendarsList', k.Holly_Id, k.HollyFullDetails, 'HOCalendarsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'N');
+                //    $('#WOCalendarList').P2BLookUpEncapsulate('#WOCalendarList', 'WOCalendarList', k.week_Id, k.WeeklyFullDetails, 'WOCalendarList', '#Remove-WOCalendar-Department,#Edit-WOCalendar-Department', 'N');
+
+                //});
+
+
+                $('#Autho_Allow').val(data[2]); //Compulsory for authorisation
+
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Department Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Department,#Create-Address-Department,#Edit-Address-Department,#Remove-Address-Department,#Lookup-ContactDetails-Department,#Create-ContactDetails-Department,#Edit-ContactDetails-Department,#Remove-ContactDetails-Department', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#DepartmentObj_DeptCode').val(k.Code);
+                    $('#DepartmentObj_DeptDesc').val(k.Name);
+                    if (k.OpeningDate != null)
+                        $('#OpeningDate').val(DateConvert(k.OpeningDate));
+                    else
+                        $('#OpeningDate').val();
+
+                    $('#Incharge_Id').val(k.Incharge_Id);
+
+                    $('#TextIncharge').val(k.Incharge);
+                    if (k.UnitId != null)
+                        $('#UnitId').val((k.UnitId));
+                    else
+                        $('#UnitId').val();
+                    $('#Department_Obj_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "DepartmentObj")", "", k.DepartmentObj_Id, "#Department_Obj_DDL"); // Dropdown bind
+
+                    @*$('#Incharge_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListIncharge", "Location")", "", k.Incharge_Id);*@11/08/2023
+
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', 'view', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', 'view', 'N');
+
+
+                });
+
+
+                $.each(data[1], function (i, k) {
+                    $('#HOCalendarsList').P2BLookUpEncapsulate('#HOCalendarsList', 'HOCalendarsList', k.Holly_Id, k.HollyFullDetails, 'HOCalendarsList', 'view', 'N');
+                    $('#WOCalendarList').P2BLookUpEncapsulate('#WOCalendarList', 'WOCalendarList', k.week_Id, k.WeeklyFullDetails, 'WOCalendarList', 'view', 'N');
+
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#DepartmentObj_DeptDesc').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        //To get data in Lookup
+        $('#Lookup-Address-Department').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsAddress", "Department")', '', 'LookupDiv', 'Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#FormDepartment', 'N', '#Edit-Address-Department,#Remove-Address-Department', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Address-Department').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Dialog', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormDepartment', '', function (data) {
+                $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList', '#Edit-Address-Department,#Remove-Address-Department', 'N');
+            });
+            event.preventDefault();
+        });
+
+        // PArtial page edit
+
+        $('#Edit-Address-Department').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormDepartment', '#AddressList', 'AddressList', 'AddressList', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#FormAddress').trigger("reset");
+                    $('#Address1').val(k.Address1);
+                    $('#Address2').val(k.Address2);
+                    $('#Address3').val(k.Address3);
+                    $('#Landmark').val(k.Landmark);
+                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                    $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                    $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                    $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                    $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        $('#Lookup-Address-Department').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsContact", "Department")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#FormDepartment', 'N', '#Edit-Address-Department,#Remove-Address-Department', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        //partial page delete
+        $('#Remove-Address-Department').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#FormDepartment', '#AddressList', '#Edit-Address-Department,#Remove-Address-Department');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+
+        @*$('#Create-ContactDetails-Department').on("click", function () {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Department")', 'Create Dialog', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500);
+        });*@
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Lookup-ContactDetails-Department').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsContact", "Department")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#FormDepartment', 'N', '#Edit-ContactDetails-Department,#Remove-ContactDetails-Department', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ContactDetails-Department').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Department")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Department,#Remove-ContactDetails-Department', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-ContactDetails-Department').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HolidayList")', '@Url.Action("Edit", "HolidayList")', b, '@Url.Action("EditSave", "HolidayList")', 'Edit Holiday Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormDepartment', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ContactDetails-Department').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Department")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailsList', $('#ContactDetailsList').val(), 200, 200, '#FormDepartment', '#ContactDetailsList', '#Edit-ContactDetails-Department,#Remove-ContactDetails-Department');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-HOCalendar-Department').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsHolliday", "Department")', '', 'LookupDiv', 'Holliday Look Up Data', '#HOCalendarsList', 'HOCalendarsList', 5, 'HOCalendarsList', '#FormDepartment', 'N', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-HOCalendar-Department').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "HolidayCalendar")', 'Create Dialog', 'open', '@Url.Action("Create", "HolidayCalendar")', '#FormHoliCalendar', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormDepartment', '', function (data) {
+                $('#HOCalendarsList').P2BLookUpEncapsulate('#HOCalendarsList', 'HOCalendarsList', data[0], data[1], 'HOCalendarsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'N');
+                $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", '');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-HOCalendar-Department').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#HOCalendarsList').P2BGetTableDataonSelectedRow('#HOCalendarsList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HolidayCalendar")', '@Url.Action("Edit", "HolidayCalendar")', b, '@Url.Action("EditSave", "HolidayCalendar")', 'Edit Holiday Details', '#FormHoliCalendar', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormDepartment', '#HOCalendarsList', 'HOCalendarsList', 'HOCalendarsList', 'N', '#Remove-HOCalendar-Department,#Edit-HOCalendar-Department', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#FormHoliCalendar').trigger('reset');
+                    $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", k.Holicalendar_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#HolidayListList').P2BLookUpEncapsulate('#HolidayListList', 'HolidayListList', k.HolidayList_Id, k.HolidayList_val, 'HolidayListList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                });
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-HOCalendar-Department').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#HOCalendarsList').P2BGetTableDataonSelectedRow('#HOCalendarsList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#HOCalendarsList').P2BGetTableDataonSelectedRow('#HOCalendarsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HOCalendarsList', $('#HOCalendarsList').val(), 200, 200, '#FormDepartment', '#HOCalendarsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department');
+            event.preventDefault();
+        });
+
+        $('#Lookup-WOCalendar-Department').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWOCalendar", "Department")', '', 'LookupDiv', 'Holliday Look Up Data', '#WOCalendarList', 'WOCalendarList', 5, 'WOCalendarList', '#FormDepartment', 'N', '#Edit-WOCalendar-Department,#Remove-WOCalendar-Department', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-WOCalendar-Department').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "WeeklyOffCalendar")', 'Create Dialog', 'open', '@Url.Action("Create", "WeeklyOffCalendar")', '#FormParWeeklyOffCalendar', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormDepartment', '', function (data) {
+                //   $('#WOCalendarList').P2BLookUpEncapsulate('#WOCalendarList', 'WOCalendarList', data[0], data[1], 'WOCalendarList', '#Edit-WOCalendar-Department,#Remove-WOCalendar-Department', 'N');
+                $('#WOCalendar_DDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "WeeklyOffCalendar")', "", '');
+            });
+            event.preventDefault();
+        });
+        $('#Edit-WOCalendar-Department').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "WeeklyOffCalendar")', '@Url.Action("Edit", "WeeklyOffCalendar")', b, '@Url.Action("EditSave", "WeeklyOffCalendar")', 'Edit WeeklyOffList Details', '#FormParWeeklyOffCalendar', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormDepartment', '#WOCalendarList', 'WOCalendarList', 'WOCalendarList', 'N', '#Remove-WOCalendar-Department,#Edit-WOCalendar-Department', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#FormParWeeklyOffCalendar').trigger('reset');
+                    $('#WOCalendar_DDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "WeeklyOffCalendar")', "", k.WOCalendar_Id);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#WeeklyOffListList').P2BLookUpEncapsulate('#WeeklyOffListList', 'WeeklyOffListList', k.WeeklyoffList_Id, k.WeeklyoffList_val, 'WeeklyOffListList', '#Edit-WeeklyOffList-WeeklyOffCalendar,#Remove-WeeklyOffList-WeeklyOffCalendar', 'N');
+                });
+
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+        $('#Lookup_Incharge').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#TextIncharge",
+                appendToId: "#Incharge_Id",
+                lookupurl: "@Url.Action("LookupDepartmentIncharge", "Location")",
+                NoOfRecordToShow: "10",
+            setnameofthelookupbyppage: "txtIncharge_FName-lookup",
+            LookupDiv: "LookupDiv",
+            lookuppagename: "lookup",
+            pagename: "PageNavPosition",
+            readonly: true,
+            });
+    });
+        $('#Remove-WOCalendar-Department').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WOCalendarList').P2BGetTableDataonSelectedRow('#WOCalendarList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WOCalendarList', $('#WOCalendarList').val(), 200, 200, '#FormDepartment', '#WOCalendarList', '#Edit-WOCalendar-Department,#Remove-WOCalendar-Department');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#Create_Department').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "DepartmentObj")', 'Create Deparment', 'open', '@Url.Action("Create", "DepartmentObj")', '#frmDepartmentObj', 'Message :', 'Request Falied :', '#JqGrid', 217, 400, '', '#DepartmentObjlist', 'change', '', '', function (data) {
+                $('#Department_Obj_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "DepartmentObj")", "", data[0], '#Department_Obj_DDL');
+            });
+        });
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+</script>

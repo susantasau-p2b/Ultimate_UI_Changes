@@ -1,0 +1,252 @@
+﻿@model  Appraisal.AppEvalMethod
+@{
+    ViewBag.Title = "Appraisal Evaluation Method";
+}
+ 
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 93px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 370px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title=" Apprisal Evaluation Method">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAppEvalMethod", name = "frmAppEvalMethod" }))
+        {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />     
+        
+        <div class="row6 content_margine">     @Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" ,@id="CodeM", @maxlength = "10" })  </div>
+        <br>
+        <div class="row6 content_margine">     @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", @id = "NameM", @maxlength = "50" })  </div>
+        <br>
+       
+        <div class="row1 content_margine horizontal_row1">
+            @Html.LabelFor(m => m.IsNormalAvg, " Is Normal Average :", new { @class = "popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio1" name="IsNormalAvg" value="true" /> <label class="ui-corner-left" for="radio1">Yes</label>
+                    <input type="radio" id="radio2" name="IsNormalAvg" value="false" /> <label class="ui-corner-right" for="radio2">No</label>
+                </span>
+            </div>
+        </div>
+        <br>
+
+        <div class="row1 content_margine horizontal_row1">
+            @Html.LabelFor(m => m.IsGPA, "Is GPA :", new { @class = "popup-content-label" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="IsGPA" value="true" /> <label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="IsGPA" value="false" /> <label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>        
+        }
+    </div>  
+</body>
+</html>
+<script>
+
+    $(document).ready(function () {
+        $('#CodeM').ValidateTextBox({ maxlength: 10, alphanum: true });
+        //$('#Code').MaxLength(10);
+        //// $('#Name').ForceOnlyAlpha();
+        //// $('#Name').MaxLength(50);
+        $('#NameM').ValidateTextBox({ maxlength: 50, alphanum: true });
+    });
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Code', 'Name', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+        SortName = 'Id';
+        Caption = 'Appraisal Evaluation Method';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        //$('input[name="IsNormalAvg"]:radio').click(function () {
+        //    if (this.value == "false") {
+
+        //        var value = true;
+        //        $("input[name=IsGPA][value=" + value + "]").prop('checked', 'checked');
+        //        //alert(this.value)
+        //        //$("input[name=IsGPA]").prop('checked', true);
+             
+
+        //    }
+        //    else {
+        //        var value = false;
+        //        $("input[name=IsGPA][value=" + value + "]").prop('checked', 'checked');
+        //    }
+        //});
+
+        //$('input[name="IsGPA"]:radio').click(function () {
+        //    if (this.value == "false") {
+        //        $("input[name=IsNormalAvg]").prop('checked', true);
+
+
+        //    }
+        //    else {
+        //        $("input[name=IsNormalAvg]").prop('checked', false);
+        //    }
+        //});
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmAppEvalMethod').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Evaluation Method', 'open', '@Url.Action("Create")', '#frmAppEvalMethod', 'Message :', 'Request Falied :', '#JqGrid', 307, 401, "", "", function (data) { });
+
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Appraisal Evaluation Method", '#frmAppEvalMethod', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 307, 401, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmAppEvalMethod').trigger('reset');
+                    $('#CodeM').val(k.Code);
+                    $('#CodeM').attr('readonly', 'readonly');
+                    $('#NameM').val(k.Name);
+                    $('[name="IsGPA"]').val([k.IsGPA]).button().button("refresh");
+                    $('[name="IsNormalAvg"]').val([k.IsNormalAvg]).button().button("refresh");
+                });
+            });
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+         });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Appraisal Evaluation Method Data', '', '', 307, 401, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmAppEvalMethod').trigger('reset');
+                    $('#CodeM').val(k.Code);
+                    $('#CodeM').attr('readonly', 'readonly');
+                    $('#NameM').val(k.Name);
+                    $('[name="IsGPA"]').val([k.IsGPA]).button().button("refresh");
+                    $('[name="IsNormalAvg"]').val([k.IsNormalAvg]).button().button("refresh");
+                });
+            });
+                $('#Autho_Allow').val(data[3]);
+        });    
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>      
+
+  

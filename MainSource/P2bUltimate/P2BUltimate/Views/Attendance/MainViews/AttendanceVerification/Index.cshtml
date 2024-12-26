@@ -1,0 +1,481 @@
+﻿@{
+    ViewBag.Title = "AttendanceVerification";
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <style>
+       
+          
+        .popup-content-label {
+            width: 255px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row2, .radio_button_div_2 {
+            display: inline-block;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 683px;
+            width: 500px;
+            margin: 4px auto;
+            position: absolute;
+        }
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 683px;
+            width: 700px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 47em;
+            /*left: 401px;*/
+        }
+        .section0 {
+            display: block;
+            border: 1px solid #ddd;
+            height: 683px;
+            width: 960px;
+            margin: 2px 2px;
+            position: absolute;
+            margin-left: 47em;
+        }
+        .section_Method1 {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            height: 118px;
+        }
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .employeeselectiondiv {
+            float: left;
+        }
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+            .transactiontablenew th, .transactiontablenew td {
+                background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+                padding: 5px;
+                border-bottom: 1px solid #c5c5c5;
+                border-right: 1px solid #c5c5c5;
+                text-align: center;
+                color: rgba(114, 113, 113, 0.9);
+            }
+            .transactiontablenew tr:hover {
+                cursor: pointer;
+                background: #EEEEEE none repeat scroll 0 0;
+            }
+        #AnalysisTable {
+            /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #AnalysisTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+        #AnalysisTable tr:hover {
+            background-color: #ddd;
+        }
+        #AnalysisTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+        #AnalysisTable td, #AnalysisTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .addons {
+            height: 246px;
+        }
+         .row3 {
+            width: 416px;
+        }
+        .row2 {
+            width: 402px;
+        }
+
+        .photo {
+            width: 114px;
+            height: 94px;
+            border: 1px solid #c5c5c5;
+            /*padding: 50px;*/
+            /*margin-left: 5px;*/
+            float: right;
+            /*margin-right: 8px;*/
+            margin-top: -50px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+        #contain-word-lab {
+            bottom: 25px;
+            position: absolute;
+            margin-left: 255px;
+        }
+        label.required {
+            color: red;
+        }
+    </style>
+    
+
+    <script>
+        
+        $(document).ready(function () {
+            $('#AnalysisTable').after('<div id="nav"></div>');
+            var rowsShown = 4;
+            var rowsTotal = $('#AnalysisTable tbody tr').length;
+            var numPages = rowsTotal / rowsShown;
+            for (i = 0; i < numPages; i++) {
+                var pageNum = i + 1;
+                $('#nav').append('<a href="#" rel="' + i + '">' + pageNum + '</a> ');
+            }
+            $('#AnalysisTable tbody tr').hide();
+            $('#AnalysisTable tbody tr').slice(0, rowsShown).show();
+            $('#nav a:first').addClass('active');
+            $('#nav a').bind('click', function () {
+
+                $('#nav a').removeClass('active');
+                $(this).addClass('active');
+                var currPage = $(this).attr('rel');
+                var startItem = currPage * rowsShown;
+                var endItem = startItem + rowsShown;
+                $('#AnalysisTable tbody tr').css('opacity', '0.0').hide().slice(startItem, endItem).
+                css('display', 'table-row').animate({ opacity: 1 }, 300);
+            });
+        });
+
+        $(document).ready(function () {
+
+            $('button').button();
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+
+
+            ColModel = ['EmpCode', 'EmpName','Id'];
+            ColNames = ['EmpCode', 'EmpName', 'Id'];
+
+            SortName = 'Id';
+            Caption = 'Attendance Verification';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            $('#txtFromDate,#txtToDate').P2BDatePicker();
+            $('#create_dialog').P2BCreateDialog();
+            $('#create').button().on("click", function () {
+                $('#frmAttendanceVerification').trigger("reset");
+                //$("#Save_data").prop("disabled", true);
+                $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create Attendance Verification', 'open', '@Url.Action("create")', '#frmAttendanceVerification', 'Message :', 'Request Falied :', '#jqgrid', 800, 1100, '', '', function (data) { }, '');
+                $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+              
+            });
+            $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employeelist_ESSAtt?geo_id=', "");
+            function AssignData() {
+                dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            }
+
+            $('#LoadAtt').on('click', function (e) {
+                if ( $('#emp').val() == '') {
+                    alert("Select Employee..");
+                    return false;
+                }
+                if ($('#txtFromDate').val() == null ) {
+                    alert("Enter FromDate.");
+                    return false;
+                }
+                if ($('#txtToDate').val() == null) {
+                    alert("Enter ToDate.");
+                    return false;
+                }
+                var index = 1;
+                var tempclass = "";
+                $('#AnalysisTable tr:gt(0)').remove();
+                $.ajax({
+                    url: "@Url.Action("GetAttData", "AttendanceVerification")",
+                    data: { FromDate: $('#txtFromDate').val(), ToDate: $('#txtToDate').val(), EmpId: $('#emp').val() },
+                    success: function (data) {
+                        if (data.returndata != "") { 
+                           
+                            $.each(data.returndata, function (i, k) {
+                                var tr = "";
+                                empclass = "weeklyoffclass";
+                                tr = "<tr class='" + tempclass + "' Id='" + k.Id + "'><td>" + index + "</td><td>" + k.Id + "</td><td><a href=#> <img src='" + k.EmpPhoto + "' Id=" + k.Id + " + height=50 width=50></a><td>" + k.SwipeDate + "</td><td>" + k.SwipeTime + "</td><td><input type='checkbox' checked='checked' name='name'" + k.Id + "' + Id=cb" + k.Id + " />&nbsp;</td></tr>";
+                                $('#AnalysisTable tr:last').after(tr);
+                                index++;
+                                tempclass = "";
+                            });
+                          
+                        }
+                        else { alert(data.msg); }
+                       
+                    }
+
+                });
+                //$("#Save_data").removeProp('disabled');
+                e.preventDefault();
+            });
+          
+            $('#advance-filter-symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 700,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        if (data.GeoStruct != null) {
+                            $('#geo_id').val(data.GeoStruct);
+                        }
+                        if (data.PayStruct != null) {
+                            $('#pay_id').val(data.PayStruct);
+                        }
+                        if (data.FunStruct != null) {
+                            $('#fun_id').val(data.FunStruct);
+                        }
+                        var forwarddata = JSON.stringify(data);
+                        $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employeelist_ESSAtt?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#fromFilter",
+                    hierarchy: true,
+                });
+            });
+
+            $('#employee-table').on('click', 'input:checkbox:gt(0)', function (e) {
+                if (this.checked) { 
+                    var id = $(this).val();
+                    $('#emp').val(id);
+                    $("#imgEmpPro").LoadImg("@Url.Action("GetEmpImage")?Id=" + id);
+                    $('#AnalysisTable tr:gt(0)').remove();
+                } else {
+                    $('#emp').val('');
+                    $('#AnalysisTable tr:gt(0)').remove();
+                }
+            });
+
+            $('#Save_data').on('click', function (e) {
+                if ($('#emp').val() == '') {
+                    alert("Select Employee..");
+                    return false;
+                }
+                if ($('#txtFromDate').val() == null) {
+                    alert("Enter FromDate.");
+                    return false;
+                }
+                if ($('#txtToDate').val() == null) {
+                    alert("Enter ToDate.");
+                    return false;
+                }
+                var formjson = [];
+                var tr = [];
+                tr = $('#AnalysisTable tr:gt(0)').toArray();
+                if (tr.length == 0) { 
+                        alert("Load the data.");
+                        return false;
+                     
+                }
+
+                $.each(tr, function (i, k) {
+                    var childs = $(k).children().toArray(); 
+                    formjson.push({
+                        "Id": $(childs[1]).text(),
+                        "SwipeDate": $(childs[3]).text(),
+                        "SwipeTime": $(childs[4]).text(),
+                        "Checked": $($('#cb' + $(childs[1]).text())).is(":checked") 
+                    });
+                });
+                $.ajax({
+                    url: "@Url.Action("SaveData", "AttendanceVerification")",
+                    method: "POST",
+                    cache: false,
+                    contentType: 'application/json',
+                    datatype: 'json',
+                    data: JSON.stringify({
+                        data: formjson
+                    }), 
+                    success: function (data) {
+                        if (data.MSG != "") {
+                            alert(data.MSG);
+                            //$('#Save_data').attr("disabled", true);
+                        } 
+                        //$('.ajax_loder').remove();
+
+                    } 
+                });
+            });
+
+           
+           
+            $('<div></div>').P2BPartialCreateModalDialog();
+            
+            $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+            $('.popup_radio_button').buttonset();
+        });
+    </script>
+</head>
+<body>
+    <div class="form_bg">
+        <div class="form_input">
+            <div class="button_container">
+                <button class="button" id="create">Verify</button>
+                @*<button class="button" id="view">View</button>
+                <button class="button" id="edit">Edit</button>
+                <button class="button" id="delete">Delete</button>*@
+
+                <div id="grid_form">
+                    <div>
+                        <table id="jqgrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="create_dialog">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmAttendanceVerification", name = "frmAttendanceVerification" }))
+        {
+
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <input id="emp" type="hidden" name="emp" />
+             <div class="section1_Leave">
+           
+                <div>
+                    <input id="geo_id" class="filter_structure_id" name="geo_id" />
+                    <input id="pay_id" class="filter_structure_id" name="pay_id" />
+                    <input id="fun_id" class="filter_structure_id" name="fun_id" />
+                    <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+                    <div class="section_Method">
+                        <div class="heading">Filter View</div>
+                        <div class="filter-div">
+                            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="advance-filter-symbol"></span></label>
+                            <div id="fromFilter"></div>
+                        </div>
+                    </div>
+                </div>
+             
+                 <div>
+                     <div class="section_Method">
+                         <div class="heading">Employee List</div>
+                         <div class="employeeselectiondiv">
+                             <div class="transactiondivnew dynamic addons" style="float:left">
+                                 <div><label>Search : </label><input type="text" id="employee-search" style="width: 425px;" /></div>
+                                 <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table">
+                                     <tr><th><input type="checkbox" id="case-employee" /></th><th>Employee</th></tr>
+                                 </table>
+                             </div>
+
+                         </div>
+                     </div>
+                 </div>   
+
+         </div>
+             <div class="section2_Leave">
+            <div style="height:600px;width:550px;">
+            <div class="section_Method1">
+                <div class="row3 content_margine">
+                    <label id="lblFromDate" class="popup-content-labelT">From Date:</label>
+                    <input type="text" id="txtFromDate" style="width: 80px;"  />
+                    <label id="lblToDate" class="popup-content-labelT">To Date:</label>
+                    <input type="text" id="txtToDate" style="width: 80px;" />
+                </div>
+                <div>
+                    <button class="button" id="LoadAtt" style="margin-left: 318px;margin-top: -21px; width:82px;">Load Data</button>
+                </div>
+                <br />
+                <div class="row3 content_margine" id="note">
+                    <label><b style="color:red"> NOTE : Kindly de-select the records which are unmatched.
+                   You have to re-process the attendance after verification.</b> </label>
+                </div>
+                <label style="position: absolute; margin-top: -66px; margin-left: 399px;font-weight:bold;">Employee Profile Photo</label>         
+                <div class="photo">               
+                    <img src="" height="94" width="114" id="imgEmpPro" alt="Selected Employee Profile" />
+                </div>
+            </div>
+
+            <div>
+                <label class="heading">Employee Data</label>
+                <div style="height:600px;width:550px;">
+                    <table id="AnalysisTable" >
+                        <thead>
+                            <tr>
+                                <th data-name="SrNo">Sr.No</th> 
+                                <th data-name="Id">Id</th>
+                                <th data-name="EmpPhoto">Emp Photo</th>
+                                <th data-name="SwipeDate">Swipe Date</th>
+                                <th data-name="SwipeTime">Swipe Time</th> 
+                                <th><input type="checkbox" id="select_all" checked="checked" /></th>
+                            </tr>
+                        </thead>
+                        @*<tr><th>Sr.No</th><th>Emp Photo</th><th>Emp Code</th><th>Emp Name</th></tr>*@
+                    </table>
+                </div>
+            </div>
+                <button id="Save_data" style="left: 2px; margin-top: -164px;">Verify Data</button>
+        </div>
+
+
+
+    </div>
+
+        }
+   </div>
+</body>
+</html>

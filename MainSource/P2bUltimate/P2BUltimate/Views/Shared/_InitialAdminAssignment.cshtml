@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = "Initial Admin Assignment";
+}
+<script>
+    $(function () {
+        var dia = $('#createdialog').dialog({
+            autoOpen: false,
+            height: 400,
+            width: 425,
+            modal: true,
+            //  beforeClose: function () { true; },
+            closeOnEscape: false,
+            title: "User Assignment",
+            buttons: {
+                Submit: function (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Update", "InitialAdminAssignment")",
+                        data: $('#frmChangePassword').serialize(),
+                        success: function (data) {
+                            if (data.success == false) {
+                                alert(data.responseText);
+                            } else {
+                                alert(data.responseText);
+                                dia.dialog('close');
+                                window.location.reload(true);
+                              //  window.location.href = "" + data.data + "";
+                            }
+                        },
+                    });
+                },
+                //Cancel: function (e) {
+                //    $(this).dialog("close");
+                //}
+            }
+        });
+        dia.dialog("open");
+        $('#Employee_Id').val('@Request.RequestContext.HttpContext.Session["EmpId"]');
+       // $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#Emp_code').P2BSelectMenuMuliSelectAppend("@Url.Action("Employee", "InitialAdminAssignment")", "", "");
+        @*$('#comp_drop').P2BSelectMenuAppend("@Url.Action("Fill_CompanyDrop", "changepassword")", "", "", "");*@
+    });
+</script>
+<div id="createdialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChangePassword" }))
+    {
+        <div class="parent_div">
+
+            <div class="child-div">
+                <label class="content-label must">Employee Code :</label>
+                <select class="drop must" id="Emp_code" name="Emp_code"></select>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .parent_div {
+        float: left;
+        width: 368px;
+    }
+
+    .content-label {
+        float: left;
+        width: 130px;
+    }
+
+    .child-div {
+        display: inline-block;
+        margin: 1px;
+        width: 400px;
+    }
+
+    .button-div {
+        padding-top: 2px;
+    }
+
+    .capcha_content {
+        width: 163px;
+        height: 50px;
+        border-color: grey;
+        border-style: solid;
+        border-width: thin;
+        margin-left: 130px;
+    }
+
+    .capcha_text {
+        margin-left: 129px;
+    }
+</style>

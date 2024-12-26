@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "GeoFencing";
+}
+@model P2b.Global.GeoFencing
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 180px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row4 {
+            padding: 0px 0 5px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .tblmargin {
+            margin-left: 177px;
+            margin-top: 6px;
+        }
+
+        .xdsoft_datetimepicker .xdsoft_timepicker {
+            width: 83px;
+            float: left;
+            text-align: center;
+            margin-left: 8px;
+            margin-top: 0;
+        }
+
+        .xdsoft_prev {
+            margin-left: 25px;
+        }
+
+        .custome_ul {
+            padding: 0 0 0 15px;
+        }
+
+        .custome_li {
+            list-style: disc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create GeoFencing">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmGeoFencing", name = "frmGeoFencing" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="LocId" type="hidden" name="LocId" />
+
+            <div class="row3 content_margine" id="Loc">
+                <label class="popup-content-label must">Location :</label>
+                <input type="text" id="txtLoc" class="popup-content-textbox" />
+            </div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.LongitudeOriginal, "Longitude Original :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.LongitudeOriginal, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.LongitudeReference, "Longitude Reference :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.LongitudeReference, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.LatitudeOriginal, "Latitude Original :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.LatitudeOriginal, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.LatitudeReference, "Latitude Reference :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.LatitudeReference, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.DistanceMeter, "Distance Meter :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.DistanceMeter, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+                        <label class="popup-content-label">ESS Attendance Appl :</label>
+                        <div class="popup_radio_button">
+                            <input type="radio" id="radio1" name="ESSAttAppl" value="true" /><label for="radio1">Yes</label>
+                            <input type="radio" id="radio2" name="ESSAttAppl" value="false" checked="checked" /><label for="radio2">No</label>
+                        </div>
+             </div>
+            
+
+            <div class="row3 content_margine" id="Loclist">
+                <label>Select Location :</label>
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="location-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="location-table">
+                        <tr><th><input type="checkbox" id="case-location" /></th><th>Location</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="location" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+
+                        <button id="load-department" class="loan-btn">Load Dept</button>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row3 content_margine" id="Deptlist">
+                <label>Select Department :</label>
+                <div class="transactiondiv grid_colllpase_height">
+                    <div><label>Search : </label><input type="text" id="department-search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="department-table">
+                        <tr><th><input type="checkbox" id="case-department" /></th><th>Department</th></tr>
+                    </table>
+                    <span class="btn-span" aria-hidden="true">
+                        <a data-p2bheadertooltip="Collapse">
+                            <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                        </a>
+                        <button class="transcation_btn transcation-refresh" data-type="department" style="left: 13%;" id="">
+                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                        </button>
+
+
+                    </span>
+                </div>
+            </div>
+
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $('#location-table').P2BTransactionTableAnimation();
+    $('#department-table').P2BTransactionTableAnimation();
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        //var btndisablenames = "#Edit-Address-Email,#Remove-Address-Email";
+        ColModel = ['LocationFullDetails', 'DepartmentFullDetails', 'LatitudeOriginal', 'LatitudeReference', 'LongitudeOriginal', 'LongitudeReference', 'DistanceMeter', 'Id'];
+        ColNames = ['LocationFullDetails', 'DepartmentFullDetails', 'LatitudeOriginal', 'LatitudeReference', 'LongitudeOriginal', 'LongitudeReference', 'DistanceMeter', 'Id'];
+        SortName = 'Id';
+        Caption = 'GeoFencing Parameter';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#Loc').hide();
+            $('#Loclist').show();
+            $('#Dept').hide();
+            //$('#Deptlist').show();
+            $('#frmGeoFencing').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create GeoFencing Parameter', 'open', '@Url.Action("Create")', '#frmGeoFencing', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { }, {});
+            $('#location-table').P2BTransactionTable('#location-search', '#case-location', '@Url.Action("GetLocDetails")', []);
+            @*$('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("GetLocDetails")', "");*@
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            $('#Loc').show();
+            $('#Loclist').hide();
+            $('#Dept').show();
+            //$('#Deptlist').hide();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit GeoFencing Data", '#frmGeoFencing', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#LongitudeOriginal').val(k.LongitudeOriginal);
+                    $('#LongitudeReference').val(k.LongitudeReference);
+                    $('#LatitudeOriginal').val(k.LatitudeOriginal);
+                    $('#LatitudeReference').val(k.LatitudeReference);
+                    $('#DistanceMeter').val(k.DistanceMeter);
+                    $('#txtLoc').val(k.Location);
+                    $('#txtLoc').attr('readonly', 'readonly');
+                    $('#LocId').val(k.LocId);
+                    $('[name="ESSAttAppl"]').val([k.ESSAttAppl]).button().button("refresh");
+                    $('#department-table').P2BTransactionTable('#department-search', '#case-department', '@Url.Action("GetDeptDetailsEdit", "GeoFencing")', $('#LocId').val());
+                }); 
+                $.each(data[1], function (i, k) {
+                    $('#department-table').find("tr td input[type=checkbox][value=" + k.code + "]").attr('checked', true);
+                });
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Loc').show();
+            $('#Loclist').hide();
+            $('#Dept').show();
+            //$('#Deptlist').hide();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View GeoFencing Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#LongitudeOriginal').val(k.LongitudeOriginal);
+                    $('#LongitudeReference').val(k.LongitudeReference);
+                    $('#LatitudeOriginal').val(k.LatitudeOriginal);
+                    $('#LatitudeReference').val(k.LatitudeReference);
+                    $('#DistanceMeter').val(k.DistanceMeter);
+                    $('#txtLoc').val(k.LocDetails);
+                    $('#txtLoc').attr('readonly', 'readonly');
+                    $('[name="ESSAttAppl"]').val([k.ESSAttAppl]).button().button("refresh");
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmGeoFencing').P2BDeleteModalDialog('@Url.Action("Delete", "GeoFencing")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Load-department').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#location-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#department-table').find('td').remove();
+            var forwardata = $('#location-table').P2BGetTableDataonSelectedRow('#location-table', 1);
+            $('#department-table').P2BTransactionTable('#department-search', '#case-department', '@Url.Action("GetDeptDetails", "GeoFencing")', forwardata);
+            e.preventDefault();
+        });
+
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+        $('.popup_radio_button').buttonset();
+    });
+</script>

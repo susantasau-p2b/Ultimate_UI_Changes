@@ -1,0 +1,196 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.YearlyPaymentT
+<html>
+
+<head>
+
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            $('#FromPeriod').P2BDatePicker();
+            $('#ToPeriod').P2BDatePicker();
+          
+           $('#HideDiv').hide();
+
+            $("#SalaryHeadlist").on("selectmenuchange", function () {
+                $.get("@Url.Action("GetSalHead", "YearlyPaymentT")", { data: $(this).val() }, function (data) {
+                    if (data == true)
+                        $('#HideDiv').fadeIn();
+                    else
+                        $('#HideDiv').fadeOut();
+                });
+
+
+            });
+          
+        $('#lookup-LvEncashReq-YearlyPaymentT').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetlvencashreqDetails", "YearlyPaymentT")', '', 'lookupdiv', 'EncashReq Look Up Data', '#LvEncashReqlist', 'LvEncashReqlist', 5, 'LvEncashReqlist', '#frmYearlyPaymentT', 'N', '#remove-LvEncashReq-YearlyPaymentT', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+        $('#remove-LvEncashReq-YearlyPaymentT').button().on('click', function (event) {
+            //dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            var a = [], b;
+            a = $('#LvEncashReqlist').P2BGetTableDataonSelectedRow('#LvEncashReqlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvEncashReqlist', $('#LvEncashReqlist').val(), 200, 200, '#frmYearlyPaymentT', '#LvEncashReqlist', '');
+            event.preventDefault();
+        });
+            
+        $('#remove-Address-Corporate').button().on('click', function (event) {
+            //dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            var a = [], b;
+            a = $('#Addresslist').P2BGetTableDataonSelectedRow('#Addresslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Addresslist', $('#Addresslist').val(), 200, 200, '#frmCorporate', '#Addresslist', '#edit-Address-Corporate,#remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+
+        $('#lookup-ContactDetails-Corporate').button().on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'lookupdiv', 'Address Look Up Data', '#Addresslist', 'Addresslist', 5, 'Addresslist', '#frmCorporate', 'N', '#edit-Address-Corporate,#remove-Address-Corporate', 'lookup_table', 'pageNavPosition');*@
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'lookupdiv', 'ContactDetails Look Up Data', '#ContactDetailslist', 'ContactDetailslist', 5, 'ContactDetailslist', '#frmCorporate', 'N', '#edit-ContactDetails-Corporate,#remove-ContactDetails-Corporate', 'lookup_table', 'pageNavPosition');
+            // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailslist', 'ContactDetailslist', 10, 'ContactDetailslist', '#frmCorporate', 'N', '#edit-ContactDetails-Corporate,#remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+            event.preventDefault();
+        });
+        $('#ProcessMonth').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+
+            dateFormat: 'mm/yy',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('mm/yy', new Date(year, month, 1)));
+            }
+        });
+ 
+
+            $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+            $('#SalaryHeadlist').P2BSelectMenuAppend("@Url.Action("GetItInvestment", "ITInvestmentPayment")", "", "", "");
+             
+        });
+
+    </script>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 84px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 130px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 626px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .process_btn {
+            float: right;
+        }
+
+        .section2_Leave {
+            width: 401px;
+        }
+
+        #lvdata {
+            display: block;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog" title="Create Yearly Payment">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmYearlyPaymentT", name = "frmYearlyPaymentT" }))
+        {
+            <input type="text" id="Emp" name="employee-table" class="filter_structure_id" />
+            <div class="section2_Leave">
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label must" })<select id="SalaryHeadlist" name="SalaryHeadlist" class="must" style="width:159px;"><option value="0">-Select-</option></select></div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessMonth, "Process Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessMonth, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.FromPeriod, "Period From:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FromPeriod, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ToPeriod, "Period To:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToPeriod, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.AmountPaid, "Amount Paid:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.AmountPaid, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDS Amount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.OtherDeduction, "Other Deduction:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OtherDeduction, new { @class = "popup-content-textbox must" })</div>
+                <div id="HideDiv">
+                    <div class="row3 content_margine">
+                        <div id="LvEncashReqlist_old"></div>
+                        @Html.LabelFor(m => m.LvEncashReq, "Leave Encash Req:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvEncashReqlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select encash" class="  popup-content-icon-lookup" id="lookup-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="remove encash" class="popup-content-icon-remove" id="remove-LvEncashReq-YearlyPaymentT"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>
+
+            </div>
+        }
+    </div>
+</body>
+</html> 

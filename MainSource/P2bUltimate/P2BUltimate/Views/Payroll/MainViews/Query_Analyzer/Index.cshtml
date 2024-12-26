@@ -1,0 +1,133 @@
+﻿@model Payroll.QueryParameter
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+    .row3 {
+        width: 477px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['QLabel', 'QName', 'QDesc', 'QType', 'Id'];
+        ColNames = ['QLabel', 'QName', 'QDesc', 'QType', 'Id'];
+        SortName = 'Id';
+        Caption = 'Query Parameter';
+        url = '@Url.Action("P2bGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmQueryParameter').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Query Parameter', 'open', '@Url.Action("create")', '#frmQueryParameter', 'Message :', 'Request Falied :', '#JqGrid', 329, 613, '', '', function (data) { });
+            $('#QTypelist').P2BSelectMenuAppend('@Url.Action("GetQTypelistData", "Query_Analyzer")', "", "");
+        });
+
+        var value = "";
+        $('#QTypelist').on('selectmenuchange', function () {
+            value = $("#QTypelist option:selected").text();
+            $("#QTypelist option:selected").val(value);
+        });
+           
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Query Parameter", '#frmQueryParameter', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $('#frmQueryParameter').trigger("reset");         
+                $('#QLabel').val(data[0].QLabel);
+                $('#QName').val(data[0].QName);
+                $('#QDesc').val(data[0].QDesc);
+                $('#QTypelist').P2BSelectMenuAppend('@Url.Action("GetQTypelistData", "Query_Analyzer")', "", data[0].QType);
+                var value = $("#QTypelist option:selected").text();
+                $("#QTypelist option:selected").val(value);
+            });
+        });
+        $('#View').button().on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Query Parameter', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#frmQueryParameter').trigger("reset");
+                $('#QLabel').val(data[0].QLabel);
+                $('#QName').val(data[0].QName);
+                $('#QDesc').val(data[0].QDesc);
+                $('#QTypelist').P2BSelectMenuAppend('@Url.Action("GetQTypelistData", "Query_Analyzer")', "", data[0].QType);
+            });
+        });
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#QTypelist').selectmenu().selectmenu("menuWidget");
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="Create_Dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmQueryParameter", name = "frmQueryParameter" }))
+    {   
+        <div class="row3 content_margine" style="width: 420px;">
+                @Html.LabelFor(m => m.Type, "QType :", new { @class = "popup-content-label" })
+             <select class="drop" style="width:120px;" name="QTypelist" id="QTypelist">
+                 <option></option>
+             </select>
+            </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.QLabel, "QLabel :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.QLabel, new { @class = "popup-content-textbox must" })
+        </div>
+        <div class="row3 content_margine">
+            @Html.LabelFor(m => m.QName, "QName :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.QName, new { @class = "popup-content-textbox must" })
+        </div>
+         <div class="row3 content_margine">
+            @Html.LabelFor(m => m.QDesc, "QDesc :", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.QDesc, new { @class = "popup-content-textbox must" })
+        </div>
+         
+    }
+</div>

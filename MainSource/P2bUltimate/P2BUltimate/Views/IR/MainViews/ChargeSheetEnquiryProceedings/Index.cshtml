@@ -1,0 +1,366 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.ChargeSheetEnquiryProceedings
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+
+
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'EnquiryProceedingDate', 'EnquiryProceedingTime', 'IsEnquiryOver', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'EnquiryProceedingDate', 'EnquiryProceedingTime', 'IsEnquiryOver', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Charge Sheet Enquiry Proceedings';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Create').button().on("click", function () {
+            $('#frmChargeSheetEnquiryProceedings').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Charge Sheet Enquiry Proceedings ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmChargeSheetEnquiryProceedings', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });
+
+            $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: empirid }, function (data) {
+
+                if (data != null) {
+                    //alert(data);
+                    $("#chargesheetDetails").val(data);
+                    $('#chargesheetDetails').attr('readonly', 'readonly');
+                    return false;
+                }
+            });
+
+        });
+        $('#Delete').on('click', function () {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-EnquiryPanelPresent-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEnquirypanelPresent", "ChargeSheetEnquiryProceedings")', '', 'LookupDiv', 'EnquirypanelPresent Look Up Data', '#EnquiryPanelPresentList', 'EnquiryPanelPresentList', 5, 'EnquiryPanelPresentList', '#frmChargeSheetEnquiryProceedings', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-WitnessPresent-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWitnessPresent", "ChargeSheetEnquiryProceedings")', '', 'LookupDiv', ' WitnessPresent Look Up Data', '#WitnessPresentList', 'WitnessPresentList', 5, 'WitnessPresentList', '#frmChargeSheetEnquiryProceedings', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-EmployeeDocuments-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "ChargeSheetEnquiryProceedings")', '', 'LookupDiv', ' GetLookupDetailsEmployeeDoc Look Up Data', '#EmployeeDocumentsList', 'EmployeeDocumentsList', 5, 'EmployeeDocumentsList', '#frmChargeSheetEnquiryProceedings', 'A', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-WitnessPresent-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+
+            //a = $('#WitnessPresentList').P2BGetTableDataonSelectedRow('#WitnessPresentList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WitnessPresentList').P2BGetTableDataonSelectedRow('#WitnessPresentList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WitnessPresentList', $('#WitnessPresentList').val(), 200, 200, '#frmChargeSheetEnquiryProceedings', '#WitnessPresentList');
+            event.preventDefault();
+        });
+        $('#Remove-EnquiryPanelPresent-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+
+            //a = $('#EnquiryPanelPresentList').P2BGetTableDataonSelectedRow('#EnquiryPanelPresentList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EnquiryPanelPresentList').P2BGetTableDataonSelectedRow('#EnquiryPanelPresentList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EnquiryPanelPresentList', $('#EnquiryPanelPresentList').val(), 200, 200, '#frmChargeSheetEnquiryProceedings', '#EnquiryPanelPresentList');
+            event.preventDefault();
+        });
+
+        $('#Remove-EmployeeDocuments-ChargeSheetEnquiryProceedings').button().on('click', function (event) {
+
+            //a = $('#EmployeeDocumentsList').P2BGetTableDataonSelectedRow('#EmployeeDocumentsList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#EmployeeDocumentsList').P2BGetTableDataonSelectedRow('#EmployeeDocumentsList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmployeeDocumentsList', $('#EmployeeDocumentsList').val(), 200, 200, '#frmChargeSheetEnquiryProceedings', '#EmployeeDocumentsList');
+            event.preventDefault();
+        });
+        $('#Edit').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ChargeSheetReply", '#frmChargeSheetEnquiryProceedings', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsEmpReport"]').val([k.IsEmpReport]).button().button("refresh");
+                    $('[name="IsEnquiryOver"]').val([k.IsEnquiryOver]).button().button("refresh");
+                    if (k.EnquiryProceedingDate != null)
+                        $('#EnquiryProceedingDate').val(DateConvert(k.EnquiryProceedingDate));
+                    else
+                        $('#EnquiryProceedingDate').val();
+                    if (k.EnquiryProceedingTime != null) {
+                        $('#EnquiryProceedingTime').val(k.EnquiryProceedingTime);
+                    }
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#WitnessPresentList').P2BLookUpEncapsulate('#WitnessPresentList', 'WitnessPresentList', k.Witness_Id, k.WitnessFullDetails, 'WitnessPresentList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EnquiryPanelPresentList').P2BLookUpEncapsulate('#EnquiryPanelPresentList', 'EnquiryPanelPresentList', k.Enquirypanel_Id, k.EnquirypanelFullDetails, 'EnquiryPanelPresentList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'EmployeeDocumentsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+
+                });
+            });
+        });
+
+
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ChargeSheetEnquiryProceedings', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsEmpReport"]').val([k.IsEmpReport]).button().button("refresh");
+                    $('[name="IsEnquiryOver"]').val([k.IsEnquiryOver]).button().button("refresh");
+                    if (k.EnquiryProceedingDate != null)
+                        $('#EnquiryProceedingDate').val(DateConvert(k.EnquiryProceedingDate));
+                    else
+                        $('#EnquiryProceedingDate').val();
+                    if (k.EnquiryProceedingTime != null) {
+                        $('#EnquiryProceedingTime').val(k.EnquiryProceedingTime);
+                    }
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#WitnessPresentList').P2BLookUpEncapsulate('#WitnessPresentList', 'WitnessPresentList', k.Witness_Id, k.WitnessFullDetails, 'WitnessPresentList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EnquiryPanelPresentList').P2BLookUpEncapsulate('#EnquiryPanelPresentList', 'EnquiryPanelPresentList', k.Enquirypanel_Id, k.EnquirypanelFullDetails, 'EnquiryPanelPresentList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'EmployeeDocumentsList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+
+                });
+            });
+        });
+
+        $('#Create-EmployeeDocuments-ChargeSheetEnquiryProceedings').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#EmployeeDocumentsList').P2BLookUpEncapsulate('#EmployeeDocumentsList', 'EmployeeDocumentsList', data.Id, data.Val, 'EmployeeDocumentsList', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+        $('#EnquiryProceedingDate').P2BDatePicker();
+        $('#EnquiryProceedingTime').P2BTimePicker();
+        $('.popup_radio_button').controlgroup();
+    });
+    </script>
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>Index</title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChargeSheetEnquiryProceedings", name = "frmChargeSheetEnquiryProceedings" }))
+        {
+            <div class="row3 content_margine">
+                    <label for="chargesheetDetails" class="popup-content-label must">charge sheet Details</label>
+                <textarea cols="30" id="chargesheetDetails" name="chargesheetDetails" rows="2"></textarea>
+                </div> 
+            
+           <div class="row3 content_margine">
+            @Html.LabelFor(m => m.EnquiryProceedingDate, "Enquiry Proceeding Date:", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.EnquiryProceedingDate, new { @class = "popup-content-textbox must" })
+        </div>
+             <div class="row3 content_margine">
+            @Html.LabelFor(m => m.EnquiryProceedingTime, "Enquiry Proceeding Time:", new { @class = "popup-content-label must" })
+            @Html.TextBoxFor(m => m.EnquiryProceedingTime, new { @class = "popup-content-textbox must" })
+        </div>
+              <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsEmpReport, "Is Employee Report :", new { @class = "popup-content-label " })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio1" name="IsEmpReport" value="true" /><label for="radio1">YES</label>
+                    <input type="radio" id="radio2" name="IsEmpReport" value="false" checked="checked" /><label for="radio2">NO</label>
+                </span>
+            </div>
+        </div>
+    <div>
+        <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.WitnessPresent, "WitnessPresent :", new { @class = "popup-content-label " })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="WitnessPresentList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup corresponding WitnessPresent" class=" popup-content-icon-lookup" id="Lookup-WitnessPresent-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create OffenseObject " class=" popup-content-icon-create" id="Create-OffenseObject-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Delete WitnessPresent" class=" popup-content-icon-remove" id="Remove-WitnessPresent-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    </div>
+            <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.EnquiryPanelPresent, "EnquiryPanelPresent :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EnquiryPanelPresentList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding EnquiryPanelPresent" class=" popup-content-icon-lookup" id="Lookup-EnquiryPanelPresent-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*<button data-p2btooltip="Create OffenseObject " class=" popup-content-icon-create" id="Create-EnquiryPanelPresent-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+            @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete EnquiryPanelPresent" class=" popup-content-icon-remove" id="Remove-EnquiryPanelPresent-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsEnquiryOver, "Is Enquiry Over :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="IsEnquiryOver" value="true" /><label for="radio3">YES</label>
+                    <input type="radio" id="radio4" name="IsEnquiryOver" value="false" checked="checked" /><label for="radio4">NO</label>
+                </span>
+            </div>
+        </div>
+            
+        <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+        </div>
+               <div class=" row3 content_margine">
+                        @Html.LabelFor(m => m.ProceedingProofDocuments, "Supporting Documents :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EmployeeDocumentsList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding EmployeeDocuments" class=" popup-content-icon-lookup" id="Lookup-EmployeeDocuments-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create EmployeeDocuments " class=" popup-content-icon-create" id="Create-EmployeeDocuments-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete EmployeeDocuments" class=" popup-content-icon-remove" id="Remove-EmployeeDocuments-ChargeSheetEnquiryProceedings"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+        }
+        </div>
+</body>
+</html>

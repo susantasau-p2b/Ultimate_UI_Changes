@@ -1,0 +1,465 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.MisExpenseObject
+
+
+<html>
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 95px;
+            top: -150px;
+        }
+
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 688px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 250px;
+            width: 610px;
+            margin: 5px 4px;
+            position: absolute;
+        }
+
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 148px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        /*.section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 688px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }*/
+
+        .section2_Leave {
+            display: block;
+            border: 2px solid #ddd;
+            height: 789px;
+            width: 509px;
+            margin: 5px 4px;
+            position: absolute;
+            padding-left: 11px;
+        }
+
+
+        .row3 {
+            width: 471px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 370px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmMisExpenseobject", name = "frmMisExpenseobject" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.MisExpenseDate, "MisExpenseDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MisExpenseDate, new { @class = "popup-content-textbox" })</div>
+            <div id="MisExpenseElligibleAmtdiv1" class="row3 content_margine">
+                @Html.LabelFor(m => m.MisExpenseElligibleAmt, "MisExpenseElligibleAmt :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MisExpenseElligibleAmt, new { @class = "popup-content-textbox must ", @id = "MisExpenseElligibleAmtid" })
+            </div>
+            <div id="MisExpenseClaimAmtdiv1" class="row3 content_margine">
+                @Html.LabelFor(m => m.MisExpenseClaimAmt, "MisExpenseClaimAmt :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MisExpenseClaimAmt, new { @class = "popup-content-textbox must ", @id = "MisExpenseClaimAmtoid" })
+            </div>
+            <div id="MisExpenseSettleAmtdiv1" class="row3 content_margine">
+                @Html.LabelFor(m => m.MisExpenseSettleAmt, "MisExpenseSettleAmt :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.MisExpenseSettleAmt, new { @class = "popup-content-textbox must ", @id = "MisExpenseSettleAmtoid" })
+            </div>
+
+            <div id="TAClaimAmtdiv1" class="row3 content_margine">
+                @Html.LabelFor(m => m.Remark, "Remark :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must ", @id = "Remarkid" })
+            </div>
+
+
+
+
+        }
+    </div>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        $('#MisExpenseDate').P2BDatePicker();
+
+        //$('#FromDate,#ToDate').datetimepicker({
+        //    format: 'd/m/Y H:i',
+        //    formatDate: 'dd/MM/yyyy',
+        //    timeFormat: 'H:i',
+        //    step: 1
+
+
+        //});
+
+        //var ColNames = [];
+        //var ColModel = [];
+        //var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-BenefitNominees,#Remove-Address-BenefitNominees,#Edit-ContactDetails-BenefitNominees,#Remove-ContactDetails-BenefitNominees";
+        //ColModel = ['Id', 'DateofBirth', 'Relation'];
+        //ColNames = ['Id', 'DateofBirth', 'Relation'];
+        @*ColModel = ['ID', 'Employee Code', 'Employee Name'];
+        ColNames = ['ID', 'Employee Code', 'Employee Name'];
+        SortName = 'Id';
+        Caption = 'Benefit Nominees';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);*@
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        $('#Partial_Datebirthid').P2BDatePicker();
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        
+
+        $('#MisExpenseClaimAmtoid').keyup(function () {
+            //alert('ok');
+            //var a = $('#TAElligibleAmtid').val();
+            //alert(a);
+            $.post('', { id: 0 }, function (data) {
+                if (data != null && data != "") {
+                    var elg = $('#MisExpenseElligibleAmtid').val();
+                    var clm = $('#MisExpenseClaimAmtoid').val();
+                    var setl = $('#MisExpenseSettleAmtoid').val();
+                    elg = parseFloat(elg);
+                    clm = parseFloat(clm);
+                    setl = parseFloat(setl);
+                    //if (elg != 0 && clm != null && clm != "") {
+                       
+                    //    if (clm > elg) {
+
+                    //        $('#MisExpenseSettleAmtoid').val(elg);
+                    //    }
+                    //    else if (clm <= elg) {
+
+                    //        $('#MisExpenseSettleAmtoid').val(clm)
+                    //    }
+                    //}
+                    //else {
+                      
+
+                        $('#MisExpenseSettleAmtoid').val(clm)
+                   // }
+                }
+                else {
+                    alert("Data Null");
+                }
+            });
+        });
+
+
+
+        /* Address button click*/
+        $('#Lookup-Address-BenefitNominees').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "BenefitNominees")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmMisExpenseobject', 'N', '#Edit-Address-BenefitNominees1,#Remove-Address-BenefitNominees1', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Address-BenefitNominees').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmMisExpenseobject', '', function (data) {
+                // to show data which is created in partial page
+                $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', data[0], data[1], 'AddressList', '#Edit-Address-BenefitNominees,#Remove-Address-BenefitNominees', 'N');
+            });
+            event.preventDefault();
+        });
+
+        // PArtial page edit
+        $('#Edit-Address-BenefitNominees').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmMisExpenseobject', '#AddressList', 'AddressList', 'AddressList', 'N', '#Edit-Address-BenefitNominees,#Remove-Address-BenefitNominees', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#FormAddress').trigger("reset");
+                    $('#Address1').val(k.Address1);
+                    $('#Address2').val(k.Address2);
+                    $('#Address3').val(k.Address3);
+                    $('#Landmark').val(k.Landmark);
+                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                    $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                    $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                    $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                    $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                });
+                //}, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('input[name="IShandicap1"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#PartialIshandicapid').removeClass('must');
+                $("#handicapRemarkdiv1").fadeOut();
+            }
+            else {
+                $("#handicapRemarkdiv1").fadeIn();
+                $("#PartialIshandicapid").val("");
+            }
+        });
+        //partial page delete
+        $('#Remove-Address-BenefitNominees').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmMisExpenseobject', '#AddressList', '#Edit-Address-BenefitNominees,#Remove-Address-BenefitNominees');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+
+
+
+        $('#Lookup-ContactDetails-BenefitNominees').on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "BenefitNominees")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmMisExpenseobject', 'N', '#Edit-Address-BenefitNominees,#Remove-Address-BenefitNominees', 'Lookup_table', 'PageNavPosition');*@
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "BenefitNominees")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmMisExpenseobject', 'N', '#Edit-ContactDetails-BenefitNominees,#Remove-ContactDetails-BenefitNominees', 'Lookup_table', 'PageNavPosition');
+            // $('.ContactDetLKDiv').P2BLookUpModal('@@Url.Action("GetContactDetLKDetails", "BenefitNominees")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 10, 'ContactDetailsList', '#frmMisExpenseobject', 'N', '#Edit-ContactDetails-BenefitNominees,#Remove-ContactDetails-BenefitNominees', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ContactDetails-BenefitNominees').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "BenefitNominees")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-BenefitNominees,#Remove-ContactDetails-BenefitNominees', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ContactDetails-BenefitNominees').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "BenefitNominees")', '@Url.Action("Editcontactdetails_partial", "BenefitNominees")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmMisExpenseobject', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-ContactDetails-BenefitNominees').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","BenefitNominees")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailsList', $('#ContactDetailsList').val(), 200, 200, '#frmMisExpenseobject', '#ContactDetailsList', '#Edit-ContactDetails-BenefitNominees,#Remove-ContactDetails-BenefitNominees');
+            event.preventDefault();
+        });
+
+
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-BenefitTypelist-BenefitNominees').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Index", "NomineeBenefit")', 'Create NomineeName', 'open', '@Url.Action("Create", "NomineeBenefit")', '#frmNomineeBenefit', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmMisExpenseobject', '', function (data) {
+                $('#Type_Nomines').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 311, ""); // Dropdown bind
+            });
+            event.preventDefault();
+        });*@
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-BenefitTypelist-BenefitNominees').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Index", "NomineeBenefit")', 'Create NomineeName', 'open', '@Url.Action("Create", "NomineeBenefit")', '#frmNomineeBenefit', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmNomineeBenefit', '', function (data) {
+                $('#BenefitTypelist').P2BLookUpEncapsulate('#BenefitTypelist', 'BenefitTypelist', data[0], data[1], 'BenefitTypelist', '', 'A');
+                $('#Type_Nomines').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 311, "");
+            });
+
+            event.preventDefault();
+        });
+        $('#Lookup-BenefitTypelist-BenefitNominees').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupBenefitNominees", "BenefitNominees")', '', 'LookupDiv', 'BenefitType Look Up Data', '#BenefitTypelist', 'BenefitTypelist', 5, 'BenefitTypelist', '#frmMisExpenseobject', 'A', '#Edit-BenefitTypelist-BenefitNominees,#Remove-BenefitTypelist-BenefitNominees', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-BenefitTypelist-BenefitNominees').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#BenefitTypelist').P2BGetTableDataonSelectedRow('#BenefitTypelist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Index", "NomineeBenefit")', '@Url.Action("Edit", "NomineeBenefit")', b, '@Url.Action("EditSave", "NomineeBenefit")', 'Edit  Details', '#frmNomineeBenefit', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmMisExpenseobject', '#BenefitTypelist', 'BenefitTypelist', 'BenefitTypelist', 'A', '#Edit-BenefitTypelist-BenefitNominees,#Remove-BenefitTypelist-BenefitNominees', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmNomineeBenefit').trigger('reset');
+                    $('#BenefitPerc').val(k.BenefitPerc);
+                    $('#Type_Nomines').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 311, k.BenefitType_Id);
+                });
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+
+
+
+
+
+        $('#Remove-BenefitTypelist-BenefitNominees').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#BenefitTypelist').P2BGetTableDataonSelectedRow('#BenefitTypelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","BenefitNominees")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#BenefitTypelist', $('#BenefitTypelist').val(), 200, 200, '#frmMisExpenseobject', '#BenefitTypelist', '#Edit-BenefitTypelist-BenefitNominees,#Remove-BenefitTypelist-BenefitNominees');
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Lookup-NomineeName-BenefitNominees1').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupNomineesName", "BenefitNominees")', '', 'LookupDiv', 'Nominee Look Up Data', '#NomineeNamelist1', 'NomineeNamelist1', 5, 'NomineeNamelist1', '#frmMisExpenseobject', 'N', '#Edit-NomineeName-BenefitNominees,#Remove-NomineeName-BenefitNominees', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-NomineeName-BenefitNominees1').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "NameSingle")', 'Create NomineeName', 'open', '@Url.Action("Create", "NameSingle")', '#frmNameSingle', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmMisExpenseobject', '', function (data) {
+                $('#NomineeNamelist1').P2BLookUpEncapsulate('#NomineeNamelist1', 'NomineeNamelist1', data[0], data[1], 'NomineeNamelist1', '#Edit-NomineeName-BenefitNominees1,#Remove-NomineeName-BenefitNominees1', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-NomineeName-BenefitNominees1').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#NomineeNamelist1').P2BGetTableDataonSelectedRow('#NomineeNamelist1', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "NameSingle")', '@Url.Action("edit", "NameSingle")', b, '@Url.Action("EditSave", "NameSingle")', 'Edit  Details', '#frmNameSingle', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmMisExpenseobject', '#NomineeNamelist', 'NomineeNamelist', 'NomineeNamelist', 'N', '#Edit-NomineeName-BenefitNominees,#Remove-NomineeName-BenefitNominees', function (data) {
+                // setTimeout(function () {
+                var k = data;
+                $('#frmnameSingle').trigger("reset");
+                $('#FName').val(k.FName);
+                $('#MName').val(k.MName);
+                $('#LName').val(k.LName);
+
+                $('#title').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 100, k.EmpTitle);
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-NomineeName-BenefitNominees1').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#NomineeNamelist1').P2BGetTableDataonSelectedRow('#NomineeNamelist1', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","BenefitNominees")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NomineeNamelist1', $('#NomineeNamelist1').val(), 200, 200, '#frmMisExpenseobject', '#NomineeNamelist1', '#Edit-NomineeName-BenefitNominees,#Remove-NomineeName-BenefitNominees');
+            event.preventDefault();
+        });
+
+        
+
+            $('.popup_radio_button').controlgroup();
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+            $('#Type_Nomines').selectmenu().selectmenu("menuWidget");
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+            $('#MisExpenseClaimAmtoid,#MisExpenseSettleAmtoid,#MisExpenseElligibleAmtid').ForceAmount();
+            $('#MisExpenseClaimAmtoid,#MisExpenseSettleAmtoid,#MisExpenseElligibleAmtid').val("0");
+
+            $('#MisExpenseClaimAmtoid').attr("value", "0");
+            $('#MisExpenseSettleAmtoid').attr("value", "0");
+            $('#MisExpenseElligibleAmtid').attr("value", "0");
+            $('#JourneyDist').attr("value", "0");
+            $('#MisExpenseElligibleAmtid').prop("readonly", true);
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+        });
+</script>

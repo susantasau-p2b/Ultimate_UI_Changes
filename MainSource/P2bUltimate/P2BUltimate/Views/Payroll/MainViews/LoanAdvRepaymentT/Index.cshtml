@@ -1,0 +1,544 @@
+﻿@{
+    ViewBag.Title = "Loan Advance RepaymentT";
+}
+@model Payroll.LoanAdvRequest
+<html>
+<head>
+
+    <title></title>
+
+    <script>
+        var paramdataload = "";
+        $(document).ready(function (e) {
+            $('button').button();
+            $('#Btn-Upload-Data').on('click', function (e) {
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+
+            $.LocalStorageHelper("LoanAdvRequest_LoadEmp", "");
+
+            function ajaxloaderv2(cameform) {
+                $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+            };
+            function ajaxloader(cameform) {
+                $('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);" aria-hidden="true"></i></div>').appendTo(cameform);
+            };
+            var ajaxLoderRemove = function (init) {
+                if (!init) {
+                    $('.ajax_loder').parents('div').remove();
+                } else {
+                    $(init).find("div .ajax_loder").remove();
+                }
+                $(window).off('beforeunload');
+            };
+
+            // PayMonthObj();
+            $('#Load').on('click', function () {
+
+                // if ($('#txtPayMonth').val()) {
+                $.LocalStorageHelper("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //  localStorage.setItem("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //PayMonthObj.SetMonth($('#txtPayMonth').val());
+                //  }
+                //paramdataload = PayMonthObj.GetMonth();
+                //   console.log(PayMonthObj.GetMonth());
+                // localStorage.setItem("LoanAdvRequest_LoadEmp", paramdataload);
+
+            });
+            $('#reset').on('click', function () {
+                //localStorage.setItem("LoanAdvRequest_LoadEmp", "");
+                $.LocalStorageHelper("LoanAdvRequest_LoadEmp", $('#txtPayMonth').val());
+                //  PayMonthObj.SetMonth();
+                $('#txtPayMonth').val("");
+                // console.log(PayMonthObj.GetMonth());
+            });
+            $('.date').P2BDatePicker();
+            $('#InstallementDate,#InstallmentCount,#InstallmentPaid,#PayMonth,#RepaymentDate')
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#MyTable').DataTable({
+                            "ajax": {
+                                "url": "@Url.Action("Emp_Grid", "LoanAdvRepaymentT")",
+                                "type": "post",
+                                "data": forwarddata,
+                            }
+                        }).load();
+                    },
+                    renderat: "#FormFilter",
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+            $('#Edit').on('click', function () {
+                //AssignData();
+                var count = $('#MyTable').DataTable().rows({ selected: true }).data();
+                console.log(count[0].Id);
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', count[0].Id, '@Url.Action("EditSave")', "Edit Data", '#frmLoanAdvRequest', count[0].Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                    $.each(data[0], function (i, k) {
+                        $('#frmCPIRule').trigger("reset");
+                        $('#Name').val(k.Name);
+                        $('#IBaseDigit').val(k.IBaseDigit);
+                        $('#MinAmountIBase').val(k.MinAmountIBase);
+                        $('#MaxAmountIBase').val(k.MaxAmountIBase);
+                        $('#RoundingMethodlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 422, k.RoundingMethod_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#CPIRuleDetailslist').P2BLookUpEncapsulate('#CPIRuleDetailslist', 'CPIRuleDetailslist', k.cpiruledetails_Id, k.cpiruledetails_Fulldetails, 'CPIRuleDetailslist', '#Edit-CPIRuleDetails,#Remove-CPIRuleDetails', 'A');
+                    });
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                }, { datatablename: "#MyTable" });
+            });
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "LoanAdvRepaymentT")",
+
+                htmurl: "@Url.Action("partial", "LoanAdvRepaymentT")",
+
+                columnname: ["Code", "Name", "LId", "LoanAdvanceHead", "LastInstallmentPaid", "Id"],
+                childheader: ["InstallementDate", "InstallmentAmount", "InstallmentCount", "InstallmentPaid", "PayMonth", "RepaymentDate", "TotalLoanBalance", "TotalLoanPaid", "Id"],
+                childurl: "@Url.Action("EditGridDetails", "LoanAdvRepaymentT")",
+                tableheader: "Loan Advance Repayment",
+                childdata: $('#txtPayMonth').val(),
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                var chhassa = $(parent_element).find('td:eq(6)').html();
+                console.log(chhassa);
+                var dt = $('#MyTable').DataTable();
+
+
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frm-YearlyPaymentT-partial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: editurl,
+                        submiturl: submiturl,
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data.data, function (i, k) {
+                                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                                $('#yearlypayment-Narration').val(k.NarrationP);
+                            });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('#Edit').ProcessConfirmation1({
+                        confirmurl: "@Url.Action("ChkProcess")",
+                        month: "#txtPayMonth",
+                        EmpCode: parentid,
+                        msg: "Salary will be deleted,Still You Want to edit..?Please Confirm..!",
+                        status: function (data) {
+                            if (data == true) {
+
+                                $('<div id="testtting"></div>').PartialCreateDialog({
+                                    height: 'auto',
+                                    width: 'auto',
+                                    form: "#EditGridForm",
+                                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRepaymentT")",
+                                    state: "open",
+                                    mode: "Edit",
+                                    editurl: "@Url.Action("GridEditData", "LoanAdvRepaymentT")",
+                                    submiturl: "",
+                                    editdata: id,
+                                    forwarddata: id,
+                                    returndatafunction: function (data) {
+                                        $.each(data, function (i, k) {
+                                            //console.log(k.MonthlyInstallmentAmount);
+                                            $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                                            $('#Edit-InstallmentAmount').val(k.InstallmentAmount);
+                                            $('#Edit-MonthlyInterest').val(k.MonthlyInterestAmount);
+                                            $('#Edit-MonthlyPricipalAmount').val(k.MonthlyPrincipaleAmount);
+                                        });
+                                    },
+                                    submitfun: function (data) {
+                                        var row = dt.row(parent_element);
+                                        if (row.child.isShown()) {
+                                            parent_element.removeClass('details');
+                                            row.child.hide();
+                                        }
+                                    },
+
+                                    displaydialog: function () {
+                                        var newDiv1 = $(document.createElement('div'));
+                                        var htmltag = '<p><span class="ui-icon ui-icon-check" style="float:left;margin-right:10px"></span> ' + "Do you want to edit till Closer Date???" + '';
+                                        htmltag += '</p>';
+                                        newDiv1.html(htmltag);
+                                        newDiv1.dialog({
+                                            autoOpen: false,
+                                            title: "Confirmation",
+                                            closeOnEscape: false,
+                                            height: 150, width: 250, modal: true,
+                                            buttons: {
+                                                Ok: function () {
+
+                                                    var ajaxdata = $.ajax({
+                                                        url: '@Url.Action("GridEditSave", "LoanAdvRepaymentT")',
+                                                        method: "POST",
+                                                        beforeSend: function () {
+                                                            $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('disable').addClass('submitbtndisable');
+                                                            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('disable').addClass('submitbtndisable');
+                                                            $('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);" aria-hidden="true"></i></div>').appendTo($(newDiv1).parent());
+                                                        }, data: $('#EditGridForm').serialize() + '&data=' + id + '' + '&conf=1' + '&Parentdata=' + parentid + '&EmpdataId=' + chhassa,
+                                                    });
+                                                    console.log(ajaxdata);
+                                                    ajaxdata.done(function (msg) {
+                                                        $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('enable').removeClass('submitbtndisable');
+                                                        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('enable').removeClass('submitbtndisable');
+
+                                                        newDiv1.dialog("close");
+                                                        newDiv1.remove();
+
+                                                        if (msg.status == true) {
+                                                            ////debugger;
+                                                            var newDiv = $(document.createElement('div'));
+                                                            var htmltag = '<p><span class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                                                            htmltag += '</p>';
+                                                            newDiv.html(htmltag);
+                                                            newDiv.dialog({
+                                                                autoOpen: false,
+                                                                title: "Confirmation",
+                                                                closeOnEscape: false,
+                                                                height: 150, width: 250, modal: true,
+                                                                buttons: {
+                                                                    Ok: function () {
+                                                                        newDiv.dialog("close");
+                                                                        newDiv.remove();
+                                                                        newDiv1.dialog("close");
+                                                                        newDiv1.remove();
+                                                                        var newdiv2 = jQuery("#ui-id-1").parent()
+                                                                        newdiv2.remove();
+                                                                    }
+                                                                }
+                                                            });
+                                                            newDiv.dialog('open');
+                                                            $($('#testtting').parent()).remove();
+                                                            // $("body .ajax_loder").remove();
+                                                            $(newDiv).find(".ajax_loder").remove();
+                                                        } else {
+                                                            ////debugger;
+                                                            var newDiv = $(document.createElement('div'));
+                                                            var htmltag = '<p><span class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                                                            htmltag += '</p>';
+                                                            newDiv.html(htmltag);
+                                                            newDiv.dialog({
+                                                                autoOpen: false,
+                                                                title: "Confirmation",
+                                                                closeOnEscape: false,
+                                                                height: 150, width: 250, modal: true,
+                                                                buttons: {
+                                                                    Ok: function () {
+                                                                        newDiv.dialog("close");
+                                                                        newDiv.remove();
+                                                                        newDiv1.dialog("close");
+                                                                        newDiv1.remove();
+                                                                        var newdiv2 = jQuery("#ui-id-1").parent()
+                                                                        newdiv2.remove();
+                                                                    }
+                                                                }
+                                                            });
+                                                            newDiv.dialog('open');
+                                                            $($('#testtting').parent()).remove();
+                                                        }
+                                                    });
+                                                },
+                                                Cancel: function () {
+                                                    var ajaxdata = $.ajax({
+                                                        url: '@Url.Action("GridEditSave", "LoanAdvRepaymentT")',
+                                                        method: "POST",
+                                                        beforeSend: function () {
+                                                            $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('disable').addClass('submitbtndisable');
+                                                            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('disable').addClass('submitbtndisable');
+                                                            // ajaxloaderv2('body');
+                                                        }, data: $('#EditGridForm').serialize() + '&data=' + id + '' + '&conf=0' + '&Parentdata=' + parentid + '&EmpdataId=' + chhassa,
+                                                    });
+                                                    console.log(ajaxdata);
+                                                    ajaxdata.done(function (msg) {
+                                                        $('.ui-dialog-buttonpane').find('button:contains("Ok")').button('enable').removeClass('submitbtndisable');
+                                                        $('.ui-dialog-buttonpane').find('button:contains("Cancel")').button('enable').removeClass('submitbtndisable');
+                                                        //$('.ajax_loder').parents('div').remove();
+                                                        ajaxLoderRemove();
+                                                        if (msg.status == true) {
+
+                                                            var newDiv = $(document.createElement('div'));
+                                                            var htmltag = '<p><span class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                                                            htmltag += '</p>';
+                                                            newDiv.html(htmltag);
+                                                            newDiv.dialog({
+                                                                autoOpen: false,
+                                                                title: "Confirmation",
+                                                                closeOnEscape: false,
+                                                                height: 150, width: 250, modal: true,
+                                                                buttons: {
+                                                                    Ok: function () {
+                                                                        newDiv.dialog("close");
+                                                                        newDiv.remove();
+                                                                        newDiv1.dialog("close");
+                                                                        newDiv1.remove();
+                                                                        var newdiv2 = jQuery("#ui-id-1").parent()
+                                                                        newdiv2.remove();
+                                                                    }
+                                                                }
+                                                            });
+                                                            newDiv.dialog('open');
+                                                            $($('#testtting').parent()).remove();
+                                                        } else {
+                                                            var newDiv = $(document.createElement('div'));
+                                                            var htmltag = '<p><span class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" style="float:left;margin-right:10px"></span> ' + msg.responseText + '';
+                                                            htmltag += '</p>';
+                                                            newDiv.html(htmltag);
+                                                            newDiv.dialog({
+                                                                autoOpen: false,
+                                                                title: "Confirmation",
+                                                                closeOnEscape: false,
+                                                                height: 150, width: 250, modal: true,
+                                                                buttons: {
+                                                                    Ok: function () {
+                                                                        newDiv.dialog("close");
+                                                                        newDiv.remove();
+                                                                        newDiv1.dialog("close");
+                                                                        newDiv1.remove();
+                                                                        var newdiv2 = jQuery("#ui-id-1").parent()
+                                                                        newdiv2.remove();
+                                                                    }
+                                                                }
+                                                            });
+                                                            newDiv.dialog('open');
+                                                            $($('#testtting').parent()).remove();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                        newDiv1.dialog('open');
+                                    }
+                                });
+                                $('#PayMonth').val($('#txtPayMonth').val());
+                            }
+                        }
+                    });
+
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            if ($("#txtPayMonth").val() == "") {
+                var dt = new Date();
+                var month = dt.getMonth() + 1;
+                month = month < 10 ? '0' + month : '' + month;
+                $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+            };
+            $('.date-picker').MonthYearPicker();
+
+            @*$('#btn-CarryForward-data').on('click', function (e) {
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmLoanHeadSelection',
+                    title: 'Selct Loan head',
+                    htmlurl: '@Url.Action("Carryforward_PARTIAL")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: '@Url.Action("AddCarryForwad")',
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                        $('#LoanHead-Selectmenu').P2BSelectMenuMuliSelectAppend1("@Url.Action("GetLoanHead")", "", "", "");
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+            });*@
+            $('#btn-CarryForward-data').on('click', function () {
+                var mon = $("#txtPayMonth").val();
+                $('#process').ProcessConfirmation({
+                    confirmurl: "@Url.Action("ChkProcesscarry")",
+                    month: "#txtPayMonth",
+                    msg: "You are going to carryforward for " + mon,
+                    status: function (data) {
+                        if (data == true) {
+
+
+                            $.ajax({
+                                @*url: "@Url.Action("AddCarryForwad", "LoanAdvRepaymentT")",*@
+                                url: "@Url.Action("AddCarryForwad", "LoanAdvRepaymentT")?month=" + $('#txtPayMonth').val(),
+                                method: "POST",
+                                beforeSend: function () {
+                                    ajaxloaderv2('body');
+                                },
+                                success: function (data) {
+                                    if (data.success == true) {
+                                        $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+
+                                    } else {
+                                        alert(data.responseText);
+                                        console.log(data);
+                                    }
+                                },
+                                complete: function () {
+                                    $('.ajax_loder').remove();
+
+                                }
+                            });
+
+
+                        }
+                    }
+                });
+                event.preventDefault();
+
+
+            });
+
+
+        });
+    </script>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 170px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float:left">
+                    <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="reset">Reset</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                <button class="button" id="btn-CarryForward-data">CarryForward</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>LID</th>
+                                <th>LoanAdvanceHead</th>
+                                <th>LastInstallementPaid</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>LID</th>
+                                <th>LoanAdvanceHead</th>
+                                <th>LastInstallementPaid</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

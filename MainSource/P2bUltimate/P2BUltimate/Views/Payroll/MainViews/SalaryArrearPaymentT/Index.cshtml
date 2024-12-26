@@ -1,0 +1,702 @@
+﻿@{
+    ViewBag.Title = "Salary Arrear Payment";
+}
+@model Payroll.SalaryArrearPaymentT
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 100px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 403px;
+    }
+
+    .emplist_row {
+        width: 768px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .row1 {
+        width: 590px;
+    }
+
+    .row2 {
+        width: 316px;
+        display: inline-block;
+    }
+
+    .Create-button {
+        margin-left: 0;
+    }
+</style>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        @*var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        ColModel = ['EmpCode', 'EmpName', 'PayMonth', 'ArrearType', 'FromDate', 'ToDate', 'TotalDays', 'Id'];
+        ColNames = ['EmpCode', 'Emp Name', 'Pay Month', 'Arrear Type', 'From Date', 'To Date', 'Total Days', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "Salary Arrear",
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption_one, url, width, height, '#pager22', { multiple: true, rowNum: 100, selectall: true });*@
+
+        var ColDisplayNames = [];
+        var ColDisplayModel = [];
+        var SortName, Caption, url, width, height, dt;
+        ColDisplayNames = ['EmpCode', 'EmpName', 'PayMonth', 'ArrearType', 'FromDate', 'ToDate', 'TotalDays', 'Id'];
+        ColDisplayModel = ['EmpCode', 'EmpName', 'PayMonth', 'ArrearType', 'FromDate', 'ToDate', 'TotalDays', 'Id'];
+        width = 1000;
+        height = 150;
+        Caption_second = "Salary Arrear",
+        urlD = '@Url.Action("P2BGrid")';
+        widthD = 850;
+        heightD = 200;
+
+
+        var totalvalcount = 0;
+
+        $.get('@Url.Action("P2BGrid")', function (result) {
+            console.log("chk :::" + JSON.stringify(result));
+            totalvalcount = parseInt(result.records);
+            // alert(totalvalcount);
+            $('#JqGridNew').P2BGrid1(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: totalvalcount, selectall: true });
+        });
+
+
+        $('#ViewSalaryArrearPFT_model_dialog').P2BCreateDialog();
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+        });
+
+        $('#Create-load').on('click', function (e) {
+            //$('#JqGrid').PostGridData({ url: url, filter: $('#Create_Paymonth').val() });
+            $("#JqGridNew").jqGrid('setGridParam', {
+                url: "@Url.Action("P2BGrid", "SalaryArrearPaymentT")?param=" + $("#Create_Paymonth").val() + "",
+                datatype: "json"
+            }).trigger("reloadGrid");
+            e.preventDefault();
+        });
+
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        @*$('#Process').on("click", function (event) {
+            var paymonth = $('#Create_Paymonth').val();
+            setTimeout(function () {
+                var selectedids = $.GetGridSelctedvalue("#JqGridNew", "Id");
+                $.post({
+                    url: "@Url.Action("Process")",
+                    data: { paymonth: paymonth, selectedids: selectedids.toString() },
+                    dataType: 'json',
+                    success: function (data) {
+                        alert(data.responseText);
+                    }
+                });
+            }, 500);
+            event.preventDefault();
+        });*@
+
+        //$.GetGridSelectedValuenew1 = function (Gridname, col) {
+        //    //console.log(Gridname);
+        //    //alert("sdasd");
+        //    $('#JqGridNew').jqGrid({
+        //        multiselect: true
+        //    });
+        //    var a = jQuery(Gridname).jqGrid('getGridParam', 'selarrrow');
+        //    // console.log(a);
+        //    debugger;
+        //    if (a.length != 0) {
+        //        var selected_ids = [];
+        //        for (var i = 0; i < a.length; i++) {
+        //            if (col != undefined) {
+        //                selected_ids.push(jQuery(Gridname).jqGrid('getCell', a[i], col));
+        //            } else {
+        //                selected_ids.push(jQuery(Gridname).jqGrid('getRowData', a[i]));
+        //            }
+        //        }
+        //        return selected_ids;
+        //    } else {
+        //        //alert("Select Row..!");
+        //        return 0;
+        //    }
+        //};
+
+
+        $('#Process').on('click', function (e) {
+            //var a = $.GetGridSelctedvalue("#JqGridNew", "Id");
+            //var a = $.GetGridSelectedValuenew1("#JqGridNew", "Id");
+
+            //alert(a);
+            //if ($('#emp_Id').val()) {
+            //    console.log($('#emp_Id').val())
+            //    a = $('#emp_Id').val();
+            //    console.log(a);
+            //}
+            //else {
+            //    a = a.toString();
+            //}
+
+            // a = a != null ? a.toString() : $('#emp_Id').val();
+
+            var arr = localStorage.getItem("LEAVECREDITTRAILBALANCE");
+            var globArr = [];
+            var answ = arr.split(',');
+            answ.forEach(function (data, i) {
+                globArr.push(data);
+            });
+
+            $.ajax({
+                url: '@Url.Action("FindArrEmpId", "SalaryArrearPaymentT")',
+                method: "GET",
+                success: function (data) {
+                    if (globArr.length == data.length) {
+                        $.ajax({
+                            method: "POST",
+                            url: "@Url.Action("Process")?selectedids=" + data + '&PayMonth=' + $("#Create_Paymonth").val(),
+                            /*data: { selectedids: globArr, PayMonth: $("#Create_Paymonth").val() },*/
+                            beforeSend: function () {
+                                ajaxloaderv2('body');
+                            },
+                            success: function (data) {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                            },
+                            error: function (data) {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                                $('#emp_Id').val("");
+                            }, complete: function (data) {
+                                $('#JqGridNew').trigger('reloadGrid');
+                                $('.ajax_loder').remove();
+                                $('#emp_Id').val("");
+                            }
+                        });
+                        localStorage.setItem("LEAVECREDITTRAILBALANCE", '');
+                    }
+                    else {
+
+
+                        $.ajax({
+                            method: "POST",
+                            url: "@Url.Action("Process")?selectedids=" + $.GetGridSelctedvalue("#JqGridNew", "Id") + '&PayMonth=' + $("#Create_Paymonth").val(),
+                            /* data: { selectedids: a, PayMonth: $("#Create_Paymonth").val() },*/
+                            beforeSend: function () {
+                                ajaxloaderv2('body');
+                            },
+                            success: function (data) {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                            },
+                            error: function (data) {
+                                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                                $('#emp_Id').val("");
+                            }, complete: function (data) {
+                                $('#JqGridNew').trigger('reloadGrid');
+                                $('.ajax_loder').remove();
+                                $('#emp_Id').val("");
+                            }
+                        });
+
+                    }
+                }
+            });
+
+            e.preventDefault();
+        });
+
+        $('#Create_Paymonth').MonthYearPicker();
+        $('#txtPayMonth').MonthYearPicker();
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        };
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+
+
+
+        $('#Create').button().on("click", function (event) {
+            $('#frmEmpList').trigger('reset');
+            //$('#JqGrid').trigger('reset');
+            if ($("#Create_Paymonth").val() == "") {
+                var dt = new Date();
+                var month = dt.getMonth() + 1;
+                month = month < 10 ? '0' + month : '' + month;
+                $("#Create_Paymonth").val(month + "/" + dt.getFullYear());
+            }
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: " Salary ArrearPayment T ",
+                submiturl: "@Url.Action("create")",
+                form: "#frmEmpList",
+                height: 475,
+                width: 800,
+                state: "open",
+                gridname: "#JqGridNew",
+                gridfunction: "GetGridSelctedvalue",
+                returnToGrid: "#inline_JqGrid",
+            });
+
+            $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', '', []);
+            event.preventDefault();
+        });
+
+        $('#edit_model_dialog').P2BGridDialog();
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("EditSave")",
+                form: "#frmeditinlinegrid",
+                height: 500,
+                width: 1100,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                filter: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+        });
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#list-employee').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#SalaryArrearPFT_View').button().click(function (event) {
+            AssignData();
+            $('#ViewSalaryArrearPFT_model_dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Lvassignment Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#LvHeadlist').P2BLookUpEncapsulate('#LvHeadlist', 'LvHeadlist', k.LvHead_Id, k.LvHead_FullDetails, 'LvHeadlist', '#Remove-LvHead-LvAssignemnt', 'N');
+                    $('#PayScaleAgreementlist').P2BLookUpEncapsulate('#PayScaleAgreementlist', 'PayScaleAgreementlist', k.PayScaleAgreement_Id, k.PayScaleAgreement_FullDetails, 'PayScaleAgreementlist', '#Remove-PayScaleAgreement-LvAssignemnt', 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#LvHeadFormulalist').P2BLookUpEncapsulate('#LvHeadFormulalist', 'LvHeadFormulalist', k.Lvheadformula_Id, k.Lvheadformula_fulldetails, 'LvHeadFormulalist', '#Remove-LvHeadFormula-LvAssignemnt', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+
+        var Emp_id = "";
+        var PayMonth_T = "";
+        var FrmDate_T = "";
+        var ToDate_T = "";
+        var Main_T = "";
+
+        //$('#gbox_JqGrid').on('change', 'input:checkbox:gt(0)', function (e) {
+        //    var data_of_grid = $('#JqGridNew tbody tr[aria-selected="true"]');
+        //    Emp_id = data_of_grid.find('td:eq(1)').text();
+        //    PayMonth_T = data_of_grid.find('td:eq(3)').text();
+        //    FrmDate_T = data_of_grid.find('td:eq(5)').text();
+        //    ToDate_T = data_of_grid.find('td:eq(6)').text();
+        //    Main_T = data_of_grid.find('td:eq(8)').text();
+
+        //});
+
+        //$('#gbox_JqGrid').on('click', 'input:checkbox:gt(0)', function (e) {
+        //    var data_of_grid = $('#JqGrid tbody tr[aria-selected="true"]');
+        //    Emp_id = data_of_grid.find('td:eq(2)').text();
+        //    PayMonth_T = data_of_grid.find('td:eq(4)').text();
+        //    FrmDate_T = data_of_grid.find('td:eq(6)').text();
+        //    ToDate_T = data_of_grid.find('td:eq(7)').text();
+        //    Main_T = data_of_grid.find('td:eq(1)').text();
+
+        //});
+
+        $('#ManualEntry').on('click', function (e) {
+            var data_of_grid = $('#JqGridNew tbody tr[aria-selected="true"]').val();
+            // console.log($(data_of_grid).length());
+            if (data_of_grid == undefined) {
+                alert('Kindly select the employee');
+                e.preventDefault();
+
+            }
+            else {
+                var a = $.GetGridSelctedvalue("#JqGridNew", "Id");
+                a = a != null ? a.toString() : null;
+                $.post("@Url.Action("ReleaseProcess")", { forwardata: a }, function (data) {
+                    console.log(data);
+                }).success(function (data) {
+                    if (data.success == false) {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
+                        return false;
+                    }
+
+                    Emp_id = $.GetGridSelctedvalue("#JqGridNew", "EmpCode");
+                    PayMonth_T = $.GetGridSelctedvalue("#JqGridNew", "PayMonth");
+                    FrmDate_T = $.GetGridSelctedvalue("#JqGridNew", "FromDate");
+                    ToDate_T = $.GetGridSelctedvalue("#JqGridNew", "ToDate");
+                    Main_T = $.GetGridSelctedvalue("#JqGridNew", "Id");
+
+                    console.log(data_of_grid);
+
+                    localStorage.setItem("Emp_info_id", Emp_id);
+                    localStorage.setItem("PayMonth_id", PayMonth_T);
+                    localStorage.setItem("FrmDate_id", FrmDate_T);
+                    localStorage.setItem("ToDate_id", ToDate_T);
+                    localStorage.setItem("Main_id", Main_T);
+
+                    $('<div id="empsalstructgridd"></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Empsalstruct")', 'Create Manual Arrear Payment', 'open', '@Url.Action("EditSave1", "Empsalstruct")', '#frmeditinlinegrid', 'Message :', 'Request Falied :', '#JqGridNew', 400, 1120, '', '', '', '#frmEmpList', '', function (data) { }, { datatablename: "#MyTable" });
+                    $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+                }).error(function (data) {
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                });
+
+                e.preventDefault();
+            }
+
+        });
+        $('#View').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget");
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "SalaryArrearPaymentT")?PayMonth=" + $("#txtPayMonth").val(),
+
+            htmurl: "@Url.Action("partial", "SalaryArrearPaymentT")",
+
+            columnname: ["Code", "Name", "PayMonth", "ArrearType", "FromDate", "ToDate", "TotalDays", "Id"],
+            childheader: ["SalaryHead", "Amount", "Id"],
+            childurl: "@Url.Action("EditGridDetails", "SalaryArrearPaymentT")",
+            tableheader: "Salary Arrear Payment",
+            childurlColumnNo: "8"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //console.log(id);
+            //console.log(htmurl);
+            console.log(parentid);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                var tid = $(parentid + ' tr:eq(2)');
+                console.log(parentid);
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "SalaryArrearPaymentT")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "SalaryArrearPaymentT")",
+                    submiturl: "@Url.Action("GridEditsave", "SalaryArrearPaymentT")",
+                    editdata: id,
+                    forwarddata: [id, parentid].toString(),
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            $('#Edit-Salheadp').val(k.SalHeadaa);
+                            $('#Edit-MonthlyAmount').val(k.SalHeadAmountaa);
+                        });
+                        //   $('#Edit-SalHeadAmount').val(data.data.SalHeadAmount);
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+        $('#Load').on('click', function (e) {
+            $('#MyTable').DataTable().ajax.url("@Url.Action("Emp_Grid", "SalaryArrearPaymentT")?PayMonth=" + $("#txtPayMonth").val()).load();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        //$('#Create_Paymonth').MonthAndYear('#Create_PayableDays');
+    });
+
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+
+            <div style="float:left">
+                <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            @*<button class="button" id="Edit">Edit</button>
+
+                <button class="button" id="Delete">Delete</button>*@
+            @*<button class="button" id="Autho">Authorized</button>*@
+            <div id="Grid_Form">
+                <div>
+                    <div id="Container" class="container">
+                        <div id="Demo">
+                            <table id="MyTable" class="display" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>DD</th>
+                                        <th>Employee Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Pay Month</th>
+                                        <th>Arrear Type</th>
+                                        <th>From Date</th>
+                                        <th>To Date</th>
+                                        <th>Total Days</th>
+                                        <th>ID</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>DD</th>
+                                        <th>Employee Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Pay Month</th>
+                                        <th>Arrear Type</th>
+                                        <th>From Date</th>
+                                        <th>To Date</th>
+                                        <th>Total Days</th>
+                                        <th>ID</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    {
+        <input id="geo_id" class="filter_structure_id" name="geo_id" />
+        <input id="pay_id" class="filter_structure_id" name="pay_id" />
+        <input id="fun_id" class="filter_structure_id" name="fun_id" />
+
+
+        <div class="emplist_row">
+            <div class="row2 content_margine">
+
+                <label id="lblcreatepaymonth" class="emplist_label">Pay Month</label>
+                <input type="text" id="Create_Paymonth" name="Create_Paymonth" class="popup-content-textbox-rowfirst" />
+            </div>
+            <div class="row2 content_margine">
+                <button id="Create-load" class="Create-button" name="Create-load">Load</button>
+                <button id="Process" class="Create-button" name="process">Process</button>
+                <button id="ManualEntry" class="Create-button" name="ManualEntry">Manual Entry</button>
+            </div>
+        </div>
+        @*<div class="emplist_row">@Html.LabelFor(m => m.SalHeadAmount, "SalheadAmount:", new { @class = "emplist_label" })@Html.TextBoxFor(m => m.SalHeadAmount, new { @class = "popup-content-textbox-rowfirst must", id = "Edit_PayableDays" })</div>*@
+
+        <div class="emplist_row">
+            @*<div>
+                    <table id="JqGrid"></table>
+                    <div id="pager22"></div>
+
+                </div>*@
+            <div>
+                <table id="JqGridNew"></table>
+                <div id="pager22"></div>
+            </div>
+        </div>
+    }
+</div>
+
+<div id="ViewSalaryArrearPFT_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmSalaryArrearPFTmodeldialog", name = "frmSalaryArrearPFTmodeldialog" }))
+    {
+        <div class="row1 content_margine">
+            <label id="lblcompepf" class="popup-content-label">Company EPF</label>
+            <input type="text" id="txtCompEPF" name="txtCompEPF" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblCompPF" class="popup-content-label">Company PF</label>
+            <input type="text" id="txtCompPF" name="txtCompPF" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblEmpPF" class="popup-content-label">Employee PF</label>
+            <input type="text" id="txtEmpPF" name="txtEmpPF" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblEmpVPF" class="popup-content-label">Employee VPF</label>
+            <input type="text" id="txtEmpVPF" name="txtEmpVPF" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblEPSWages" class="popup-content-label">EPF Wages</label>
+            <input type="text" id="txtEPFWages" name="txtEPFWages" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblEPSWages" class="popup-content-label">EPS Wages</label>
+            <input type="text" id="txtEPSWages" name="txtEPSWages" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblSalaryWages" class="popup-content-label">Salary Wages</label>
+            <input type="text" id="txtSalaryWages" name="txtSalaryWages" class="popup-content-textbox" />
+        </div>
+        <div class="row1 content_margine">
+            <label id="lblIsRecovery" class="popup-content-label">Recovery</label>
+
+            <div class="popup_radio_button">
+                <input type="radio" id="IsRecovery_radio1" name="IsRecovery" value="true" /><label for="IsRecovery_radio1">Yes</label>
+                <input type="radio" id="IsRecovery_radio2" name="IsRecovery" value="false" checked="checked" /><label for="IsRecovery_radio2">No</label>
+            </div>
+        </div>
+
+    }
+</div>
+

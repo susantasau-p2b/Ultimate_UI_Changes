@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "Hobby";
+}
+@model P2b.Global.Hobby
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form_bg">
+        <div class="form_input">
+            <div class="button_container">
+                <button class="button" id="create">Create</button>
+                <button class="button" id="view">View</button>
+                <button class="button" id="edit">Edit</button>
+                <button class="button" id="delete">Delete</button>
+                <button class="button" id="autho">Authorised</button>
+                <div id="grid_form">
+                    <div>
+                        <table id="jqgrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="create_dialog" title="Create Hobby">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmHobby", name = "frmHobby" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.HobbyName, "HobbyName :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.HobbyName, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'HobbyName'];
+        ColNames = ['Id', 'HobbyName'];
+        SortName = 'Id';
+        Caption = 'Hobby';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+        }
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+
+        $('#create_dialog').P2BCreateDialog();
+        $('#create').on("click", function (event) {
+            $('#frmHobby').trigger("reset");
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create Hobby', 'open', '@Url.Action("Create")', '#frmHobby', 'Message :', 'Request Falied :', '#jqgrid', 500, 620, '', btndisablenames, function (data) { });
+         
+            event.preventDefault();
+        });
+
+        $('#delete').button().click(function (event) {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            $('#create_dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#jqgrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#edit').on('click', function () {
+            AssignData();
+            $('#create_dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmHobby', dt.Id, 'Message : ', 'Request Falied :', '#jqgrid', 500, 620, '', btndisablenames, function (data) {
+                // setTimeout(function () {
+              
+                $.each(data[0], function (i, k) {
+              
+                    $('#frmHobby').trigger("reset");
+                    // alert(k.Institute);
+                    $('#HobbyName').val(k.HobbyName);
+                    alert(k.HobbyName);
+
+                });
+
+                $('#autho_allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+        //View main page
+        $('#view').button().click(function (event) {
+            AssignData();
+
+            $('#create_dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#Qualificationlist', btndisablenames, 500, 620, '#autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#jqgrid', function (data) {
+                $.each(data[0], function (i, k) {
+
+                    $('#frmHobby').trigger("reset");
+                    // alert(k.Institute);
+                    $('#Institute').val(k.Institute);
+
+                });
+                $('#autho_allow').val(data[3]);
+            });
+
+        });
+
+        // $('.popup_radio_button').buttonset();
+        $('#autho').makeDisable('#create,#edit,#delete');
+        //$('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        // $('.drop').selectmenu().selectmenu('menuWidget');
+        $('.date').P2BDatePicker();
+    });
+
+
+</script>
+
+

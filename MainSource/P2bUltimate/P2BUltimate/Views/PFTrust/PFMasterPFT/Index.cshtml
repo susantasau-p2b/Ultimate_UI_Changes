@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "PFMasterPFT";
+}
+@model P2B.PFTRUST.PFMasterPFT
+<html>
+<body onresize="myFunction()">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EstablishmentID</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            <table id="JqGrid"></table>
+            <div id="pager2"></div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPFMasterPFT", name = "frmPFMasterPFT" }))
+        {
+            <input type="hidden" id="EstablishmentID" name="EstablishmentID" value="0">
+            <input type="hidden" id="CompPFNo" name="CompPFNo" value="0">
+            <input type="hidden" id="RegDate" name="RegDate" value="@DateTime.Now.Date">
+            <div>
+                <label class="must" id="label1">EstablishmentID</label>
+                <div id="MyDivSelect">
+                    <select class="must" style="width:180px;" name="PFMasterIDList" id="PFMasterIDList">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="must" id="label2">InterestPolicies</label>
+                <div id="MyDivLookup">
+                    <table class="lookuptableselected" id="InterestPoliciesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row" id="icons">
+                    <button data-p2btooltip="Lookup InterestPolicies" class=" popup-content-icon-lookup" id="Lookup-InterestPolicies"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete InterestPolicies" class=" popup-content-icon-remove" id="Remove-InterestPolicies"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {      
+        $('button').button();          
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("PFMasterPFTModel_Grid")",
+            columnname: ["EstablishmentID", "Id", ],
+            childheader: ["InterestPolicies", "Id"],
+            childurl: "@Url.Action("A_PFMasterPFTModel_Grid", "PFMasterPFT")",
+            tableheader: "PFMasterPFT",
+            childurlColumnNo: "2"
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();        
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmPFMasterPFT');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PFMasterPFT ', 'open', '@Url.Action("Create")', '#frmPFMasterPFT', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" }); 
+            $('#PFMasterIDList').P2BSelectMenuAppend('@Url.Action("DropMenuEstablishmentID", "PFMasterPFT")', "", "");
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            $('#frmPFMasterPFT').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit PFMasterPFT", '#frmPFMasterPFT', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {                                   
+                    $('#PFMasterIDList').P2BSelectMenuAppend("@Url.Action("DropMenuEstablishmentID", "PFMasterPFT")", "", k.PFMaster_Id);
+                });              
+                $.each(data[1], function (i, k) {
+                    $('#InterestPoliciesList').P2BLookUpEncapsulate('#InterestPoliciesList', 'InterestPoliciesList', k.InterestPoliciesId, k.InterestPoliciesFullDetails, 'InterestPoliciesList', '', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+        $('#View').on('click', function () {
+            $('#frmPFMasterPFT').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View PFMasterPFT', '#InterestPoliciesList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#PFMasterIDList').P2BSelectMenuAppend("@Url.Action("DropMenuEstablishmentID", "PFMasterPFT")", "", k.PFMaster_Id);
+                });
+
+                
+                $.each(data[1], function (i, k) {
+                    $('#InterestPoliciesList').P2BLookUpEncapsulate('#InterestPoliciesList', 'InterestPoliciesList', k.InterestPoliciesId, k.InterestPoliciesFullDetails, 'InterestPoliciesList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmAppraisalAttributeModel');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200,{ datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Lookup-InterestPolicies').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("LookupInterestPolicies", "PFMasterPFT")', '', 'LookupDiv', 'PFMasterPFT Look Up Data', '#InterestPoliciesList', 'InterestPoliciesList', 10, 'InterestPoliciesList', '#frmPFMasterPFT', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-InterestPolicies').button().on('click', function (event) {
+            var selectedRows = [];
+            selectedRows = $('#InterestPoliciesList').P2BGetTableDataonSelectedRow('#InterestPoliciesList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#InterestPoliciesList', $('#InterestPoliciesList').val(), 200, 200, '#frmPFMasterPFT', '#InterestPoliciesList');
+            event.preventDefault();
+        });       
+        $('#PFMasterIDList').selectmenu().selectmenu('menuWidget');
+        document.getElementById("MyDivSelect").style.margin = "-10px 0px 0px 107px";
+        document.getElementById("MyDivLookup").style.margin = "0px 0px 0px 100px";
+        document.getElementById("icons").style.margin = "27px 0px 0px 120px";
+        function myFunction() {
+            let w = window.outerWidth;
+            let h = window.outerHeight;
+            let txt = "Window size: width=" + w + ", height=" + h;
+            alert(txt);
+        }
+    });
+</script>

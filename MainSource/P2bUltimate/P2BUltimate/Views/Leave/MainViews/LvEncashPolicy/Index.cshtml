@@ -1,0 +1,482 @@
+﻿@{
+    ViewBag.Title = "Leave Encash Policy";
+}
+@model Leave.LvEncashPolicy
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+       
+        $('#PolicyName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+       // $('#PolicyName').ForceOnlyAlphaNumeric();
+       // $('#PolicyName').MaxLength(35);
+        $('#MaxEncashment').ForceOnlyNumeric(),
+          $('#MaxEncashment').MaxLength(10);
+        $('#EncashSpanYear').ForceOnlyNumeric(),
+          $('#EncashSpanYear').MaxLength(10);
+        $('#FromServ').ForceOnlyNumeric(),
+          $('#FromServ').MaxLength(10);
+        $('#ToServ').ForceOnlyNumeric(),
+          $('#ToServ').MaxLength(10);
+        $('#MinBalance').ForceOnlyNumeric(),
+          $('#MinBalance').MaxLength(10);
+        $('#MinEncashment').ForceOnlyNumeric(),
+          $('#MinEncashment').MaxLength(10);
+        $('#MinUtilized').ForceOnlyNumeric();
+        $('#MinUtilized').MaxLength(10);
+        $('#LvBalPercent').ForceOnlyNumeric();
+        $('#LvBalPercent').MaxLength(10);
+        $('#txtlvhead').attr('readonly', 'readonly');
+        $('#LvMultiplier').MaxLength(10);
+
+        $('#LvBalPercent').attr("value", "0");
+        $('#MaxEncashment').attr("value", "0");
+        $('#EncashSpanYear').attr("value", "0");
+        $('#FromServ').attr("value", "0");
+        $('#ToServ').attr("value", "0");
+        $('#MinBalance').attr("value", "0");
+        $('#MinEncashment').attr("value", "0");
+        $('#MinUtilized').attr("value", "0");
+        $('#LvMultiplier').attr("value", "0");
+    });
+</script>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#OpeningDate').P2BDatePickerssssssssss
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['PolicyName', 'EncashSpanYear', 'MinBalance', 'MinEncashment', 'MinUtilized', 'Id'];
+        ColNames = ['Policy Name', 'Encash Span Year', 'Min Balance', 'Min Encashment', 'Min Utilized', 'Id'];
+        SortName = 'Id';
+        Caption = 'Leave Encash Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var dt;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#txtlvhead').attr('readonly', true);
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#MinEncashment').on('change', function () {
+            check();
+        });
+        function check() {
+            var as = $('#MinEncashment').val();
+            as = '0' + as;
+            // alert(as);
+            if (as == 00) {
+                alert('Enter Minimum Days..!');
+                $('#MaxEncashment').val('0');
+                return false;
+                // e.preventDefault();
+            }
+            var aa = '0' + $(this).val();
+
+            //alert(aa);
+            if (aa) {
+                //alert(parseInt(aa));
+                // alert(parseInt(as));
+                // var a = aa < as;
+                if (parseInt(aa) < parseInt(as)) {
+                    alert("Max Days Should Be Grater Than Min Days..!"); $('#MaxEncashment').val('0');
+                }
+            }
+        }
+        $('#MaxEncashment').on('focusout', function (e) {
+            check();
+        });
+      
+        //Create Function
+        $('#Create').on("click", function (event) {
+            
+            $('#hideshowLvConvertPolicy').hide();
+            $('#frmleaveenchash').trigger("reset");
+            $('#Lookup_LvheadDetails').attr("disabled", false);
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Encash Policy', 'open', '@Url.Action("Create")', '#frmleaveenchash', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', "", function (data) { });
+            $('#txtlvhead').attr('readonly', 'readonly');
+            $('#LvBalPercent').prop("disabled", true);
+            $('#LvMultiplier').prop("disabled", true);
+            $('#PayDate_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550, "");
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Leave Encash Policy Data", '#frmleaveenchash', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmleaveenchash').trigger("reset");
+                    //console.log(k.PolicyName);
+                    //   ////debugger;
+                    $('#PayDate_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550, k.PayMonthConcept_Id);
+                    $('#Lookup_LvheadDetails').attr("disabled", true);
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#txtlvhead').attr('readonly', 'readonly');
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    $('#EncashSpanYear').val(k.EncashSpanYear);
+                    $('#MinBalance').val(k.MinBalance);
+                    $('#MinEncashment').val(k.MinEncashment);
+                    $('#MaxEncashment').val(k.MaxEncashment);
+                    $('#MinUtilized').val(k.MinUtilized);
+                    $('#Head_id').val(k.LvHead_Id);
+                    $('#txtlvhead').val(k.Lvhead_FullDetails);
+                    $('#LvMultiplier').val(k.LvMultiplier);
+                    $('#LvBalPercent').val(k.LvBalPercent);
+                    $('[name="IsLvRequestAppl"]').val([k.IsLvRequestAppl]).button().button("refresh");
+                    $('[name="IsLvMultiple"]').val([k.IsLvMultiple]).button().button("refresh");
+                    if (k.IsLvMultiple == false) {
+                        $('#LvMultiplier').prop("disabled", true);
+                        $('#LvMultiplier').val("0");
+                    }
+                    else {
+                        $('#LvMultiplier').prop("disabled", false);
+                    }
+
+                    $('[name="IsOnBalLv"]').val([k.IsOnBalLv]).button().button("refresh");
+                    if (k.IsOnBalLv == false) {
+                        $('#LvBalPercent').prop("disabled", true);
+                        $('#LvBalPercent').val("0");
+                    }
+                    else {
+                        $('#LvBalPercent').prop("disabled", false);
+                    }
+                    $('[name="Convert"]').val([k.Convert]).button().button("refresh");
+                    if ([k.Convert] == "false") {
+                        $('#hideshowLvConvertPolicy').fadeOut();
+                    }
+
+
+                });
+                $.each(data[1], function (i, k) { });
+
+                $.each(data[2], function (i, k) {
+                    $('#LvConvertPolicylist').P2BLookUpEncapsulate('#LvConvertPolicylist', 'LvConvertPolicylist', k.LvConvertPolicy_Id, k.LvConvertPolicy_FullDetails, 'LvConvertPolicylist', '#Edit-LvConvertPolicy-LvDebitPolicy,#Remove-LvConvertPolicy-LvDebitPolicy', 'A');
+                });
+
+
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Leave Encash Policy', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#IsOnBalLv').prop("disabled", true);
+                $('#IsLvMultiple').prop("disabled", true);
+                $('#IsLvRequestAppl').prop("disabled", true);
+                $.each(data[0], function (i, k) {
+                    //console.log(k.PolicyName);
+                    $('#frmleaveenchash').trigger("reset");
+                    //   ////debugger;
+                    $('#PayDate_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550, k.PayMonthConcept_Id);
+                    $('#Lookup_LvheadDetails').attr("disabled", true);
+                    $('#PolicyName').val(k.PolicyName);
+                    $('#txtlvhead').attr('readonly', 'readonly');
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    $('#EncashSpanYear').val(k.EncashSpanYear);
+                    $('#MinBalance').val(k.MinBalance);
+                    $('#MinEncashment').val(k.MinEncashment);
+                    $('#MaxEncashment').val(k.MaxEncashment);
+                    $('#MinUtilized').val(k.MinUtilized);
+                    $('#Head_id').val(k.LvHead_Id);
+                    $('#txtlvhead').val(k.Lvhead_FullDetails);
+                    $('#LvMultiplier').val(k.LvMultiplier);
+                    $('#LvBalPercent').val(k.LvBalPercent);
+                    $('[name="IsLvRequestAppl"]').val([k.IsLvRequestAppl]).button().button("refresh");
+                    $('[name="IsLvMultiple"]').val([k.IsLvMultiple]).button().button("refresh");
+                    if (k.IsLvMultiple == false) {
+                        $('#LvMultiplier').prop("disabled", true);
+                        $('#LvMultiplier').val("0");
+                    }
+                    else {
+                        $('#LvMultiplier').prop("disabled", false);
+                    }
+
+                    $('[name="IsOnBalLv"]').val([k.IsOnBalLv]).button().button("refresh");
+                    if (k.IsOnBalLv == false) {
+                        $('#LvBalPercent').prop("disabled", true);
+                        $('#LvBalPercent').val("0");
+                    }
+                    else {
+                        $('#LvBalPercent').prop("disabled", false);
+                    }
+                });
+                $('[name="Convert"]').val([k.Convert]).button().button("refresh");
+                if ([k.Convert] == "false") {
+                    $('#hideshowLvConvertPolicy').fadeOut();
+                }
+
+                $.each(data[1], function (i, k) { });
+                $.each(data[2], function (i, k) {
+                    $('#LvConvertPolicylist').P2BLookUpEncapsulate('#LvConvertPolicylist', 'LvConvertPolicylist', k.LvConvertPolicy_Id, k.LvConvertPolicy_FullDetails, 'LvConvertPolicylist', '#Edit-LvConvertPolicy-LvDebitPolicy,#Remove-LvConvertPolicy-LvDebitPolicy', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+       
+        //Convert Leave
+        $('input[name="Convert"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowLvConvertPolicy').fadeOut();
+            }
+            else {
+                $('#hideshowLvConvertPolicy').fadeIn();
+            }
+        });
+
+        $('#Lookup-LvConvertPolicy-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLvSharingPolicyLKDetails", "LvEncashPolicy")', '', 'LookupDiv', 'LeaveSharingPolicy Look Up Data', '#LvConvertPolicylist', 'LvConvertPolicylist', 5, 'LvConvertPolicylist', '#frmleaveenchash', 'A', '#Remove-LvConvertPolicy-LvDebitPolicy,#Edit-LvConvertPolicy-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Create-LvConvertPolicy-LvDebitPolicy').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "LvEncashPolicy")', 'Create Leave Convert Policy', 'open', '@Url.Action("Create", "LvConvertPolicy")', '#frmLvConvertPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmleaveenchash', '', function (data) {
+                // to show data which is created in partial page
+                $('#LvConvertPolicylist').P2BLookUpEncapsulate('#LvConvertPolicylist', 'LvConvertPolicylist', data[0], data[1], 'LvConvertPolicylist', '#Edit-LvConvertPolicy-LvDebitPolicy,#Remove-LvConvertPolicy-LvDebitPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-LvConvertPolicy-LvDebitPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#LvConvertPolicylist').P2BGetTableDataonSelectedRow('#LvConvertPolicylist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "LvEncashPolicy")', '@Url.Action("edit", "LvConvertPolicy")', b, '@Url.Action("Editsave", "LvConvertPolicy")', 'Edit LvConvertPolicy', '#frmLvConvertPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmleaveenchash', '#LvConvertPolicylist', 'LvConvertPolicylist', 'LvConvertPolicylist', 'A', '#Edit-LvConvertPolicy-LvDebitPolicy,#Remove-LvConvertPolicy-LvDebitPolicy', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmLvConvertPolicy').trigger("reset");
+                    $('#LvHead_drop').P2BSelectMenuAppend('@Url.Action("GetLookupLvHeadObjNew", "LvEncashPolicy")', k.LvHead_Id, k.LvHead_Id);
+
+                    $('#LvConvert_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3035, k.LvConvert_Id);
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+        $('#Remove-LvConvertPolicy-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvConvertPolicylist').P2BGetTableDataonSelectedRow('#LvConvertPolicylist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvConvertPolicylist').P2BGetTableDataonSelectedRow('#LvConvertPolicylist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvConvertPolicylist', $('#LvConvertPolicylist').val(), 200, 200, '#frmleaveenchash', '#LvConvertPolicylist', '');
+            event.preventDefault();
+        });
+
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#LvMultiplier').prop("disabled", true);
+        $('#LvBalPercent').prop("disabled", true);
+        $('input[name="IsLvMultiple"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#LvMultiplier').prop("disabled", true);
+                $('#LvMultiplier').val("0");
+            }
+            else {
+                $('#LvMultiplier').prop("disabled", false);
+            }
+        });
+
+        $('input[name="IsOnBalLv"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#LvBalPercent').prop("disabled", true);
+                $('#LvBalPercent').val("0");
+            }
+            else {
+                $('#LvBalPercent').prop("disabled", false);
+            }
+        });
+        $('#Lookup_LvheadDetails').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtlvhead",
+                appendToId: "#Head_id",
+                lookupurl: "@Url.Action("GetLookupLvHeadObj", "LvEncashPolicy")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css("height", "100px");
+        $('#PayDate_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550, "");
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+<style>
+    .icon-row {
+        position: relative;
+        left: 112px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 151px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row1 {
+        width: 403px;
+    }
+
+    .row2 {
+        width: 278px;
+        display: inline-flex;
+    }
+
+    .popup_radio_button {
+        font-size: 9px;
+        margin: 0 0 2px 2px;
+    }
+
+    #Lookup_LvheadDetails {
+        right: -198px;
+        position: absolute;
+        top: 10px;
+    }
+</style>
+<html>
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Corporate">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmleaveenchash", name = "frmleaveenchashEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row2 content_margine"> @Html.LabelFor(m => m.PolicyName, "Policy Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PolicyName, new { @class = "popup-content-textbox must" })</div>
+            <div class="row2 content_margine">
+                <label id="lbllvhead" class="popup-content-label must">Leave Head:</label>
+                <input name="txtlvhead" type="text" id="txtlvhead" class="date-picker" />
+                <input type="text" id="Head_id" name="Head_id" class="filter_structure_id" />
+
+                <button data-p2btooltip="Lookup Head Details" class="button popup-content-icon-lookup" id="Lookup_LvheadDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            </div>
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.MinEncashment, "Min Days:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MinEncashment, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.MaxEncashment, "Max Days :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MaxEncashment, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MinBalance, "Min Balance :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.MinBalance, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MinUtilized, "Min Utilized :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.MinUtilized, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.EncashSpanYear, "Encash Span Year :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EncashSpanYear, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsOnBalLv, "On Balance Leave:", new { @class = "popup-content-label " })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsOnBalLvt_radio1" name="IsOnBalLv" value="true" /><label class="ui-corner-left" for="IsOnBalLvt_radio1">Yes</label>
+                    <input type="radio" id="IsOnBalLv_radio2" name="IsOnBalLv" value="false" checked="checked" /><label class="ui-corner-right" for="IsOnBalLv_radio2">No</label>
+                </div>
+            </div>
+            <br />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.LvBalPercent, "Leave Balance Percent:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvBalPercent, new { @class = "popup-content-textbox" })</div>
+            <br />
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsLvMultiple, "Is Leave Multiple:", new { @class = "popup-content-label " })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsLvMultiple_radio1" name="IsLvMultiple" value="true" /><label class="ui-corner-left" for="IsLvMultiple_radio1">Yes</label>
+                    <input type="radio" id="IsLvMultiple_radio2" name="IsLvMultiple" value="false" checked="checked" /><label class="ui-corner-right" for="IsLvMultiple_radio2">No</label>
+                </div>
+            </div>
+
+            <div class="row1 content_margine">@Html.LabelFor(m => m.LvMultiplier, "Leave Multiplier:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.LvMultiplier, new { @class = "popup-content-textbox" })</div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IsLvRequestAppl, "Leave Request Applicable:", new { @class = "popup-content-label " })
+                <div class="popup_radio_button">
+                    <input type="radio" id="IsLvRequestAppl_radio1" name="IsLvRequestAppl" value="true" /><label class="ui-corner-left" for="IsLvRequestAppl_radio1">Yes</label>
+                    <input type="radio" id="IsLvRequestAppl_radio2" name="IsLvRequestAppl" value="false" checked="checked" /><label class="ui-corner-right" for="IsLvRequestAppl_radio2">No</label>
+                </div>
+            </div>
+   
+        <div class="row1 content_margine">@Html.LabelFor(m => m.PayMonthConcept, "Pay Month Concept :", new { @class = "popup-content-label" })<select class="selectmenu" style="width:120px" id="PayDate_drop" name="PayDate_drop"><option>-Select-</option></select></div>
+    
+            
+             <div class="section_Method">
+                <div class="heading">Convert</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LvConvertPolicy, "Credit Share:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Convert_radio1" name="Convert" value="true" /><label class="ui-corner-left" for="Convert_radio1">Yes</label>
+                        <input type="radio" id="Convert_radio2" name="Convert" value="false" checked="checked" /><label class="ui-corner-right" for="Convert_radio2">No</label>
+                    </div>
+                </div>
+                 <div id="hideshowLvConvertPolicy">
+                     <div class="row3 content_margine">
+                         <div id="LvSharingPolicylist_old"></div>
+                         @Html.LabelFor(m => m.LvConvertPolicy, "Leave Convert Policy :", new { @class = "popup-content-label" })
+                         <div class="popup-content-table">
+                             <table class="lookuptableselected" id="LvConvertPolicylist">
+                                 <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                             </table>
+                         </div>
+                         <div class="icon-row">
+                             <button data-p2btooltip="Select LvConvertPolicy" class="popup-content-icon-lookup" id="Lookup-LvConvertPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                             <button data-p2btooltip="Create LvConvertPolicy" class="popup-content-icon-create" id="Create-LvConvertPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                             <button data-p2btooltip="Edit LvConvertPolicy" class="popup-content-icon-edit" id="Edit-LvConvertPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                             <button data-p2btooltip="Remove LvConvertPolicy" class="popup-content-icon-remove" id="Remove-LvConvertPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+            
+
+
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+﻿@{
+    ViewBag.Title = "Leave WF  Details ";
+}
+
+@model Leave.LvWFDetails
+
+
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+        
+
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+
+        $('button').button();
+        var ColCommentss = [];
+        var ColModel = [];
+        var SortComments, Caption, url, width, height;
+        var btndisableCommentss = "";
+   //"#RemarkDesc","#RemarkId",  "#SelectedRemark"
+        ColModel = ['Id', 'WFStatus','Comments'];
+        ColCommentss = ['Id', 'WFStatus','Comments'];
+        SortComments = 'Code';
+        Caption = 'Leave WF  Details ';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColCommentss, ColModel, SortComments, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        @*$('#Create').on("click", function (event) {
+            $('#frmLeaveWFDetails').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave WF  Details ', 'open', '@Url.Action("Create")', '#frmLeaveWFDetails', 'Message :', 'Request Falied :', '#JqGrid', 500, 500, '', "", function (data) { });
+            event.preventDefault();
+        });*@
+        $('#Create').on("click", function (event) {
+            $('#frmLeaveWFDetails').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Corporate', 'open', '@Url.Action("Create")', '#frmLeaveWFDetails', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList', "", function (data) { });
+            $('#Categorylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+        //$('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmLeaveWFDetails', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 160, 450, '', btndisableCommentss, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Comments').val(k.Comments);
+                    $('#Comments').attr('readonly', 'readonly');
+                    $('#WFStatus').val(k.WFStatus);                  
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '',170, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Comments').val(k.Comments);
+                    $('#Comments').attr('readonly', 'readonly');
+                    $('#WFStatus').val(k.WFStatus);
+                    //$('#WFStatus').attr('readonly', 'readonly');                    
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Comments').oldVal(data[2].Comments);
+                    $('#WFStatus').oldVal(data[2].WFStatus); 
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+       
+        $('#Comments').MaxLength(100);
+        $("#WFStatus").ForceOnlyNumeric();
+        $('#WFStatus').MaxLength(4);     
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+    });
+</script>
+
+
+<div class="Form_Bg">
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <div id="Create_Dialog" title="Create Leave WF  Details ">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmLeaveWFDetails" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.WFStatus, "WF Status:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.WFStatus, new { @class = "popup-content-textbox ", @id = "WFStatus", @style = "width=99px" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Comments, "Comments:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Comments, new { @class = "popup-content-textbox",  @id = "Comments" })</div>
+          
+        }
+    </div>
+</body>

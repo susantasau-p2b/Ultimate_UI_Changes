@@ -1,0 +1,335 @@
+@{
+    ViewBag.Title = "PersonnelModel";
+}
+@model CMS_SPS.PersonnelModel
+<html>
+<head>
+    <title></title>
+    <style>
+        .popup-content-label {
+            width: 170px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row3, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 477px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+
+        .popup-content-table {
+            right: 120px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ModelCode</th>
+                                <th>ModelName</th>
+                                <th>ModelDescription</th>
+                                <th>CreatedDate</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPersonnelModel", name = "frmPersonnelModel" }))
+        {
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Code, "Model Code :", new { @class = "popup-content-label must", @maxlength = "10" })
+                @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelName, "Model Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelName, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelDescription, "Model Description :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelDescription, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.CreatedDate, "Created Date :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.CreatedDate, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.PersonnelModelObject, "Personnel Object :", new { @class = "popup-content-label must " })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PersonnelModelObjectList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup PersonnelModelObject" class=" popup-content-icon-lookup" id="Lookup-PersonnelModelObject"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create PersonnelModelObject " class=" popup-content-icon-create" id="Create-PersonnelModelObject"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit  PersonnelModelObject" class=" popup-content-icon-edit" id="Edit-PersonnelModelObject"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete PersonnelModelObject" class=" popup-content-icon-remove" id="Remove-PersonnelModelObject"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('#Code').ValidateTextBox({ maxlength: 10 });
+        $('#ModelName').ValidateTextBox({ maxlength: 25 });
+        $('#ModelDescription').ValidateTextBox({ maxlength: 50 });
+        $('button').button();
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("PersonnelModel_Grid")",
+            columnname: ["Code", "ModelName", "ModelDescription", "CreatedDate", "Id", ],
+            childheader: ["PersonnelModel", "EvaluationModel", "Id"],
+            childurl: "@Url.Action("A_PersonnelModel_Grid", "PersonnelModel")",
+            tableheader: "Personnel Model",
+            childurlColumnNo: "5"
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };*@
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmPersonnelModel');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Appraisal Personnel Model Object', 'open', '@Url.Action("Create")', '#frmPersonnelModel', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#CreatedDate').TodayDate();
+            $('#CreatedDate').attr("readonly", "readonly");
+            event.preventDefault();
+        });
+
+        $('#Create-PersonnelModelObject').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PersonnelModelPartial", "PersonnelModel")', 'Personnel Model Object', 'open', '@Url.Action("Create", "PersonnelModelObject")', '#frmPersonnelModelObject', 'Message :', 'Request Falied :', '#JqGrid', 300, 550, '', '', '', '#frmPersonnelModel', '', function (data) {
+                @*$('#PersonnelModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, "");*@
+                $('#PersonnelModellist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "PersonnelModelObject")', '', "");
+                $('#PersonnelModelObjectList').P2BLookUpEncapsulate('#PersonnelModelObjectList', 'PersonnelModelObjectList', data[0], data[1], 'PersonnelModelObjectList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+
+         $('#Edit').on('click', function () {
+             $('#frmPersonnelModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Appraisal Personnel Model Object", '#frmPersonnelModel', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmPersonnelModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#PersonnelModelObjectList').P2BLookUpEncapsulate('#PersonnelModelObjectList', 'PersonnelModelObjectList', k.PersonnelModelObject_Id, k.PersonnelModelObject_FullDetails, 'PersonnelModelObjectList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+         });
+        $('#View').on('click', function () {
+            $('#frmPersonnelModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Appraisal Personnel Model Object', '#PersonnelModelObjectList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmPersonnelModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#PersonnelModelObjectList').P2BLookUpEncapsulate('#PersonnelModelObjectList', 'PersonnelModelObjectList', k.PersonnelModelObject_Id, k.PersonnelModelObject_FullDetails, 'PersonnelModelObjectList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmPersonnelModel');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Lookup-PersonnelModelObject').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupPersonnelModelObject", "PersonnelModel")', '', 'LookupDiv', ' PersonnelModel Look Up Data', '#PersonnelModelObjectList', 'PersonnelModelObjectList', 5, 'PersonnelModelObjectList', '#frmPersonnelModel', 'A', '#Remove-Witness-Witness', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-PersonnelModelObject').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PersonnelModelList').P2BGetTableDataonSelectedRow('#PersonnelModelObjectList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PersonnelModelPartial", "PersonnelModel")', '@Url.Action("Edit", "PersonnelModelObject")', b, '@Url.Action("Editsave", "PersonnelModelObject")', 'Edit Personnel Model Object', '#frmPersonnelModelObject', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmPersonnelModel', '#PersonnelModelObjectList', 'PersonnelModelObjectList', 'PersonnelModelObjectList', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    @*$('#PersonnelModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, k.PersonnelModelObject_Id);*@
+                    $('#PersonnelModellist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "PersonnelModelObject")", "", k.PersonnelModel_Id, '');
+                    $('#CompetencyEvaluationModelList').P2BLookUpEncapsulate('#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', k.CompetencyEvaluationModel_Id, k.CompetencyEvaluationModelDetails, 'CompetencyEvaluationModelList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PersonnelModelObject').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#PersonnelModelObjectList').P2BGetTableDataonSelectedRow('#PersonnelModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PersonnelModelObjectList').P2BGetTableDataonSelectedRow('#PersonnelModelObjectList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PersonnelModelObjectList', $('#PersonnelModelObjectList').val(), 200, 200, '#frmPersonnelModel', '#PersonnelModelObjectList');
+            event.preventDefault();
+        });
+
+        //$('.popup_radio_button').controlgroup();
+    });
+</script>
+
+
+

@@ -1,0 +1,169 @@
+﻿@{
+    Layout = null;
+}
+
+@model Training.TrainingExpenses
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+    .add_popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 300px;
+    }
+</style>
+
+
+
+
+<script>
+    $(document).ready(function (e) {
+        var dia;
+
+        $('button').button();
+
+        var btndisablenames = "";
+        //"#StayFees","#TrainingFees",  "#TravelFees"
+
+        Caption = 'Training  Expenses';
+
+        width = 1000;
+        height = 150;
+
+        @*$('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmTrainingExpenses').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training  Expensess ', 'open', '@Url.Action("Create")', '#frmTrainingExpenses', 'Message :', 'Request Falied :', '#JqGrid',300,595, '', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmTrainingExpenses', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 340, 595, '', btndisablenames, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#FoodFees').val(k.FoodFees);
+                    $('#FoodFees').attr('readonly', 'readonly');
+                    $('#MiscFees').val(k.MiscFees);
+                   // $('#MiscFees').attr('readonly', 'readonly');
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').val(k.StayFees);
+                    $('#TrainingFees').val(k.TrainingFees);
+                    $('#TravelFees').val(k.TravelFees);
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 370, 600, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#FoodFees').val(k.FoodFees);
+                   // $('#FoodFees').attr('readonly', 'readonly');
+                    $('#MiscFees').val(k.MiscFees);
+                    //$('#MiscFees').attr('readonly', 'readonly');
+                    $('#StayFees').val(k.StayFees);
+                    $('#TrainingFees').val(k.TrainingFees);
+                    $('#TravelFees').val(k.TravelFees);
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#FoodFees').oldVal(data[2].FoodFees);
+                    $('#MiscFees').oldVal(data[2].MiscFees);
+                    //"#StayFees","#TrainingFees",  "#TravelFees"
+                    $('#StayFees').oldVal(data[2].StayFees);
+                    $('#TrainingFees').oldVal(data[2].TrainingFees);
+                    $('#TravelFees').oldVal(data[2].TravelFees);
+                }
+
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });*@
+
+        $("#FoodFees").ForceOnlyNumeric().MaxLength(20);
+        $("#MiscFees").ForceOnlyNumeric().MaxLength(20);
+        $("#StayFees").ForceOnlyNumeric().MaxLength(20);
+        $("#TrainingFees").ForceOnlyNumeric().MaxLength(20);
+        $("#TravelFees").ForceOnlyNumeric().MaxLength(20);
+
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+        $('#dob').P2BDatePicker();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+        $('#Total').click(function (event) {
+            event.preventDefault();
+            var foodfees = parseInt($('#FoodFees').val()) || 0;
+            var miscfees = parseInt($('#MiscFees').val()) || 0;
+            var stayfees = parseInt($('#StayFees').val()) || 0;
+            var trainingfees = parseInt($('#TrainingFees').val()) || 0;
+            var travalfees = parseInt($('#TravelFees').val()) || 0;
+            var sum = foodfees + miscfees + stayfees + trainingfees + travalfees;
+            $('#TotalFees').val(sum)   //.toFixed(2)
+        });
+    });
+</script>
+
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+
+
+    <div id="Create_Dialog" title="Create Training  Expensess ">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingExpenses" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.FoodFees, "Food Fees", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.FoodFees, new { @class = "popup-content-textbox", @id = "FoodFees" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.MiscFees, "Misc Fees", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.MiscFees, new { @class = "popup-content-textbox", @id = "MiscFees" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.StayFees, "Stay Fees", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.StayFees, new { @class = "popup-content-textbox", @id = "StayFees" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.TrainingFees, "Training Fees", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.TrainingFees, new { @class = "popup-content-textbox", @id = "TrainingFees" })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.TravelFees, "Travel Fees", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.TravelFees, new { @class = "popup-content-textbox", @id = "TravelFees" })</div>
+
+    <button class="button" style="margin-left: 116px" id="Total">Total</button>
+            <div class="row1 content_margine">
+                <label class="popup-content-label" style="margin-top: 29px; margin-left: -232px;">Total Fees</label>
+                <input type="text" id="TotalFees" class="popup-content-textbox" style="margin-top: 31px; margin-left: -133px; margin-bottom: 1px;"readonly  />
+            </div>
+        }
+    </div>
+</body>
+

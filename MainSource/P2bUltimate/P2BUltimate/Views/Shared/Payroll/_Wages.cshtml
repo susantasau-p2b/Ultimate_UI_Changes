@@ -1,0 +1,298 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.Wages
+
+
+
+@*<link href="~/Content/Wages/wages.css" rel="stylesheet" />*@
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmWages", name = "frmWages" }))
+    {
+    <div class="weg_row1 content_margine">
+
+        @Html.LabelFor(m => m.WagesName, "Wage Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.WagesName, new { @class = "popup-content-textbox must" })
+    </div>
+
+    <div class="weg_row1 content_margine">
+        @Html.LabelFor(m => m.Percentage, "Perc :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Percentage, new { @class = "popup-content-textbox must" })@*<img id="ImgID" src="~/Content/P2B_CSS/images/Percentage.png" class="dem" />*@
+    </div>
+    <div class="weg_row1 content_margine">
+        @Html.LabelFor(m => m.CeilingMin, "Ceiling Min :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CeilingMin, new { @class = "popup-content-textbox must", id = "WagesCeilingMin" })
+    </div>
+    <div class="weg_row1 content_margine">
+        @Html.LabelFor(m => m.CeilingMax, "Ceiling Max :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CeilingMax, new { @class = "popup-content-textbox must", id = "WagesCeilingMax" })
+    </div>
+    <div class="weg_row1 content_margine">
+        @Html.LabelFor(m => m.RateMaster, "Rate :-", new { @class = "popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="RateMasterlist">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+        <div class="weg_icon-row icon-row">
+            <button data-p2btooltip="Select RateMaster" class="popup-content-icon-lookup" id="Lookup-RateMaster-Wages"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create RateMaster" class="popup-content-icon-create" id="Create-RateMaster-Wages"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Edit RateMaster" class="popup-content-icon-edit" id="Edit-RateMaster-Wages"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Remove RateMaster" class="popup-content-icon-remove" id="Remove-RateMaster-Wages"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            <button data-p2btooltip="View Wages" class="popup-content-icon-view" id="view-RateMaster-SalHeadFormula"><span class="ui-icon ui-icon-extlink popup-content-iconmark"></span></button>
+        </div>
+    </div>
+    }
+</div>
+
+<div id="editratemasterdetails" title="Edit RateMaster">
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmRateMasterEdit", name = "frmRateMasterEdit" }))
+    {
+    <div class="Release_grid">
+        <div id="Grid_Form">
+            <div>
+                <table id="JqGridedit"></table>
+                <div id="JqGrid_pageredit"></div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<div id="viewratemasterdetails" title="View RateMaster">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmRateMasterEdit", name = "frmRateMasterEdit" }))
+    {
+    <div class="Release_grid">
+        <div id="Grid_Form">
+            <div>
+                <table id="JqGridview"></table>
+                <div id="JqGrid_pagerview"></div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<style>
+    .weg_icon-row {
+        position: absolute;
+        left: 71px;
+        top: 100px;
+    }
+
+    .popup-content-textbox {
+        width: 170px;
+    }
+
+    .popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 101px;
+    }
+</style>
+
+<div class="dialog_RateMaster">
+    <div title="LookUp Data">
+        <div class="lookupdiv_RateMaster"></div>
+    </div>
+    <div id="pageNavPosition_RateMaster">
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu().css({ "height": "auto" });
+        $('#WagesName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+        //$('#WagesName').MaxLength(25).ForceOnlyAlphaNumeric();
+        $('#WagesCeilingMax').on('focusout', function (e) {
+            if (!$('#WagesCeilingMin').val()) {
+                alert('Enter Range From value...!');
+                $('#WagesCeilingMax').val('');
+                return false;
+            }
+            if (parseFloat($("#WagesCeilingMax").val()) < parseFloat($("#WagesCeilingMin").val())) {
+                alert(" CeilingMax value Should Be Grater Than Starting CeilingMin Value ..!");
+                $('#WagesCeilingMax').val('');
+            }
+        });
+        $('#Percentage').ForcePercent().MaxLength(4);
+        $('#WagesCeilingMin').ForceAmount().MaxLength(10);
+        $('#WagesCeilingMax').ForceAmount().MaxLength(10);
+
+        var ColNames_release = [];
+        var ColModel_release = [];
+        var SortName_release, Caption_release, url_release, width_release, height_release;
+        ColNames_releaseV = ['Id', 'Code', 'SalHead', 'Percentage', 'Amount'];
+        ColModel_releaseV = ['Id', 'Code', 'SalHead', 'Percentage', 'Amount'];
+        ColNames_release = ['Id', 'Code', 'SalHead', 'Percentage', 'Amount', 'Editable'];
+        ColModel_release = ['Id', 'Code', 'SalHead', 'Percentage', 'Amount', 'Editable'];
+        SortName_release = 'Id';
+        Caption_release = 'Rate Master Per Head';
+        url_release = '@Url.Action("P2BInlineGrid", "RateMaster")';
+        //width_release = 1000;
+        width_release = 800;
+        height_release = 150;
+
+        //  a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
+        //$('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+
+        $('#JqGridview').InlineEditGrid({
+            ColNames: ColNames_releaseV,
+            ColModel: ColModel_releaseV,
+            SortName: SortName_release,
+            Caption: Caption_release,
+            url: url_release,
+            tablename: '#JqGridview',
+            eddelurl: '',
+            width: width_release,
+            height: height_release,
+            CheckCol: "",
+            EditableCol: "",
+
+        });
+
+
+        $('#JqGridedit').InlineEditGrid({
+            ColNames: ColNames_release,
+            ColModel: ColModel_release,
+            SortName: SortName_release,
+            Caption: Caption_release,
+            url: url_release,
+            tablename: '#JqGrid',
+            eddelurl: '',
+            width: width_release,
+            height: height_release,
+            CheckCol: "Editable",
+            EditableCol: ["Percentage", "Amount"],
+
+        });
+
+        $('#editratemasterdetails').P2BCreateDialog();
+        $('#viewratemasterdetails').P2BCreateDialog();
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+        $('#Lookup-RateMaster-Wages').on('click', function (event) {
+            $('.dialog_RateMaster').P2BLookUpModal('@Url.Action("GetLookupDetails", "Ratemaster")', '', 'lookupdiv_RateMaster', 'Look Up Data', '#RateMasterlist', 'RateMasterlist', 5, 'RateMasterlist', '#frmWages', 'A', '', 'Lookup_table_RateMaster', 'pageNavPosition_RateMaster');
+            event.preventDefault();
+        });
+
+        $('#Create-RateMaster-Wages').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ratemaster")', 'Create Rate Master', 'open', '@Url.Action("Create", "ratemaster")', '#frmRateMaster', 'Message :', 'Request Falied :', '#JqGrid', 374, 530, '', '', '', '#frmWages', '', function (data) {
+                $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', data[0], data[1], 'RateMasterlist', '', 'A');
+            });
+
+            $('#CeilingMax').on('focusout', function (e) {
+                if (!$('#CeilingMin').val()) {
+                    alert('Enter Min Celing!');
+                    $('#CeilingMax').val('');
+                    return false;
+                    // e.preventDefault();
+                }
+                if ($(this).val()) {
+                    var a = $.StartEndDateCheck({
+                        startdate: '#CeilingMin',
+                        enddate: '#CeilingMax',
+                    });
+                    if (a == 0) {
+                        alert("Ceiling max Should Be Grater Than Ceiling min..!"); $('#CeilingMax').val('');
+                    }
+                }
+            });
+
+            e.preventDefault();
+        });
+
+        @*$('#Edit-RateMaster-Wages').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RateMasterlist').P2BGetTableDataonSelectedRow('#RateMasterlist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Wages")', '@Url.Action("EditRateMaster_partial", "Wages")', b, '@Url.Action("EditSave", "RateMaster")', 'Edit Rate Master', '#frmRateMaster', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmWages', '#RateMasterlist', 'RateMasterlist', 'RateMasterlist', 'N', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmRateMaster').trigger('reset');
+                    $('#rate_Amount').val(k.Amount);
+                    $('#Code').val(k.Code);
+                    $('#rate_Percentage').val(k.Percentage);
+
+                    $('#SalHead_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "SalaryHead")", "", k.SalHead_Id);
+                });
+
+            });
+            event.preventDefault();
+        });*@
+
+        $('#Edit-RateMaster-Wages').button().on("click", function (e) {
+            var a = [], b;
+            a = $('#RateMasterlist').P2BGetTableDataonSelectedRow('#RateMasterlist', 0);
+            b = a[0];
+            if (b == 'undefined' || b == null) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Row..!");
+                return false;
+            }
+
+            var c = JSON.stringify(b);
+             $('#JqGridedit').PostGridData({ url: url_release, filter: b });
+
+            $('#editratemasterdetails').P2BGridDialog({
+                maindialogtitle: "Create Dialog",
+                submiturl: "@Url.Action("EditVal", "RateMaster")",
+                form: "#frmRateMasterEdit",
+                height: 475,
+                width: 800,
+                state: "open",
+                gridname: "#JqGridedit",
+                //editurl: url_release,
+                gridfunction: "GetGridSelctedvalue",
+                gridreloadname: "#JqGridedit",
+                returnToGrid: "#JqGridedit",
+            });
+           
+            event.preventDefault();
+        });
+
+        $('#View-RateMaster-SalHeadFormula').on('click', function (e) {
+            ////debugger;
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable').removeClass('submitbtndisable');
+            var a = [], b;
+            a = $('#RateMasterlist').P2BGetTableDataonSelectedRow('#RateMasterlist', 0);
+            b = a[0];
+            if (b == 'undefined' || b == null) {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Row..!");
+                return false;
+            }
+
+            var c = JSON.stringify(b);
+            console.log(b);
+            $('#JqGridview').PostGridData({ url: url_release, filter: b });
+
+            $('#viewratemasterdetails').P2BGridDialog({
+                maindialogtitle: "View Rate Master",
+                //submiturl: "@Url.Action("EditVal", "RateMaster")",
+                form: "#frmRateMasterEdit",
+                height: 555,
+                width: 1100,
+                state: "open",
+                gridname: "#JqGridview",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-RateMaster-Wages').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#RateMasterlist').P2BGetTableDataonSelectedRow('#RateMasterlist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#RateMasterlist').P2BGetTableDataonSelectedRow('#RateMasterlist', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RateMasterlist', $('#RateMasterlist').val(), 200, 200, '#frmWages', '#RateMasterlist', '#Remove-RateMaster-Wages');
+            event.preventDefault();
+        });
+
+    });
+</script>

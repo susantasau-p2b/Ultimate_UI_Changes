@@ -1,0 +1,179 @@
+﻿@model Payroll.ServiceDependRule
+@{
+    Layout = null;
+}
+@*@using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmServiceDependRule", name = "frmServiceDependRule" }))
+    {*@
+<div>
+
+    <div class="ser_row1">
+        @Html.LabelFor(m => m.ServiceRange, new { @class = "ser_popup-content-label" })
+        <div class="popup-content-table">
+            <table class="lookuptableselected" id="ServRangeList">
+                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="ser_icon-row">
+        <button data-p2btooltip="Select ServiceRange" class="popup-content-icon-lookup" id="Lookup-ServRange-SalHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Create ServiceRange" class="popup-content-icon-create" id="Create-ServRange-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Edit ServiceRange" class="popup-content-icon-edit" id="Edit-ServRange-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+        <button data-p2btooltip="Remove ServiceRange" class="popup-content-icon-remove" id="Remove-ServRange-SalHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+        <button data-p2btooltip="View ServiceRange" class="popup-content-icon-view" id="view-ServRange-SalHeadFormula"><span class="ui-icon ui-icon-extlink popup-content-iconmark"></span></button>
+    </div>
+
+</div>
+@*}*@
+
+<div class="dialog_ServRange">
+    <div title="LookUp Data">
+        <div class="lookupdiv_ServRange"></div>
+    </div>
+    <div id="pageNavPosition_ServRange">
+
+    </div>
+</div>
+<style>
+    .ser_popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .ser_icon-row {
+        position: relative;
+        left: 58px;
+        top: -150px;
+    }
+
+    .ser_row1 {
+        width: 400px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        /*ServiceRange CRUD Start*/
+        $('button').button();
+
+
+        $('#Lookup-ServRange-SalHeadFormula').button().on('click', function (event) {
+            $('.dialog_ServRange').P2BLookUpModal('@Url.Action("GetServRangeLKDetails", "ServiceRange")', '', 'lookupdiv_ServRange', 'ServiceRange Look Up Data', '#ServRangeList', 'ServRangeList', 5, 'ServRangeList', '#frmServiceDependRule', 'A', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', 'Lookup_table_ServRange', 'pageNavPosition_ServRange');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ServRange-SalHeadFormula').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateServRange_partial", "SalHeadFormula")', 'Create Service Range', 'open', '@Url.Action("CreateSave", "ServiceRange")', '#frmserviceRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmServiceDependRule', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', function (data) {
+                $('#ServRangeList').P2BLookUpEncapsulate('#ServRangeList', 'ServRangeList', data[0], data[1], 'ServRangeList', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        @*$('#Edit-ServRange-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ServRangeList').P2BGetTableDataonSelectedRow('#ServRangeList', 0);
+            b = a[0];
+            console.log(b);
+
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateServRange_partial", "SalHeadFormula")', '@Url.Action("EditServRange_partial", "ServiceRange")', b, '@Url.Action("EditSave", "ServiceRange")', 'Edit ServiceRange', '#frmserviceRange', b, 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#FormSalHeadFormula', '#Edit-ServRange-SalHeadFormula,#Remove-ServRange-SalHeadFormula', '#ServRangeList', 'ServRangeList', 'ServRangeList', 'A', function (data) {
+                //setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        $('#frmServiceRange').trigger('reset');
+                        $('#RangeFrom').val(k.RangeFrom);
+                        $('#RangeTo').val(k.RangeTo);
+                        $('#Percentage').val(k.Percentage);
+                        $('#Amount').val(k.Amount);
+                        $('#txtCeilingMin').val(k.CeilingMin);
+                        $('#txtCeilingMax').val(k.CeilingMax);
+                        $('#ServiceTo').val(k.ServiceTo);
+                        $('#ServiceFrom').val(k.ServiceFrom);
+                    });
+                //}, 3000);
+
+
+            });
+        });*@
+
+        $('#Edit-ServRange-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ServRangeList').P2BGetTableDataonSelectedRow('#ServRangeList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateServRange_partial", "SalHeadFormula")', '@Url.Action("EditServRange_partial", "ServiceRange")', b, '@Url.Action("EditSave", "ServiceRange")', 'Edit Service', '#frmserviceRange', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmServicedepenrule', '#ServRangeList', 'ServRangeList', 'ServRangeList', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#ServRangeList').trigger("reset");
+
+                    $('#ServiceFrom').val(k.ServiceFrom);
+                    $('#ServiceTo').val(k.ServiceTo);
+                    $('#WagesFrom').val(k.WagesFrom);
+                    $('#WagesTo').val(k.WagesTo);
+                    $('#Amount').val(k.Amount);
+                    $('#Percentage').val(k.Percentage);
+                    $('#txtCeilingMin').val(k.CeilingMax);
+                    $('#txtCeilingMax').val(k.CeilingMin);
+                    //$('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.rate_id, k.RateCode, 'RateMasterlist', '#Remove-RateMaster-Wages', 'N');
+
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+        $('#View-ServRange-SalHeadFormula').on('click', function (e) {
+            var a = [], b;
+            a = $('#ServRangeList').P2BGetTableDataonSelectedRow('#ServRangeList', 0);
+            b = a[0];
+            $('<div></div>').P2bViewPartialDialog({
+                htmurl: '@Url.Action("CreateServRange_partial", "SalHeadFormula")',
+                btnid: '#View-ServRange-SalHeadFormula',
+                editurl: "@Url.Action("EditServRange_partial", "ServiceRange")",
+                height: 'auto',
+            width: 'auto',
+            returndatafunction: function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#ServRangeList').trigger("reset");
+                    //alert(k.CeilingMax);
+                    $('#ServiceFrom').val(k.ServiceFrom);
+                    $('#ServiceTo').val(k.ServiceTo);
+                    $('#WagesFrom').val(k.WageFrom);
+                    $('#WagesTo').val(k.WageTo);
+                    $('#Amount').val(k.Amount);
+                    $('#Percentage').val(k.Percentage);
+                    $('#StxtCeilingMin').val(k.CeilingMax);
+                    $('#StxtCeilingMax').val(k.CeilingMin);
+                });
+            },
+            editdata: b,
+            });
+        e.preventDefault();
+    });
+
+
+        $('#Remove-ServRange-SalHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#ServRangeList').P2BGetTableDataonSelectedRow('#ServRangeList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ServRangeList').P2BGetTableDataonSelectedRow('#ServRangeList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#ServRangeList', $('#ServRangeList').val(), 200, 200, '#FormSalHeadFormula', '#ServRangeList', '');
+            event.preventDefault();
+        });
+
+
+        /*ServiceRange CRUD End*/
+    });
+</script>

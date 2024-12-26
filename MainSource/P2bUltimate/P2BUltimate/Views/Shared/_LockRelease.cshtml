@@ -1,0 +1,129 @@
+﻿@model P2b.Global.LoginDetails
+@{
+    Layout = null;
+}
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmlockrelease" }))
+    {
+
+        @*<div class="child-div content_margine">
+                <label for="employee" class="content-label">Employee :</label>
+                <select id="employee" class="drop" name="employee" style="width:200px">
+                    <option>-Select-</option>
+                </select>
+            </div>*@
+        @*<div class="child-div content_margine">
+                Employee Name:<input name="EmpName" type="text" id="EmpName" />
+                <button data-p2btooltip="Lookup Employee Name" class="popup-content-drop-icon-lookup" id="Lookup-EmpName-FName">
+                    <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                </button>
+
+            </div>*@
+        <div class="row2 content_margine">
+            <label class="popup-content-label">Employee Name:</label>
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="EmployeeNamelist">
+                    <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Employee  Details" class="popup-content-icon-lookup" id="Lookup-HOCalendar-Location"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create Holiday Calendar Details" class="popup-content-icon-create" id="Create-HOCalendar-Location"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Holiday Calendar Details" class="popup-content-icon-edit" id="Edit-HOCalendar-Location"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove Employee Name" class="popup-content-icon-remove" id="Remove-HOCalendar-Location"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="dialog">
+            <div title="LookUp Data">
+                <div class="LookupDiv" id="Lookup"></div>
+            </div>
+            <div id="PageNavPosition">
+
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $(function () {
+        $('button').button();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#employee').P2BSelectMenuAppend("@Url.Action("GetEmp", "LockRelease")", "", "");
+
+        $.fn.doval = function () {
+
+            return valid = true;
+
+        };
+
+      
+
+        $('#Remove-HOCalendar-Location').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#EmployeeNamelist').P2BGetTableDataonSelectedRow('#EmployeeNamelist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EmployeeNamelist').P2BGetTableDataonSelectedRow('#EmployeeNamelist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmployeeNamelist', $('#EmployeeNamelist').val(), 200, 200, '#frmlockrelease', '#EmployeeNamelist', '#Edit-HOCalendar-Location,#Remove-HOCalendar-Location');
+            event.preventDefault();
+        });
+
+        @*$('#Lookup-EmpName-FName').on('click', function (event) {
+
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#EmpName",
+                lookupurl: "@Url.Action("GetEmp", "LockRelease")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "EmpName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                appendToId: "#EmpName_id",
+                readonly: true,
+                pagename: "PageNavPosition"
+            });
+        });*@
+    });
+    $('#Lookup-HOCalendar-Location').button().on('click', function (event) {
+        $('.dialog').P2BLookUpModal('@Url.Action("GetEmp", "LockRelease")', '', 'LookupDiv', 'Employee Name ', '#EmployeeNamelist', 'EmployeeNamelist', 5, 'EmployeeNamelist', '#frmlockrelease', 'A', '#Remove-HOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+</script>
+<style>
+    .child-div {
+        display: inline-block;
+    }
+
+    .popup-content-label {
+        float: left;
+        width: 124px;
+        display: block;
+    }
+
+    .popup-content-drop-icon-edit, .popup-content-drop-icon-create, .popup-content-drop-icon-lookup {
+        display: inline-block;
+        left: 0;
+        top: 4px;
+    }
+    .icon-row {
+        left: 93px;
+        position: absolute;
+        top: 8px;
+    }
+
+
+    .popup-content-drop-icon-edit, .popup-content-drop-icon-create, .popup-content-drop-icon-lookup {
+        height: 20px;
+        margin: auto;
+        /*position: absolute;*/
+        width: 20px;
+        left: 24px;
+    }
+
+    .popup-content-drop-icon-edit {
+        left: 76px;
+    }
+
+    .popup-content-drop-icon-lookup {
+        left: 0px;
+        top: 6px;
+    }
+</style>

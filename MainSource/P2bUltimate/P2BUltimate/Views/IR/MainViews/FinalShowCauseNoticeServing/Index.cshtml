@@ -1,0 +1,349 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.FinalShowCauseNoticeServing
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row2, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'IsClosedServing', 'IsNoticeRecd', 'NoticeServingDate', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'IsClosedServing', 'IsNoticeRecd', 'NoticeServingDate', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Final Show Cause Notice Serving';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Lookup-ShowCauseNotice-FinalShowCauseNoticeServing').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "FinalShowCauseNoticeServing")', '', 'LookupDiv', 'FinalShowCauseNoticeServingDoc Look Up Data', '#ShowCauseNoticelist', 'ShowCauseNoticelist', 4, 'ShowCauseNoticelist', '#frmFinalShowCauseNoticeServing', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-Witness-FinalWitness').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupWitnessData", "FinalShowCauseNoticeServing")', '', 'LookupDiv', 'FinalShowCauseNoticeServingWitness Look Up Data', '#Witnesslist', 'Witnesslist', 4, 'Witnesslist', '#frmFinalShowCauseNoticeServing', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-ShowCauseServingMode-FinalShowCauseServingMode').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupChargeSheetServingMode", "FinalShowCauseNoticeServing")', '', 'LookupDiv', 'FinalShowCauseNoticeServingMode Look Up Data', '#ShowCauseServingModelist', 'ShowCauseServingModelist', 4, 'ShowCauseServingModelist', '#frmFinalShowCauseNoticeServing', 'N', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Create').button().on("click", function () {
+            $('#frmFinalShowCauseNoticeServing').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Final Show Cause Notice Serving ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmFinalShowCauseNoticeServing', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });
+        });
+        $('#Remove-ShowCauseNotice-FinalShowCauseNoticeServing').button().on('click', function (event) {
+
+            //a = $('#ShowCauseNoticelist').P2BGetTableDataonSelectedRow('#ShowCauseNoticelist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ShowCauseNoticelist').P2BGetTableDataonSelectedRow('#ShowCauseNoticelist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ShowCauseNoticelist', $('#ShowCauseNoticelist').val(), 200, 200, '#frmFinalShowCauseNoticeServing', '#ShowCauseNoticelist');
+            event.preventDefault();
+        });
+        $('#Remove-Witness-FinalWitness').button().on('click', function (event) {
+
+            //a = $('#Witnesslist').P2BGetTableDataonSelectedRow('#Witnesslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Witnesslist').P2BGetTableDataonSelectedRow('#Witnesslist', 0);
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Witnesslist', $('#Witnesslist').val(), 200, 200, '#frmFinalShowCauseNoticeServing', '#Witnesslist');
+            event.preventDefault();
+        });
+        $('#Remove-ShowCauseNotice-FinalShowCauseServingMode').button().on('click', function (event) {
+
+            //a = $('#ShowCauseServingModelist').P2BGetTableDataonSelectedRow('#ShowCauseServingModelist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ShowCauseServingModelist').P2BGetTableDataonSelectedRow('#ShowCauseServingModelist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ShowCauseServingModelist', $('#ShowCauseServingModelist').val(), 200, 200, '#frmFinalShowCauseNoticeServing', '#ShowCauseServingModelist');
+            event.preventDefault();
+        });
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+        $('#View').button().on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View FinalShowCauseNoticeServing', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmFinalShowCauseNoticeServing').trigger("reset");
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsClosedServing"]').val([k.IsClosedServing]).button().button("refresh");
+                    $('[name="IsNoticeRecd"]').val([k.IsNoticeRecd]).button().button("refresh");
+                    if (k.NoticeServingDate != null)
+                        $('#NoticeServingDate').val(DateConvert(k.NoticeServingDate));
+                    else
+                        $('#NoticeServingDate').val();
+
+                    $('[name="IsWitnessReqd"]').val([k.IsWitnessReqd]).button().button("refresh");
+                    if (k.IsWitnessReqd == false) {
+                        $('#hidew').fadeOut();
+                    }
+                    else {
+                        $('#hidew').fadeIn();
+
+                    }
+
+                    $('#ShowCauseServingModelist').P2BLookUpEncapsulate('#ShowCauseServingModelist', 'ShowCauseServingModelist', k.ShowCauseServingMode_Id, k.ShowCauseServingMode, 'ShowCauseServingModelist', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#Witnesslist').P2BLookUpEncapsulate('#Witnesslist', 'Witnesslist', k.witness_Id, k.witnessfulldetails, 'Witnesslist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#ShowCauseNoticelist').P2BLookUpEncapsulate('#ShowCauseNoticelist', 'ShowCauseNoticelist', k.shownoticedoc_Id, k.shownoticedocfulldetails, 'ShowCauseNoticelist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+
+                });
+            });
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit FinalShowCauseNoticeServing", '#frmFinalShowCauseNoticeServing', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmFinalShowCauseNoticeServing').trigger("reset");
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsClosedServing"]').val([k.IsClosedServing]).button().button("refresh");
+                    $('[name="IsNoticeRecd"]').val([k.IsNoticeRecd]).button().button("refresh");
+                    if (k.NoticeServingDate != null)
+                        $('#NoticeServingDate').val(DateConvert(k.NoticeServingDate));
+                    else
+                        $('#NoticeServingDate').val();
+
+                    $('[name="IsWitnessReqd"]').val([k.IsWitnessReqd]).button().button("refresh");
+                    if (k.IsWitnessReqd == false) {
+                        $('#hidew').fadeOut();
+                    }
+                    else {
+                        $('#hidew').fadeIn();
+
+                    }
+                    $('#ShowCauseServingModelist').P2BLookUpEncapsulate('#ShowCauseServingModelist', 'ShowCauseServingModelist', k.ShowCauseServingMode_Id, k.ShowCauseServingMode, 'ShowCauseServingModelist', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#Witnesslist').P2BLookUpEncapsulate('#Witnesslist', 'Witnesslist', k.witness_Id, k.witnessfulldetails, 'Witnesslist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#ShowCauseNoticelist').P2BLookUpEncapsulate('#ShowCauseNoticelist', 'ShowCauseNoticelist', k.shownoticedoc_Id, k.shownoticedocfulldetails, 'ShowCauseNoticelist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+
+            });
+        });
+
+        $('#hidew').hide();
+        $('input[name="IsWitnessReqd"]:radio').change(function () {
+
+            if (this.value == "false") {
+
+                $('#hidew').fadeOut();
+            }
+            else {
+                $('#hidew').fadeIn();
+
+            }
+        });
+        $('#Create-ShowCauseNotice-FinalShowCauseNoticeServing').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#ShowCauseNoticelist').P2BLookUpEncapsulate('#ShowCauseNoticelist', 'ShowCauseNoticelist', data.Id, data.Val, 'ShowCauseNoticelist', '', 'A');
+                },
+            });
+            event.preventDefault();
+
+        });
+
+        $('#NoticeServingDate').P2BDatePicker();
+        //$('.popup-radio-button ').controlgroup();
+    });
+</script>
+<!DOCTYPE html>
+
+<html>
+<head>
+    
+    <title>Index</title>
+</head>
+<body>
+    <div class="form-bg">
+        <div class="form-input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmFinalShowCauseNoticeServing", name = "frmFinalShowCauseNoticeServing" }))
+        {
+                   
+             <div class="row3 content_margine">
+        @Html.LabelFor(m => m.NoticeServingDate, "Notice Serving Date:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.NoticeServingDate, new { @class = "popup-content-textbox must" })
+            </div>
+              <div class=" row3 content_margine">
+                        @Html.LabelFor(m => m.ShowCauseNotice, "Supporting Documents :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ShowCauseNoticelist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding ShowCauseNotice" class=" popup-content-icon-lookup" id="Lookup-ShowCauseNotice-FinalShowCauseNoticeServing"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ShowCauseNotice " class=" popup-content-icon-create" id="Create-ShowCauseNotice-FinalShowCauseNoticeServing"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>            
+                        <button data-p2btooltip="Delete ShowCauseNotice" class=" popup-content-icon-remove" id="Remove-ShowCauseNotice-FinalShowCauseNoticeServing"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div> 
+            <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsClosedServing, "Is Closed Serving :", new { @class = "popup-content-label must" })
+                 <div class="popup-radio-button radio-button-div1">
+                     <span class="popup-rdaio-button radio-button-div1">
+                         <input type="radio" id="radio1" name="IsClosedServing" value="true" /><label for="radio1">YES</label>
+                         <input type="radio" id="radio2" name="IsClosedServing" value="false" /><label for="radio2">NO</label>
+                     </span>
+                 </div> 
+                 </div>
+            <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsNoticeRecd, "Is Notice Recd :", new { @class = "popup-content-label must" })
+                 <div class="popup-radio-button radio-button-div1">
+                     <span class="popup-rdaio-button radio-button-div1">
+                         <input type="radio" id="radio3" name="IsNoticeRecd" value="true" /><label for="radio3">YES</label>
+                         <input type="radio" id="radio4" name="IsNoticeRecd" value="false" /><label for="radio4">NO</label>
+                     </span>
+                 </div> 
+                 </div>
+            <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsWitnessReqd, "Is Witness Reqd:", new { @class = "popup-content-label " })
+                 <div class="popup-radio-button radio-button-div1">
+                     <span class="popup-rdaio-button radio-button-div1">
+                         <input type="radio" id="radio5" name="IsWitnessReqd" value="true" /><label for="radio5">YES</label>
+                         <input type="radio" id="radio6" name="IsWitnessReqd" value="false" /><label for="radio6">NO</label>
+                     </span>
+                 </div> 
+                 </div>
+            <div id="hidew">
+               <div class=" row3 content_margine">
+                        @Html.LabelFor(m => m.Witness, "Witness :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="Witnesslist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding Witness" class=" popup-content-icon-lookup" id="Lookup-Witness-FinalWitness"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>                      
+                        <button data-p2btooltip="Delete Witness" class=" popup-content-icon-remove" id="Remove-Witness-FinalWitness"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                </div>
+                <div class="row3 content_margine">
+        @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+             <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.ShowCauseServingMode, "Show Cause ServingMode :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ShowCauseServingModelist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding  ShowCauseServingMode" class=" popup-content-icon-lookup" id="Lookup-ShowCauseServingMode-FinalShowCauseServingMode"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>                        
+                        <button data-p2btooltip="Delete ShowCauseServingMode" class=" popup-content-icon-remove" id="Remove-ShowCauseNotice-FinalShowCauseServingMode"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            
+        }
+        </div>
+</body>
+</html>

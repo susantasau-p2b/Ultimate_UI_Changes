@@ -1,0 +1,584 @@
+﻿@{
+    ViewBag.Title = "EmpTimingRoasterData";
+}
+@model Attendance.EmpTimingRoasterData
+
+<style>
+    #lvdata {
+        float: right;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 112px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 600px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 250px;
+        display: inline-block;
+        /*! margin-left: -89px; */
+        position: absolute;
+        left: 191px;
+        top: 137px;
+    }
+
+    .loader {
+        width: 299px;
+        /*! display: inline-flex; */
+        /*! margin-left: -89px; */
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 29px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 554px;
+        /*! width: 610px; */
+        /*! margin: 5px 4px; */
+        position: absolute;
+        left: 546px;
+    }
+</style>
+
+
+
+
+@*<style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>*@
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var btndisablenames = "#Edit-TimingMonthlyRoaster-EmpMonthlyRoaster,#Remove-TimingMonthlyRoaster-EmpMonthlyRoaster";
+        var btndisablenamepol = "#Edit-TimingPolicy-EmpMonthlyRoaster,#Remove-TimingPolicy-EmpMonthlyRoaster";
+        var btndisablenameAll = "#Lookup-TimingMonthlyRoaster-EmpMonthlyRoaster,#Create-TimingMonthlyRoaster-EmpMonthlyRoaster,#Edit-TimingMonthlyRoaster-EmpMonthlyRoaster,#Remove-TimingMonthlyRoaster-EmpMonthlyRoaster,#Edit-TimingPolicy-EmpMonthlyRoaster,#Remove-TimingPolicy-EmpMonthlyRoaster,#Create-TimingPolicy-EmpMonthlyRoaster,#Lookup-TimingPolicy-EmpMonthlyRoaster";
+        var dt;
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmEmpTimingMonthlyRoaster').trigger("reset");
+            $.LoadEmpByDefault();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create EmpTimingMonthlyRoaster', 'open', '@Url.Action("Create")', '#frmEmpTimingMonthlyRoaster', 'Message :', 'Request Falied :', '#JqGrid', 500, 900, '#TimingMonthlyRoasterlist', btndisablenames, function (data) { });
+            $('#DayTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 203, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        $('#Lookup-TimingMonthlyRoaster-EmpMonthlyRoaster').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingMonRosterDetails", "EmpTimingMonthlyRoaster")', '', 'LookupDiv', 'Look Timing Monthly Roaster', '#TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', 5, 'TimingMonthlyRoasterlist', '#frmEmpTimingMonthlyRoaster', 'N', btndisablenames, '#Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "EmpTimingRoasterData")",
+            htmurl: "@Url.Action("GridPartial", "EmpTimingRoasterData")",
+            columnname: ["Id", "Code", "Name"],
+            childheader: ["Id", "DayType", "InTime", "RoasterDate"],
+            childurl: "@Url.Action("Get_EmpTimingRostData", "EmpTimingRoasterData")",
+            tableheader: "Emp Timing Monthly Roaster Data"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "EmpTimingRoasterData")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            $('#Grid-ReqDate').val(k.ReqDate);
+                            $('#Grid-FromDate').val(k.FromDate);
+                            $('#Grid-ToDate').val(k.ToDate);
+                            $('#Grid-TotalDays').val(k.TotalDays);
+                            $('#Grid-Reason').val(k.Reason);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#EditGridForm",
+                    htmlurl: "@Url.Action("GridPartial", "EmpTimingRoasterData")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "EmpTimingRoasterData")",
+                    submiturl: "@Url.Action("GridEditsave", "EmpTimingRoasterData")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data, function (i, k) {
+                            //console.log(k.MonthlyInstallmentAmount);
+                            $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                            //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingMonthlyRoaster-EmpMonthlyRoaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TimingMonthlyRoaster")', 'Create Dialog', 'open', '@Url.Action("Create", "TimingMonthlyRoaster")', '#frmTimingMonthlyRoaster', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmEmpTimingMonthlyRoaster', '', function (data) {
+                // to show data which is created in partial page
+                $('#TimingMonthlyRoasterlist').P2BLookUpEncapsulate('#TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', data[0], data[1], 'TimingMonthlyRoasterlist', btndisablenames, 'N');
+            }, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Edit-TimingMonthlyRoaster-EmpMonthlyRoaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TimingMonthlyRoasterlist').P2BGetTableDataonSelectedRow('#TimingMonthlyRoasterlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TimingMonthlyRoaster")', '@Url.Action("edit", "TimingMonthlyRoaster")', b, '@Url.Action("Editsave", "TimingMonthlyRoaster")', 'Edit TimingMonthlyRoaster', '#frmTimingMonthlyRoaster', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmEmpTimingMonthlyRoaster', '#TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', 'N', '#Edit-TimingMonthlyRoaster-EmpMonthlyRoaster,#Remove-TimingMonthlyRoaster-EmpMonthlyRoaster', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmTimingMonthlyRoaster').trigger('reset');
+                    $('#RoasterName').val(k.RoasterName);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#TimingGrouplist').P2BLookUpEncapsulate('#TimingGrouplist', 'TimingGrouplist', k.TimingGroup_Id, k.TimingGroup_FullAddress, 'TimingGrouplist', btndisablenames, 'N');
+                });
+
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Remove-TimingMonthlyRoaster-EmpMonthlyRoaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#TimingMonthlyRoasterlist').P2BGetTableDataonSelectedRow('#TimingMonthlyRoasterlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingMonthlyRoasterlist', $('#TimingMonthlyRoasterlist').val(), 200, 200, '#frmEmpTimingMonthlyRoaster', '#TimingMonthlyRoasterlist', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-TimingPolicy-EmpMonthlyRoaster').button().on('click', function (event) {
+
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTimingPolicyDetails", "EmpTimingMonthlyRoaster")', '', 'LookupDiv', 'Look Timing Policy Details', '#TimingPolicylist1', 'TimingPolicylist1', 5, 'TimingPolicylist1', '#frmEmpTimingMonthlyRoaster', 'N', btndisablenamepol, '#Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-TimingPolicy-EmpMonthlyRoaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#TimingPolicylist1').P2BGetTableDataonSelectedRow('#TimingPolicylist1', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TimingPolicylist1', $('#TimingPolicylist1').val(), 200, 200, '#frmEmpTimingMonthlyRoaster', '#TimingPolicylist1', '#Edit-TimingPolicy-EmpMonthlyRoaster,#Remove-TimingPolicy-EmpMonthlyRoaster');
+            event.preventDefault();
+        });
+
+
+        ////@*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-TimingPolicy-EmpMonthlyRoaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "TimingPolicy")', 'Create Dialog', 'open', '@Url.Action("Create", "TimingPolicy")', '#frmTimingMonthlyRoaster', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmEmpTimingMonthlyRoaster', '', function (data) {
+                // to show data which is created in partial page
+                $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', data[0], data[1], 'TimingPolicylist', btndisablenames, 'N');
+            });
+            event.preventDefault();
+        });*@
+
+        //// Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmEmpTimingMonthlyRoaster', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#TimingMonthlyRoasterlist,#TimingPolicylist1', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Code);
+                    // $('#RoasterDate').val(k.RoasterDate);
+                    if (k.RoasterDate != null) {
+                        $('#RoasterDate').val(DateConvert(k.RoasterDate));
+                    }
+                    $('#DayTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 203, k.DayType_Id); // Dropdown bind
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#TimingMonthlyRoasterlist').P2BLookUpEncapsulate('#TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', k.TimingMonthlyRoaster_Id, k.TimingMonthlyRoaster_FullDetails, 'TimingMonthlyRoasterlist', btndisablenames, 'N');
+                    $('#TimingPolicylist1').P2BLookUpEncapsulate('#TimingPolicylist1', 'TimingPolicylist1', k.TimingPolicy_Id, k.TimingPolicy_FullDetails, 'TimingPolicylist1', btndisablenamepol, 'N');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#TimingMonthlyRoasterlist,#TimingPolicylist1', btndisablenameAll, 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    // $('#RoasterDate').val(k.RoasterDate);
+                    if (k.RoasterDate != null) {
+                        $('#RoasterDate').val(DateConvert(k.RoasterDate));
+                    }
+                    $('#DayTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 203, k.DayType_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#TimingMonthlyRoasterlist').P2BLookUpEncapsulate('#TimingMonthlyRoasterlist', 'TimingMonthlyRoasterlist', k.TimingMonthlyRoaster_Id, k.TimingMonthlyRoaster_FullDetails, 'TimingMonthlyRoasterlist', btndisablenames, 'N');
+                    $('#TimingPolicylist1').P2BLookUpEncapsulate('#TimingPolicylist1', 'TimingPolicylist1', k.TimingPolicy_Id, k.TimingPolicy_FullDetails, 'TimingPolicylist1', btndisablenamepol, 'N');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#RoasterDate').oldVal(data[2].RoasterDate);
+                    $('#DayTypelist').oldDropval(data[2].DayType_Val);
+                    $('#TimingMonthlyRoasterlist_old').oldLookupVal(data[2].TimingMonthlyRoaster_Val);
+                    $('#TimingPolicylist_old').oldLookupVal(data[2].TimingPolicy_Val);
+                }
+                //}, 2000);
+            });
+        });
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete", "EmpTimingMonthlyRoaster")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#InTime').P2BTimePicker();
+
+        //$('.popup_radio_button').controlgroup();
+        $('.date').P2BDatePicker();
+        $('#DayTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Employee Timing Monthly Roaster">
+        <div class="heading">Filter View</div>
+
+        <div class="filter-div">
+            <label class="advance_filter_label">
+                Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                </span>
+            </label>
+
+        </div>
+
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpTimingMonthlyRoaster", name = "frmEmpTimingMonthlyRoasterEdit" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            //  <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="Employee-Search" style="width: 425px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr>
+                                <th><input type="checkbox" id="Case-Employee" /></th>
+                                <th>Employee</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="section2_Leave">
+                <div class="dropdown_row1 row3 content_margine">
+                    @Html.LabelFor(m => m.DayType, "Day Type :", new { @class = "popup-content-label must" })
+                    <select id="DayTypelist" name="DayTypelist"><option></option></select>
+                </div>
+                <div class="row1 content_margine">
+                    @Html.LabelFor(m => m.RoasterDate, "RoasterDate :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.RoasterDate, new { @class = "popup-content-textbox date must" })
+                </div>
+                <div class="row1 content_margine">
+                    @Html.LabelFor(m => m.InTime, "InTime :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.InTime, new { @class = "popup-content-textbox must" })
+                </div>
+
+            </div>
+
+        }
+    </div>
+</body>

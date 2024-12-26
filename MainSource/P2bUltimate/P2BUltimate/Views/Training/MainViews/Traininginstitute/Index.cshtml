@@ -1,0 +1,241 @@
+﻿@{
+    ViewBag.Title = "TrainingInstitute";
+}
+
+@model Training.TrainingInstitute
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function (e) {
+
+
+        var btndisablenames = "#Edit-ContactDetails-TrainingInstitute,Remove-ContactDetails-TrainingInstitute";
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-ContactDetails-TrainingInstitute,#Remove-ContactDetails-TrainingInstitute";
+        ColModel = ['Id', 'Code', 'Name'];
+        ColNames = ['Id', 'Code', 'Name'];
+        SortName = 'Code';
+        Caption = 'Training Institute';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+      
+        $('#Create').on("click", function (event) {
+            $('#frmTrainingInstitute').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Training Institute', 'open', '@Url.Action("Create")', '#frmTrainingInstitute', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#ContactDetailsList', btndisablenames, function (data) { });
+            $('#InstituteTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1053, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Training Institute Data", '#frmTrainingInstitute', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#ContactDetailsList', '', function (data) {
+                $.each(data[1], function (i, k) {
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.ContactDetails_Id, k.ContactDetails_FullDetails, 'ContactDetailsList', '#Edit-ContactDetails-TrainingInstitute,#Remove-ContactDetails-TrainingInstitute', 'A');
+                });
+                $.each(data[0], function (i, k) {
+                    $('#frmTrainingInstitute').trigger('reset');
+                    $('#Name').val(k.Name);
+                    $('#Code').val(k.Code);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('#InstituteTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1053, k.InstituteType_ID); // Dropdown bind
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Training Institute', '#ContactDetailsList', 'Lookup-ContactDetails-TrainingInstitute,#Create-ContactDetails-TrainingInstitute,#Edit-ContactDetails-TrainingInstitute,#Remove-ContactDetails-TrainingInstitute', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Id').val(k.Id);
+                    $('#Name').val(k.Name);
+                    $('#Code').val(k.Code);
+                    $('#ContactPerson').val(k.ContactPerson);
+                    $('#InstituteTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1053, k.InstituteType_ID);
+                });
+
+                $.each(data[1], function (i, k) {
+                    // $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.ContactDetails_Id, k.ContactDetails_FullDetails, 'ContactDetailsList', 'view', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').StickNote(data[2].Name);
+                    $('#Code').StickNote(data[2].Code);
+                    $('#ContactPerson').StickNote(data[2].ContactPerson);
+                    $('#InstituteTypelist').StickNote(data[2].InstituteType_Val);
+                    $('#ContactDetailsList_Old').StickNote(data[2].Contact_Val);
+                }
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-ContactDetails-TrainingInstitute').button().on('click', function (event) {          
+            $('.dialog1').P2BLookUpModal('@Url.Action("GetContactDetails", "TrainingInstitute")', '', 'lookupdiv1', 'Look ContactDetails Details', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmTrainingInstitute', 'N', btndisablenames, '#Lookup_table', 'pageNavPosition1');
+            event.preventDefault();
+        });
+
+      
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ContactDetails-TrainingInstitute').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', 'Create Contact Details', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '', function (data) {
+                $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-ContactDetails-TrainingInstitute').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTrainingInstitute', '#ContactDetailsList', 'ContactDetailsList', 'ContactDetailsList', 'N', '#Edit-ContactDetails-TrainingInstitute,#Remove-ContactDetails-TrainingInstitute', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Remove-ContactDetails-TrainingInstitute').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#ContactDetailsList').P2BGetTableDataonSelectedRow('#ContactDetailsList', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "ContactDetails")', b, dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#ContactDetailsList').val(), 200, 200, '#frmTrainingInstitute', '#ContactDetailsList');
+            event.preventDefault();
+        });
+
+        $('#Name').ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+
+
+
+<style>
+    .all_row3 {
+        width: 400px;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog1">
+        <div title="LookUp Data">
+            <div class="lookupdiv1"></div>
+        </div>
+        <div id="pageNavPosition1">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Training Institute">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmTrainingInstitute" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Code, " Code", new { @class = "popup-content-label must " })@Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must " })</div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name", new { @class = "popup-content-label must " })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must " })</div>
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.InstituteType, "Institute Type :", new { @class = "popup-content-label must" })
+            <select class="drop must" name="InstituteTypelist" id="InstituteTypelist" style='width:160px'><option></option></select>
+        </div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.ContactPerson, "Contact Person :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.ContactPerson, new { @class = "popup-content-textbox" })</div>
+
+
+
+            <div class="row1 content_margine">
+                <div id="ContactDetailsList_Old"></div>
+                @Html.LabelFor(m => m.ContactDetails, "Contact Details :", new { @class = "popup-content-label" })
+
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ContactDetailsList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUp Contact Details" class="popup-content-icon-lookup" id="Lookup-ContactDetails-TrainingInstitute"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Crate Contact Details" class="popup-content-icon-create" id="Create-ContactDetails-TrainingInstitute"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Contact Details" class="popup-content-icon-edit" id="Edit-ContactDetails-TrainingInstitute"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Contact Details" class="popup-content-icon-remove" id="Remove-ContactDetails-TrainingInstitute"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

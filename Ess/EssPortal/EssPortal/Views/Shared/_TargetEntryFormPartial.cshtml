@@ -1,0 +1,519 @@
+﻿@{
+    Layout = null;
+}
+@model Appraisal.BA_Category
+
+<style>
+    #lvdata {
+        float: right;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 70px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 122px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 222px;
+    }
+
+    .row3 {
+        /*! width: 600px; */
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+    .row5 {
+        width: 282px;
+        display: inline-flex;
+    }
+
+    .row2 {
+        width: 250px;
+        display: inline-block;
+        /*! margin-left: -89px; */
+        position: absolute;
+        left: 191px;
+        top: 137px;
+    }
+
+    .loader {
+        width: 299px;
+        /*! display: inline-flex; */
+        /*! margin-left: -89px; */
+    }
+
+    .addwidth {
+        width: 453px;
+        height: 58px;
+    }
+
+    #process {
+        top: 29px;
+        left: 76px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        /*! margin: 0 auto; */
+        width: 379px;
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*! width: 507px; */
+        border-radius: 5px;
+        height: 100%;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: left;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        /*! width: 511px; */
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 50px;
+        width: 100%;
+        /*! margin: 5px 4px; */
+        position: absolute;
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        position: relative;
+        /*! height: 502px; */
+        width: 362px;
+        /*! margin: 5px 4px; */
+        /*! position: absolute; */
+        /*! left: 842px; */
+        top : -9em;
+        float: right;
+    }
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 70%;
+        position:relative;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    .monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    #monthTable tr:hover {
+        background-color: #ddd;
+    }
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    .weeklyoffclass {
+        background-color: #e8fefa;
+    }
+
+    .holidayclass {
+        background-color: #e8f3f1;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('#StartPeriod').P2BDatePicker();
+        $('#EndPeriod').P2BDatePicker();
+        $('#EntryDate').TodayDate();
+        $('#EmpAppraisal_id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+
+        $('.popup_radio_button').buttonset();
+
+        $.post("@Url.Action("getEmployeewiseData")", function (data) {
+            if (data != null && data != "") {
+                $('#StartPeriod').val(data[0]);
+                $('#EndPeriod').val(data[1]);
+                $('#Frequencylist').val(data[2]);
+            }
+
+        });
+
+        $.get("@Url.Action("GetCategoryList", "TargetEntryForm")", function (data) {
+            var tr = "";
+            var index = 1;
+            var tempclass = "";
+            $('#monthTable tr:gt(0)').remove();
+            var intimeval = $('#default_time').val();
+            console.log(data.data);
+            debugger;
+            if (data.status == true) {
+                $.each(data.data, function (l, k) {
+                    tr += "<tr class='" + tempclass + "' id='" + index + "'><td>" + index + "</td><td>" + k.CatName + "</td><td>" + k.SubCatName + "</td><td>" + k.Accounts + "</td><td>" + k.Amount + "</td><td>" + k.Compliance + "</td><td>" + k.Narration + "</td><td>" + k.CustomerId + "</td><td>" + k.AccountNo + "</td></tr>";
+                    index++;
+                    tempclass = "";
+                });
+            }
+
+            $('#monthTable tr:last').after(tr);
+        });
+
+
+        $.LocalStorageHelper.Set('FormTargetEntryData', "");
+        $('#monthTable').on('click', 'tr:gt(0)', function (e) {
+            var target = $(e.target).parent('tr');
+            target.toggleClass('monthTable-selected');
+            $('#monthTable tr:gt(0)').not(target).removeClass('monthTable-selected');
+            //  var sno = target.attr('id');
+            $('#sr_no').focus();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.children().each(function (i, k) {
+
+                if (i == 0) {
+                    $('#sr_no').val($(k).text());
+                }
+                if (i == 1) {
+                    $('#Category').val($(k).text());
+                    $.post("@Url.Action("ChkApplCategory")", { CatName: $(k).text() }, function (data) {
+                        if (data != null && data != "") {
+                            if (data[0] == false) {
+                                $('#Accounts').val("0");
+                                $('#Accounts').attr('readonly', false);
+                            }
+                            else {
+                                $('#Accounts').val("1");
+                                $('#Accounts').attr('readonly', true);
+                            }
+                            if (data[1] == false) {
+                                $('#Amount').attr('readonly', true);
+                            }
+                            else {
+                                $('#Amount').attr('readonly', false);
+                            }
+                            if (data[2] == false) {
+                                $('#Compliance').attr('readonly', true);
+                            }
+                            else {
+                                $('#Compliance').attr('readonly', false);
+                            }
+                        }
+
+                    });
+                }
+                if (i == 2) {
+                    $('#SubCategory').val($(k).text());
+                }
+                if (i == 3) {
+                    $('#Amount').val($(k).text());
+                }
+                if (i == 4) {
+                    $('#Accounts').val($(k).text());
+                }
+                if (i == 5) {
+                    $('#Compliance').val($(k).text());
+                }
+                if (i == 6) {
+                    $('#Narration').val($(k).text());
+                }
+                if (i == 7) {
+                    $('#CustomerId').val($(k).text());
+                }
+                if (i == 8) {
+                    $('#AccountNo').val($(k).text());
+                }
+            });
+            e.preventDefault();
+        });
+        $('#sub_form').on('click', function (e) {
+            var table_sr_no = $('#sr_no').val();
+            var target = $('#monthTable tr#' + table_sr_no).children();
+            var input = $('#frm_edit_form input[type="text"],#frm_edit_form select').toArray();
+            target.each(function (i, k) {
+                if (i == 0) {
+                    $(k).text($('#sr_no').val());
+                }
+                if (i == 1) {
+                    $(k).text($('#Category').val());
+                }
+                if (i == 2) {
+                    $(k).text($('#SubCategory').val());
+                }
+                if (i == 3) {
+                    $(k).text($('#Amount').val());
+                }
+                if (i == 4) {
+                    $(k).text($('#Accounts').val());
+                }
+                if (i == 5) {
+                    $(k).text($('#Compliance').val());
+                }
+                if (i == 6) {
+                    $(k).text($('#Narration').val());
+                }
+                if (i == 7) {
+                    $(k).text($('#CustomerId').val());
+                }
+                if (i == 8) {
+                    $(k).text($('#AccountNo').val());
+                }
+                // $(k).text($(input[i]).val());
+            });
+        });
+        $('#create-data').on('click', function (e) {
+            e.preventDefault();
+            var formjson = [];
+            var tr = [];
+            tr = $('#monthTable tr:gt(0)').toArray();
+            if (tr.length == 0) {
+                tr = $('#monthTable tr:gt(0)').toArray();
+            }
+
+            $.each(tr, function (i, k) {
+                var childs = $(k).children().toArray();
+                formjson.push({
+                    "SNo": $(childs[0]).text(),
+                    "Category": $(childs[1]).text(),
+                    "SubCategory": $(childs[2]).text(),
+                    "Amount": $(childs[3]).text(),
+                    "Accounts": $(childs[4]).text(),
+                    "Compliance": $(childs[5]).text(),
+                    "Narration": $(childs[6]).text(),
+                    "CustomerId": $(childs[7]).text(),
+                    "AccountNo": $(childs[8]).text()
+                });
+            });
+            $.ajax({
+                url: "@Url.Action("createdata", "TargetEntryForm")",
+                method: "POST",
+                contentType: 'application/json',
+                datatype: 'json',
+                data: JSON.stringify({
+                    data: formjson, StartDate: $('#StartPeriod').val(), EndDate: $('#EndPeriod').val()
+                }),
+                success: function (data) {
+                    if (data.status = true) {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        $('#sub_form').remove();
+                        $('#create-data').remove();
+                    }
+                    
+                }
+            });
+        });
+        $('#Amount').ForceAmount();
+        $('#Accounts').ForceOnlyNumeric();
+        $('#Compliance').ForceOnlyNumeric();
+        $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        $('.popup_radio_button').buttonset();
+
+    });
+</script>
+
+<body>
+    <div id="create_dialog1" title="Create Employee Target Entry Request">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTargetEntryFormNeedRequest", name = "frmTargetEntryFormNeedRequest" }))
+        {
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="EmpTargetEntryForm_id" class="filter_structure_id" name="EmpTargetEntryForm_id" />
+                <div>
+                    <div class="section2_Leave">
+                        <label class="">Start Period :</label>
+                        <input type="text" id="StartPeriod" class="popup-content-textbox" style="width:180px;" readonly />
+
+                        <label class="">End Period:</label>
+                        <input type="text" id="EndPeriod" class="popup-content-textbox" style="width:180px;" readonly />
+
+                        <label class="">Entry Date:</label>
+                        <input type="text" id="EntryDate" class="popup-content-textbox" style="width:180px;" readonly />
+
+                        <label class="" style="">Frequency:</label>
+                        <input type="text" id="Frequencylist" class="popup-content-textbox" style="width:180px;" readonly />
+                        
+                    </div>
+
+                    <br><br><br><br>                           
+                    <table id="monthTable">
+                        <tr><th>Id</th><th>Category</th><th>SubCategory</th><th>Amount</th><th>Accounts</th><th>Compliance</th><th>Narration</th><th>CustomerId</th><th>AccountNo</th></tr>
+                    </table>
+
+                    <div class="section3_Leave">
+                        <form id="frm_edit_form" name="frm_edit_form">
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Sr.No :</label>
+                                <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Category :</label>
+                                <input type="text" id="Category" class="popup-content-textbox" readonly />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">SubCategory :</label>
+                                <input type="text" id="SubCategory" class="popup-content-textbox" readonly />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Amount :</label>
+                                <input type="text" id="Amount" class="popup-content-textbox" />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Accounts :</label>
+                                <input type="text" id="Accounts" class="popup-content-textbox" />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Compliance :</label>
+                                <input type="text" id="Compliance" class="popup-content-textbox" />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">Narration :</label>
+                                <input type="text" id="Narration" class="popup-content-textbox" />
+                            </div>
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">CustomerId :</label>
+                                <input type="text" id="CustomerId" class="popup-content-textbox" />
+                            </div>
+
+                            <div class="row1 content_margine">
+                                <label class="popup-content-label">AccountNo :</label>
+                                <input type="text" id="AccountNo" class="popup-content-textbox" />
+                            </div>
+
+
+
+                            <button type="button" id="sub_form">Modify</button>
+                            <div style="float:right">
+                                <button id="create-data">Create</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            @*<div class="section3_Leave">
+            <form id="frm_edit_form" name="frm_edit_form">
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Sr.No :</label>
+                    <input type="text" id="sr_no" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Category :</label>
+                    <input type="text" id="Category" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">SubCategory :</label>
+                    <input type="text" id="SubCategory" class="popup-content-textbox" readonly />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Amount :</label>
+                    <input type="text" id="Amount" class="popup-content-textbox" />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Accounts :</label>
+                    <input type="text" id="Accounts" class="popup-content-textbox" />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Compliance :</label>
+                    <input type="text" id="Compliance" class="popup-content-textbox" />
+                </div>
+                <div class="row1 content_margine">
+                    <label class="popup-content-label">Narration :</label>
+                    <input type="text" id="Narration" class="popup-content-textbox" />
+                </div>
+                
+                <button type="button" id="sub_form">Modify</button>
+                <div style="float:right">
+                        <button id="create-data">Create</button>
+                    </div>
+            </form>
+        </div>*@
+        }
+      
+    </div>
+</body>
+

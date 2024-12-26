@@ -1,0 +1,177 @@
+﻿@model Attendance.AttendancePayrollPolicy
+@{
+    ViewBag.Title = "Attendance upload in Payroll Policy";
+}
+<html>
+<head>
+    <title></title>
+    @*<link href="~/Content/Pay_scale/Pay_scale.css" rel="stylesheet" />*@
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+
+            
+            //$('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablenames = "#Edit-PayScaleArea-PayScale,removet-PayScaleArea-PayScale";
+
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['LWPAdjustCurSal', 'PayProcessGroupList', 'Id'];
+            ColNames = ['LWPAdjustCurSal', 'PayProcessGroupList', 'Id'];
+            SortName = 'Id';
+            Caption = 'Attendance upload in Payroll Policy';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmattendanceuploadpolicy').trigger('reset');
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PayScale ', 'open', '@Url.Action("create") ', '#frmattendanceuploadpolicy', 'Message :', 'Request Falied :', '#JqGrid', 415, 540, '#PayScaleArealist', btndisablenames, function (data) { });
+                @*$('#PayProcessGroupList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 423, '');*@
+                $('#PayProcessGroupList').P2BSelectMenuAppend('@Url.Action("Polulate_PayProcessGroup", "ManualAttendanceProcess")', "", "");
+
+                @*$('#RoundingList').P2BSelectMenuAppend('@Url.Action("GetLookupValue","lookup")', 422, '');*@
+                e.preventDefault();
+            });
+
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#frmattendanceuploadpolicy').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+
+            $('#Edit').on('click', function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Attendance upload in payroll policy Data", '#frmattendanceuploadpolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 415, 540, '#PayScaleArealist', '', function (data) {
+                  
+                    $.each(data[0], function (i, k) {
+                       
+                        $('#frmattendanceuploadpolicy').trigger('reset');
+                        $('[name="LWPAdjustCurSal"]').val([k.LWPAdjustCurSal]).button().button("refresh");
+                        @*$('#PayProcessGroupList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 423, k.PayScaleType_Id)*@
+                        $('#PayProcessGroupList').P2BSelectMenuAppend('@Url.Action("Polulate_PayProcessGroup", "ManualAttendanceProcess")', k.PayProcessGroup_Id, "");
+
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) {
+                AssignData();
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                // $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View PayScale Data', '#PayScaleArealist', '#Lookup-PayScaleArea-PayScale,#Create-PayScaleArea-PayScale,#Edit-PayScaleArea-PayScale,#removet-PayScaleArea-PayScale', 415, 540, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Autho_Action').val(k.Action);
+                        $('[name="LWPAdjustCurSal"]').val([k.LWPAdjustCurSal]).button().button("refresh");
+                        $('#PayProcessGroupList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 423, k.PayScaleType_Id)
+                      
+                       
+                    });
+                  
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        $('[name="LWPAdjustCurSal"]').StickNote([data[2].LWPAdjustCurSal]);
+                        $('#PayProcessGroupList').StickNote(data[2].PayScaleType_Val);
+                       
+                    }
+                });
+            });
+
+          
+
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+          
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+    </script>
+</head>
+<body>
+    <style>
+        .icon-row {
+            position: absolute;
+            left: 80px;
+            top: 35px;
+        }
+        .popup-content-label {
+            display:block;
+            float: left;
+            width: 106px;
+        }
+    </style>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Attendance upload policy">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmattendanceuploadpolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="payscale_row3 content_margine">
+                @Html.LabelFor(m => m.PayProcessGroup, "Pay Process Group :", new { @class = "popup-content-label must" })
+                <select class="drop must" name="PayProcessGroupList" id="PayProcessGroupList" style="width:120px;"></select>
+            </div>
+           
+            <div class="payscale_row3 content_margine horizontal_row2">
+                @Html.LabelFor(m => m.LWPAdjustCurSal, "LWP Adjust Cur Sal:", new { @class = "popup-content-label" })
+                <div class="popup_radio_button radio_button_div_1">
+                    <span class="popup_radio_button radio_button_div_1">
+                        <input type="radio" id="radio3" name="LWPAdjustCurSal" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                        <input type="radio" id="radio4" name="LWPAdjustCurSal" value="false" /><label class="ui-corner-right" for="radio4">No</label>
+                    </span>
+                </div>
+                <span class="popup_radio_button radio_button_div_1">
+                </span>
+            </div>
+          
+
+          
+          
+           
+        }
+    </div>
+
+</body>
+
+
+</html>

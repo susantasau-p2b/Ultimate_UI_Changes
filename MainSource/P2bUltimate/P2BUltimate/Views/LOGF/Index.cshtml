@@ -1,0 +1,148 @@
+﻿@{
+    ViewBag.title = "LogFile";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+   
+    <script>
+        $(document).ready(function (e) {
+            
+            var btndisablenames = "";
+            $('button').button();
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            var btndisablenames = "";
+            ColModel = ['CreateDate', 'Name'];
+            ColNames = ['CreateDate', 'Name'];
+            SortName = 'GroupCode';
+            Caption = 'Timing Group';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Name');
+
+            }
+           
+            $('#Filetype_dropview').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3006, "");
+            $('#Load').on('click', function (e) {
+                var value = $('select#Filetype_dropview option:selected').text(); 
+                if (value == "-Select-") {
+                    alert('Kindly select file type.');
+                }
+                else {
+                    $('#JqGrid').PostGridData({ url: url, filter: value });
+                }
+                
+            });
+
+            $('#Download').click(function (event) {
+                AssignData();
+                // $.post("@@Url.Action("Download")", { id: dt.FileName }, function (data) {
+                //if (data != null && data != "") {
+                window.location = '@Url.Action("DownloadFile", "LOGF")?fileName=' + dt.Name;
+                //}
+                //else {
+                //    alert("Data Null");
+                //}
+            });
+            event.preventDefault();
+        });
+
+      
+
+
+    </script>
+</head>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <div style="float:left">
+
+                <label id="lblPayMonth" class="popup-content-label must">Select File:</label>
+                <select id="Filetype_dropview" name="Filetype_dropview" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Download">Download</button>
+
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<body>
+    <div id="Create_Dialog" title="Log Files">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmlog" }))
+        {
+        }
+    </div>
+</body>
+
+
+</html>

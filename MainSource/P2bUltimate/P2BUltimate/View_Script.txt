@@ -1,0 +1,38 @@
+﻿USE [ASSAM_AJ]
+GO
+
+/****** Object:  View [dbo].[SalaryDetails]    Script Date: 07/08/2018 12:25:05 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE VIEW [dbo].[SalaryDetails]
+AS
+SELECT        dbo.SalaryT.Geostruct_Id, dbo.VGeoStructD.Comp_Code, dbo.VGeoStructD.Company_Name, dbo.VGeoStructD.LocCode, dbo.VGeoStructD.LocDesc, dbo.SalaryT.PayMonth, dbo.SalaryHead.Code AS EarnCode, 
+                         dbo.SalaryHead.Name AS EarnHead, dbo.SalaryHead.FullDetails, dbo.LookupValue.LookupVal, dbo.SalaryHead.InPayslip, SUM(SalEarnDedT_1.StdAmount) AS StdAmount, SUM(SalEarnDedT_1.Amount) AS EarnAmount, 
+                         dbo.SalaryT.EmployeePayroll_Id, dbo.EmployeePayroll.Employee_Id, dbo.Employee.EmpCode, dbo.Employee.EmpName_Id, dbo.NameSingle.FullNameFML, dbo.SalaryT.TotalEarning, dbo.SalaryT.TotalDeduction, 
+                         dbo.SalaryT.TotalNet, dbo.SalaryHead.SeqNo, dbo.SalaryT.PayStruct_Id, dbo.VPayStructD.Grade_Code, dbo.VPayStructD.Grade_Name, dbo.VFuncStructD.Job_Code, dbo.VFuncStructD.Job_Name, dbo.SalaryHead.Id, 
+                         dbo.PFECRR.EPS_Share, dbo.PFECRR.ER_Share
+FROM            dbo.LookupValue INNER JOIN
+                         dbo.Lookup ON dbo.LookupValue.Lookup_Id = dbo.Lookup.Id INNER JOIN
+                         dbo.SalaryT INNER JOIN
+                         dbo.SalEarnDedT AS SalEarnDedT_1 ON dbo.SalaryT.Id = SalEarnDedT_1.SalaryT_Id INNER JOIN
+                         dbo.SalaryHead ON SalEarnDedT_1.SalaryHead_Id = dbo.SalaryHead.Id INNER JOIN
+                         dbo.VGeoStructD ON dbo.SalaryT.Geostruct_Id = dbo.VGeoStructD.Geo_Struct_Id ON dbo.LookupValue.Id = dbo.SalaryHead.Type_Id INNER JOIN
+                         dbo.EmployeePayroll ON dbo.SalaryT.EmployeePayroll_Id = dbo.EmployeePayroll.Id INNER JOIN
+                         dbo.Employee ON dbo.EmployeePayroll.Employee_Id = dbo.Employee.Id INNER JOIN
+                         dbo.NameSingle ON dbo.Employee.EmpName_Id = dbo.NameSingle.Id INNER JOIN
+                         dbo.VPayStructD ON dbo.SalaryT.PayStruct_Id = dbo.VPayStructD.PayStruct_Id INNER JOIN
+                         dbo.VFuncStructD ON dbo.SalaryT.FuncStruct_Id = dbo.VFuncStructD.FuncStruct_Id INNER JOIN
+                         dbo.PFECRR ON dbo.SalaryT.PFECRR_Id = dbo.PFECRR.Id
+WHERE        (dbo.SalaryT.IsHold = 0) AND (dbo.SalaryHead.Frequency_Id <> 723)
+GROUP BY dbo.SalaryT.Geostruct_Id, dbo.VGeoStructD.Comp_Code, dbo.VGeoStructD.Company_Name, dbo.SalaryT.PayMonth, dbo.SalaryHead.Code, dbo.SalaryHead.Name, dbo.SalaryHead.FullDetails, dbo.LookupValue.LookupVal, 
+                         dbo.SalaryHead.InPayslip, dbo.VGeoStructD.LocCode, dbo.VGeoStructD.LocDesc, dbo.SalaryT.EmployeePayroll_Id, dbo.EmployeePayroll.Employee_Id, dbo.Employee.EmpCode, dbo.Employee.EmpName_Id, 
+                         dbo.NameSingle.FullNameFML, dbo.SalaryT.TotalNet, dbo.SalaryT.TotalDeduction, dbo.SalaryT.TotalEarning, dbo.SalaryHead.SeqNo, dbo.SalaryT.PayStruct_Id, dbo.VPayStructD.Grade_Code, dbo.VPayStructD.Grade_Name, 
+                         dbo.VFuncStructD.Job_Code, dbo.VFuncStructD.Job_Name, dbo.SalaryHead.Id, dbo.PFECRR.EPS_Share, dbo.PFECRR.ER_Share
+
+GO
+
+

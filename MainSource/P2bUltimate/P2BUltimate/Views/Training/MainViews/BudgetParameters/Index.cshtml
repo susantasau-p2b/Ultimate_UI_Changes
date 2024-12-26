@@ -1,0 +1,342 @@
+﻿@{
+    ViewBag.Title = "Budget Parameters";
+}
+
+@model Training.BudgetParameters
+<script>
+    $(document).ready(function () {
+        var btndisablenames = "#Edit-LeaveCalendar-LeaveHead,#Remove-LeaveCalendar-LeaveHead,#Edit-LvCreditPolicy-LeaveHead,#Remove-LvCreditPolicy-LeaveHead";
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['IsBudgetAppl', 'IsCategory', 'IsFuncStruct', 'IsGeoStruct', 'IsPayStruct', 'IsProgram', 'Id'];
+        ColNames = ['IsBudgetAppl', 'IsCategory', 'IsFuncStruct', 'IsGeoStruct', 'IsPayStruct', 'IsProgram', 'Id'];
+        SortName = 'Id';
+        Caption = 'Budget Parameters';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        
+
+        //$('input[name="IsBudgetAppl"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsBudget').prop("disabled", true);
+        //        $('#IsBudget').val("");
+        //    }
+        //    else {
+        //        $('#IsBudget').prop("disabled", false);
+        //    }
+        //});
+
+        //$('input[name="IsCategory"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsCateg').prop("disabled", true);
+        //        $('#IsCateg').val("");
+        //    }
+        //    else {
+        //        $('#IsCateg').prop("disabled", false);
+        //    }
+        //});
+
+        //$('input[name="IsFuncStruct"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsFuncStr').prop("disabled", true);
+        //        $('#IsFuncStr').val("");
+        //    }
+        //    else {
+        //        $('#IsFuncStr').prop("disabled", false);
+        //    }
+        //});
+
+        //$('input[name="IsGeoStruct"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsGeoStr').prop("disabled", true);
+        //        $('#IsGeoStr').val("");
+        //    }
+        //    else {
+        //        $('#IsGeoStr').prop("disabled", false);
+        //    }
+        //});
+
+        //$('input[name="IsPayStruct"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsPayStr').prop("disabled", true);
+        //        $('#IsPayStr').val("");
+        //    }
+        //    else {
+        //        $('#IsPayStr').prop("disabled", false);
+        //    }
+        //});
+
+        //$('input[name="IsProgram"]:radio').change(function () {
+        //    if (this.value == "false") {
+        //        $('#IsProg').prop("disabled", true);
+        //        $('#IsProg').val("");
+        //    }
+        //    else {
+        //        $('#IsProg').prop("disabled", false);
+        //    }
+        //});
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmBudgetParameters').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Budget Parameters', 'open', '@Url.Action("Create")', '#frmBudgetParameters', 'Message :', 'Request Falied :', '#JqGrid', 500, 650, '#LeaveCalendarlist,#LvCreditPolicylist', btndisablenames, function (data) { });
+
+            event.preventDefault();
+        });
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            //$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Other Salary Head Master", '#frmOtherSalHead', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 315, 543, '', btndisablename, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Budget Parameter Data", '#frmBudgetParameters', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#LeaveCalendarlist,#LvCreditPolicylist', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmBudgetParameters').trigger('reset');
+           
+                    $('[name="IsBudgetAppl"]').val([k.IsBudgetAppl]).button().button("refresh");
+                    $('[name="IsCategory"]').val([k.IsCategory]).button().button("refresh");
+                    $('[name="IsFuncStruct"]').val([k.IsFuncStruct]).button().button("refresh");
+                    $('[name="IsGeoStruct"]').val([k.IsGeoStruct]).button().button("refresh");
+                    $('[name="IsPayStruct"]').val([k.IsPayStruct]).button().button("refresh");
+                    $('[name="IsProgram"]').val([k.IsProgram]).button().button("refresh");
+                });
+                
+
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+            });
+            event.preventDefault();
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Budget Parameter Data', '#LeaveCalendarlist,#LvCreditPolicylist', '#Lookup-LeaveCalendar-LeaveHead,#Create-LeaveCalendar-LeaveHead,#Edit-LeaveCalendar-LeaveHead,#Remove-LeaveCalendar-LeaveHead,#Lookup-LvCreditPolicy-LeaveHead,#Create-LvCreditPolicy-LeaveHead,#Edit-LvCreditPolicy-LeaveHead,#Remove-LvCreditPolicy-LeaveHead', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmBudgetParameters').trigger('reset');
+
+                    $('[name="IsBudgetAppl"]').val([k.IsBudgetAppl]).button().button("refresh");
+                    $('[name="IsCategory"]').val([k.IsCategory]).button().button("refresh");
+                    $('[name="IsFuncStruct"]').val([k.IsFuncStruct]).button().button("refresh");
+                    $('[name="IsGeoStruct"]').val([k.IsGeoStruct]).button().button("refresh");
+                    $('[name="IsPayStruct"]').val([k.IsPayStruct]).button().button("refresh");
+                    $('[name="IsProgram"]').val([k.IsProgram]).button().button("refresh");
+
+                });
+
+                
+            });
+        });
+
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        @*$('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');*@
+    });
+
+
+
+</script>
+<style>
+    .popup-content-label {
+        width: 130px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        width: 150px;
+    }
+
+    .row1 {
+        width: 433px;
+    }
+
+    .add_icon-row {
+        left: 41px;
+        position: relative;
+        top: -48px;
+    }
+
+    .icon-row {
+        left: 90px;
+        position: relative;
+        top: -151px;
+    }
+
+    .horizontal_row1, .popup_radio_button {
+        display: inline-block;
+    }
+
+    .drop_edit {
+        top: 22px;
+        left: 369px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .row4 {
+        width: 650px;
+        display: inline-flex;
+    }
+
+    .namepush {
+        margin-right: 2px;
+    }
+
+    .radiopush {
+        margin-right: 94px;
+    }
+
+    .lblwidth {
+        width: 100px;
+    }
+
+    .Clblwidth {
+        width: 97px;
+    }
+
+    .radiowidth {
+        width: 94px;
+    }
+
+    .Cnamepush {
+        margin-right: 127px;
+    }
+
+    #LvHeadOprationTypelist {
+        width: 158px;
+        margin-left: -37px;
+    }
+    /*style="width: 158px; margin-left:-37px;"*/
+</style>
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                @*<button class="button" id="Autho">Authorised</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Budget Parameters">
+
+
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmBudgetParameters", name = "frmBudgetParameters" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="section_Method">
+                <div class="heading">Budget Parameters Details</div>
+
+                <div class="row4 content_margine ">
+                    @Html.LabelFor(m => m.IsBudgetAppl, "IsBudgetAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1 radiopush">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsBudgetAppl_radio1" name="IsBudgetAppl" value="true" /><label for="IsBudgetAppl_radio1">Yes</label>
+                            <input type="radio" id="IsBudgetAppl_radio2" name="IsBudgetAppl" value="false" checked="checked" /><label for="IsBudgetAppl_radio2">No</label>
+                        </span>
+                    </div>
+
+                    @Html.LabelFor(m => m.IsCategory, "IsCategoryAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsCategory_radio1" name="IsCategory" value="true" /><label for="IsCategory_radio1">Yes</label>
+                            <input type="radio" id="IsCategory_radio2" name="IsCategory" value="false" checked="checked" /><label for="IsCategory_radio2">No</label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row4 content_margine ">
+                    @Html.LabelFor(m => m.IsFuncStruct, "IsFuncStructAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1 radiopush">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsFuncStruct_radio1" name="IsFuncStruct" value="true" /><label for="IsFuncStruct_radio1">Yes</label>
+                            <input type="radio" id="IsFuncStruct_radio2" name="IsFuncStruct" value="false" checked="checked" /><label for="IsFuncStruct_radio2">No</label>
+                        </span>
+                    </div>
+                    @Html.LabelFor(m => m.IsGeoStruct, "IsGeoStructAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsGeoStruct_radio1" name="IsGeoStruct" value="true" /><label for="IsGeoStruct_radio1">Yes</label>
+                            <input type="radio" id="IsGeoStruct_radio2" name="IsGeoStruct" value="false" checked="checked" /><label for="IsGeoStruct_radio2">No</label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row4 content_margine ">
+                    @Html.LabelFor(m => m.IsPayStruct, "IsPayStructAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1 radiopush">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsPayStruct_radio1" name="IsPayStruct" value="true" /><label for="IsPayStruct_radio1">Yes</label>
+                            <input type="radio" id="IsPayStruct_radio2" name="IsPayStruct" value="false" checked="checked" /><label for="IsPayStruct_radio2">No</label>
+                        </span>
+                    </div>
+                    @Html.LabelFor(m => m.IsProgram, "IsProgramAppl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button radio_button_div_1">
+                        <span class="popup_radio_button radio_button_div_1">
+                            <input type="radio" id="IsProgram_radio1" name="IsProgram" value="true" /><label for="IsProgram_radio1">Yes</label>
+                            <input type="radio" id="IsProgram_radio2" name="IsProgram" value="false" checked="checked" /><label for="IsProgram_radio2">No</label>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+        }
+    </div>
+</body>
+</html>

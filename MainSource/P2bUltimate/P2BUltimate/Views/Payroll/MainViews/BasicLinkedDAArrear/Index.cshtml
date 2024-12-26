@@ -1,0 +1,223 @@
+﻿@{
+    ViewBag.Title = "Basic Linked DA Arrears";
+}
+@model Payroll.BasicLinkedDA
+
+
+<script>
+
+    $('#ActualIndexPoint').MaxLength(10).ForcePercent();
+    //$('#Name').ForceOnlyAlphaNumeric();
+    $('#CalIndexPoint').MaxLength(10).ForcePercent();
+    
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['EffectiveFrom', 'EffectiveTo', 'Id'];
+        ColNames = ['EffectiveFrom', 'EffectiveTo', 'Id'];
+        SortName = 'Id';
+        Caption = 'Basic Linked DA Arrears';
+        url = '@Url.Action("P2BGrid")';
+
+        $('#EffectiveFrom,#EffectiveTo').P2BDatePicker();
+        $('#FromDate,#ToDate').P2BDatePicker();
+        $('#DAPoint').MaxLength(10);
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        // $('#ActualIndexPoint').prop("disabled", true);
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmBasiclinkedDaArrearForm').trigger("reset");
+            $('#EffectiveFrom').prop('disabled', false);
+            $('#EffectiveTo').prop('disabled', false);
+            $('#FromDate').prop('disabled', false);
+            $('#ToDate').prop('disabled', false);
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create BasicLinked DA Arrears', 'open', '@Url.Action("EditSave")?data=' + 0, '#frmBasiclinkedDaArrearForm', 'Message :', 'Request Falied :', '#JqGrid', 400, 400, '', btndisablenames, function (data) { });
+            $('#EffectiveFrom').attr('readonly', true);
+            $('#EffectiveTo').attr('readonly', true);
+            $('#FromDate').attr('readonly', true);
+            $('#ToDate').attr('readonly', true);
+            event.preventDefault();
+        });;
+
+
+        @*$('#payscaleagreement_drop').on("selectmenuchange", function () {
+            $.get("@Url.Action("getPayscaleDetails")", { data: $("#payscaleagreement_drop").val() }, function (data) {
+                if (data == true) {
+                    $('#ActualIndexPoint').prop("disabled", false);
+                    $('#ActualIndexPoint').val(0);
+
+                    $('#CalIndexPoint').prop("disabled", true);
+                    $('#CalIndexPoint').val(0);
+
+                }
+                else {
+                    $('#ActualIndexPoint').prop("disabled", true);
+                    $('#ActualIndexPoint').val(0);
+
+                    $('#CalIndexPoint').prop("disabled", false);
+                    $('#CalIndexPoint').val(0);
+                }
+            });
+             });*@
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmBasiclinkedDaArrearForm', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+               // setTimeout(function () {
+                $('#EffectiveFrom').prop('disabled', true);
+                $('#EffectiveTo').prop('disabled', true);
+                $('#FromDate').prop('disabled', true);
+                $('#ToDate').prop('disabled', true);
+                $.each(data[0], function (i, k) {
+                    $('#DAPoint').val(k.DAPoint);
+                    if (k.EffectiveFrom != null) { $('#EffectiveFrom').val(DateConvert(k.EffectiveFrom)); }
+                    //$('#ValidDate').val(k.ValidDate);
+                    if (k.EffectiveTo != null) { $('#EffectiveTo').val(DateConvert(k.EffectiveTo)); }
+
+                    if (k.FromDate != null) { $('#FromDate').val(DateConvert(k.FromDate)); }
+
+                    if (k.ToDate != null) { $('#ToDate').val(DateConvert(k.ToDate)); }
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View BasicLinked DA Arrears', '#frmBasiclinkedDaArrearForm', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#DAPoint').val(k.DAPoint);
+                    if (k.EffectiveFrom != null) { $('#EffectiveFrom').val(DateConvert(k.EffectiveFrom)); }
+                    //$('#ValidDate').val(k.ValidDate);
+                    if (k.EffectiveTo != null) { $('#EffectiveTo').val(DateConvert(k.EffectiveTo)); }
+
+                    if (k.FromDate != null) { $('#FromDate').val(DateConvert(k.FromDate)); }
+
+                    if (k.ToDate != null) { $('#ToDate').val(DateConvert(k.ToDate)); }
+                });
+
+
+                //To bind old data if authorisation is true
+
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+       
+
+        $('.popup_radio_button').controlgroup();
+        $('#payscaleagreement_drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+    @*<link href="~/Content/Corporate/corporate.css" rel="stylesheet" />*@
+    @*<link href="~/Content/Cpi_entry_form/cpi_entry_form.css" rel="stylesheet" />*@
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+        .emplist_label {
+            display: block;
+            float: left;
+            width: 146px;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 108px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                @*<button class="button" id="Autho">Authorised</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create CPIEntryForm">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmBasiclinkedDaArrearForm", name = "frmBasiclinkedDaArrearForm" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+             
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EffectiveFrom, "EffectiveFrom:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EffectiveFrom, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EffectiveTo, "EffectiveTo:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EffectiveTo, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.FromDate, "FromDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.FromDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.ToDate, "ToDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ToDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.DAPoint, "DAPoint:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DAPoint, new { @class = "popup-content-textbox must" })</div>
+        
+        }
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.ChargeSheetReply
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    /*.active {
+        color: red;
+    }*/
+
+    .horizontal_row3, .radio_button_div_1 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'Replydate', 'punishmenttype', 'penaltytype', 'PunishmentDetails', 'IsDropChargeSheet', 'IsEnquiryStart', 'IsNotifyHR', 'IsPleadGuilty', 'IsReplySatisfactory', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'Replydate', 'punishmenttype', 'penaltytype', 'PunishmentDetails', 'IsDropChargeSheet', 'IsEnquiryStart', 'IsNotifyHR', 'IsPleadGuilty', 'IsReplySatisfactory', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Charge Sheet Reply';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Create').button().on("click", function () {
+            $('#frmChargeSheetReply').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Charge Sheet Reply ', 'open', '@Url.Action("Create")?EmpIr=' + empirid, '#frmChargeSheetReply', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', function (data) { });
+
+            // =============== Get Chargesheet Details ========================= //
+            $.post("@Url.Action("GetChargeSheetData")", { EmpIr: empirid }, function (data) {
+
+                if (data != null) {
+                    //alert(data);
+                    $("#chargesheetDetails").val(data);
+                    $('#chargesheetDetails').attr('readonly', 'readonly');
+                    return false;
+                }
+            });
+
+
+
+            $('#PunishmentTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3039, "");
+            $('#PenaltyTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3040, "");
+        });
+        $('#Delete').on('click', function () {
+
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#View').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ChargeSheetReply', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //  $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id,  "view ChargeSheetReply", '#frmChargeSheetReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey");
+                    $('#PunishmentTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3039, k.PunishmentType_Id);
+                    $('#PenaltyTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3040, k.PenaltyType_Id);
+                    $('#PunishmentDetails').val(k.PunishmentDetails);
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsDropChargeSheet"]').val([k.IsDropChargeSheet]).button().button("refresh");
+                    $('[name="IsEnquiryStart"]').val([k.IsEnquiryStart]).button().button("refresh");
+                    $('[name="IsNotifyHR"]').val([k.IsNotifyHR]).button().button("refresh");
+                    $('[name="IsPleadGuilty"]').val([k.IsPleadGuilty]).button().button("refresh");
+                    $('[name="IsReplySatisfactory"]').val([k.IsReplySatisfactory]).button().button("refresh");
+                    if (k.ReplyDate != null)
+                        $('#ReplyDate').val(DateConvert(k.ReplyDate));
+                    else
+                        $('#ReplyDate').val();
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ChargeSheetReplyDocList').P2BLookUpEncapsulate('#ChargeSheetReplyDocList', 'ChargeSheetReplyDocList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'ChargeSheetReplyDocList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ChargeSheetReply", '#frmChargeSheetReply', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    console.log(data[0]);
+                    $('#frmenquirypanel').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey");
+                    $('#PunishmentTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3039, k.PunishmentType_Id);
+                    $('#PenaltyTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3040, k.PenaltyType_Id);
+                    $('#PunishmentDetails').val(k.PunishmentDetails);
+                    $('#Narration').val(k.Narration);
+                    $('[name="IsDropChargeSheet"]').val([k.IsDropChargeSheet]).button().button("refresh");
+                    $('[name="IsEnquiryStart"]').val([k.IsEnquiryStart]).button().button("refresh");
+                    $('[name="IsNotifyHR"]').val([k.IsNotifyHR]).button().button("refresh");
+                    $('[name="IsPleadGuilty"]').val([k.IsPleadGuilty]).button().button("refresh");
+                    $('[name="IsReplySatisfactory"]').val([k.IsReplySatisfactory]).button().button("refresh");
+                    if (k.ReplyDate != null)
+                        $('#ReplyDate').val(DateConvert(k.ReplyDate));
+                    else
+                        $('#ReplyDate').val();
+
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#ChargeSheetReplyDocList').P2BLookUpEncapsulate('#ChargeSheetReplyDocList', 'ChargeSheetReplyDocList', k.Employeedoc_Id, k.EmployeedocFullDetails, 'ChargeSheetReplyDocList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('#Lookup-ChargeSheetReplyDoc-ChargeSheetReplyDoc').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "ChargeSheetReply")', '', 'LookupDiv', 'ChargeSheetReplyDoc Look Up Data', '#ChargeSheetReplyDocList', 'ChargeSheetReplyDocList', 4, 'ChargeSheetReplyDocList', '#frmChargeSheetReply', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-ChargeSheetReplyDoc-ChargeSheetReplyDoc').button().on('click', function (event) {
+
+            // a = $('#ChargeSheetReplyDocList').P2BGetTableDataonSelectedRow('#ChargeSheetReplyDocList', 0);
+            //  b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#ChargeSheetReplyDocList').P2BGetTableDataonSelectedRow('#ChargeSheetReplyDocList', 0);
+            console.log("verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ChargeSheetReplyDocList', $('#ChargeSheetReplyDocList').val(), 200, 200, '#frmChargeSheetReply', '#ChargeSheetReplyDocList');
+            event.preventDefault();
+        });
+        $('#Create-ChargeSheetReplyDoc-ChargeSheetReplyDoc').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#ChargeSheetReplyDocList').P2BLookUpEncapsulate('#ChargeSheetReplyDocList', 'ChargeSheetReplyDocList', data.Id, data.Val, 'ChargeSheetReplyDocList', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+        $('.popup_radio_button').controlgroup();
+        $('#ReplyDate').P2BDatePicker();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+    });
+    </script>
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>Index</title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+               
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChargeSheetReply", name = "frmChargeSheetReply" }))
+        {
+            <div class="row3 content_margine">
+                    <label for="chargesheetDetails" class="popup-content-label">charge sheet Details</label>
+                <textarea cols="30" id="chargesheetDetails" name="chargesheetDetails" rows="2"></textarea>
+                </div> 
+            
+            <div class="row3 content_margine">
+        @Html.LabelFor(m => m.ReplyDate, " ReplyDate:", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.ReplyDate, new { @class = "popup-content-textbox must" })
+        </div>
+            
+            <div class="row3 content_margine">
+        @Html.LabelFor(m => m.PunishmentType, " PunishmentType:", new { @class = "popup-content-label" })
+                <select class="drop must" style="width:120px;" name="PunishmentTypelist" id="PunishmentTypelist">
+                    <option></option>
+                </select>
+        </div>
+              <div class="row3 content_margine">
+        @Html.LabelFor(m => m.PenaltyType, " PenaltyType:", new { @class = "popup-content-label " })
+                <select class="drop must" style="width:120px;" name="PenaltyTypelist" id="PenaltyTypelist">
+                    <option></option>
+                </select>
+        </div>
+              <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.PunishmentDetails, "PunishmentDetails :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.PunishmentDetails, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class="row3 content_margine">
+            @Html.LabelFor(m => m.IsDropChargeSheet, "IsDropChargeSheet :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio1" name="IsDropChargeSheet" value="true" /><label class="ui-corner-left" for="radio1">Yes</label>
+                    <input type="radio" id="radio2" name="IsDropChargeSheet" value="false" checked="checked" /><label class="ui-corner-right" for="radio2">No</label>
+                </span>
+            </div>
+        </div>
+             <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsEnquiryStart, "IsEnquiryStart :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="IsEnquiryStart" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="IsEnquiryStart" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+            <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsNotifyHR, "IsNotifyHR :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio5" name="IsNotifyHR" value="true" /><label class="ui-corner-left" for="radio5">Yes</label>
+                    <input type="radio" id="radio6" name="IsNotifyHR" value="false" checked="checked" /><label class="ui-corner-right" for="radio6">No</label>
+                </span>
+            </div>
+        </div>
+            <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsPleadGuilty, "IsPleadGuilty :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio7" name="IsPleadGuilty" value="true" /><label class="ui-corner-left" for="radio7">Yes</label>
+                    <input type="radio" id="radio8" name="IsPleadGuilty" value="false" checked="checked" /><label class="ui-corner-right" for="radio8">No</label>
+                </span>
+            </div>
+        </div>
+             <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsReplySatisfactory, "IsReplySatisfactory :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio9" name="IsReplySatisfactory" value="true" /><label class="ui-corner-left" for="radio9">Yes</label>
+                    <input type="radio" id="radio10" name="IsReplySatisfactory" value="false" checked="checked" /><label class="ui-corner-right" for="radio10">No</label>
+                </span>
+            </div>
+        </div>
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.ChargeSheetReplyDoc, "ChargeSheetReplyDoc :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ChargeSheetReplyDocList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding ChargeSheetReplyDoc" class=" popup-content-icon-lookup" id="Lookup-ChargeSheetReplyDoc-ChargeSheetReplyDoc"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ChargeSheetServing " class=" popup-content-icon-create" id="Create-ChargeSheetReplyDoc-ChargeSheetReplyDoc"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete ChargeSheetReplyDoc" class=" popup-content-icon-remove" id="Remove-ChargeSheetReplyDoc-ChargeSheetReplyDoc"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+        }
+        </div>
+</body>
+</html>

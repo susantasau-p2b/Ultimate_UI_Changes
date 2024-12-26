@@ -1,0 +1,674 @@
+﻿@{
+    ViewBag.Title = "Notice Period Salary Process ";
+}
+@model EMS.FFSSettlementDetailT
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 100px;
+        top: -140px;
+    }
+
+    .emplist_row {
+        width: 700px;
+        padding: 2px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .popup-content-label {
+        width: 100px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 500px;
+        padding: 2px;
+    }
+
+    .row1 {
+        width: 450px;
+        display: inline-flex;
+    }
+
+    .btn-action-class {
+        padding: 1px;
+    }
+
+    .btn-action-div {
+        float: left;
+        padding: 1px 12px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height, dt;
+        //var btndisablenames = "#Edit-empdetails,#Remove-empdetails";
+        //ColModel = ['EmpCode', 'EmpName', 'Salcode','SalType','PayAmount', 'PayMonth', 'ProcessMonth', 'Paydate', 'Id'];
+        //ColNames = ['EmpCode', 'EmpName', 'Salcode', 'SalType', 'PayAmount', 'PayMonth', 'ProcessMonth', 'Paydate', 'Id'];
+
+        ColDisplayNames = ['EmployeeCode', 'EmployeeName', 'Id'];
+        ColDisplayModel = ['Employee Code', 'Employee Name', 'Id'];
+        url ='0';
+        width = 1000;
+        height = 150;
+        Caption_one = "Functional Attendance",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 850;
+        heightD = 200;
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        //inline_ColModel = ['Code', 'Name', 'LastWorkDateByComp', 'LastWorkDateApproved', 'Id'];
+        //inline_ColNames = ['Code', 'Name', 'LastWorkDateByComp', 'LastWorkDateApproved',  'Id'];
+        inline_ColModel = ['EmpCode', 'EmpName', 'TotalNet', 'TotalEarning', 'TotalDeduction', 'PayMonth', 'ReleaseDate', 'Hold', 'Id'];
+        inline_ColNames = ['EmpCode', 'EmpName', 'TotalNet', 'TotalEarning', 'TotalDeduction', 'PayMonth', 'ReleaseDate', 'Hold', 'Id'];
+
+        inline_SortName = 'Id';
+        inline_Caption = 'FF Settlement details';
+        inline_url = '@Url.Action("P2BGrid")';
+        inline_width = 900;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+       
+
+        $('#JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#JqGrid',
+            eddelurl: '',
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            EditableCol: ["HourDays", 'Reason'],
+            LocalStorageId: "EditClickFunctAttendanceT",
+            onEditClick: true,
+        });
+        @*$('#lvheadList').P2BSelectMenuMuliSelectAppend1("@Url.Action("GetLvhead")", "", "");*@
+        $("#JqGrid").jqGrid('hideCol', "Editable").trigger('reloadGrid');
+        $('#Get-edited-data').on('click', function (e) {
+            if (modified_data.data.length > 0) {
+                console.log(modified_data.data);
+            }
+            e.preventDefault();
+        });
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: inline_url, filter: $('#txtPayMonth').val() });
+        });
+        $('#txtPayMonth').MonthYearPicker();
+        $('#fromdate').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+            dateFormat: 'dd/mm/yy'
+        });
+        $('#Todate').datepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+
+        $('#LastWorkDateByComp').datepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+        $('#LastWorkDateApproved').datepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+        $('#JqGridNew').P2BGrid1(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: false });
+
+        $('#inline_JqGrid').InlineEditGrid({
+            ColNames: inline_ColNames,
+            ColModel: inline_ColModel,
+            SortName: inline_SortName,
+            Caption: inline_Caption,
+            url: inline_url,
+            tablename: '#inline-JqGrid',
+            eddelurl: '',
+            width: inline_width,
+            height: inline_height,
+            CheckCol: "Editable",
+            EditableCol: ["HourDays"],
+        });
+
+        $("#inline_JqGrid").jqGrid('hideCol', "Editable").trigger('reloadGrid');
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $.get("@Url.Action("GetPayprocessgroup")", { data: dt.PayProcessGroup_Id }, function (data) {
+                $('#payprocessgroup_id').val(data.Id);
+                $('#payprocessgroup').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            $('#PayMonth').val(dt.PayMonth);
+            $('#Edit_PaybleDays').val(dt.PaybleDays);
+            $('#LWPDays').val(dt.LWPDays);
+        };
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BGridDialog();
+        $('#Create').button().on("click", function (event) {
+            //  $('#frmEmpNoticeList').trigger('reset');
+            @*$('#Promonth').fadeOut();
+            $('#Lvlist').fadeOut();
+            $('#frmEmpNoticeList').find('input').val("");
+            $('#frmEmpNoticeList').find('#lvheadList option').text("");
+            $('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "NoticePeriodSalaryProcess")', "", "");*@
+
+
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create FunctAttendanceT",
+                submiturl: "@Url.Action("create")",
+                form: "#frmEmpNoticeList",
+                height: 575,
+                width: 900,
+                title: "Notice Period Salary Process ",
+                state: "open",
+                gridname: "#JqGridNew",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            $('#Remove-SalaryHead-FunctAttendance').button('disable').button().button("refresh");
+            $('#ProcTypeList').P2BSelectMenuAppend1('@Url.Action("Polulate_ProcTypeChk", "NoticePeriodSalaryProcess")', $("#txtPayMonth").val(), "");
+            event.preventDefault();
+        });
+
+
+        $("#Empstruct_drop").on("selectmenuchange", function () {
+
+            alert($(this).val());
+        });
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        
+
+        $('input[name="lblManualIT"]:radio').change(function () {
+           
+            var a = $.GetGridSelctedvalue("#JqGridNew", 3);
+            if (a == null || a.length == 0) {
+              
+                alert('Select Employee...');
+                return false;
+            }
+           
+            if (this.value == 1 || this.value == 3) {
+               
+                $("#dvProcType").hide();
+            }
+            else {
+               
+                $.ajax({
+                    method: "POST",
+                    url: "@Url.Action("ChkIFManual")",
+                    //data: $('#frmEmpNoticeList').serialize() + "&PayMonth=" + $('#txtPayMonth').val(),
+                    data: { forwardata: parseInt(a), PayMonth: $("#txtPayMonth").val() },
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    var a = "";
+
+                    if (data.responseText != "") {
+
+                        if (data.responseText == "Kindly select employee") {
+                            //$('[name="lblManualIT"]').prop('checked', false).button().button("refresh");
+                            $('<div></div>').P2BMessageModalDialog1('ui-icon-info', data.responseText);
+
+                        }
+                        else {
+                            $.each(data.responseText, function (index, value) {
+                                a += "<li>" + value + "</li>";
+                            });
+
+                            $('<div></div>').P2BMessageModalDialog1('ui-icon-info', a);
+                        }
+
+                    }
+
+                },
+                error: function (data) {
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                }, complete: function (data) {
+                    $('.ajax_loder').remove();
+                }
+            });
+            
+            $("#dvProcType").show();
+        }
+        });
+
+
+        $('#JqGridNew').on('click', function (e) {
+            var a = $.GetGridSelctedvalue("#JqGridNew", 3);
+            $("#Waive").val("0");
+            $("#LastWorkDateByComp").val("") ;
+            $("#LastWorkDateApproved").val("");
+            $("#Todate").val("");
+            if (a == null || a.length == 0) {
+                $("#Waive").val("0");
+                $("#LastWorkDateByComp").val("");
+                $("#LastWorkDateApproved").val("");
+                $("#Todate").val("");
+                alert('Select Employee...');
+                return false;
+            }
+            else if (a.length > 1) {
+                $("#Waive").val("0");
+                $("#LastWorkDateByComp").val("");
+                $("#LastWorkDateApproved").val("");
+                $("#Todate").val("");
+                alert('Select only one employee at a time...');
+                return false;
+            }
+            $.get("@Url.Action("getResigndate", "NoticePeriodSalaryProcess")", { data: parseInt(a) }, function (data) {
+                $.each(data, function (i, k) {
+                
+                $('#LastWorkDateByComp').val(k.Fromperiod);
+                $('#LastWorkDateApproved').val(k.Toperiod);
+                $('#Todate').val(k.Toperiod);
+                $('#Waive').val(k.Waive);
+                });
+            });
+            $.get("@Url.Action("getSalaryProcessdate", "NoticePeriodSalaryProcess")", { data: parseInt(a) }, function (data) {
+               // $('#fromdate').val(data.Fromperiod);
+               // $('#fromdate').val(data.Periodfrom);
+                $.each(data, function (i, k) {
+                    $('#fromdate').val(k.Periodfrom);
+                   
+                });
+                
+               
+            });
+          
+        });
+
+        @*$('#SalaryHeadlist').on('selectmenuchange', function () {
+            //console.log("dasd");
+            // alert($(this).val());
+            var a = $.GetGridSelctedvalue("#JqGridNew", 3);
+
+            if (a == null || a.length == 0) {
+                alert('Select Employee...');
+                return false;
+            }
+            else if (a.length > 1) {
+                alert('Select only one employee at a time...');
+                return false;
+            }
+
+            var id = $(this).val();
+            $.get("@Url.Action("GetSalHead", "NoticePeriodSalaryProcess")", { data: $(this).val() }, function (data) {
+                $('#fromdate').val();
+                $('#Todate').val();
+
+                if (data == "LVENCASH") {
+                    $.get("@Url.Action("getLeaveCalendar", "NoticePeriodSalaryProcess")", function (data) {
+                        $('#fromdate').val(data.Fromperiod);
+                        $('#Todate').val(data.Toperiod);
+                    });
+
+                    $('#Promonth').fadeIn();
+                    $('#Lvlist').fadeIn();
+                    var b = $.GetGridSelctedvalue("#JqGridNew", 3);
+                    $('#lvheadList').P2BSelectMenuMuliSelectAppend1('@Url.Action("GetLVHEAD", "NoticePeriodSalaryProcess")', "", parseInt(b));
+                    $('#lvheadList').attr('readonly', 'readonly');
+
+                }
+                else if (data == "GRATUITY") {
+                    $.get("@Url.Action("getCalendarjoinretdt", "NoticePeriodSalaryProcess")", { data: parseInt(a) }, function (data) {
+                        $('#fromdate').val(data.Fromperiod);
+                        $('#Todate').val(data.Toperiod);
+                    });
+                    $('#Promonth').fadeOut();
+                    $('#Lvlist').fadeOut();
+                }
+                else {
+
+
+                    $.get("@Url.Action("getCalendar", "NoticePeriodSalaryProcess")", function (data) {
+                        $('#fromdate').val(data.Fromperiod);
+                        $('#Todate').val(data.Toperiod);
+                    });
+                    $('#Promonth').fadeOut();
+                    $('#Lvlist').fadeOut();
+                }
+                //if (data == true)
+                //    $('#HideDiv').fadeIn();
+                //else
+                //    $('#HideDiv').fadeOut();
+            });
+
+
+        });*@
+        //console.log(lastDay);
+
+        $.LocalStorageHelper("EditClickFunctAttendanceT", false);
+        $('#cancle,#Save').hide();
+        $('#edit_model_dialog').P2BGridDialog();
+        var count = 0;
+
+
+        $('#Edit').on('click', function (e) {
+            $("#PayMonthEdit").val($('#txtPayMonth').val());
+            var aa = $('#JqGrid').jqGrid('getGridParam', 'selrow');
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            if (aa != null) {
+                $('#Edit').ProcessConfirmation1({
+                    confirmurl: "@Url.Action("ChkProcess")",
+                    month: "#txtPayMonth",
+                    EmpCode: dt.EmpCode,
+                    msg: "Salary will be deleted,Still You Want to edit..?Please Confirm..!",
+                    status: function (data) {
+                        if (data == true) {
+                            if (aa != null) {
+                                $('#Load,#Create,#Delete,#Edit').button("disable").css("background-color", "rgba(241, 241, 241, 0.66)");
+                                $('#cancle,#Save').fadeIn();
+                                $.LocalStorageHelper("EditClickFunctAttendanceT", true);
+                            }
+                            //else {
+                            //    alert('Please Select Row..!');
+                            //}
+                            $('#PayMonth').val($('#txtPayMonth').val());
+                        }
+                        else {
+                            $('#cancle,#Save').fadeOut();
+                            $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                        }
+                    }
+                });
+            }
+            else {
+                $('#cancle,#Save').fadeOut();
+                $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+                //alert('Please Select Row..!');
+            }
+        });
+
+
+        $(document).on('click', '#Save', function (e) {
+            var a = $('#JqGrid').InlineGridEdittedData.GetData();
+            if (a != null) {
+                var b = JSON.stringify(a);
+                $.post({
+                    url: '@Url.Action("EditSave", "FunctAttendanceT")',
+                    data: { PayMonth: $("#PayMonthEdit").val(), forwarddata: b },
+                    success: function (data) {
+                        if (data != null) {
+                            alert(data[2]);
+                            $('#JqGrid').InlineGridEdittedData.Empty();
+                            $('#JqGrid').trigger('reloadGrid');
+                            $.LocalStorageHelper("EditClickFunctAttendanceT", false);
+                        }
+                    }
+                });
+            } else {
+                $('#JqGrid').trigger('reloadGrid');
+                $.LocalStorageHelper("EditClickFunctAttendanceT", false);
+            }
+            //$(this).text("Edit");
+            $('#cancle,#Save').fadeOut();
+            $('#Load,#Create,#Delete,#Edit').button("enable").css("background-color", "");
+        });
+        $('#cancle').on('click', function (e) {
+
+            location.reload();
+        });
+
+        $('#View').on('click', function (e) {
+            AssignData();
+
+            $('#edit_model_dialog').P2BGridDialog({
+                maindialogtitle: "Edit Dialog",
+                submiturl: "@Url.Action("process")",
+                form: "#frmeditinlinegrid",
+                height: 400,
+                width: 900,
+                gridname: "#JqGrid",
+                state: "open",
+                editurl: "@Url.Action("P2BInlineGrid")",
+                editdata: dt.Id,
+                returnToGrid: "#inline_JqGrid",
+            });
+
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");;
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+        $('#ITLable').hide();
+        $('#ITCalctype').hide();
+        $('.popup_radio_button').controlgroup();
+        $('#Create_Processmonth').MonthAndYear();
+       // $('#SalaryHeadlist').selectmenu().selectmenu("menuWidget");
+        $('#ProcTypeList').selectmenu().selectmenu("menuWidget");
+        $('#Create_Paymonth').MonthAndYear('#Create_PayableDays');
+        //$('#Create_Paymentdate').P2BDatePicker();
+        $('#Create_Paymentdate').datepicker({
+            dateFormat: 'dd/mm/yy'
+        });
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#list-employee').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+
+
+
+    });
+
+</script>
+<html>
+<head>
+    <style>
+        .row3 {
+            width: 627px;
+        }
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+        .popup-content-labelT {
+            display: block;
+            float: left;
+            width: 166px;
+        }
+    </style>
+</head>
+</html>
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+
+            <div style="float:left">
+                <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="Create">Create</button>
+            @*<button class="button" id="Edit">Edit</button>*@
+            <button class="button" id="Save">Save</button>
+            <button class="button" id="cancle">Cancel</button>
+            @*<button class="button" id="Delete">Delete</button>*@
+
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="JqGrid_pager"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="loder_div"></div>
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    <div class="btn-action-class">
+
+    </div>
+    <div class="emplist_row">
+        <div id="Grid_Form2">
+            <div>
+                <table id="JqGridNew"></table>
+                <div id="pager22"></div>
+            </div>
+        </div>
+    </div>
+
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpNoticeList", name = "frmEmpNoticeList" }))
+    {
+        <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="filter_structure_id" />
+        @*<div class="emplist_row">
+
+            <label for="Empstruct_drop" class="emplist_label must">Salary Head:</label>
+
+            <select id="SalaryHeadlist" name="SalaryHeadlist" class="drop" style="width:180px;"><option value="0">-Select-</option></select>
+
+        </div>*@
+        <div id="ITLable" style="float:right;width:350px">
+                        <label id="LblPayprogessGroup" class="popup-content-label must">Selection For:</label>
+                        <div class="popup_radio_button">
+                            <label for="lblManualIT_radio">Manual IT</label>
+                            <input type="radio" id="lblManualIT_radio" name="lblManualIT" value="1" />
+                            <label for="lblAutoIT_radio">Include Auto IT</label>
+                            <input type="radio" id="lblAutoIT_radio" name="lblManualIT" value="2" />
+                            <label for="lblNone_radio">None</label>
+                            <input type="radio" id="lblNone_radio" name="lblManualIT" value="3" checked="checked" />
+                        </div>
+          
+                    </div>
+        
+               <div id="ITCalctype" class="row3 content_margine" style="float: right; width: 729px;">
+                    <div style="width: 450px; float: right; display: none" id="dvProcType">
+                        <label id="lblProcType" class="popup-content-labelT">Tax Calculation On:</label>
+                        <select id="ProcTypeList" name="ProcTypeList" style="width:270px">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>
+                </div>
+        
+        
+         <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label">Last Work Date by Comp</label>
+             <input type="text" id="LastWorkDateByComp" name="LastWorkDateByComp" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label">Last Work Date Approved</label>
+            <input type="text" id="LastWorkDateApproved" name="LastWorkDateApproved" class="popup-content-textbox-rowfirst must" />
+        </div>
+         <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label">Waive Days</label>
+             <input type="text" id="Waive" name="Waive" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+        <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label">From Date</label>
+            <input type="text" id="fromdate" name="fromdate" class="popup-content-textbox-rowfirst must" />
+        </div>
+        <div class="emplist_row">
+            <label id="lblfrmdt" class="emplist_label">To Date</label>
+            <input type="text" id="Todate" name="Todate" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+        @*<div id="Lvlist" class="emplist_row">
+            <label class="popup-content-label must">Leave Head :</label>
+            <select id="lvheadList" multiple name="LvHead"></select>
+
+        </div>*@
+        @*<div id="Promonth" class="row1">
+
+            <label id="lblcreatepaymonth" class="emplist_label must">Process Month</label>
+            <input type="text" id="Create_Processmonth" name="Create_Processmonth" class="popup-content-textbox-rowfirst must" />
+          
+        </div>*@
+
+
+        <div class="emplist_row">
+
+            <label id="lblcreatepaymonth" class="emplist_label must">Pay Month</label>
+            <input type="text" id="Create_Paymonth" name="Create_Paymonth" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+        <div class="emplist_row">
+
+            <label id="lblcreatepaymonth" class="emplist_label must">Payment date</label>
+            <input type="text" id="Create_Paymentdate" name="Create_Paymentdate" class="popup-content-textbox-rowfirst must" />
+        </div>
+
+
+
+
+    }
+</div>
+
+<div id="edit_model_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    {
+
+        <div>
+            <table id="inline_JqGrid"></table>
+            <div id="inline_JqGrid_pager"></div>
+        </div>
+    }
+</div>

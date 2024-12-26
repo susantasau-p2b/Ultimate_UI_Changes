@@ -1,0 +1,532 @@
+﻿@{
+    ViewBag.Title = "Other EarningT";
+}
+@model Payroll.OthEarningDeductionT
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 66px;
+        top: -150px;
+    }
+
+    .emplist_row {
+        width: 400px;
+        padding: 2px;
+    }
+
+    .popup-content-label{
+        width: 110px;
+         display: block;
+            float: left;
+            margin: 1px;
+    }
+
+    .emplist_label {
+        display: block;
+        float: left;
+        width: 146px;
+    }
+
+    .FormYearlypymentt {
+        margin-left: 298px;
+        margin-top: 15px;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 300px;
+    }
+
+    .disabled {
+        pointer-events: none;
+        /*optional opacity: 0.4;*/
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 560px;
+        width: 514px;
+        margin: 4px auto;
+        position: absolute;
+          padding-left: 9px;
+        padding-top: 2px;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 250px;
+        width: 630px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+         padding-left: 11px;
+        padding-top: 7px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var PayMonthObj = {
+            Month: null,
+            SetMonth: function (val) {
+                if (val != null) {
+                    this.Month = val
+                } else {
+                    this.Month = null;
+                }
+               // $('#SalAmount').ForceOnlyNumeric().MaxLength(15);
+            },
+            GetMonth: function () {
+                return this.Month;
+            }
+
+        };
+        $('#Load').on('click', function () {
+            if ($('#txtPayMonth').val()) {
+                PayMonthObj.SetMonth($('#txtPayMonth').val());
+            }
+            console.log(PayMonthObj.GetMonth());
+        });
+        $('#reset').on('click', function () {
+            PayMonthObj.SetMonth(); $('#txtPayMonth').val("");
+            console.log(PayMonthObj.GetMonth());
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+            columnname: ["Code", "Name", "Id"],
+            childheader: ['PayMonth', 'Remark', 'SalAmount', 'Salaryhead', 'TDSAmount', "Id"],
+            childurl: "@Url.Action("Get_OtherEarningT", "OtherEarningT")",
+            tableheader: "Other Earning Transaction",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmlurl: "@Url.Action("GridPartial", "OtherEarningT")",
+                editurl: "@Url.Action("GridEdit", "OtherEarningT")",
+                submiturl: "@Url.Action("GridEditSave", "OtherEarningT")",
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frmchildedit",
+                    htmlurl: "@Url.Action("GridPartial", "OtherEarningT")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEdit", "OtherEarningT")",
+                    submiturl: "@Url.Action("GridEditSave", "OtherEarningT")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#frmchildedit PayMonth').val(k.PayMonth);
+                            $('#frmchildedit TDSAmount').val(k.Remark);
+                            $('#frmchildedit SalAmount').val(k.SalAmount);
+                            $('#frmchildedit TDSAmount').val(k.TDSAmount);
+                            $('#frmchildedit Remark').val(k.Remark);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                $('#Edit').ProcessConfirmation1({
+                    confirmurl: "@Url.Action("ChkProcess")",
+                    month: "#txtPayMonth",
+                EmpCode: parentid,
+                msg: "Salary will be deleted,Still You Want to edit..?Please Confirm..!",
+                status: function (data) {
+                    if (data == true) {
+                        $('<div></div>').PartialCreateDialog({
+                            height: 'auto',
+                            width: 'auto',
+                            form: "#OtherEarningTGridPartial",
+                            htmlurl: "@Url.Action("GridPartial", "OtherEarningT")",
+                            state: "open",
+                            mode: "Edit",
+                            editurl: "@Url.Action("GridEdit", "OtherEarningT")",
+                            submiturl: "@Url.Action("GridEditSave", "OtherEarningT")",
+                            editdata: id,
+                            forwarddata: id,
+                            returndatafunction: function (data) {
+                                $('#Edit-SalAmount').val(data.SalAmount);
+                                $('#Edit-TDSAmount').val(data.TDSAmount);
+                                $('#Edit-Remark').val(data.Remark);
+                            },
+                            submitfun: function (data) {
+                                var row = dt.row(parent_element);
+                                if (row.child.isShown()) {
+                                    parent_element.removeClass('details');
+                                    row.child.hide();
+                                }
+                            }
+                        });
+                    $('#PayMonth').val($('#txtPayMonth').val());
+                }
+            }
+        });
+
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+        $('#txtPayMonth').MonthYearPicker();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $.get("@Url.Action("GetPayprocessgroup")", { data: dt.PayProcessGroup_Id }, function (data) {
+                $('#payprocessgroup_id').val(data.Id);
+                $('#payprocessgroup').val(data.FullDetails).attr("readonly", "readonly");
+            });
+            // $('#PayMonth').val(dt.PayMonth);
+
+            $('#Edit_PaybleDays').val(dt.PaybleDays);
+            $('#LWPDays').val(dt.LWPDays);
+        };
+
+        $('#edit_model_dialog').P2BGridDialog();
+        $('#list-employee').P2BCreateDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#TDSAmount').ForceOnlyNumeric().MaxLength(15);
+            $('#SalAmount').ForceOnlyNumeric().MaxLength(15);
+            $('#frmEmpList').trigger("reset");
+            //$.LoadEmpByDefault();
+           
+            $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
+
+
+            @*$('#SalaryHeadlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "OtherEarningT")', "", ""); // To bind dropdown on page load*@
+            $('#list-employee').P2BCreateDialog('', '', '', '', 'Create Other Earning', 'open', '@Url.Action("Create")', '#frmEmpList', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '#SalaryHeadlist', '#Remove-SalaryHead-OtherEarningT', function (data) { }, { datatablename: "#MyTable" });
+            if ($("#PayMonth").val() == "") {
+                var dt = new Date();
+                var month = dt.getMonth() + 1;
+                month = month < 10 ? '0' + month : '' + month;
+                $("#PayMonth").val(month + "/" + dt.getFullYear());
+            }
+            event.preventDefault();
+            $('#SalAmount,#TDSAmount').val(0);
+
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', 'Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+        });
+
+        $('#Lookup-SalaryHead-OtherEarningT').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSalaryHeadDetails", "OtherEarningT")', '', 'LookupDiv', ' Look Up Data', '#SalaryHeadlist', 'SalaryHeadlist', 5, 'SalaryHeadlist', '#frmEmpList', 'A', '#Remove-SalaryHead-OtherEarningT', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-SalaryHead-OtherEarningT').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#SalaryHeadlist').P2BGetTableDataonSelectedRow('#SalaryHeadlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#SalaryHeadlist').P2BGetTableDataonSelectedRow('#SalaryHeadlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SalaryHeadlist', $('#SalaryHeadlist').val(), 200, 200, '#frmEmpList', '#SalaryHeadlist', '');
+            event.preventDefault();
+        });
+        $('#btn-carryforward-data').on('click', function () {
+
+            if ($('#txtPayMonth').val() == "") {
+                PayMonthObj.SetMonth($('#txtPayMonth').val());
+                alert('Please select PayMonth');
+                return false;
+            }
+
+            var mon = $("#txtPayMonth").val();
+            $('#process').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcesscarry")",
+                month: "#txtPayMonth",
+            msg: "You are going to carryforward for " + mon,
+            status: function (data) {
+                if (data == true) {
+
+            //
+            $.ajax({
+                url: "@Url.Action("AddCarryForwad", "OtherEarningT")?month=" + $('#txtPayMonth').val(),
+                method: "POST",
+                beforeSend: function () {
+                    // $('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder_carryforward ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999" aria-hidden="true"></i></div>').appendTo("#list-employee");
+                    $('<div style="width:100%;height:100%;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder_carryforward ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999" aria-hidden="true"></i></div>').appendTo("#loder_div");
+                },
+                success: function (data) {
+                    if (data.success == true) {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-alert', data.responseText);
+                        $('.ajax_loder_carryforward').remove();
+                    } else {
+                        $('.ajax_loder_carryforward').remove();
+                        console.log(data);
+                    }
+                },
+                complete: function (data) {
+                    $('.ajax_loder_carryforward').remove();
+                }
+            });
+            //
+                }
+            }
+            });
+            event.preventDefault();
+
+        });
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#PayMonth').MonthYearPicker();
+        $('#Btn-Upload-Data').on('click', function (e) {
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+
+    });
+
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+
+            <div style="float:left">
+                <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+            </div>
+            <button class="button" id="Load">Load</button>
+            <button class="button" id="reset">Reset</button>
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="btn-carryforward-data">Carry Forward</button>
+            <button class="button" id="Btn-Upload-Data">Upload</button>
+            <div id="Grid_Form">
+                <div>
+                    <div id="Grid_Form">
+                        <div>
+                            <div id="Container" class="container">
+                                <div id="Demo">
+                                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>DD</th>
+                                                <th>Employee Code</th>
+                                                <th>Employee Name</th>
+                                                <th>ID</th>
+                                            </tr>
+                                        </thead>
+                                        <tfoot>
+                                            <tr>
+                                                <th>DD</th>
+                                                <th>Employee Code</th>
+                                                <th>Employee Name</th>
+                                                <th>ID</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="loder_div"></div>
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    <div class="filter-div">
+        <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+        <div id="FormFilter"></div>
+    </div>
+    <div id="FormFilter"></div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    {
+        <div class="section1_Leave">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+                    @*<span class="btn-span1" aria-hidden="true">
+                            <button id="load_emp" class="loan-btn">Load Employee</button>
+                        </span>*@
+                </div>
+                <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+            </div>
+        </div>
+        <div class="section2_Leave">
+            <div class=" ">
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="SalaryHeadlist">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup SalaryHead" class="button popup-content-icon-lookup" id="Lookup-SalaryHead-OtherEarningT"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        @*   <button data-p2btooltip="Create LocationObj" class="button popup-content-icon-create" id="Create-LocationObj-ESIC"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                        @*<button data-p2btooltip="Edit Statutory EffectiveMonths Details" class="button popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Remove SalaryHead" class="button popup-content-icon-remove" id="Remove-SalaryHead-OtherEarningT"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PayMonth, "Pay Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.SalAmount, "Salary Amount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SalAmount, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDS Amount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.Remark, "Remark:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox " })</div>
+            </div>
+        </div>
+        <div class="emplist_row">
+            <div id="Grid_Form2">
+
+            </div>
+        </div>
+    }
+</div>
+@*<div id="edit_model_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmchildedit", name = "frmchildedit" }))
+        {
+            <div class="row3 content_margine">@Html.LabelFor(m => m.SalaryHead, "Salary Head:", new { @class = "popup-content-label" })<select id="frmchildEdit-SalaryHeadlist" name="frmchildEdit-SalaryHeadlist" style="width:159px;"><option value="0">-Select-</option></select></div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Remark, "Remark:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.SalAmount, "SalAmount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SalAmount, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDSAmount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @class = "popup-content-textbox must" })</div>
+
+        }
+    </div>*@

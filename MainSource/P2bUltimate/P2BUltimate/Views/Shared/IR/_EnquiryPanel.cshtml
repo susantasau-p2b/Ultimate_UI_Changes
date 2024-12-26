@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null;
+}
+
+@model IR.EnquiryPanel
+@*<link href="~/Content/staginant/staginant.css" rel="stylesheet" />*@
+
+
+    <div >
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmenquirypanellist", name = "frmenquirypanellist" }))
+        {
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.EnquiryPanelType, " EnquiryPanelType:", new { @class = "popup-content-label must" })
+                <select class="drop must" style="width:120px;" name="EnquiryPanelTypelist" id="EnquiryPanelTypelist">
+                    <option></option>
+                </select>
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.PanelName, "PanelName :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.PanelName, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @*@Html.LabelFor(m => m.Witness, "Panel Member :", new { @class = "popup-content-label" })*@
+                <label class="popup-content-label">Panel Member :</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="EmployeeList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup corresponding EmployeeObject" class="popup-content-icon-lookup" id="Lookup-EmployeeObject-EnquiryPanel"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create OffenseObject " class=" popup-content-icon-create" id="Create-OffenseObject-MisconductComplaint"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Delete EmployeeObject" class="popup-content-icon-remove" id="Remove-EmployeeObject-EnquiryPanel"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+<script>
+    $(function () {
+        $('#EnquiryPanelTypelist').selectmenu().selectmenu('menuWidget');
+        $('#EnquiryPanelTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 421, "");
+    });
+  
+    $('#Lookup-EmployeeObject-EnquiryPanel').on('click', function (event) {
+        $('.dialog').P2BLookUpModal('@Url.Action("GetEmployeeDetails", "EnquiryPanel")', '', 'LookupDiv', 'Look Up Data', '#EmployeeList', 'EmployeeList', 5, 'EmployeeList', '#frmenquirypanel', 'A', '#Edit-Address-Location,#Remove-Address-Location', 'Lookup_table', 'PageNavPosition');
+        event.preventDefault();
+    });
+    $('#Remove-EmployeeObject-EnquiryPanel').button().on('click', function (event) {
+
+        //a = $('#EmployeeList').P2BGetTableDataonSelectedRow('#EmployeeList', 0);
+        //b = a[0];
+        var selectedRows = [];
+        selectedRows = $('#EmployeeList').P2BGetTableDataonSelectedRow('#EmployeeList', 0);
+
+        $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmployeeList', $('#EmployeeList').val(), 200, 200, '#frmEnquiryPanel', '#EmployeeList');
+        event.preventDefault();
+    });
+</Script>
+
+
+
+

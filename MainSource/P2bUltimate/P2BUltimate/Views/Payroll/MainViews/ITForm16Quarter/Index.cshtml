@@ -1,0 +1,382 @@
+﻿@model Payroll.ITForm16Quarter
+@{
+    ViewBag.Title = "ITForm16Quarter";
+}
+<html>
+<head>
+    <title></title>
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            $('.popup_radio_button').controlgroup();
+            var dt;
+            var btndisablenames = "#Edit-PayScaleArea-GratuityAct,Remove-PayScaleArea-GratuityAct";
+
+            var dt;
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['QuarterName', 'Receipt No', 'From Date', 'To Date', 'Tax Deducted', 'Id'];
+            ColNames = ['QuarterName', 'Receipt No', 'From Date', 'To Date', 'Tax Deducted', 'Id'];
+            SortName = 'Id';
+            Caption = 'Form16 Quarterly Returns';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            $('#QuarterAckNo').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            
+            $('#TaxableIncome').MaxLength(10);
+            $('#TaxableIncome').ForceOnlyNumeric();
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#QuarterFromDate,#QuarterToDate').P2BDatePicker();
+            $('#Create').button().on("click", function (e) {
+                $('#frmForm16Q').trigger('reset');
+
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Form16 Quarterly Returns ', 'open', '@Url.Action("create") ', '#frmForm16Q', 'Message :', 'Request Falied :', '#JqGrid', 500, 750, '#ITChallanlist', btndisablenames, function (data) { });
+                $('#QuarterName_drop').attr('disabled', false);
+                $('#TaxableIncome').attr('readonly', 'readonly');
+                $('#QuarterFromDate').attr('readonly', 'readonly');
+                $('#QuarterToDate').attr('readonly', 'readonly');
+                $('#QuarterName_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 606, ""); // To bind dropdown on page load |||||it was 520
+                e.preventDefault();
+            });
+
+            $('#Delete').button().click(function (e) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                e.preventDefault();
+            });
+
+            $('#Edit').on('click', function (event) {
+                $('#frmForm16Q').trigger('reset');
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Form16 Quarterly Returns Data", '#frmForm16Q', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 750, '#ITChallanlist', '', function (data) {
+                    $('#TaxableIncome').attr('readonly', true);
+                    $.each(data[1], function (i, k) {
+                        $('#ITChallanlist').P2BLookUpEncapsulate('#ITChallanlist', 'ITChallanlist', k.ITChallan_Id, k.ITChallan_FullDetails, 'ITChallanlist', '#Remove-ITChallan-ITForm16Q', 'A');
+                       
+                    });
+                    $.each(data[0], function (i, k) {
+                        $('#frmForm16Q').trigger('reset');
+                        $('#QuarterName_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 606, k.QuarterName_Id); //it was 520
+                        $('#QuarterName_drop').attr('disabled', 'disabled');
+                        if (k.FromDate != null) {
+                            $('#QuarterFromDate').val(DateConvert(k.FromDate));
+                          //  $('#QuarterFromDate').attr('disabled', true);
+                            //$('#QuarterFromDate').attr('readonly', 'readonly');                           
+                        }
+                        if (k.ToDate != null) {
+                            $('#QuarterToDate').val(DateConvert(k.ToDate));
+                          //  $('#QuarterToDate').attr('disabled', true);
+                            //$('#QuarterToDate').attr('readonly', 'readonly');
+                        }
+                        $('#TaxableIncome').val(k.TaxableIncome);
+                        $('#QuarterAckNo').val(k.QuarterAckNo); 
+                    });
+                    //alert(data[3]);
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+
+            //View main page
+            $('#View').button().click(function (event) { 
+                AssignData();
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Form16 Quarterly Returns Data', '#ITChallanlist', '#Lookup-ITChallan-ITForm16Q,#Remove-ITChallan-ITForm16Q', 500, 750, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        //$('#Autho_Action').val(k.Action);
+                        $('#frmForm16Q').trigger('reset');
+                        $('#QuarterName_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 606, k.QuarterName_Id);
+                        if (k.FromDate != null) {
+                            $('#QuarterFromDate').val(DateConvert(k.FromDate));
+                        }
+                        if (k.ToDate != null) {
+                            $('#QuarterToDate').val(DateConvert(k.FromDate));
+                        }
+                        $('#TaxableIncome').val(k.TaxableIncome);
+                        $('#QuarterAckNo').val(k.QuarterAckNo);
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#ITChallanlist').P2BLookUpEncapsulate('#ITChallanlist', 'ITChallanlist', k.ITChallan_Id, k.ITChallan_FullDetails, 'ITChallanlist', 'view', 'A');
+
+                    });
+
+                    //To bind old data if authorisation is true
+                    if ($("#Autho").hasClass('auto_active')) {
+                        //$('[name="BasicScaleAppl"]').StickNote([data[2].BasicScaleAppl]);
+                        //$('[name="CPIAppl"]').StickNote([data[2].CPIAppl]);
+                        //$('#PayScaleTypeList').StickNote(data[2].PayScaleType_Val);
+                        //$('#BonusWageslist_old').StickNote(data[2].PayScaleDetails_Val);
+                    }
+                });
+            });
+
+
+            $('#Lookup-ITChallan-ITForm16Q').button().on('click', function (e) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetITChallanLKDetails", "ITForm16Quarter")', '', 'LookupDiv', 'Look Up Data', '#ITChallanlist', 'ITChallanlist', 10, 'ITChallanlist', '#frmForm16Q', 'A', '#Remove-ITChallan-ITForm16Q', 'Lookup_table', 'PageNavPosition');
+
+                e.preventDefault();
+            });
+
+
+            $('#Remove-ITChallan-ITForm16Q').button().on('click', function (event) {
+                //var a = [], b;
+                //a = $('#ITChallanlist').P2BGetTableDataonSelectedRow('#ITChallanlist', 0);
+                //b = a[0];
+                //console.log(b);
+                var selectedRows = [];
+                selectedRows = $('#ITChallanlist').P2BGetTableDataonSelectedRow('#ITChallanlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ITChallanlist', $('#ITChallanlist').val(), 200, 200, '#frmForm16Q', '#ITChallanlist');
+                event.preventDefault();
+            });
+
+            
+            $('#calculate').on("click", function (event) {
+                //var a = [], b;
+                //a = $('#ITChallanlist').P2BGetTableDataonSelectedRow('#ITChallanlist', 0);
+                //b = a[0];
+                //alert(b);
+                //if ($('#ITChallanlist').val() == 0) {
+                //    alert('Select ITChallan..!');
+                //    return false;
+                //}
+                var form = $("#frmForm16Q").serialize();
+                
+                    $.post({
+                        url: "@Url.Action("Calculate")",
+                        data: form,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.TaxAmount != 0) {
+                            var TaxableIncome = data.TaxAmount;
+                            $('#TaxableIncome').val(TaxableIncome);
+                        }
+                        else { alert('Select ITChallan..!'); }
+                    },
+                    complete: function (data) {
+                        $('#lblloader').hide();
+                    }
+                });
+
+            });
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+            $('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+
+            $('#TaxableIncome').attr('readonly', 'readonly');
+        });
+    </script>
+
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 124px;
+            top: 265px;
+        }
+
+        .iconrownew {
+            top: 421px;
+            left: 469px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            width: 750px;
+            display: inline-flex;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .section1 {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 318px;
+            width: 432px;
+            margin: 4px auto;
+            position: absolute;
+            left: 4px;
+            top: -2px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .namepush {
+            margin-right: 30px;
+        }
+
+        .lblwidth {
+            width: 110px;
+        }
+
+        .Clblwidth {
+            width: 111px;
+        }
+
+        .Cnamepush {
+            margin-right: 127px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 116px;
+            top: -148px;
+        }
+    </style>
+
+</head>
+<body>
+    <style>
+        .row2 {
+            left: 149px;
+            top: 263px;
+            display: inline-block;
+            position: absolute;
+        }
+
+        .row4 {
+            width: 600px;
+            position: absolute;
+            display: inline-block;
+            left: -1px;
+        }
+
+        .content_margine1 {
+            margin: 13.5px;
+            margin-top:25px;
+            padding: 0.5px;
+            padding-left: 0px;
+            padding-right: 11px;
+        }
+    </style>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Form16 Quarterly Returns">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmForm16Q" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.QuarterName, "Quarter Name :", new { @class = "popup-content-label must" })
+                <select id="QuarterName_drop" name="QuarterName_drop" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+            </div>
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.QuarterFromDate, "From Date :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.QuarterFromDate, "From Date :", new { @class = ".popup-content-textbox must" })
+            </div>
+              <div class="row3 content_margine">
+                @Html.LabelFor(m => m.QuarterToDate, "To Date :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.QuarterToDate, "To Date :", new { @class = ".popup-content-textbox must" })
+            </div>
+             <div class="row3 content_margine">
+                @Html.LabelFor(m => m.QuarterAckNo, "Receipt No :", new { @class = "popup-content-label", @disabled="disabled" })
+                @Html.TextBoxFor(m => m.QuarterAckNo, "Receipt No :", new { @class = ".popup-content-textbox" })
+            </div>
+            
+             <div class="row3 content_margine">
+                <div id="ITChallanlist_old"></div>
+                @Html.LabelFor(m => m.ITChallan, "IT Challan :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="ITChallanlist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup ITChallan Details" class="  popup-content-icon-lookup" id="Lookup-ITChallan-ITForm16Q"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove ITChallan Details" class="  popup-content-icon-remove" id="Remove-ITChallan-ITForm16Q"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+             <div class="row2 content_margine">
+                    <button id="calculate" class="button" name="calculate">Calculate</button>
+             </div>
+             
+            <br />
+            
+            <div class="row4 content_margine1">
+                @Html.LabelFor(m => m.TaxableIncome, "Taxable Income :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.TaxableIncome, "TaxableIncome :", new { @class = ".popup-content-textbox must", @Value="0" })
+            </div>
+
+           
+
+           
+
+        }
+    </div>
+
+</body>
+
+
+</html>

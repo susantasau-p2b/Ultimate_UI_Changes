@@ -1,0 +1,714 @@
+﻿@{
+    ViewBag.Title = "JVParameter";
+}
+@model Payroll.JVParameter
+<script>
+    $(function () {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#JVProductCode').ValidateTextBox({ maxlength: 8, alphanum: true });
+        $('#AccountNo').ValidateTextBox({ maxlength: 38, alphanum: true });
+        $('#SubAccountNo').ValidateTextBox({ maxlength: 38, alphanum: true });
+        $('#JVName').ValidateTextBox({ maxlength: 20, name: true });
+        $('#JVName').ForceOnlyAlpha();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'Credit_Debit', 'BranchCode', 'AccountNo', 'Id'];
+        ColNames = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'Credit_Debit', 'BranchCode', 'AccountNo', 'Id'];
+        SortName = 'Id';
+        Caption = 'JVParameter';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#hidebrank').hide();
+        $('#hidepaybank').hide();
+        $("#Group_drop").on("selectmenuchange", function () {
+            // alert($(this).val());
+            if ($("#Group_drop :selected").text() == "COMPANY") {
+                $('#hidebrank').fadeIn();
+                $('#hidepaybank').fadeOut();
+            }
+            else if ($("#Group_drop :selected").text() == "PAYMENTBANK") {
+                $('#hidebrank').fadeIn();
+                $('#hidepaybank').fadeIn();
+            }
+            else {
+                $('#hidebrank').fadeOut();
+                $('#hidepaybank').fadeOut();
+            }
+            if ($("#Group_drop :selected").text() == "LOCATION") {
+                $('#dvGroup').show();
+            }
+            else {
+                $('#dvGroup').hide();
+            }
+        });
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#Createpartial').attr('disabled', false);
+            $('#frmJVParameter').trigger('reset');
+            $("input[name='" + 'LocationOut-table' + "']").off("change");
+            //$("input[name='" + 'PayStruct-table' + "']").off("change");
+            $('#multiple-shwdiv').hide();
+            $('#multiple-shwdivG').hide();
+            $.SelectionRefresh();
+            $('#Create_Dialog').P2BCreateDialog('', 0, '', '', 'Create JVParameter Dialog', 'open', '@Url.Action("Create")', '#frmJVParameter', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#salaryheadslist', '#Remove-salaryhead-Lookup1', function () { });
+            $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, "");// To bind dropdown on page load
+            $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", ""); // To bind dropdown on page load
+            $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", ""); // To bind dropdown on page load
+            $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, "");// To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        };
+        $.SelectionRefresh = function () {
+            var aa = $('.transactiontable').find('tr.selectedtr');
+            $.each(aa, function (i, k) {
+                $(k).removeClass('selectedtr');
+            });
+        };
+        $.MarkChecked = function (fn, val) {
+            var ele = $("input[name='" + fn + "'][value='" + val + "']");
+            console.log(val);
+            ele.attr('checked', 'checked');
+            ele.parents('tr').addClass("selectedtr");
+        };
+        function SingleSelection1() {
+            $("input[name='" + 'jobposition-table' + "']").on("change", function () {
+                var aa = $("input[name='" + 'jobposition-table' + "'].case:checked").not(this).prop('checked', false).parent('td').parents('tr:eq(0)').removeClass('selectedtr');
+            });
+        };
+
+        function SingleSelection() {
+            $("input[name='" + 'LocationOut-table' + "']").on("change", function () {
+                var aa = $("input[name='" + 'LocationOut-table' + "'].case:checked").not(this).prop('checked', false).parent('td').parents('tr:eq(0)').removeClass('selectedtr');
+            });
+        };
+        var jobid = 0;
+        var checking = 0;
+        var jobposiid = 0;
+
+        $('#Edit').on('click', function (event) {
+
+            AssignData();
+            $('#frmJVParameter').trigger('reset');
+            $('#Createpartial').attr('disabled', true);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit JVParameter Dialog", '#frmJVParameter', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#salaryheadslist', '#Remove-salaryhead-Lookup1', function (data) {
+
+                //  $.each(data[0], function (i, k) {
+                var k = data[0];
+                $('#JVProductCode').val(k.JVCode);
+                //$('#JVProductCode').attr('readonly', 'readonly');
+                $('#JVName').val(k.JVName);
+                $('[name="CreditDebitFlag"]').val([k.CreditDebitFlag]).button().button("refresh");
+                $('#CreditDebitBranchCode').val(k.CreditDebitBranchCode);
+                $('#AccountNo').val(k.AccountNo);
+                $('#SubAccountNo').val(k.SubAccountNo);
+                $('#NarrationFormat').val(k.NarrationFormat);
+                $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", k.CreditDebitBranchName); // To bind dropdown on page load
+                $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", k.PaymentBank_Id); // To bind dropdown on page load
+                $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, k.SourceType_Id);
+                $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
+                if (k.Irregular == true) {
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    $('#multiple-shwdiv').show();
+                    //console.log(k.LocationIn);
+                    //console.log(k.LocationOut);
+                    //console.log("----------------------------------");
+                    //$.each(k.LocationIn, function (i) {
+                    //    alert(k.LocationIn[i]);
+                    //    $.MarkChecked('LocationIn-table', k.LocationIn[i]);
+                    //});
+                    //console.log("----------------------------------");
+                    $.MarkChecked('LocationIn-table', k.LocationIn);
+                    $.MarkChecked('LocationOut-table', k.LocationOut);
+                    SingleSelection();
+                }
+                if (k.Group_Name == "COMPANY") {
+                    $('#hidebrank').fadeIn();
+                    $('#hidepaybank').fadeOut();
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                }
+                else if (k.Group_Name == "PAYMENTBANK") {
+                    $('#hidebrank').fadeIn();
+                    $('#hidepaybank').fadeIn();
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                }
+                else {
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    $('#hidebrank').fadeOut();
+                    $('#hidepaybank').fadeOut();
+                }
+                if (k.FuncStruct_Id != "0") {
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    //$('[name="Group"]').val('1');
+                    $('input:radio[name=Group]').val(['1']);
+                    $('#multiple-shwdivG').show();
+                    $('#dvGroup').show();
+                    $('#job-table').P2BTransactionTable('#job-search', '#case-job', '@Url.Action("Get_job", "JVParameter")', null);
+                    $('#jobposition-table').P2BTransactionTable('#jobposition-search', '#case-jobposition', '@Url.Action("Get_jobPosition", "JVParameter")', k.Job_Id);
+                    if (k.Job_Id != "" && k.Job_Id != null) {
+                        jobid = k.Job_Id;
+                        console.log(jobid);
+                        $.MarkChecked('job-table', k.Job_Id);
+                    }
+
+                    if (k.JobPosition_Id != "" && k.JobPosition_Id != null) {
+                        jobposiid = k.JobPosition_Id;
+                        console.log(jobposiid);
+                        $.MarkChecked('jobposition-table', k.JobPosition_Id);
+                    }
+                    SingleSelection1();
+                    $('#functionalstruct_div').show();
+                    $('#divPay').hide();
+                }
+                else if (k.PayStruct_Id != "0") {
+                    $('input:radio[name=Group]').val(['2']);
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    $('#multiple-shwdivG').show();
+                    $('#dvGroup').show();
+                    $.MarkChecked('grade-table', k.Grade_Id);
+                    SingleSelection();
+                    $('#functionalstruct_div').hide();
+                    $('#divPay').show();
+
+                }
+                else {
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    $('#multiple-shwdivG').hide();
+                    $('#dvGroup').hide();
+                    $('#functionalstruct_div').hide();
+                    $('#divPay').hide();
+                }
+
+                //  });
+                $.each(data[1], function (i, k) {
+                    // function (nameoftable_classorid, nameofthelist, firstdataparameter, seconddataparameter, nameoftable, nameofthebtndisable, multiple_allowed_or_not) {
+                    $('#salaryheadslist').P2BLookUpEncapsulate('#salaryheadslist', 'salaryheadslist', k.Id, k.fulldetails, 'salaryheadslist', '#Remove-salaryhead-Lookup1', 'A');
+                });
+
+                $('#Autho_Allow').val(data[3]);
+            });
+            checking = 1;
+
+            event.preventDefault();
+        });
+
+        //$.when(P2BEditModalDialog()).done(function () {
+        //    console.log('sdhdsahdsef');
+        //    $.MarkChecked('job-table', jobid).end();
+        //    $.MarkChecked('jobposition-table', jobposiid).end();
+        //});
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#frmJVParameter').trigger('reset');
+            $("input[name='" + 'LocationOut-table' + "']").off("change");
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View JVParameter Dialog', '#salaryheadslist', '#Lookup-salaryhead-Lookup,#Remove-salaryhead-Lookup1', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $('#frmJVParameter').trigger('reset');
+                var k = data[0];
+                $('#JVProductCode').val(k.JVCode);
+                $('#JVProductCode').attr('readonly', 'readonly');
+                $('#JVName').val(k.JVName);
+                $('[name="CreditDebitFlag"]').val([k.CreditDebitFlag]).button().button("refresh");
+                $('#CreditDebitBranchCode').val(k.CreditDebitBranchCode);
+                $('#AccountNo').val(k.AccountNo);
+                $('#SubAccountNo').val(k.SubAccountNo);
+                $('#NarrationFormat').val(k.NarrationFormat);
+                $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", k.CreditDebitBranchName); // To bind dropdown on page load
+                $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", k.PaymentBank_Id); // To bind dropdown on page load
+                $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, k.SourceType_Id);
+                $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
+                if (k.Irregular == true) {
+                    $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
+                    $('#multiple-shwdiv').show()
+                    $.MarkChecked('LocationIn-table', k.LocationIn);
+                    $.MarkChecked('LocationOut-table', k.LocationOut);
+                    SingleSelection();
+                }
+                if (k.Group_Name == "COMPANY") {
+                    $('#hidebrank').fadeIn();
+                    $('#hidepaybank').fadeOut();
+
+                }
+                else if (k.Group_Name == "PAYMENTBANK") {
+                    $('#hidebrank').fadeIn();
+                    $('#hidepaybank').fadeIn();
+
+                }
+                else {
+                    $('#hidebrank').fadeOut();
+                    $('#hidepaybank').fadeOut();
+                }
+                $.each(data[1], function (i, k) {
+                    $('#salaryheadslist').P2BLookUpEncapsulate('#salaryheadslist', 'salaryheadslist', k.Id, k.fulldetails, 'salaryheadslist', '', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#salaryheadslist_old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            $('#frmJVParameter').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JqGrid');
+        });
+
+        $('#Lookup-salaryhead-Lookup1').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupSalaryHead", "JVParameter")', '', 'LookupDiv', 'Look Up Data', '#salaryheadslist', 'salaryheadslist', 10, 'salaryheadslist', '#frmJVParameter', 'A', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-salaryhead-Lookup1').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#salaryheadslist').P2BGetTableDataonSelectedRow('#salaryheadslist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#salaryheadslist').P2BGetTableDataonSelectedRow('#salaryheadslist', 0); 
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete","LookupValue")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#salaryheadslist', $('#salaryheadslist').val(), 200, 200, '#frmJVParameter', '#salaryheadslist', '');
+            event.preventDefault();
+        });
+
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+
+        $('#Load-jobposition').on("click", function (e) {
+            var a = TranscationTableCheckboxCount('#job-table');
+            console.log(a);
+            if (a > 1) {
+                alert("Select One Record");
+                return false;
+            } else if (a == 0) {
+                alert("Select Atleast One Record");
+                return false;
+            }
+            $('#jobposition-table').find('td').remove();
+            var forwardata = $('#job-table').P2BGetTableDataonSelectedRow('#job-table', 1);
+            $('#jobposition-table').P2BTransactionTable('#jobposition-search', '#case-jobposition', '@Url.Action("Get_jobPosition", "JVParameter")', forwardata);
+            e.preventDefault();
+        });
+        //$('#Remove-salaryhead-Lookup').button().on('click', function (event) {
+        //    //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        //    var a = [], b;
+        //    a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmCorporate', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+        //    event.preventDefault();
+        //});
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#LocationIn-table').P2BTransactionTableAnimation();
+        $('#LocationOut-table').P2BTransactionTableAnimation();
+
+        $('#LocationIn-table').P2BTransactionTable('#LocationIn-search', '#case-LocationIn', '@Url.Action("GetLocation", "JVParameter")', []);
+        $('#LocationOut-table').P2BTransactionTable('#LocationOut-search', '#case-LocationOut', '@Url.Action("GetLocation", "JVParameter")', []);
+
+        
+
+        $('input[name="Irregular"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#multiple-shwdiv').fadeOut();
+            }
+            else {
+                $('#multiple-shwdiv').fadeIn();
+            }
+
+        });
+
+
+        $('#Createpartial').on('click', function (e) {
+            ////debugger;
+            var Ival = $('input[name=Irregular]:checked').val();
+            if (Ival == "true") {
+
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "JVNonStandardEmp")', 'Create ReportingStructRights', 'open', '@Url.Action("Create", "JVNonStandardEmp")', '#frmJVNonStandardEmp', 'Message :', 'Request Falied :', '#JqGrid', 520, 670, '', '', '', '#frmJVParameter', '', function (data) {
+                    $('#AccountType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, "");// To bind dropdown on page load
+
+                    $('[name="Irregular"]').val([Ival]).button().button("refresh");
+
+                });
+            }
+        });
+
+
+        $('[name="Group"]').on('change', function (e) {
+            var val = $('input[name=Group]:checked').val();
+            if (val == "1") {
+                $('#multiple-shwdivG').show();
+
+
+                $('#functionalstruct_div').show();
+                $('#jobposition-table').P2BTransactionTable('#jobposition-search', '#case-jobposition', '@Url.Action("Get_jobPosition", "JVParameter")', null);
+                // $('#job-table').P2BTransactionTable('#job-search', '#case-job', '@@Url.Action("Get_job", "JVParameter")', null);
+                //$('#divFunc').show();
+                $('#divPay').hide();
+
+            }
+            else {
+                $('#multiple-shwdivG').show();
+                $('#functionalstruct_div').hide();
+
+                $('#divPay').show();
+            }
+
+            //$('#multiple-shwdivG').toggle();
+        });
+    });
+</script>
+<style>
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 133px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+    .popup-content-textbox1 {
+        margin-bottom: 1px;
+        min-width: 291px;
+    }
+
+    .row3 {
+        width: 551px;
+        display: inline-flex;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 434px;
+    }
+
+    .icon-row {
+        left: 94px;
+        position: relative;
+        top: -147px;
+    }
+
+    .row1 {
+        width: 190px;
+        display: block;
+        margin: 1px 1px 6px 6px;
+        float: left;
+    }
+
+    .row2 {
+        float: left;
+    }
+
+    .filter_row {
+        padding-top: 60px;
+    }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .transcation_btn {
+        width: 21px;
+        height: 21px;
+    }
+
+    .StrctSelectionClass {
+        float: left;
+    }
+
+    .grid_colllpase_height {
+        height: 43px;
+    }
+
+    .row8 {
+        /*! display: inline-block; */
+        /*! width: 199px; */
+        /*! float: left; */
+    }
+</style>
+<div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dialog">
+            <div title="LookUp Data">
+                <div class="LookupDiv"></div>
+            </div>
+            <div id="PageNavPosition">
+
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        <form id="frmJVParameter" method="post" name="frmJVParameter">
+            <input id="JVIdForNonStd" type="hidden" name="JVIdForNonStd" />
+            @*<input id="JVLocIdForNonStd" type="hidden" name="JVLocIdForNonStd" />*@
+            <div class="content_margine row3">
+                @Html.LabelFor(m => m.JVGroup, "JVGroup:", new { @class = "popup-content-label must" })
+                <select class="drop must" name="Group_drop" id="Group_drop" style="width:180px">
+                    <option value="0">-Select-</option>
+
+                </select>
+            </div>
+            <div class="content_margine row3">
+                @Html.LabelFor(m => m.SourceType, "SourceType:", new { @class = "popup-content-label must" })
+                <select class="drop must" name="SourceType_drop" id="SourceType_drop" style="width:180px">
+                    <option value="0">-Select-</option>
+
+                </select>
+            </div>
+            <div id="depend-div" class="">
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">Select Mode :</label>
+                    <div class="popup_radio_button">
+                        <label class="popup-content-label" for="rd1">Non Standard</label><input type="radio" id="rd1" name="Irregular" value="true" />
+                        <label class="popup-content-label" for="rd2">Standard</label><input type="radio" id="rd2" name="Irregular" value="false" />
+                    </div>
+                </div>
+                <div class="row3" style="display:none" id="multiple-shwdiv">
+                    <label class="popup-content-label">Select Location :</label>
+                    <div class="row8">
+                        <div class="transactiondiv grid_colllpase_height">
+                            <div><label>Search : </label><input type="text" id="LocationIn-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="LocationIn-table">
+                                <tr><th><input type="checkbox" id="case-LocationIn" /></th><th>LocationIn</th></tr>
+                            </table>
+                            <span class="btn-span" aria-hidden="true">
+                                <a data-p2bheadertooltip="Collapse">
+                                    <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                </a>
+                                <button class="transcation_btn transcation-refresh" data-type="LocationIn" style="left: 13%;" id="">
+                                    <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row8">
+                        <div class="transactiondiv grid_colllpase_height">
+                            <div><label>Search : </label><input type="text" id="LocationOut-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="LocationOut-table">
+                                <tr><th><input type="checkbox" id="case-LocationOut" /></th><th>LocationOut</th></tr>
+                            </table>
+                            <span class="btn-span" aria-hidden="true">
+                                <a data-p2bheadertooltip="Collapse">
+                                    <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                </a>
+                                <button class="transcation_btn transcation-refresh" data-type="LocationOut" style="left: 13%;" id="">
+                                    <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button data-typeofbtn="Create" id="Createpartial" name="Createpartial">Create</button>
+                </div>
+
+                <div class="row3 content_margine" style="display:none" id="dvGroup">
+                    <label class="popup-content-label">Select Struct :</label>
+                    <div class="popup_radio_button">
+                        <label class="popup-content-label" for="rd3">FuncStruct</label><input type="radio" id="rd3" name="Group" value="1" />
+                        <label class="popup-content-label" for="rd4">PayStruct</label><input type="radio" id="rd4" name="Group" value="2" />
+                    </div>
+                </div>
+                <div class="row3 content_margine" id="multiple-shwdivG" style="display:none">
+                    <label class="popup-content-label"> </label>
+                    <div id="functionalstruct_div">
+                        @*<div class="row1">
+                                <div class="transactiondiv grid_colllpase_height">
+                                    <div><label>Search : </label><input type="text" id="job-search" /></div>
+                                    <table cellspacing="0" cellpadding="1" class="transactiontable" id="job-table">
+                                        <tr><th><input type="checkbox" id="case-job" /></th><th>job</th></tr>
+                                    </table>
+                                    <span class="btn-span" aria-hidden="true">
+                                        <button class="transcation_btn transcation-refresh" data-type="job" style="left: 13%;" id="">
+                                            <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                        </button>
+                                        <button id="load-jobposition" class="loan-btn">LoadJobPos</button>
+                                    </span>
+                                </div>
+                            </div>*@
+                        <div class="row1">
+                            <div class="transactiondiv grid_colllpase_height">
+                                <div><label>Search : </label><input type="text" id="jobposition-search" /></div>
+                                <table cellspacing="0" cellpadding="1" class="transactiontable" id="jobposition-table">
+                                    <tr><th><input type="checkbox" id="case-jobposition" /></th><th>jobposition</th></tr>
+                                </table>
+                                <span class="btn-span" aria-hidden="true">
+                                    <a data-p2bheadertooltip="Collapse">
+                                        <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                    </a>
+                                    <button class="transcation_btn transcation-refresh" data-type="jobposition" style="left: 13%;" id="">
+                                        <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                    </button>
+                                    @*<button class="transcation_btn transcation-lookup" data-type="jobposition" style="left: 15%;" id="">
+                                            <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                        </button>*@
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row8" id="divPay" style="display:none">
+                        <div class="transactiondiv grid_colllpase_height">
+                            <div><label>Search : </label><input type="text" id="PayStruct-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="PayStruct-table">
+                                <tr><th><input type="checkbox" id="case-PayStruct" /></th><th>PayStruct</th></tr>
+                            </table>
+                            <span class="btn-span" aria-hidden="true">
+                                <a data-p2bheadertooltip="Collapse">
+                                    <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                </a>
+                                <button class="transcation_btn transcation-refresh" data-type="PayStruct" style="left: 13%;" id="">
+                                    <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="row3" style="display:none">
+                        <div id="salaryheadslist_old"></div>
+                        <label>Employee Details :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Emplist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Address" class="popup-content-icon-lookup" id="Lookup-salaryhead-Lookup"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="Remove-salaryhead-Lookup"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>*@
+                <div class="row3 content_margine">@Html.LabelFor(m => m.JVProductCode, "JVProductCode:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.JVProductCode, new { @class = "popup-content-textbox" })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.JVName, "JVName:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.JVName, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.CreditDebitFlag, "Credit/Debit:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="CreditDebitFlag_radio1" name="CreditDebitFlag" value="C" /><label for="CreditDebitFlag_radio1">Credit</label>
+                        <input type="radio" id="CreditDebitFlag_radio2" name="CreditDebitFlag" value="D" /><label for="CreditDebitFlag_radio2">Debit</label>
+                    </div>
+                </div>
+                <div id="hidepaybank">
+
+                    <div class="content_margine row3">
+                        @Html.LabelFor(m => m.PaymentBank, "Payment Bank :", new { @class = "popup-content-label " })
+                        <select class="drop " name="PaymentBank_drop" id="PaymentBank_drop" style="width:200px">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="hidebrank">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.CreditDebitBranchCode, "BranchCode:", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.CreditDebitBranchCode, new { @class = "popup-content-textbox " })
+                    </div>
+                    <div class="content_margine row3">
+                        @Html.LabelFor(m => m.CreditDebitBranchName, "Branch Name:", new { @class = "popup-content-label " })
+                        <select class="drop " name="Branch_drop" id="Branch_drop" style="width:200px">
+                            <option value="0">-Select-</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row2 content_margine">
+                    <div id="salaryheadslist_old"></div>
+                    @Html.LabelFor(m => m.SalaryHead, "SalaryHead:", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="salaryheadslist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup Salary Head" class="  popup-content-icon-lookup" id="Lookup-salaryhead-Lookup1"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                        <button data-p2btooltip="Remove Salary Head" class="popup-content-icon-remove" id="Remove-salaryhead-Lookup1"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.AccountNo, "PL/GLAccountNo:", new { @class = "popup-content-label" })
+                    @Html.TextBoxFor(m => m.AccountNo, new { @class = "popup-content-textbox" })
+                </div>
+
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.SubAccountNo, "PL/GLSubAccountNo:", new { @class = "popup-content-label" })
+                    @Html.TextBoxFor(m => m.SubAccountNo, new { @class = "popup-content-textbox" })
+                </div>
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.NarrationFormat, "NarrationFormat:", new { @class = "popup-content-label" })
+                    @Html.TextBoxFor(m => m.NarrationFormat, new { @class = "popup-content-textbox1", title = "Key Value :-#PAYMONTH,#LOCCODE,#EMPCODE,#EMPNAME,#SALCODE,#SALDESC" })
+                </div>
+
+                @*<div class="row3">
+                        <div id="NonStandardlist_old"></div>
+                        <label>Employee Details :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="NonStandard">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                        </div>
+                    </div>*@
+
+            </div>
+
+        </form>
+    </div>
+</div>

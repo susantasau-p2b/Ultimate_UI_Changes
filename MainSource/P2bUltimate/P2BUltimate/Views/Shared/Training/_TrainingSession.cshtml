@@ -1,0 +1,284 @@
+﻿@{
+    Layout = null;
+}
+@model Training.TrainingSession
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+
+
+<style>
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 1055px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 1055px;
+    }
+
+    .popup-content-textbox2 {
+        margin-bottom: 1px;
+        min-width: 290px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#StartTime').P2BTimePicker();
+        //$('#EndTime').P2BTimePicker();
+        //// $('#SessionDate').P2BTimeInlinePicker();
+        //$('#SessionDate').P2BDatePicker();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['ID', 'Code', 'Name', 'OpeningDate'];
+        ColNames = ['ID', 'Code', 'Name', 'OpeningDate'];
+        SortName = 'ID';
+        Caption = 'TrainingSession';
+        url = '//';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+
+
+
+
+        $('.popup_radio_button').controlgroup();
+        //$('#Categorylist1').selectmenu().selectmenu("menuWidget");
+        //$('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#SessionDate').P2BDatePicker();
+
+        $('#StartTime').P2BTimePicker();
+        $('#EndTime').P2BTimePicker();
+        $("#StartTime").ForceOnlyAlphaNumeric();
+        $("#EndTime").ForceOnlyAlphaNumeric();
+        $("#TotalHours").ForceOnlyAlphaNumeric();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#Lookup-Faculty-TrainingSession').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsFacultyExternal", "TrainingSession")', '', 'LookupDiv', 'FacultyExternal Look Up Data', '#Faculty_List', 'Faculty_List', 5, 'Faculty_List', '#frmTrainingSession', 'N', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Faculty-TrainingSession').button().on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "FacultyInternalExternal")', 'Create FacultyInternalExternal', 'open', '@Url.Action("Create", "FacultyInternalExternal")', '#frmFacultyInternalExternal', 'Message :', 'Request Falied :', '#JqGrid', 550, 1126, '', '', '', '#frmTrainingSession', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', function (data) {
+                // to show data which is created in partial page
+                $('#Categorylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1051, "");
+
+                $('#Faculty_List').P2BLookUpEncapsulate('#Faculty_List', 'Faculty_List', data[0], data[1], 'Faculty_List', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', 'N');
+
+
+            });
+            event.preventDefault();
+        });
+
+
+        // Partial page edit
+        $('#Edit-Faculty-TrainingSession').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Faculty_List').P2BGetTableDataonSelectedRow('#Faculty_List', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateFacultyExternal_partial", "TrainingSession")', '@Url.Action("edit", "FacultyInternalExternal")', b, '@Url.Action("Editsave", "FacultyInternalExternal")', 'Edit FacultyInternalExternal', '#frmFacultyInternalExternal', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 1126, '#frmTrainingSession', '#Faculty_List', 'Faculty_List', 'Faculty_List', 'N', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmFacultyInternalExternal').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#Narration').val(k.Narration);
+                    $('#Name').val(k.Name);
+                    $('#Categorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1051, k.FacultyType_Id); // Dropdown bind
+                    $('#TrainingInstitutelist').P2BLookUpEncapsulate('#TrainingInstitutelist', 'TrainingInstitutelist', k.train_id, k.traininginst_details, 'TrainingInstitutelist', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', 'N');
+                });
+                $.each(data[1], function (i, k) {
+
+                    $('#FacultySpecializationlist').P2BLookUpEncapsulate('#FacultySpecializationlist', 'FacultySpecializationlist', k.fac_id, k.fac_details, 'FacultySpecializationlist', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession', 'N');
+
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        //partial page delete
+        $('#Remove-Faculty-TrainingSession').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#Faculty_List').P2BGetTableDataonSelectedRow('#Faculty_List', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Faculty_List', $('#Faculty_List').val(), 200, 200, '#frmTrainingSession', '#Faculty_List', '#Edit-Faculty-TrainingSession,#Remove-Faculty-TrainingSession');
+            event.preventDefault();
+        });
+
+
+
+        @*$('#frmTrainingSession').P2BCreateDialog();
+        $('#Create').button().on("click", function () {
+            $('#frmTrainingSession').P2BCreateDialog('@Url.Action("PopulateLookupDropDownList", "TrainingSession")', 0, '', '', 'Create Training Session', 'open', '@Url.Action("CreateSave")', '#frmTrainingSession', 'Message :', 'Request Falied :', '#JqGrid', 600, 550, '', '', function (data) {
+                $('#Category').empty();
+                $('#Category').append($('<option>', {
+                    value: "0",
+                    text: "-Select-"
+                }));
+                $.each(data, function (i, k) {
+                    $('#Category').append($('<option>', {
+                        value: k.Value,
+                        text: k.Text
+                    }));
+                });
+            });
+        });
+        //  $('.drop').selectmenu().selectmenu("menuWidget").css({ "width": "200px" });
+
+        $('#Lookup_Faculty').button().on('click', function (event) {
+            $('.TrainingFaculty').P2BLookUpModal('@Url.Action("GetLookupDetailsFacultyExternal", "TrainingSession")', '', 'lookupdiv_TrainingFact', 'Look Up Data', '#Faculty_List', 'Faculty_List', 10, 'Faculty_List', '#frmTrainingSession', 'A', '#Faculty_Edit,#Faculty_Remove,#Faculty_Create', 'lookupdiv_TrainingFact', 'pageNavPosition_TrainingFact');
+            event.preventDefault();
+        });*@
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create_Faculty').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateFacultyExternal_partial", "TrainingSession")', 'Create Incharge Unit', 'open', '@Url.Action("CreateSave", "NameDetails")', '#frmNameDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmUnit', '#Incharge_Edit,#Incahrge_Remove', function (data) {
+             $('#Incharge_List').P2BLookUpEncapsulate('#Incharge_List', 'InchargeList', data[0], data[1], 'Incharge_List');
+
+            });
+            event.preventDefault();
+        });*@
+
+        $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+        $('#Categorylist1').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 448, "");
+
+    });
+</script>
+
+
+<body>
+    <div class="TrainingFaculty">
+        <div title="LookUp Data">
+            <div class="lookupdiv_TrainingFact"></div>
+        </div>
+        <div id="pageNavPosition_TrainingFact">
+        </div>
+    </div>
+
+
+
+
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTrainingSession", name = "frmTrainingSession" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+
+            @*<div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.SessionType, "Session Type :", new { @class = "popup-content-label must" })<select id="Categorylist" name="Categorylist" class="drop" style="width:161px;"><option></option></select></div>*@
+
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.SessionType, "SessionType :", new { @class = "popup-content-label must" })
+                <select class="must" id="Categorylist1" name="Categorylist1" style="width:120px;"><option></option></select>
+            </div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.SessionDate, "Session Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SessionDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.StartTime, "Start Time  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.StartTime, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.EndTime, "End Time  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndTime, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.TotalHours, "Total Hours   :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TotalHours, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row3 content_margine">
+                <div id="AddressList_Old"></div>
+                @Html.LabelFor(m => m.Faculty, "Faculty :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="Faculty_List">
+
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Faculty" class="  popup-content-icon-lookup" id="Lookup-Faculty-TrainingSession"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Faculty" class="popup-content-icon-create" id="Create-Faculty-TrainingSession"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Faculty" class="popup-content-icon-edit" id="Edit-Faculty-TrainingSession"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Faculty" class="popup-content-icon-remove" id="Remove-Faculty-TrainingSession"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+            <div class="row3 content_margine">@Html.LabelFor(m => m.TrainerName, "TrainerName   :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TrainerName, new { @class = "popup-content-textbox2 must" })</div>
+            <div class="row3 content_margine">
+                <div id="AddressList_Old"></div>
+                @Html.LabelFor(m => m.TrainingProgramCalendar, "Training Program Calendar :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="Faculty_List">
+
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Faculty" class="  popup-content-icon-lookup" id="Lookup-Faculty-TrainingProgramCalendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Faculty" class="popup-content-icon-create" id="Create-Faculty-TrainingProgramCalendar"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Faculty" class="popup-content-icon-edit" id="Edit-Faculty-TrainingProgramCalendar"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Faculty" class="popup-content-icon-remove" id="Remove-Faculty-TrainingProgramCalendar"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>

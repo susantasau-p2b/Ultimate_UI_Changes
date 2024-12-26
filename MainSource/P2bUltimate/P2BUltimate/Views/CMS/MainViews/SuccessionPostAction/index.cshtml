@@ -1,0 +1,604 @@
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model CMS_SPS.SuccessionPostAction
+<style>
+    .date-picker {
+        z-index: 999;
+    }
+
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    .active {
+        color: red;
+    }
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .lookup {
+        margin-left: 155px;
+    }
+
+    .Daterecord {
+        margin-left: 315px;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 554px;
+        width: 515px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 643px;
+        width: 874px;
+        margin: 2px 2px;
+        position: absolute;
+        margin-left: 48em;
+        /*left: 401px;*/
+    }
+
+    .section3_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        /*! height: 502px; */
+        width: 250px;
+        margin: 2px 2px;
+        position: absolute;
+        left: 920px;
+        top: 28px;
+        /*float: right;*/
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    #monthTable {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        #monthTable td, #monthTable th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+    #monthTable-selected {
+        color: #8e6d87;
+        font-weight: bold;
+    }
+    /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+    /*#monthTable tr:hover {
+        background-color: #ddd;
+    }*/
+
+    #monthTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #009282;
+        color: white;
+    }
+
+    .selected {
+        background-color: #ddd;
+        font-weight: bold;
+    }
+
+</style>
+<script type="text/javascript" src="~/Scripts/P2b_Scripts/jQuery.mbValidations.js"></script>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+
+        @*var ColDisplayNames = [];
+        var ColDisplayModel = [];
+        var SortName, Caption, url, width, height, dt;
+
+        ColDisplayNames = ['EmployeeCode', 'EmployeeName', 'Id'];
+        ColDisplayModel = ['Employee Code', 'Employee Name', 'Id'];
+        Caption_one = "Functional Attendance",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 850;
+        heightD = 200;
+
+        $('#jqgridNew').P2BGrid1(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });*@
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("SuccessionEmployeeDataT_Grid")",
+            editurl: "",
+            htmurl: "",
+            submiturl: "",
+            columnname: ["EmpCode", "EmpName", "Id", ],
+            childheader: ["IsTrainingRecommend", "IsTransferRecomment", "IsOfficiatingRecomment", " IsPromotionRecomment", "Id"],
+            childurl: "@Url.Action("Get_TargetSettingRequest")",
+            tableheader: "Competency Post Action",
+            childurlColumnNo: "3"
+        });
+
+
+
+        $('#create_dialog').P2BCreateDialog();
+        $('#create').button().on("click", function () {
+            $('#frmsuccessionpostaction').trigger("reset");
+            $('#create_dialog').P2BCreateDialog('', '', '', '', 'Create successionpostaction', 'open', '@Url.Action("create")', '#frmsuccessionpostaction', 'Message :', 'Request Falied :', '#jqgrid', 770, 1400, '', '', function (data) { });
+            $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+            $('#BatchNameList').P2BSelectMenuAppend('@Url.Action("GetBatchName", "SuccessionEmployeeDataT")');
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        //$('#case-employeeD').off('click').on('click', function (e) {
+        //    var b = init.attr('id');
+
+
+        //            $('#' + b + ' .case').each(function (i, k) {
+        //                var ele = $(k);
+        //                var parent = ele.parent('td').parent('tr');
+        //                if (!parent.hasClass('table-div-hide')) {
+        //                    parent.removeClass('selectedtr');
+        //                    ele.removeAttr('checked');
+        //                }
+
+        //            });
+
+        //    });
+
+
+        $('#advance-filter-symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var forwarddata = JSON.stringify(data);
+                    $.ajax({
+                        url: "@Url.Action("Get_Employelist_h", "SuccessionPostAction")",
+                        data: { geo_id: forwarddata },
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        success: function (data) {
+                            var tr = "";
+                            var index = 1;
+                            var tempclass = "";
+                            var checkclass = "";
+                            $('#monthTable tr:gt(0)').remove();
+
+                            $.each(data, function (i, k) {
+                                tempclass = "weeklyoffclass";
+                                checkclass = "Ischeck";
+                                var img1 = '<a href="' + k.EmpPhoto + '"><img src="' + k.EmpPhoto + '"/></a>';
+                                tr = "<tr class='" + tempclass + "' Id=tr_'" + k.EmpCode + "'><td>" + index + "</td><td class='" + checkclass + "'><input type='checkbox' class='case' name='monthTable' value=" + k.SNo + " id=" + k.EmpCode + " /></td><td>" + img1 + "</td><td>" + k.EmpCode + "</td><td>" + k.EmpName + "</td><td>" + k.Location + "</td><td>" + k.Department + "</td><td>" + k.Designation + "</td></tr>";
+                                $('#monthTable tr:last').after(tr);
+                                index++;
+                                tempclass = "";
+
+
+                                //});
+                            });
+
+                            $('.ajax_loder').remove();
+                        }
+                    });
+                    //$('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#fromFilter",
+                hierarchy: true,
+            });
+
+        });
+
+        //$(document).on("click", "#monthTable", function (e) {
+        //    var dataTr = $(this).closest('tr');
+        //    var b = dataTr.find('td:eq(3).text');
+        //    console.log("b : " + b);
+        //    if (this.checked) {
+        //        alert("Hello");
+        //    }
+        //    let abcd = $('.case').is(':checked');
+        //    console.log("abcd " + abcd);
+        //    var data = $(b).attr('id')
+        //    alert(data);
+        //});
+
+        $('#employee-table').on('click', 'input:checkbox:gt(0)', function (e) {
+
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                $('#Emp_id').val($(this).val());
+                $('#monthTable tr:gt(0)').remove();
+                $('#Save_Data').removeAttr('disabled'); 
+            } else {
+                $('#Emp_id').val("");
+
+            }
+        });
+
+        $('#monthTable').on('click', 'tr', function () {
+            var a = $(this).closest('tr');
+            var b = a.find('td:eq(3)').text();
+           
+            $('#monthTable input[type="checkbox"]:checked').each(function () {
+                var chk = $(this).attr('id');
+                if (chk != b) {
+                    $("#" + chk).prop("checked", false);
+                    $('#monthTable tr').removeClass("selected");
+                }
+            });
+            $(this).closest('tr').addClass('selected');
+            
+        });
+
+        $('#Save_Data').click(function () {
+            var selected = new Array();
+            $('#monthTable input[type="checkbox"]:checked').each(function () {
+                selected.push($(this).attr('id'));
+            });
+
+            var BatchName = $("#BatchNameList option:selected").val();
+            var ProcessDate = $("#ProcessDateList option:selected").val();
+            var EmpId = $("#Emp_id").val();//$.GetGridSelctedvalue("#employee-table", "Id");
+         
+            $.ajax(
+                {
+                    type: "Post",
+                    data: { BatchNamelist: BatchName, EmpId: EmpId, ProcessDate: ProcessDate, ReplacedEmpId: selected[0] },
+                    url: "@Url.Action("createdata", "SuccessionPostAction")",
+                    success: function (data) {
+                        alert(data.responseText);
+                        $('#Save_Data').attr('disabled', 'disabled');
+                    }
+                });
+        });
+
+
+
+
+        $('#Load_Emp').click(function () {
+            var BatchName = $('#BatchNameList :selected').val();
+            var ProcessDate = $('#ProcessDateList :selected').text();
+            var ProcessBatch = $('#ProcessBatchList :selected').text();
+            //$.LoadEmpByDefaultWOGeoId(true, "");
+            $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './SuccessionPostAction/Get_Employelist?BatchName=' + BatchName + '&ProcessDate=' + ProcessDate + '&ProcessBatch=' + ProcessBatch, "", true);
+        });
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+        }
+
+
+
+        $('#lookup-TrainingLookuplist').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTrainingCategory", "SuccessionPostAction")', '', 'lookupdiv', 'LvDependPolicy Look Up Data', '#TrainingLookuplist', 'TrainingLookuplist', 5, 'TrainingLookuplist', '#frmsuccessionpostaction', 'A', '#edit-LvDependPolicy-SalaryHead,#remove-LvDependPolicy-SalaryHead', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#remove-TrainingLookuplist').button().on('click', function (event) {
+
+            //var a = [], b;
+            //a = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TrainingLookuplist').P2BGetTableDataonSelectedRow('#TrainingLookuplist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TrainingLookuplist', $('#TrainingLookuplist').val(), 200, 200, '#frmcompetencypostaction', '#TrainingLookuplist', '');
+            event.preventDefault();
+        });
+
+        $('#load').click(function () {
+            var selectedtext = $("#BatchNamelistG option:selected").text();
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("SuccessionEmployeeDataT_Grid")?selectedtextcmn=" + selectedtext,
+                columnname: ["EmpCode", "EmpName", "Id", ],
+                htmurl: "",
+                childheader: ["IsTrainingRecommend", "IsTransferRecomment", "IsOfficiatingRecomment", "IsPromotionRecomment", "Id"],
+                childurl: "@Url.Action("A_SuccessionModel_Grid", "SuccessionPostAction")",
+                tableheader: "Succession Post Action",
+                childurlColumnNo: "3"
+            });
+        });
+
+        $('#BatchNameList').on('selectmenuchange', function () {
+            var BatchName = $("#BatchNameList option:selected").val();
+
+            $.ajax(
+                {
+                    type: "Post",
+                    data: { 'data': BatchName, 'data2': '' },
+                    url: "@Url.Action("GetProcessDate", "SuccessionPostAction")",
+                    success: function (data) {
+                        $('#ProcessDateList').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                        $.each(data, function (i, k) {
+                            $('#ProcessDateList').append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: k.Selected
+                            }));
+                            $('#ProcessDateList').selectmenu("refresh").selectmenu("menuWidget").css({ "height": "auto" });
+                        });
+                    }
+                });
+
+            $.ajax(
+               {
+                   type: "Post",
+                   data: { 'data': BatchName, 'data2': '' },
+                   url: "@Url.Action("GetProcessBatch", "SuccessionPostAction")",
+                   success: function (data) {
+                       $('#ProcessBatchList').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                       $.each(data, function (i, k) {
+                           $('#ProcessBatchList').append($('<option>', {
+                               value: k.Value,
+                               text: k.Text,
+                               selected: k.Selected
+                           }));
+                           $('#ProcessBatchList').selectmenu("refresh").selectmenu("menuWidget").css({ "height": "auto" });
+                       });
+                   }
+               });
+        });
+
+        $('#TrainingCloseDate').P2BDatePicker();
+        $('#TransferCloseDate').P2BDatePicker();
+        $('#OfficiatingCloseDate').P2BDatePicker();
+        $('#PromotionCloseDate').P2BDatePicker();
+        $('.drop').selectmenu().selectmenu("menuWidget").addClass("overflow");
+        $('.popup_radio_button').controlgroup();
+
+        $('#BatchNamelistG').selectmenu().selectmenu("menuWidget");
+        $('#BatchNamelistG').P2BSelectMenuAppend('@Url.Action("GetBatchName", "SuccessionEmployeeDataT")');
+        //  $('#BatchNameList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("GetProcessDate", "SuccessionPostAction")", '#ProcessDateList', "");
+        //$('#ProcessDatelist').P2BSelectMenuAppend('@Url.Action("GetProcessDate", "CompetencyPostAction")');
+    });
+</script>
+
+<div class="form_bg">
+    <div class="form_input">
+        <div class="button_container">
+            <div style="float:left;margin-left:25px"><label>Batch Name:</label></div>
+
+            <div style="float:left;margin-left:25px">
+                <select class="drop must" style="width:180px;" name="BatchNamelistG" id="BatchNamelistG">
+                    <option value="0">--Select--</option>
+                </select>
+            </div>
+            <button class="button" id="load">Load</button>
+            <button class="button" id="create">Create</button>
+            @*<button class="button" id="view">View</button>
+                <button class="button" id="edit">Edit</button>
+                <button class="button" id="delete">Delete</button>
+                <button class="button" id="autho">Authorized</button>*@
+            @*<button class="button" id="delete">Delete</button>*@
+            @*<button class="button" id="release">Release</button>*@
+
+        </div>
+    </div>
+</div>
+
+<div id="grid_form">
+    <div>
+        <div id="container" class="container">
+            <div id="demo">
+                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>DD</th>
+                            <th>EmpCode</th>
+                            <th>EmpName</th>
+                            <th>ID</th>
+                        </tr>
+                    </thead>
+                    @*<tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                            </tr>
+                        </tfoot>*@
+                </table>
+            </div>
+        </div>
+        <table id="jqgrid"></table>
+        <div id="pager2"></div>
+    </div>
+</div>
+
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="lookupdiv"></div>
+    </div>
+    <div id="pageNavPosition">
+
+    </div>
+</div>
+<div id="create_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmsuccessionpostaction", name = "frmsuccessionpostaction" }))
+    {
+
+        <input id="autho_action" type="hidden" name="autho_action" />
+        <input id="autho_allow" type="hidden" name="autho_allow" />
+
+        <div class="section1_Leave">
+            <div class="heading">Succession Batch Details</div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblBatchName" class="popup-content-labelT">BatchName:</label>
+                <select id="BatchNameList" name="BatchNameList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+
+            </div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblProcessDate" class="popup-content-labelT">Process Date:</label>
+                <select id="ProcessDateList" name="ProcessDateList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+            </div>
+
+            <div class="row3 content_margine" style="width: 729px;">
+                <label id="lblProcessBatch" class="popup-content-labelT">Process Batch:</label>
+                <select id="ProcessBatchList" name="ProcessBatchList" style="width:270px" class="drop">
+                    <option value="0">-Select-</option>
+                </select>
+                @*<input name="txtProcessDate" type="text" id="txtProcessDate" class="date-picker" />*@
+                <button id="Load_Emp" style="left:10px;">Load Employee</button>
+            </div>
+
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="employee-search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table">
+                        <tr><th><input type="checkbox" id="case-employee" /></th><th>Employee</th></tr>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="section2_Leave">
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="Emp_id" class="filter_structure_id" name="Emp_id" />
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="advance-filter-symbol"></span></label>
+                    <div id="fromFilter"></div>
+                </div>
+            </div>
+
+            @*<div class="emplist_row">
+                    <div id="grid_form2">
+                        <div>
+                            <table id="jqgridNew"></table>
+                            <div id="pager22"></div>
+                        </div>
+                    </div>
+                </div>*@
+
+            <label class="heading">Analysis Data</label>
+            <table id="monthTable">
+                <thead>
+                    <tr>
+                        <th data-name="SrNo">Sr.No</th>
+                        <th><input type="checkbox" id="case-employeeD" disabled="disabled" /></th>
+                        <th data-name="EmpPhoto">Emp Photo</th>
+                        <th data-name="EmpCode">Emp Code</th>
+                        <th data-name="EmpName">Emp Name</th>
+                        <th data-name="Location">Location</th>
+                        <th data-name="Department">Department</th>
+                        <th data-name="Designation">Designation</th>
+                    </tr>
+                </thead>
+            </table>
+            <button id="Save_Data" style="left:10px;">Save</button>
+        </div>
+    }
+</div>

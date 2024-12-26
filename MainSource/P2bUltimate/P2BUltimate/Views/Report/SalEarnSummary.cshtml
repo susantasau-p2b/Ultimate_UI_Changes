@@ -1,0 +1,323 @@
+﻿@{
+    ViewBag.title = "SalEarnSummary";
+}
+<div class="dialog_RateCode">
+    <div title="LookUp Data">
+        <div class="lookupdiv_RateCode" id="Lookup_table"></div>
+    </div>
+    <div id="pageNavPosition_RateCode">
+
+    </div>
+</div>
+<div>
+    <div class="filter-div">
+        <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+        <div id="FormFilter"></div>
+    </div>
+    <form id="frmreport">
+        <div class="fileremployee">
+            <div class="employee-transcationdiv dynamic" style="float:left">
+                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                <table cellspacing="0" cellpadding="1" class="employee-transcationtable filter-emp" id="employee_table">
+                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                </table>
+            </div>
+        </div>
+        <div class="report_form">
+            <div class="row6 box_border">
+                <div class="header_heading">
+                    <label class="header_label">Filter</label>
+                </div>
+                <div class="form-content5">
+                    <div class="radiobtn_div">
+                        <input type="radio" name="filter" id="monthly_chk" value="Monthly" /><label for="monthly_chk" class="radiobtn_label">Monthly</label>
+                    </div>
+                    <div class="radiobtn_div">
+                        <input type="radio" name="filter" id="PERIODICALLY_chk" value="PERIODICALLY" /><label for="PERIODICALLY_chk" class="radiobtn_label">PERIODICALLY</label>
+
+                    </div>
+                    <div class="radiobtn_div">
+                        <input type="radio" name="filter" id="Calender_chk" value="Calender" /><label for="Calender_chk" class="radiobtn_label">Calender</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row1 box_border" id="row1" style="display:none">
+                <div class="header_heading">
+                    <label for="monthly" class="header_label">Monthly</label>
+                </div>
+                <div class="form-content" id="Form1">
+                    <input type="text" name="monthly" class="dateMonth" style="width:150px" />
+                  
+                </div>
+
+            </div>
+            <div class="row2 box_border" id="row2" style="display:none">
+                <div class="header_heading">
+                    <label for="periodically" class="header_label">Periodically</label>
+                </div>
+                <div class="form-content2" id="Form2">
+                    <div class="content_margine">
+                        <label for="fromdate" class="reprot-label">FromDate :</label>
+                        <input type="text" id="fromdate" name="fromdate" class="date" />
+                    </div>
+                    <div class="content_margine">
+                        <label for="todate" class="reprot-label">ToDate :</label>
+                        <input type="text" id="todate" name="todate" class="date" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="row5 box_border" id="row5" style="display:none">
+                <div class="header_heading">
+                    <label for="calender" class="header_label">Calender</label>
+                </div>
+                <div class="form-content2" id="Form3">
+                    <div class="content_margine">
+                        <label for="fromdate" class="reprot-label">FromDate :</label>
+                        <input type="text" id="fromdate" name="fromdate" class="date" />
+                    </div>
+                    <div class="content_margine">
+                        <label for="todate" class="reprot-label">ToDate :</label>
+                        <input type="text" id="todate" name="todate" class="date" />
+                    </div>
+                </div>
+                <button data-p2btooltip="Select Calender" class="popup-content-icon-lookup calender_btn" id="Lookup-Name-RateMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            </div>
+            <div class="row3 box_border">
+                <div class="header_heading">
+                    <label for="salaryhead" class="header_label">SalaryHead</label>
+                </div>
+                <div class="form-content4" id="form4">
+                    <select id="salaryhead_id" name="salaryhead_id" style="width:195px" multiple="multiple"></select>
+                </div>
+            </div>
+            <input id="typeoffilter" class="filter_structure_id" name="typeoffilter" />
+            <input id="salaryheadname" class="filter_structure_id" name="salaryheadname" />
+            <input id="geo_id" class="filter_structure_id" name="" />
+            <input id="pay_id" class="filter_structure_id" name="" />
+            <input id="fun_id" class="filter_structure_id" name="" />
+            <div class="row7">
+                <button id="Genrate_report" class="report_btn">Report</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    $(function () {
+        $('button').button();
+        $('.date').P2BDatePicker();
+        $('.drop').selectmenu();
+        $('.dateMonth').MonthYearPicker();
+        var TranscationTableCheckboxCount = function (table) {
+            return $(table).find('input:checkbox:gt(0):checked').length;
+        };
+        $('#Genrate_report').on('click', function (e) {
+            var url = "Reports/Payroll/SalEarnSummary.aspx";
+            $.ajax({
+                url: "@Url.Action("GenrateReport", "ReportFilter")",
+                //url: "ReportFilter/GenrateReport",
+                method: "POST",
+                data: $('#frmreport').serialize() + "?&url=" + url,
+                success: function (data) {
+                    window.open("" + data + "", "_blank");
+                }
+            });
+            e.preventDefault();
+        });
+        $('[name="filter"]').on("change", function () {
+            if ($(this).val() == "Monthly") {
+                $('#row1').show();
+                $('#typeoffilter').val("Monthly");
+                $('#row2,#row5').hide();
+            }
+            if ($(this).val() == "PERIODICALLY") {
+                $('#row2').show();
+                $('#typeoffilter').val("PERIODICALLY");
+                $('#row1,#row5').hide();
+            }
+            if ($(this).val() == "Calender") {
+                $('#row5').show();
+                $('#typeoffilter').val("Calender");
+                $('#row2,#row1').hide();
+            }
+
+        });
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                //htmlurl : "Transcation/Advance_Partial",
+                returnat: function (data) {
+                    var forwarddata = JSON.stringify(data);
+                    $('#employee_table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+        });
+        $('#Lookup-Name-RateMaster').on('click', function (event) {
+            $('.dialog_RateCode').AddDataToTextbox({
+                appendTo: '#calender',
+                lookupurl: '.("Get_Calender", "ReprotMainPage")',
+                NoOfRecordToShow: 5,
+                setnameofthelookupbyppage: 'lookuptable',
+                LookupDiv: 'lookupdiv_RateCode',
+                lookuppagename: "Lookup_table",
+                pagename: "pageNavPosition_RateCode",
+                readonly: true
+            });
+
+            event.preventDefault();
+        });
+        $('[name="filter"]').prop('checked', true);
+        $('#salaryhead_id').P2BSelectMenuMuliSelectAppend("@Url.Action("GetSalaryHead", "reprotmainpage")", "", "", "");
+        //$('#salaryhead_id').P2BSelectMenuMuliSelectAppend("reprotmainpage/GetSalaryHead", "", "", "");
+        $.LoadEmpByDefaultV2();
+    });
+</script>
+<style>
+
+    .form-content5 {
+        margin: 6px 7px;
+    }
+
+    .filter-emp {
+        height: 272px;
+    }
+
+    .radiobtn_label {
+        margin: 0px 3px;
+    }
+
+    .radiobtn_div {
+        margin: 2px auto;
+        /*! padding: 0px; */
+    }
+
+    .row6 {
+        width: 209px;
+        margin: 2px 3px;
+        height: 86px;
+        /*! padding: 0px; */
+        float: left;
+    }
+
+    .report_btn {
+        width: 168px;
+        height: 55px;
+    }
+
+    .form-content3 {
+        margin: 5px 14px;
+    }
+
+    .dynamic {
+        width: 293px;
+        height: 303px;
+        margin: 0 0 0 0;
+    }
+
+    .transactiondiv {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 192px;
+        border-radius: 5px;
+        height: 285px;
+    }
+
+    .row1 {
+        width: 272px;
+        /*! float: left; */
+        margin: 0px 3px;
+        position: absolute;
+        /*! top: 27px; */
+        left: 509px;
+    }
+
+    .box_border {
+        border: 0.1px solid #e9e9e9;
+    }
+
+    .row2 {
+        width: 272px;
+        /*! float: left; */
+        margin: 0px 3px;
+        position: absolute;
+        /*! top: 27px; */
+        left: 509px;
+    }
+
+    .row3 {
+        width: 211px;
+        height: 102px;
+        float: left;
+        margin: 92px -214px;
+    }
+
+    .row4 {
+        width: 164px;
+        display: inline-block;
+    }
+
+    .row5 {
+        display: block;
+        float: left;
+        height: 86px;
+        position: absolute;
+        /*! top: 26px; */
+        left: 512px;
+        width: 275px;
+    }
+
+    .reprot-label {
+        display: block;
+        width: 71px;
+        float: left;
+    }
+
+    .report_form {
+        float: left;
+        width: 741px;
+        height: 100px;
+    }
+
+    .header_label {
+    }
+
+    .header_heading {
+        background-color: #e3e3e3;
+        padding: 1px;
+        margin: 1px 1px;
+    }
+
+    .form-content {
+        margin: 16px 11px;
+    }
+
+    .form-content2 {
+        margin: 7px 1px;
+    }
+
+    .form-content4 {
+        margin: 2px 8px;
+    }
+
+    .calender_btn {
+        left: 244px;
+        position: absolute;
+        top: 29px;
+    }
+
+    .row7 {
+    
+        position: absolute;
+        margin-top: 138px;
+        margin-left: 223px;
+    }
+
+
+
+</style>

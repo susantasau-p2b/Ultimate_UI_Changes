@@ -1,0 +1,260 @@
+﻿@{
+    ViewBag.Title = "Job";
+}
+
+@model P2b.Global.Job
+<style>
+    .icon-row {
+        position: relative;
+        left: 56px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 100px;
+        display: block;
+        float: left;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 100px;
+    }
+
+    .popup-content-textbox-large {
+        width: 153px;
+    }
+
+    .row1 {
+        width: 471px;
+    }
+</style>
+
+
+
+<html>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmJob", name = "frmJob" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1 content_margine"> @Html.LabelFor(m => m.Code, "Code :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must", @id = "JobCode", @maxlength = "10" })</div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" }) @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox-large must", @id = "JobName", @maxlength = "50" })
+            </div>
+            <div class="row1 content_margine">
+                <div id="PostionList_old"></div>
+                @Html.LabelFor(m => m.JobPosition, "Position :", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PostionList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Postion" class="popup-content-icon-lookup" id="Lookup-JobPosition-Job"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Postion" class="popup-content-icon-create" id="Create-JobPosition-Job"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Postion" class="popup-content-icon-edit" id="Edit-JobPosition-Job"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Postion" class="popup-content-icon-remove" id="Remove-JobPosition-Job"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+
+
+
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('#JobCode').MaxLength(10);
+        $('#JobName').MaxLength(50);
+
+
+        
+       
+        //$('#Code').ValidateTextBox({ maxlength: 10 });
+        //$('#Name').ValidateTextBox({ maxlength: 50 });
+        $('button').button().on('click', function () {
+        });
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-JobPosition-Job,#Remove-JobPosition-Job";
+        ColModel = ['Code', 'Name', 'Id'];
+        ColNames = ['Code', 'Name', 'Id'];
+        SortName = 'Id';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = 'Job';
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmJob').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Job', 'open', '@Url.Action("Create")', '#frmJob', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#PostionList', btndisablenames, function (data) { });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#frmJob').trigger("reset");
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Job Data", '#frmJob', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#PostionList', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#Code').val(k.Code);
+                    $('#Code').attr('readonly', 'readonly');
+                    $('#Name').val(k.Name);
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+
+                    $('#PostionList').P2BLookUpEncapsulate('#PostionList', 'PostionList', k.Position_Id, k.Position_FullDetails, 'PostionList', '#Edit-JobPosition-Job,#Remove-JobPosition-Job', 'A');
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        $('#View').button().click(function (event) {
+            AssignData();
+
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Job', '#PostionList', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+            //$('div [name="frmJobEdit"]').P2BViewModalDialog('@Url.Action("Edit")', dt.ID, 'View', '#PostionList', '#Lookup-JobPosition-Job,#Create-JobPosition-Job,#Edit-JobPosition-Job,#Remove-JobPosition-Job', 500, 620, function (data) {
+                $.each(data[1], function (i, k) {
+                    $('#PostionList').P2BLookUpEncapsulate('#PostionList', 'PostionList', k.Position_Id, k.Position_FullDetails, 'PostionList', '', 'A');
+                });
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Code').val(k.Code)
+                    $('#Name').val(k.Name);
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').StickNote(data[2].Name);
+                    $('#PostionList_old').StickNote(data[2].PostionList_Val);
+                }
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmJob').P2BDeleteModalDialog('@Url.Action("Delete", "Job")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+
+
+        $('#Lookup-JobPosition-Job').button().on('click', function (event) {
+            @*$('.LookupJob').P2BLookUpModal('@Url.Action("GetLookupPostion", "Job")', '', 'lookupdiv_Postion', 'Look Up Data', '# $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');', 'PostionList', 10, 'PostionList', '#frmJob', 'N', '', '#lookupdiv_Postion', 'PageNavPosition');*@
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPositionDetails", "Job")', '', 'LookupDiv', 'Look Up Data', '#PostionList', 'PostionList', 5, 'PostionList', '#frmJob', 'A', '#Edit-JobPosition-Job,#Remove-JobPosition-Job', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-JobPosition-Job').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Job")', 'Create Job Position', 'open', '@Url.Action("Create", "JobPosition")', '#frmJobPosition', 'Message :', 'Request Falied :', '#JqGrid', 200,300, '', '', '', '#frmJob', '', function (data) {
+                // to show data which is created in partial page
+                $('#PostionList').P2BLookUpEncapsulate('#PostionList', 'PostionList', data[0], data[1], 'PostionList', '#Edit-JobPosition-Job,#Remove-JobPosition-Job', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+
+        @*$('#Edit-JobPosition-Job').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PostionList').P2BGetTableDataonSelectedRow('#PostionList', 0);
+            b = a[0];
+            console.log(b);
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateJobPartial", "Job")', '@Url.Action("EditPostion_partial", "JobPosition")', b, '@Url.Action("EditSave","JobPosition")', 'Edit Job Position', '#frmPosition', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmJob', '#Edit-JobPosition-Job,#Remove-JobPosition-Job', '#PostionList', 'PostionList', 'PostionList', function (data) {
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        alert(k.Position);
+                        $('#frmJob').trigger('reset');
+                        $('#JobPositionCode').val(k.JobPositionCode);
+                        $('#JobPositionDesc').val(k.JobPositionDesc);
+                        $('#PostionList').P2BLookUpEncapsulate('#PostionList', 'PostionList', k.Id, k.Position, 'PostionList');
+                    });
+                }, 2000);
+            });
+        });*@
+
+        $('#Edit-JobPosition-Job').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PostionList').P2BGetTableDataonSelectedRow('#PostionList', 0);
+            b = a[0];
+            console.log(b);
+
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Job")', '@Url.Action("EditPostion_partial", "JobPosition")', b, '@Url.Action("EditSave", "JobPosition")', 'Edit Job Position', '#frmJobPosition', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmJob', '#PostionList', 'PostionList', 'PostionList', 'A', '#Edit-JobPosition-Job,#Remove-JobPosition-Job', function (data) {
+                $.each(data[0], function (i, k) {
+                    console.log(data[0]);
+                    $('#frmJobPosition').trigger('reset');
+                    $('#JobPositionCode').val(k.JobPositionCode);
+                    $('#JobPositionCode').attr('readonly', 'readonly');
+                    $('#JobPositionDesc').val(k.JobPositionDesc);
+
+                });
+            });
+            event.preventDefault();
+        });
+        $('#Remove-JobPosition-Job').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PostionList').P2BGetTableDataonSelectedRow('#PostionList', 0);
+            //b = a[0];
+            
+            var selectedRows = [];
+            selectedRows = $('#PostionList').P2BGetTableDataonSelectedRow('#PostionList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PostionList', $('#PostionList').val(), 200, 200, '#frmJob', '#PostionList', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate');
+            event.preventDefault();
+        });
+
+
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+
+
+
+
+</script>

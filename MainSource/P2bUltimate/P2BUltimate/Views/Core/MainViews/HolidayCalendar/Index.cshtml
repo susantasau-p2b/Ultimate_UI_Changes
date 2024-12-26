@@ -1,0 +1,358 @@
+﻿@model P2b.Global.HolidayCalendar
+@{
+    ViewBag.Title = "Holiday Calendar";
+}
+<html>
+<head>
+    <style>
+        .row3 {
+            width: 400px;
+        }
+
+        .popup-content-label {
+            width: 100px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            min-width: 150px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 58px;
+            top: -150px;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function (e) {
+            $("button").button();
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['HolidayCalendar', 'Name', 'Id']
+            ColNames = ['HolidayCalendar', 'Name', 'Id']
+            SortName = 'Id';
+            Caption = 'HolidayCalendar';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            // $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+            $('.date').P2BDatePicker();
+            $('.popup_radio_button').controlgroup();
+
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "HolidayCalendar")",
+                columnname: ["HoliCalendar", "Name", "Id"],
+                // editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+                htmurl: "@Url.Action("partial", "HolidayCalendar")",
+                // submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",
+                childheader: ["HolidayList", "Id"],
+                childurl: "@Url.Action("GridEditData", "HolidayCalendar")",
+                tableheader: "Holiday Calendar",
+                childurlColumnNo: "3"
+
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: '@Url.Action("Edit", "HolidayCalendar")',
+                    submiturl: '@Url.Action("EditSave", "HolidayCalendar")',
+                };
+                @*if ($(init).hasClass('ui-icon-newwin')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#Create_Dialog",
+                        htmlurl: "@Url.Action("Partial", "HolidayCalendar")",
+                        state: "open",
+                        mode: "View",
+                        editurl: '@Url.Action("Edit", "HolidayCalendar")',
+                        submiturl: '@Url.Action("EditSave", "HolidayCalendar")',
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data.data, function (i, k) {
+                                $('#HolidayList').val(k.HolidayList_Id);        //*************
+                                $('#HoliCalendar').val(k.HolidayList_val);
+                            });
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: "@Url.Action("Partial", "HolidayCalendar")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "HolidayCalendar")",
+                        submiturl: "@Url.Action("GridEditsave", "HolidayCalendar")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                //console.log(k.MonthlyInstallmentAmount);
+
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else*@
+                    if ($(init).hasClass('ui-icon-trash')) {
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').on("click", function (event) {
+                $('#FormHolidayCalendar').trigger("reset");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Holiday Calendar', 'open', '@Url.Action("Create", "HolidayCalendar")', '#FormHolidayCalendar', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#HolidayListList', '', function (data) { }, { datatablename: "#MyTable" });
+                // $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create HolidayCalendar', 'open', '@Url.Action("Create", "HolidayCalendar")', '#FormHolidayCalendar', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#HolidayListList', '', function (data) { }, { validurl: "@Url.Action("ValidateForm")" });
+                $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", '');
+                @*$('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "InitialCompanyCreate")', "", '');*@
+                event.preventDefault();
+            });
+
+            $('#Edit').on('click', function () {
+                // AssignData();
+                $('#FormSalHeadFormula').trigger("reset");
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                //data('datatable_selectedrow');
+                console.log(a.Id);
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit", "HolidayCalendar")', a.Id, '@Url.Action("EditSave", "HolidayCalendar")', "Edit Holiday Calendar", '#FormHolidayCalendar', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar ', "", function (data) {
+                    //  $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit", "HolidayCalendar")', dt.Id, '@Url.Action("EditSave", "HolidayCalendar")', "Edit HolidayCalendar", '#FormHolidayCalendar', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList,#PayscaleList', "", function (data) {
+
+                    $.each(data[0], function (i, k) {
+                        $('#Name').val(k.Name);
+                        $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendarEditview", "HolidayCalendar")', "", k.Holicalendar_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#HolidayListList').P2BLookUpEncapsulate('#HolidayListList', 'HolidayListList', k.HolidayList_Id, k.HolidayList_val, 'HolidayListList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                    });
+
+                    $('#Autho_Allow').val(data[3]);
+                }, { datatablename: "#MyTable" });
+            });
+
+            $('#View').button().click(function (event) {
+                AssignData();
+                $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit", "HolidayCalendar")', dt.Id, 'View Holiday Calendar Data', '#HolidayListList', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#Name').val(k.Name);
+                        $('#HoliCalendarDDL').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendarEditview", "HolidayCalendar")', "", k.Holicalendar_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#HolidayListList').P2BLookUpEncapsulate('#HolidayListList', 'HolidayListList', k.HolidayList_Id, k.HolidayList_val, 'HolidayListList', '#Edit-Address-Company,#Remove-Address-Company', 'N');
+                    });
+
+                    if ($("#Autho").hasClass('auto_active')) {
+                        if (data[3] != null) {
+                            $('#Name').oldVal(data[2].Name);
+                            $('#AddressList_Old').oldLookupVal(data[3].Address_Val);
+                            $('#ContactDetailsList_Old').oldLookupVal(data[3].Contact_Val);
+                            $('#PayScaleList_Old').oldLookupVal(data[3].PayScale_Val);
+                        }
+                    }
+                });
+            });
+
+            @*$('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#FormHolidayCalendar').P2BDeleteModalDialog('@Url.Action("Delete", "HolidayList")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            });*@
+            @*$('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });*@
+
+            $('#Delete').button().click(function (event) {
+                //dt = $('#MyTable').P2BGrid.P2BEdDelV('#MyTable', 'Id');
+                $('#FormHolidayCalendar').trigger("reset");
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete", "HolidayCalendar")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+
+            });
+
+            $('#Lookup-HolidayList-HolidayCalendar').button().on('click', function (event) {
+                var a = $('#HoliCalendarDDL').val();
+                var b = $('#Name').val(); 
+                if (a == "0") {
+                    alert("Please Select The Calendar");
+                    return false;
+                }
+              
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "HolidayList")?Param=' + a + '&Param1=' + b +'','', 'LookupDiv', 'Look Up Data', '#HolidayListList', 'HolidayListList', 5, 'HolidayListList', '#FormHolidayCalendar', 'A', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+        
+            $('#Create-HolidayList-HolidayCalendar').button().on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "HolidayList")', 'Create HolidayList', 'open', '@Url.Action("Create", "HolidayList")', '#FormHolidayList', 'Mess age :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormHolidayList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', function (data) {
+                    $('#HolidayListList').P2BLookUpEncapsulate('#HolidayListList', 'HolidayListList', data[0], data[1], 'HolidayListList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                }, { validurl: "@Url.Action("ValidateForm", "HolidayList")" });
+                event.preventDefault();
+            });
+
+            $('#Edit-HolidayList-HolidayCalendar').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#HolidayListList').P2BGetTableDataonSelectedRow('#HolidayListList', 0);
+                b = a[0];
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "HolidayList")', '@Url.Action("Edit", "HolidayList")', b, '@Url.Action("EditSave", "HolidayList")', 'Edit HolidayList', '#FormHolidayList', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormHolidayCalendar', '#HolidayListList', 'HolidayListList', 'HolidayListList', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                    $.each(data[0], function (i, k) {
+                        $('#FormHoliday').trigger('reset');
+                        // $('#HolidayList').P2BLookUpEncapsulate('#HolidayList', 'HolidayList', data[0], data[1], 'HolidayList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'N');
+                        $('#HolidayList').P2BLookUpEncapsulate('#HolidayList', 'HolidayList', k.HolidayId, k.HolidayVal, 'HolidayList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar', 'A');
+                        $('#HolidayDate').val(k.holidaydate);
+                        if (k.holidaydate != null) {
+                            $('#HolidayDate').val(DateConvert(k.holidaydate));
+                        }
+                    });
+
+                });
+                event.preventDefault();
+            });
+
+            //$('#Remove-HolidayList-HolidayCalendar').button().on('click', function (event) {
+            //    var a = [], b;
+            //    a = $('#HolidayListList').P2BGetTableDataonSelectedRow('#HolidayListList', 0);
+            //    b = a[0];
+            //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HolidayListList', $('#HolidayListList').val(), 200, 200, '#FormHolidayList', '#HolidayListList', '#Edit-HolidayList-HolidayCalendar,#Remove-HolidayList-HolidayCalendar');
+            //    event.preventDefault();
+            //});
+            $('#Remove-HolidayList-HolidayCalendar').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#HolidayListList').P2BGetTableDataonSelectedRow('#HolidayListList', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#HolidayListList').P2BGetTableDataonSelectedRow('#HolidayListList', 0);
+
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HolidayListList', $('#HolidayListList').val(), 200, 200, '#FormHolidayCalendar', '#HolidayListList', '');
+                event.preventDefault();
+            });
+            $('.drop').selectmenu().selectmenu('menuWidget').addClass('overflow');
+
+        });
+    </script>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>*@
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>HoliCalendar</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>HoliCalendar</th>
+                                            <th>Name</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormHolidayCalendar", name = "FormHolidayCalendar" }))
+        {
+            <div class="dropdown_row1 row3 content_margine">
+                @Html.LabelFor(m => m.HoliCalendar, "Calendar :", new { @class = "popup-content-label" })
+                <select id="HoliCalendarDDL" style="width:200px" name="HoliCalendarDDL" class="drop"></select>
+            </div>
+            
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })
+               @Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+            
+            <div class="row3 content_margine">
+                @Html.LabelFor(m => m.HolidayList, "Holiday List:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="HolidayListList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="LookUP HolidayList" id="Lookup-HolidayList-HolidayCalendar" class="popup-content-icon-lookup"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create HolidayList" id="Create-HolidayList-HolidayCalendar" class=" popup-content-icon-create"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit HolidayList" id="Edit-HolidayList-HolidayCalendar" class=" popup-content-icon-edit"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove HolidayList" id="Remove-HolidayList-HolidayCalendar" class=" popup-content-icon-remove"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+</html>

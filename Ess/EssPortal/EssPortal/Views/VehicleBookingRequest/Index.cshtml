@@ -1,0 +1,666 @@
+﻿@{
+    Layout = null;
+}
+@model Payroll.VehicleBookingRequest
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .popup-content-textbox1 {
+        margin-left: 7px;
+        float: right;
+        min-width: 150px;
+        top: 221px;
+        position: absolute;
+    }
+
+    .row3 {
+        width: 626px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .process_btn {
+        float: right;
+    }
+
+    .section2_Leave {
+        width: 401px;
+    }
+
+    #lvdata {
+        display: block;
+        float: right;
+    }
+
+    .add_icon-row {
+        position: relative;
+        left: -20px;
+        top: -46px;
+    }
+</style>
+
+<html>
+<head>
+    <title></title>
+    <script>
+    $(document).ready(function () {
+        $('button').button();
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').buttonset();
+
+        $('#autho').makeDisable('#create,#edit,#delete');
+        $('.drop').selectmenu().selectmenu('menuWidget');
+        $('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Type_Nomines').selectmenu().selectmenu("menuWidget");
+
+        $('#Categorylist1').selectmenu().selectmenu("menuWidget");
+        $('#autho').onClickGrid('#jqgrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        // $('#NoOfRooms').ForceAmount().MaxLength(10);
+        $('#NoOfRooms').attr("value", "0");
+        $('#TotFamilyMembers').attr("value", "0");
+        $('#TotalAdults').attr("value", "0");
+        $('#TotalChild').attr("value", "0");
+        $('#TotalInfant').attr("value", "0");
+        $('#TotalSrCitizen').attr("value", "0");
+        $('#RatePerDay').attr("value", "0");
+        $('#StdDiscount').attr("value", "0");
+        $('#Taxes').attr("value", "0");
+        $('#BillAmount').attr("value", "0");
+        $('#Eligible_BillAmount').attr("value", "0");
+
+        $('#ReqDate').P2BDatePicker();
+
+        var btndisablenames = "#edit-Address-BenefitNominees,#remove-HotelEligibilityPolicy,#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees";
+        $("#handicapRemarkdiv").fadeOut();
+        $('#lvexcludeleavediv').fadeOut();
+
+
+
+
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+
+        }
+
+        $('#DateofBirth').P2BDatePicker();
+        $('#StartDate').P2BDatePicker();
+        $('#EndDate').P2BDatePicker();
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", "", '#StateList');
+
+        $('#CountryList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "state")", '#StateList', "");
+        $('#StateList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "StateRegion")", "#StateRegionList", "");
+        $('#StateRegionList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "District")", "#Districtlist", "");
+        $('#Districtlist').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "Taluka")", "#TalukaList", "");
+        $('#TalukaList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "City")", "#CityList", "");
+        $('#CityList').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "area")", "#AreaList", "");
+
+        $('.popup_radio_button').buttonset();
+
+        $('#CountryList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "Country")', "", "");
+        $('#StateList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListState")', "", "");
+        $('#CityList').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCity")', "", "");
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create_country').on("click", function (e) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_Country", "Country")', 'Create Country', 'open', '@Url.Action("Create", "Country")', '#frmCountry', 'Message :', 'Request Falied :', '#jqgrid', 217, 339, '', '#CountryList', 'change', '', '', function (data) {
+                $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Country")", "", data[0], '#StateList');
+
+            });
+            e.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create_state').on("click", function (e) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_State", "state") ', 'Create State', 'open', '@Url.Action("Create", "State")', '#frmState', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, $("#CountryList option:selected").val(), '#CountryList', 'change', '', '', function (data) {
+                $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", data[0], '#StateRegionList');
+            });
+            e.preventDefault();
+
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create_city').on("click", function (e) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial_City", "city") ', 'Create City', 'open', '@Url.Action("Create","City")', '#frmCity', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, 1, '#TalukaList', 'change', '', '', function (data) {
+                $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "city")", "", data[0], '#AreaList');
+            });
+            e.preventDefault();
+
+        });
+
+        /*----------------------------------------------------------------------------------*/
+
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-Address-BenefitNominees').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#frmAddress', 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '', '', '', '#frmVehiclebookingrequest', '', function (data) {
+                // to show data which is created in partial page
+                $('#Addresslist').P2BLookUpEncapsulate('#Addresslist', 'Addresslist', data[0], data[1], 'Addresslist', '#edit-Address-BenefitNominees,#remove-Address-BenefitNominees', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        //partial page delete
+        $('#remove-Address-BenefitNominees').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#Addresslist').P2BGetTableDataonSelectedRow('#Addresslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Addresslist', $('#Addresslist').val(), 200, 200, '#frmVehiclebookingrequest', '#Addresslist', '#edit-Address-BenefitNominees,#remove-Address-BenefitNominees');
+            event.preventDefault();
+        });
+
+
+
+
+        /* ContactDetails button click*/
+
+
+
+        $('#lookup-ContactDetails-BenefitNominees').on('click', function (event) {
+            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "EmployeeFamilyDetails")', '', 'lookupdiv', 'Address Look Up Data', '#Addresslist', 'Addresslist', 5, 'Addresslist', '#frmVehiclebookingrequest', 'N', '#edit-Address-BenefitNominees,#remove-Address-BenefitNominees', 'lookup_table', 'pageNavPosition');*@
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "VehicleBookingRequest")', '', 'lookupdiv', 'ContactDetails Look Up Data', '#ContactDetailslist', 'ContactDetailslist', 5, 'ContactDetailslist', '#frmVehiclebookingrequest', 'N', '#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees', 'lookup_table', 'pageNavPosition');
+            // $('.ContactDetLKDiv').P2BLookUpModal('@@Url.Action("GetContactDetLKDetails", "EmployeeFamilyDetails")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetailslist', 'ContactDetailslist', 10, 'ContactDetailslist', '#frmVehiclebookingrequest', 'N', '#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-ContactDetails-BenefitNominees').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "VehicleBookingRequest")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '', '', '', '#frmContactDetails', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+                $('#ContactDetailslist').P2BLookUpEncapsulate('#ContactDetailslist', 'ContactDetailslist', data[0], data[1], 'ContactDetailslist', '#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#edit-ContactDetails-BenefitNominees').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactDetailslist').P2BGetTableDataonSelectedRow('#ContactDetailslist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "VehicleBookingRequest")', '@Url.Action("Editcontactdetails_partial", "VehicleBookingRequest")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '#frmVehiclebookingrequest', '#ContactDetailslist', 'ContactDetailslist', 'ContactDetailslist', 'N', '#remove-ContactNo-ContDetails,#edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#remove-ContactDetails-BenefitNominees').button().on('click', function (event) {
+            // dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            var a = [], b;
+            a = $('#ContactDetailslist').P2BGetTableDataonSelectedRow('#ContactDetailslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails", "VehicleBookingRequest")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ContactDetailslist', $('#ContactDetailslist').val(), 200, 200, '#frmVehiclebookingrequest', '#ContactDetailslist', '#edit-ContactDetails-BenefitNominees,#remove-ContactDetails-BenefitNominees');
+            event.preventDefault();
+        });
+
+        //******* Journey Details
+
+      $('#lookup-JourneyDetails-LTCSettlementClaim').on('click', function (event) {
+          $('.dialog').P2BLookUpModal('@Url.Action("GetJourneyLKDetails", "VehicleBookingRequest")', '', 'lookupdiv', ' Look Up Data', '#JourneyDetailsList', 'JourneyDetailsList', 5, 'JourneyDetailsList', '#frmVehiclebookingrequest', 'N', '#remove-JourneyDetails-LTCSettlementClaim', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#create-JourneyDetails-LTCSettlementClaim').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial_JourneyDetails", "VehicleBookingRequest")', 'Create JourneyDetails Master', 'open', '@Url.Action("Create", "JourneyDetails")', '#frmJourneyDetailsPartial', 'Message :', 'Request Falied :', '#jqgrid', 600, 600, '', '', '#edit-JourneyObject1-JourneyDetails,#edit-JourneyObject-JourneyDetails,#edit-FamilyDetails-JourneyDetails,#remove-FamilyDetails-JourneyDetails', '#frmVehiclebookingrequest', '', function (data) {
+                $('#JourneyDetailsList').P2BLookUpEncapsulate('#JourneyDetailsList', 'JourneyDetailsList', data[0], data[1], 'JourneyDetailsList', '#remove-JourneyDetails-LTCSettlementClaim', 'N');
+            });
+            event.preventDefault();
+        });
+        $('#remove-JourneyDetails-LTCSettlementClaim').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#JourneyDetailsList').P2BGetTableDataonSelectedRow('#JourneyDetailsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#JourneyDetailsList', $('#JourneyDetailsList').val(), 200, 200, '#frmVehiclebookingrequest', '#JourneyDetailsList', '#remove-CandidateDocuments-Candidate');
+            event.preventDefault();
+        });
+
+
+        //******** Reference Documents
+
+        $('#lookup-CandidateDocuments-Candidate').button().on('click', function (e) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCandDocsLKDetails", "EmployeeDocuments")', '', 'lookupdiv', 'Employee Document Look Up Data', '#CandidateDocumentslist', 'CandidateDocumentslist', 5, 'CandidateDocumentslist', '#frmCandidate', 'N', '#remove-CandidateDocuments-Candidate', 'CandidateDocumentslist_table', 'pageNavPosition');
+            e.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-CandidateDocuments-Candidate').on("click", function (event) {
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "EmployeeDocuments")', 'Create Employee Documents', 'open', '@Url.Action("Create", "EmployeeDocuments")', '#frmCandidateDocs', 'Message :', 'Request Failed :', '#jqgrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data[0], data[1], 'CandidateDocumentslist', '', 'N');
+                });*@
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data.Id, data.Val, 'CandidateDocumentslist', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+
+
+
+
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-NomineeName-BenefitNominees').button().on("click", function (event) {
+            // alert("hh...");
+            var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("GridPartial", "EmployeeFamilyDetails")', 'Create Family Name', 'open', '@Url.Action("GridCreate", "EmployeeFamilyDetails")?Empid=' + a, '#frmBenefitNominees', 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '', '', '', '#frmHotelBookingReq', '', function (data) {
+                //  alert("hhhhhhhhhhhh...");
+                $('#NomineeNamelist').P2BLookUpEncapsulate('#NomineeNamelist', 'NomineeNamelist', data[0], data[1], 'NomineeNamelist', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees', 'N');
+                $('#Categorylist1').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 107, "");
+
+            });
+
+            event.preventDefault();
+        });
+
+        $('#remove-NomineeName-BenefitNominees').button().on('click', function (event) {
+            var a = [], b;
+
+            a = $('#NomineeNamelist').P2BGetTableDataonSelectedRow('#NomineeNamelist', 0);
+            //      alert("remove lookup : "+a);
+            b = a[0];
+            //alert("remove lookup b val: " + b);
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NomineeNamelist', $('#NomineeNamelist').val(), 200, 200, '#frmHotelBookingReq', '#NomineeNamelist', '#remove-NomineeName-BenefitNominees');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+
+
+
+        $('#lookup-NomineeName-BenefitNominees').on('click', function (event) {
+            var a = "@Request.RequestContext.HttpContext.Session["TempEmpId"]";
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupFamilyName", "EmployeeFamilyDetails")?Empid=' + a, '', 'lookupdiv', 'Family Look Up Data', '#NomineeNamelist', 'NomineeNamelist', 5, 'NomineeNamelist', '#frmHotelBookingReq', 'A', '#edit-NomineeName-BenefitNominees,#remove-NomineeName-BenefitNominees', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+
+        /* Address button click*/
+        $('#lookup-Address-BenefitNominees').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "VehicleBookingRequest")', '', 'lookupdiv', 'Travel Look Up Data', '#Addresslist', 'Addresslist', 5, 'Addresslist', '#frmVehiclebookingrequest', 'N', '#edit-Address-BenefitNominees,#remove-Address-BenefitNominees', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-CandidateDocuments-Candidate').on("click", function (event) {
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "EmployeeDocuments")', 'Create Employee Documents', 'open', '@Url.Action("Create", "EmployeeDocuments")', '#frmCandidateDocs', 'Message :', 'Request Failed :', '#jqgrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data[0], data[1], 'CandidateDocumentslist', '', 'N');
+                });*@
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("Partial__EmployeeDocuments", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data.Id, data.Val, 'CandidateDocumentslist', '', 'A');
+                },
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#edit-CandidateDocuments-Candidate').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+            b = a[0];
+
+
+
+            $.post("@Url.Action("CheckUploadFile", "EmployeeDocuments")?Id=" + b, function (data) {
+
+                debugger;
+                if (data.success == false) {
+
+                    alert("File Not Found");
+                    return false;
+                } else if (data.fileextension == ".pdf") {
+                    window.location = "@Url.Action("GetCompImage", "EmployeeDocuments")?data=" + b;
+                }
+                else {
+                    $('<div></div>').PartialCreateDialog({
+                        height: '500',
+                        width: '500',
+                        form: "#frmImageviewer",
+                        title: "Image Viewer",
+                        htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GetCompImage", "EmployeeDocuments")",
+                        editdata: b,
+                        forwarddata: b,
+                        returndatafunction: function (data) {
+                            debugger;
+                            console.log(data);
+
+                            if (data != null) {
+                                $("#dashboard-Investment-viewer").attr('src', "data:image/png;base64," + data + "");
+                            } else {
+                                alert("First Upload the File");
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            event.preventDefault();
+        });
+
+        $('#remove-CandidateDocuments-Candidate').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#frmHotelBookingReq', '#CandidateDocumentslist', '#remove-CandidateDocuments-Candidate');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    });
+
+
+
+    </script>
+</head>
+<body>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="lookupdiv"></div>
+        </div>
+        <div id="pageNavPosition">
+
+        </div>
+    </div>
+
+
+    <div id="create_dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmVehiclebookingrequest", name = "frmVehiclebookingrequest", enctype = "multipart/form-data" }))
+        {
+            <input type="text" id="EmpLvnereq_Id" name="EmpLvnereq_Id" class="filter_structure_id" />
+            <div class="section2_Leave">
+                <div class=" " style="width: 506px;">
+
+                    <input id="autho_action" type="hidden" name="autho_action" />
+                    <input id="autho_allow" type="hidden" name="autho_allow" />
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.AgencyName, "AgencyName  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.AgencyName, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ContactPerson, "ContactPerson  :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ContactPerson, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        <div id="Addresslist_old"></div>
+                        @Html.LabelFor(m => m.AgencyAddress, "AgencyAddress :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Addresslist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Address" class="  popup-content-icon-lookup" id="lookup-Address-BenefitNominees"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Address" class="popup-content-icon-create" id="create-Address-BenefitNominees"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="edit-Address-BenefitNominees"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="remove-Address-BenefitNominees"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.AgencyContactDetails, "Agency Contact Details :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="ContactDetailslist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Contact Details" class="  popup-content-icon-lookup" id="lookup-ContactDetails-BenefitNominees"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Contact Details" class="  popup-content-icon-create" id="create-ContactDetails-BenefitNominees"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Contact Details" class="  popup-content-icon-edit" id="edit-ContactDetails-BenefitNominees"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Contact Details" class="  popup-content-icon-remove" id="remove-ContactDetails-BenefitNominees"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="row3 content_margine ">
+                        @Html.LabelFor(m => m.IsFullDayBook, " IsFullDayBook:", new { @class = "popup-content-label" })
+                        <span class="popup_radio_button">
+                            <span><input type="radio" id="radio31" name="IsFullDayBook" value="true" /> <label for="radio31">Yes</label></span>
+                            <span><input type="radio" id="radio41" name="IsFullDayBook" value="false" /> <label for="radio41">No</label></span>
+                        </span>
+                    </div>
+
+
+
+                    <div class="row3 content_margine addons">
+                        <div id="JourneyDetailsList_old"></div>
+                        @Html.LabelFor(m => m.JourneyDetails, "Journey Details:", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="JourneyDetailsList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Journey Details" class="button popup-content-icon-lookup" id="lookup-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Journey Details" class="button popup-content-icon-create" id="create-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Journey Details" class="button popup-content-icon-edit" id="edit-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Journey Details" class="button popup-content-icon-remove" id="remove-JourneyDetails-LTCSettlementClaim"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.ReqDate, "Req. Date :", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.ReqDate, new { @class = "popup-content-textbox must", @maxlength = "10" })</div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.VehicleModelName, "Vehicle Model Name  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.VehicleModelName, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.VehicleNumber, "Vehicle Number  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.VehicleNumber, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.BillNo, "Bill No :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.BillNo, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.BillAmount, "Bill Amount  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.BillAmount, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.RatePerDay, "Rate Per Day  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.RatePerDay, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.StdDiscount, "Std Discount  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.StdDiscount, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Taxes, "Taxes  :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.Taxes, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Elligible_BillAmount, "Eligible Bill Amount  :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.Elligible_BillAmount, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TotFamilyMembers, "Total Family member :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.TotFamilyMembers, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TotalAdults, "Total Adults :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.TotalAdults, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TotalChild, "Total Child :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.TotalChild, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TotalInfant, "Total Infant :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.TotalInfant, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.TotalSrCitizen, "Total Sr. Citizen :", new { @class = "popup-content-label " })
+                        @Html.TextBoxFor(m => m.TotalSrCitizen, new { @class = "popup-content-textbox must" })
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.SpecialRemark, "SpecialRemark :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.SpecialRemark, new { @class = "popup-content-textbox must" })
+                    </div>
+
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Narration, "Narration  :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+                    </div>
+
+
+                    <div class="row3 content_margine">
+                        <div id="Empdoclist_old"></div>
+                        <label class="popup-content-label">Reference Document :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="CandidateDocumentslist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+
+                        </div>
+
+                        <div class="icon-Document icon-row">
+                            <button data-p2btooltip="Lookup Document Details" class=" popup-content-icon-lookup" id="lookup-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Document Details" class=" popup-content-icon-create" id="create-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Document Details" class=" popup-content-icon-edit" id="edit-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Delete Document Details" class=" popup-content-icon-remove" id="remove-CandidateDocuments-Candidate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>
+

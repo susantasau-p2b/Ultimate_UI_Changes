@@ -1,0 +1,411 @@
+﻿
+<link href="~/Content/popup_form.css" rel="stylesheet" />
+@model IR.ChargeSheetEnquiryNoticeServing
+<style>
+    .popup-content-label {
+        width: 170px;
+        display: block;
+        float: left;
+    }
+
+    .popup-content-textbox {
+        width: 120px;
+    }
+
+    .row1 {
+        width: 320px;
+    }
+
+    
+
+    .horizontal_row2, .radio_button_div_2 {
+        display: inline-block;
+    }
+
+    .row3 {
+        width: 477px;
+    }
+
+    .row2 {
+        width: 402px;
+    }
+
+    .icon-row {
+        left: 127px;
+        position: relative;
+        top: -121px;
+    }
+
+    .popup-content-table {
+        right: 120px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+
+        ColModel = ['CaseNo', 'VictimName', 'ProceedingStage', 'ChargeSheetServingModeName', 'IsWitnessReqd', 'IsClosedServing', 'IsChargeSheet Recd', 'Narration', 'Id'];
+        ColNames = ['CaseNo', 'VictimName', 'ProceedingStage', 'ChargeSheetServingModeName', 'IsWitnessReqd', 'IsClosedServing', 'IsChargeSheet Recd', 'Narration', 'Id'];
+
+        SortName = 'Id';
+        Caption = 'Charge Sheet Enquiry Notice Serving';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Create').button().on("click", function () {
+            $('#frmChargeSheetEnquiryNoticeserving').trigger("reset");
+            var temp = localStorage.getItem("getEmpIrIdKey");
+
+            var empirid = @Request.QueryString["EmpIr"]
+            console.log("empirid :::: " + empirid);
+            if (empirid == undefined) {
+                empirid = temp.toString();
+            }
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Charge Sheet Enquiry Notice serving ', 'open', '@Url.Action("create")?EmpIr=' + empirid, '#frmChargeSheetEnquiryNoticeserving', 'Message :', 'Request Falied :', '#JqGrid', 600, 600, '', '', '', function (data) { });
+
+            // =============== Get Chargesheet Details from ChargeSheetServing ========================= //
+            $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: empirid }, function (data) {
+
+                if (data != null) {
+                    //alert(data);
+                    $("#chargesheetDetails").val(data);
+                    $('#chargesheetDetails').attr('readonly', 'readonly');
+                    return false;
+                }
+            });
+
+        });
+        $('#Lookup-ChargeSheetEnquiryNoticeServing-Witness').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWitness", "ChargeSheetEnquiryNoticeServing")', '', 'LookupDiv', 'Witness Look Up Data', '#WitnessList', 'WitnessList', 5, 'WitnessList', '#WitnessList', 'A', '#Remove-EnquiryPanel-EnquiryPanel', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-ChargeSheetEnquiryNoticeServing-ChargeSheetServingMode').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupChargeSheetServingMode", "ChargeSheetEnquiryNoticeServing")', '', 'LookupDiv', 'Look Up Data', '#ChargeSheetservingList', 'ChargeSheetservingList', 5, 'ChargeSheetservingList', '#frmChargeSheetEnquiryNoticeserving', 'N', '#Edit-Address-Location,#Remove-Address-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-ChargeSheetEnquiryNoticeServing-EnquiryNotice').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsEmployeeDoc", "ChargeSheetEnquiryNoticeServing")', '', 'LookupDiv', 'EmployeeDoc Look Up Data', '#EnquiryNoticeList', 'EnquiryNoticeList', 4, 'EnquiryNoticeList', '#frmChargeSheetEnquiryNoticeserving', 'A', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        //$('#Remove-ChargeSheetEnquiryNoticeServing-ChargeSheetEnquiryNoticeServing').button().on('click', function (event) {
+
+        //    a = $('#ChargeSheetservingList').P2BGetTableDataonSelectedRow('#ChargeSheetservingList', 0);
+        //    b = a[0];
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, '', 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ChargeSheetservingList', $('#ChargeSheetservingList').val(), 200, 200, '#frmChargeSheetEnquiryNoticeserving', '#ChargeSheetservingList');
+        //    event.preventDefault();
+        //});
+        $('#Remove-ChargeSheetEnquiryNoticeServing-Witness').button().on('click', function (event) {
+
+            //a = $('#WitnessList').P2BGetTableDataonSelectedRow('#WitnessList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#WitnessList').P2BGetTableDataonSelectedRow('#WitnessList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WitnessList', $('#WitnessList').val(), 200, 200, '#frmChargeSheetEnquiryNoticeserving', '#WitnessList');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-ChargeSheetMode-EnquiryNotice').button().on('click', function (event) {
+
+            //a = $('#ChargeSheetservingList').P2BGetTableDataonSelectedRow('#ChargeSheetservingList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#ChargeSheetservingList').P2BGetTableDataonSelectedRow('#ChargeSheetservingList', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ChargeSheetservingList', $('#ChargeSheetservingList').val(), 200, 200, '#frmChargeSheetEnquiryNoticeserving', '#ChargeSheetservingList');
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Remove-ChargeSheetEnquiryNoticeServing-EnquiryNotice').button().on('click', function (event) {
+
+            //a = $('#EnquiryNoticeList').P2BGetTableDataonSelectedRow('#EnquiryNoticeList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#EnquiryNoticeList').P2BGetTableDataonSelectedRow('#EnquiryNoticeList', 0);
+
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EnquiryNoticeList', $('#EnquiryNoticeList').val(), 200, 200, '#frmChargeSheetEnquiryNoticeserving', '#EnquiryNoticeList');
+            event.preventDefault();
+        });
+
+        $('#View').button().on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ChargeSheetEnquiryNoticeServing', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                //$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id,  'View ChargeSheetEnquiryNoticeServing', '#frmChargeSheetEnquiryNoticeserving', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmChargeSheetEnquiryNoticeserving').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('[name="IsChargeSheetRecd"]').val([k.IsChargeSheetRecd]).button().button("refresh");
+                    $('[name="IsClosedServing"]').val([k.IsClosedServing]).button().button("refresh");
+
+                    $('[name="IsWitnessReqd"]').val([k.IsWitnessReqd]).button().button("refresh");
+                    if (k.IsWitnessReqd == false) {
+                        $('#hidew').fadeOut();
+                    }
+                    else {
+                        $('#hidew').fadeIn();
+
+                    }
+                    $('#Narration').val(k.Narration);
+                    $('#ChargeSheetservingList').P2BLookUpEncapsulate('#ChargeSheetservingList', 'ChargeSheetservingList', k.ChargeSheetServingMode_Id, k.ChargeSheetServingModeDetails, 'ChargeSheetservingList', 'view', 'N');
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+                });
+                $.each(data[1], function (i, k) {
+                    console.log(data[1]);
+                    $('#WitnessList').P2BLookUpEncapsulate('#WitnessList', 'WitnessList', k.Witness_Id, k.WitnessFullDetails, 'WitnessList', 'view', 'A');
+                    $('#EnquiryNoticeList').P2BLookUpEncapsulate('#EnquiryNoticeList', 'EnquiryNoticeList', k.EmployeeDoc_Id, k.EmployeeDocFullDetails, 'EnquiryNoticeList', 'view', 'A');
+                });
+            });
+        });
+
+        $('#Edit').click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ChargeSheetEnquiryNoticeServing", '#frmChargeSheetEnquiryNoticeserving', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                //Compulsory for authorisation
+                var val = null;
+                $.each(data[0], function (i, k) {
+                    $('#frmChargeSheetEnquiryNoticeserving').trigger("reset");
+                    var tempIR = localStorage.getItem("getEmpIrIdKey").toString();
+                    $('[name="IsChargeSheetRecd"]').val([k.IsChargeSheetRecd]).button().button("refresh");
+                    $('[name="IsClosedServing"]').val([k.IsClosedServing]).button().button("refresh");
+
+
+                    $('[name="IsWitnessReqd"]').val([k.IsWitnessReqd]).button().button("refresh");
+                    if (k.IsWitnessReqd == false) {
+                        $('#hidew').fadeOut();
+                    }
+                    else {
+                        $('#hidew').fadeIn();
+
+                    }
+                    $('#Narration').val(k.Narration);
+                    $('#ChargeSheetservingList').P2BLookUpEncapsulate('#ChargeSheetservingList', 'ChargeSheetservingList', k.ChargeSheetServingMode_Id, k.ChargeSheetServingModeDetails, 'ChargeSheetservingList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+
+                    $.post("@Url.Action("GetChargeSheetData", "ChargeSheetServing")", { EmpIr: tempIR }, function (data) {
+
+                        if (data != null) {
+                            //alert(data);
+                            $("#chargesheetDetails").val(data);
+                            $('#chargesheetDetails').attr('readonly', 'readonly');
+                            return false;
+                        }
+                    });
+
+                });
+                $.each(data[1], function (i, k) {
+                    console.log(data[1]);
+                    $('#WitnessList').P2BLookUpEncapsulate('#WitnessList', 'WitnessList', k.Witness_Id, k.WitnessFullDetails, 'WitnessList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                    $('#EnquiryNoticeList').P2BLookUpEncapsulate('#EnquiryNoticeList', 'EnquiryNoticeList', k.EmployeeDoc_Id, k.EmployeeDocFullDetails, 'EnquiryNoticeList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            });
+        });
+        $('#Delete').button().click(function () {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#hidew').hide();
+        $('input[name="IsWitnessReqd"]:radio').change(function () {
+
+            if (this.value == "false") {
+
+                $('#hidew').fadeOut();
+            }
+            else {
+                $('#hidew').fadeIn();
+
+            }
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-ChargeSheetEnquiryNoticeServing-ChargeSheetEnquiryNoticeServing').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ChargeSheetEnquiryNoticeServing")', 'Create ChargeSheetServingMode', 'open', '@Url.Action("Create", "ChargeSheetServingMode")', '#frmChargeSheetServingMode', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmChargeSheetEnquiryNoticeserving', '', function (data) {
+                $('#ChargeSheetservingList').P2BLookUpEncapsulate('#ChargeSheetservingList', 'ChargeSheetservingList', data[0], data[1], 'ChargeSheetservingList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Create-ChargeSheetEnquiryNoticeServing-EnquiryNotice').on("click", function (event) {
+
+
+            var a = $('#EmpCode').val();
+
+            $('<div></div>').P2BConfidentialModelDialog({
+                htmlurl: "@Url.Action("partial", "EmployeeDocuments")",
+                submiturl: "@Url.Action("Create", "EmployeeDocuments")?EmpCode=" + a,
+                form: '#frmCandidateDocs',
+                height: "400",
+                type: "FILE",
+                width: "500",
+                title: "DocumentUpload",
+                BeforeSendurl: "true",
+                returnfun: function (data) {
+                    $('#EnquiryNoticeList').P2BLookUpEncapsulate('#EnquiryNoticeList', 'EnquiryNoticeList', data.Id, data.Val, 'EnquiryNoticeList', '', 'A');
+                },
+            });
+
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+    });
+    </SCRIPT>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <title>Index</title>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+               <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmChargeSheetEnquiryNoticeserving", name = "frmChargeSheetEnquiryNoticeservinglist" }))
+        {
+            <div class="row3 content_margine">
+                    <label for="chargesheetDetails" class="popup-content-label must">charge sheet Details</label>
+                <textarea cols="30" id="chargesheetDetails" name="chargesheetDetails" rows="2"></textarea>
+                </div> 
+            
+               <div class=" row3 content_margine">
+        @Html.LabelFor(m => m.ChargeSheetServingMode, "Charge Sheet Serving Mode :", new { @class = "popup-content-label " })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="ChargeSheetservingList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-lookup" id="Lookup-ChargeSheetEnquiryNoticeServing-ChargeSheetServingMode"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ChargeSheetEnquiryNoticeServing " class=" popup-content-icon-create" id="Create-ChargeSheetEnquiryNoticeServing-ChargeSheetEnquiryNoticeServing"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+        @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-remove" id="Remove-ChargeSheetMode-EnquiryNotice"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+              <div class="row3 content_margine">
+        @Html.LabelFor(m => m.IsWitnessReqd, "IsWitnessReqd :", new { @class = "popup-content-label " })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio1" name="IsWitnessReqd" value="true" /> <label class="ui-corner-left" for="radio1">Yes</label>
+                    <input type="radio" id="radio2" name="IsWitnessReqd" value="false" checked="checked" /> <label class="ui-corner-right" for="radio2">No</label>
+                </span>
+            </div>
+        </div>
+    <div id="hidew">
+        <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.Witness, "Witness :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="WitnessList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup corresponding ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-lookup" id="Lookup-ChargeSheetEnquiryNoticeServing-Witness"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Create ChargeSheetServingMode " class=" popup-content-icon-create" id="Create-EnquiryNotice-ChargeSheetServingMode"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Delete ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-remove" id="Remove-ChargeSheetEnquiryNoticeServing-Witness"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    </div>
+            <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsChargeSheetRecd, "Is ChargeSheet Recd :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio3" name="IsChargeSheetRecd" value="true" /><label class="ui-corner-left" for="radio3">Yes</label>
+                    <input type="radio" id="radio4" name="IsChargeSheetRecd" value="false" checked="checked" /><label class="ui-corner-right" for="radio4">No</label>
+                </span>
+            </div>
+        </div>
+            <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsClosedServing, "Is Closed Serving :", new { @class = "popup-content-label must" })
+            <div class="popup_radio_button radio_button_div_1">
+                <span class="popup_radio_button radio_button_div_1">
+                    <input type="radio" id="radio5" name="IsClosedServing" value="true" /><label class="ui-corner-left" for="radio5">Yes</label>
+                    <input type="radio" id="radio6" name="IsClosedServing" value="false" checked="checked" /><label class="ui-corner-right" for="radio6">No</label>
+                </span>
+            </div>
+        </div>
+           
+            <div class=" row3 content_margine">
+                        @Html.LabelFor(m => m.EnquiryNotice, "Supplementory documents :", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="EnquiryNoticeList">
+                            <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Lookup corresponding ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-lookup" id="Lookup-ChargeSheetEnquiryNoticeServing-EnquiryNotice"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create ChargeSheetEnquiryNoticeServing " class=" popup-content-icon-create" id="Create-ChargeSheetEnquiryNoticeServing-EnquiryNotice"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                         @*<button data-p2btooltip="Edit corresponding Contact Details" class=" popup-content-icon-edit" id="Edit-CorrsContactDetails-Employee"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                        <button data-p2btooltip="Delete ChargeSheetEnquiryNoticeServing" class=" popup-content-icon-remove" id="Remove-ChargeSheetEnquiryNoticeServing-EnquiryNotice"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+             
+              <div class=" row3 content_margine">
+                        @Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })
+            </div>
+        }
+        </div>
+</body>
+</html>

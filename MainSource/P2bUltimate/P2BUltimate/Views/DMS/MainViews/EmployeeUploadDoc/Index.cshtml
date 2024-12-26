@@ -1,0 +1,756 @@
+﻿@{
+    ViewBag.Title = "Employee Document";
+}
+@model  P2BUltimate.Models.FileModel
+
+<html>
+
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 115px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 151px;
+        }
+
+        .popup-content-labelT {
+            display: block;
+            float: left;
+            width: 120px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 627px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .date-picker {
+            z-index: 999;
+        }
+
+        .employeeselectiondiv {
+            float: left;
+        }
+
+        .addons {
+            height: 246px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .section_Method1 {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            height: 755px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 867px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 859px;
+            width: 581px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+    </style>
+</head>
+
+<script>
+        $(document).ready(function (e) {
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            // $('#ToDate').datepicker({ dateFormat: 'dd/mm/yy' });
+            //  $("#FromDate").datepicker({ dateFormat: 'dd/mm/yy' });
+            $('#FromDate').P2BDatePicker();
+            $('#ToDate').P2BDatePicker();
+            $('#ResumeDate').P2BDatePicker();
+            $('#ReqDate').P2BDatePicker();
+            $('#Create_Dialog').P2BCreateDialog();
+            @*$('#EmpLvnereq_Id').val("@Request.RequestContext.HttpContext.Session["TempEmpId"]");*@
+            $('button').button();
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+
+            $.fn.P2BSelectMenuAppendP = function (url1, forwardata1, forwardata21, drop21) {
+                //   ////debugger;
+                var init = jQuery(this);
+                var w = $(init).css('width');
+                var htm = '<option style=' + w + ' value=0 selected=false>-Select-</option>';
+                jQuery(init).empty().append(htm).selectmenu().selectmenu("refresh");
+                $.post(url1, { data: forwardata1, data2: forwardata21 }, function (data) {
+                    $.each(data, function (i, k) {
+                        console.log(i);
+                        console.log('------------------------------------');
+                        console.log(k);
+                        if (k.Text == "FULLSESSION") {
+                            jQuery(init).append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: true
+                            }));
+                        }
+                        else {
+                            jQuery(init).append($('<option>', {
+                                value: k.Value,
+                                text: k.Text,
+                                selected: k.Selected
+                            }));
+                        }
+                    });
+                    jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+                });
+                // $("<span class='DropdownCode'>" + forwardata + "</span>").insertAfter(init);
+                // jQuery(drop21).empty().append(htm).selectmenu().selectmenu("refresh");
+            };
+
+            $('#Calendar_DDL').P2BSelectMenuAppend('@Url.Action("Polulate_LeaveCalendar", "LvOpenBal")', "", ""); // To bind dropdown on page load
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Advance-Filter-Symbol').on('click', function (e) {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                e.preventDefault();
+            });
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $.FormReset('#frmEmpUploadDoc');
+                //$.LoadEmpByDefault(true);
+                $.LoadEmpByDefaultWOGeoId(true, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Upload Employee Document', 'open', '@Url.Action("Create")', '#frmEmpUploadDoc', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+                $('#FuncModulelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 601, ""); 
+                event.preventDefault();
+            });
+            $('#FuncModulelist').on('selectmenuopen', function () {
+                var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+                if (a == null || a.length == 0) {
+                    alert('Select Employee...');
+                }
+            });
+           
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+
+
+
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('.popup_radio_button').controlgroup();
+            $('#FuncModulelist,#DocTypelist,#SubDocTypelist').selectmenu().selectmenu("menuWidget");
+           
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+            $('#FuncModulelist').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "EmployeeDMS_Doc")", '#DocTypelist', "");
+            $('#DocTypelist').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "EmployeeUploadDoc")", '#SubDocTypelist', "");
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "LvNewReq")",
+                htmurl: "@Url.Action("GridPartial", "LvNewReq")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["LvHead", "ReqDate", "FromDate", "ToDate", "TotalDays", "Reason", "IsCancel", "DebitDays", "CreditDays", "FromStat", "ToStat", "Status", "LvyrFrom", "Incharge", "Id"],
+                childurl: "@Url.Action("Get_LvNewReq", "LvNewReq")",
+                tableheader: "Leave Requisition",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvNewReqGridPartial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData","lvnewreq")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                $('#Grid-ReqDate').val(k.ReqDate);
+                                $('#Grid-FromDate').val(k.FromDate);
+                                $('#Grid-ToDate').val(k.ToDate);
+                                $('#Grid-TotalDays').val(k.TotalDays);
+                                $('#Grid-Reason').val(k.Reason);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: "@Url.Action("GridPartial", "LoanAdvRepaymentT")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "LoanAdvRepaymentT")",
+                        submiturl: "@Url.Action("GridEditsave", "LoanAdvRepaymentT")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                //console.log(k.MonthlyInstallmentAmount);
+                                $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                                //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('fa fa-upload')) {
+                    var chk = $($(init)).closest('tr');
+                    //  var SubId = $(chk).find('td:eq(6)').html();
+                    var testnew = $('<div></div>').P2BConfidentialModelDialog({
+                        htmlurl: "@Url.Action("UploadLeaveCertificate", "LvNewReq")",
+                        submiturl: "@Url.Action("LeaveCertificateUpload", "LvNewReq")?Id=" + id,
+                        form: '#FormUploadInvestment',
+                        height: "500",
+                        type: "FILE",
+                        width: "800",
+                        title: "DocumentUpload",
+                        BeforeSendurl: "@Url.Action("CheckLeveCertificateUpload", "LvNewReq")?Id=" + id,
+                        returnfun: function (data) {
+                            //  window.location.href = "" + data + "";
+                        },
+                    });
+                }
+                else if ($(init).hasClass('ui-icon-image')) {
+                    ////debugger;
+                    var chk = $($(init)).closest('tr');
+                    // var SubId = $(chk).find('td:eq(6)').html();
+                    $.post("@Url.Action("CheckUploadLeaveFile", "LvNewReq")?Id=" + id, function (data) {
+                        ////debugger;
+                        if (data.success == false) {
+
+                            alert("File Not Found");
+                            return false;
+                        } else if (data.fileextension == ".pdf") {
+                            window.location = "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id;
+                        }
+                        else {
+                            $('<div></div>').PartialCreateDialog({
+                                height: '500',
+                                width: '500',
+                                form: "#FormImageViewer",
+                                htmlurl: "@Url.Action("Imageviewr", "Upload")",
+                                state: "open",
+                                mode: "View",
+                                editurl: "@Url.Action("GetLeaveImage", "LvNewReq")?Id=" + id,
+                                editdata: id,
+                                forwarddata: id,
+                                returndatafunction: function (data) {
+                                    ////debugger;
+                                    console.log(data);
+                                    if (data.status == "pdf") {
+                                        $("#PDFLoad").attr('src', "data:application/pdf;base64," + data.data + "");
+                                    }
+                                    else if (data.status == ".png") {
+                                        $("#Dashboard-Investment-Viewer").attr('src', "data:image/png;base64," + data.data + "");
+                                    } else if (data.status == ".jpg") {
+                                        $("#Dashboard-Investment-Viewer").attr('src', "data:image/jpg;base64," + data.data + "");
+                                    } else {
+                                        alert("First Upload the File");
+                                    }
+                                }
+                            });
+                        }
+                    })
+
+                }
+            };
+
+            //$('#ToDate').on('change', function () {
+
+            //    var from = $("#ToDate").val().split("/");
+            //    // alert(from);
+            //    var convertedStartDate = new Date(from[2], from[1] - 1, from[0]);
+            //    // alert(convertedStartDate);
+            //    var newdate = new Date(convertedStartDate);
+
+            //    newdate.setDate(newdate.getDate() + 1);
+            //    // alert(newdate);
+            //    var dd = newdate.getDate();
+            //    // alert("date" + dd);
+            //    var mm = newdate.getMonth() + 1;
+            //    var yyyy = newdate.getFullYear();
+            //    if (dd < 10) {
+            //        dd = '0' + dd;
+            //    }
+
+            //    if (mm < 10) {
+            //        mm = '0' + mm;
+            //    }
+            //    today = dd + '/' + mm + '/' + yyyy;
+            //    document.getElementById("ResumeDate").value = today;
+
+            //});
+
+            function ajaxloaderv2(cameform) {
+                $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+            };
+           
+            $('#Btn-Upload-Data').on('click', function (e) {
+                ////debugger;
+                $('<div></div>').PartialCreateDialog({
+                    height: '500',
+                    width: '700',
+                    form: '#frmlookup',
+                    title: 'Upload',
+                    htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                    state: "open",
+                    mode: 'edit',
+                    editurl: null,
+                    submiturl: null,
+                    editdata: 'a',
+                    forwarddata: 'a',
+                    returndatafunction: function (data) {
+                        console.log(data);
+                    },
+                    submitfun: function (data) {
+                        console.log(data);
+                    }
+                });
+
+                e.preventDefault();
+            });
+
+            $('#filepathid').attr('disabled', 'disabled');
+            $('#FileDownload_idUser').hide();
+           
+
+            $('#Download_btnUser').button().on("click", function (event) {
+                ////debugger;
+                var filepath = $('#filepathiduser').val();
+                if (filepath != null) {
+                    $.post("@Url.Action("Filename", "ELMS")?filepath=" + filepath, function (data) {
+                        if (data != null && data != "") {
+                            window.location = '@Url.Action("GetCompImage", "ELMS")?filepath=' + data.data;
+                        }
+                        else {
+                            alert("Data Null");
+                        }
+                    })
+                }
+                event.preventDefault();
+            });
+            var imagesPreview = function (input, placeToInsertImagePreview) {
+                ////debugger;
+                if (input.files) {
+                    var filesAmount = input.files.length;
+                    $(placeToInsertImagePreview).empty();
+                    for (i = 0; i < filesAmount; i++) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (event) {
+                            $($.parseHTML('<img class="imgdata">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                        }
+
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+
+            };
+
+            @*var url = '@Url.Action("DisplaySearchResults", "EmployeeUploadDoc")';
+            $('#Upload_btnUser').click(function () {
+                var keyWord = $('#Keyword').val();
+                $('#container2').load(url, { searchText: keyWord });
+            });*@
+
+            // Loaded via <script> tag, create shortcut to access PDF.js exports.
+            //var pdfjsLib = window['pdfjs-dist/build/pdf'];
+            //$("#files").on("change", function (e) {
+            //    ////debugger;
+            //    var file = e.target.files[0]
+            //    var filesize = e.target.files[0].size;
+            //    var maxfilesize = 500000;//500kb
+            //    if (filesize <= maxfilesize) {
+            //        if (file.type == "application/pdf") {
+            //            $('#container2').empty();
+            //            $("#user_investment").hide();
+            //            $("#pdfViewer").show();
+            //            var fileReader = new FileReader();
+            //            fileReader.onload = function () {
+            //                var pdfData = new Uint8Array(this.result);
+            //                // Using DocumentInitParameters object to load binary data.
+            //                var loadingTask = pdfjsLib.getDocument({ data: pdfData });
+            //                loadingTask.promise.then(function (pdf) {
+            //                    console.log('PDF loaded');
+
+            //                    // Fetch the first page
+            //                    // var pageNumber = 1;
+            //                    //var container = document.getElementById("container")
+            //                    for (var i = 1; i <= pdf.numPages; i++) {
+            //                        pdf.getPage(i).then(function (page) {
+            //                            console.log('Page loaded');
+
+            //                            var scale = 1.5;
+            //                            var viewport = page.getViewport({ scale: scale });
+
+            //                            var div = document.createElement("div");
+
+            //                            // Set id attribute with page-#{pdf_page_number} format
+            //                            div.setAttribute("id", "page-" + (page.pageIndex + 1));
+
+            //                            // This will keep positions of child elements as per our needs
+            //                            div.setAttribute("style", "position: relative");
+            //                            div.setAttribute("class", "form-group content_margine");
+
+            //                            // Append div within div#Container
+            //                            container2.appendChild(div);
+
+            //                            // Create a new Canvas element
+            //                            var canvas = document.createElement("canvas");
+
+            //                            // Append Canvas within div#page-#{pdf_page_number}
+            //                            div.appendChild(canvas);
+
+            //                            var context = canvas.getContext('2d');
+            //                            canvas.height = viewport.height;
+            //                            canvas.width = viewport.width;
+
+            //                            var renderContext = {
+            //                                canvasContext: context,
+            //                                viewport: viewport
+            //                            };
+
+            //                            // Render PDF page
+            //                            var renderTask = page.render(renderContext);
+            //                            renderTask.promise.then(function () {
+            //                                console.log('Page rendered');
+            //                            });
+            //                        });
+            //                    }
+            //                }, function (reason) {
+            //                    // PDF loading error
+            //                    console.error(reason);
+            //                });
+            //            };
+            //            fileReader.readAsArrayBuffer(file);
+            //        } if (file.type == "image/jpeg" || file.type == "image/png") {
+            //            $('#container2').empty();
+            //            $("#user_investment").show();
+            //            $("#pdfViewer").hide();
+            //            imagesPreview(this, '#user_investment')
+            //        }
+            //        // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('enable');
+            //        $('#Upload_btnUser').button('enable');
+            //    } else {
+            //        alert("File Size Should Not Be Grater than 500kb");
+            //        $('#Upload_btnUser').button('disable');
+            //        // $('.ui-dialog-buttonpane').find('button:contains("Submit")').button('disable');
+            //    }
+            //});
+
+            $('#filepathid').attr('disabled', 'disabled');
+            //$('#FileDownload_idUser').hide();
+            $('#Upload_btnUser').button().on("click", function (event) {
+                
+                var vidFileLength = $("#files")[0].files.length;
+                if (vidFileLength === 0) {
+                    alert("No file selected.");
+                    return false;
+                }
+
+                var form = $("#frmEmpUploadDoc").serialize();
+                var tempExcel = new FormData($("#frmEmpUploadDoc")[0]);
+                $.post({
+                    url: "@Url.Action("FileUpload", "EmployeeUploadDoc")",
+                    data: tempExcel,
+                    datatype: "json",
+                    method: "POST",
+                    data: tempExcel,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            alert("File Upload Successfully");
+                            //jQuery('.ui-dialog').remove();
+                            $('#FileDownload_idUser').hide();
+                            return false;
+                        }
+                        else {
+                            alert(data.responseText);
+                        }
+                    },
+                    complete: function (data) {
+                        //$('#lblloader').hide();
+                    }
+                });
+                event.preventDefault();
+            });
+        });
+</script>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Create_Dialog" title="Create Employee Document">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpUploadDoc", name = "frmEmpUploadDoc" }))
+        {
+         <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+            </div>
+
+    <div class="section1_Leave">
+        <div class="section_Method1">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+            <div class="section2_Leave">
+                <div class="row3 content_margine"><label class="popup-content-label must">Functional Package:</label><select id="FuncModulelist" name="FuncModulelist" class="must" style="width:161px;"><option></option></select></div>
+                <div class="row3 content_margine"><label class="popup-content-label must">Document Type:</label><select id="DocTypelist" name="DocTypelist" class="must" style="width:161px;"><option></option></select></div>
+                <div class="row3 content_margine"><label class="popup-content-label">SubDocument Type :</label><select id="SubDocTypelist" name="SubDocTypelist" class="must" style="width:161px;"><option></option></select></div>
+                <div class="form-horizontal" id="Upload_Div">
+                    <div class="form-group content_margine" id="FileBrowes_id">
+                        @Html.LabelFor(model => model.files, htmlAttributes: new { @class = "control-label popup-content-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.files, "", new { @type = "file", @multiple = "multiple" }) <button id="Upload_btnUser" name="Upload_btnUser">Upload</button>
+                        </div>
+                    </div>
+
+                    @*<div id="container2">
+
+                    </div>*@
+                    <div style="height:100%;width:100%;overflow:auto;" id="user_investment" class="content_margine"></div>
+                    
+                    <div id="container2" class="container2">
+                        @{Html.RenderPartial("~/Controls/PDFViewer.ascx",
+                        new P2BUltimate.Controls.PDFViewer { AnnotationImageSource = "~/D://Rptpayslip.pdf" });}
+                    </div>
+                </div>
+            </div>
+          
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,302 @@
+﻿@{
+    ViewBag.title = "GeoStructure Wise Head Maping";
+}
+<script>
+    $(function () {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['Id', 'EffectiveDate', 'EndDate'];
+        ColNames = ['Id', 'EffectiveDate', 'EndDate'];
+        SortName = 'Id';
+        Caption = 'GeoStructure Wise Head Maping';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Lookup-HolidayMaster-Company').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsHolliday", "Location")', '', 'LookupDiv', 'Holliday Look Up Data', '#HolidayMasterlist', 'HolidayMasterlist', 5, 'HolidayMasterlist', '#frmTemp', 'N', '#Edit-HOCalendar-Location,#Remove-HOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-WeaklyoffMaster-Company').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsWOCalendar", "Location")', '', 'LookupDiv', 'WOCalendar Look Up Data', '#WeaklyoffMasterlist', 'WeaklyoffMasterlist', 5, 'WeaklyoffMasterlist', '#frmTemp', 'N', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-InCharge-Company').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsIncharge", "GeostructureWiseHeadMaping")', '', 'LookupDiv', 'WOCalendar Look Up Data', '#InChargelist', 'InChargelist', 5, 'InChargelist', '#frmTemp', 'N', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Create').on("click", function (event) {
+            $('#frmTemp').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create GeoStructure Wise Head Maping', 'open', '@Url.Action("Create")', '#frmTemp', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '#EmployeeLvStructDetailslist', "", function (data) { });
+           // $('input[name="ExcludeLeaves"]').val(["c"]).button().button("refresh");
+            event.preventDefault();
+        });
+        
+        $.get("@Url.Action("GetStruc", "GeostructureWiseHeadMaping")", function (data) {
+            $.each(data.data, function (i, k) {
+                $('#div3').append($("<a class='struc_link' href='#' data-type=" + k + ">" + k + "</a>").on('click', function (e) {
+                    var type = $(e.target).attr('data-type');
+                      console.log(type);
+                      $('#type').val(type);
+                      $('#corporate-table').remove("tr");
+                    $('#corporate-table').P2BTransactionTable('#corporate-search', '#case-corporate', '@Url.Action("Get_Data", "GeostructureWiseHeadMaping")', [type]);
+                    e.preventDefault();
+                }));
+            });
+
+        });
+        var TranscationTableCheckboxCount = function (table) {
+            return [$(table).find('input:checkbox:gt(0):checked').length, $(table).find('input:checkbox:gt(0):checked').val()];
+        };
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Obj_drop').on('selectmenuchange', function (e) {
+
+            var b = TranscationTableCheckboxCount("#corporate-table");
+            console.log(b);
+            if (b[0] == 0) {
+                alert("select Atleast one record");
+                return false;
+            }
+            var aa = $(this).val();
+           // alert(aa);
+            if (aa != 0) {
+                $("#" + aa + "-div").show();
+                $('.Lookup-div').not("#" + aa + "-div").hide();
+            }
+            console.log($('input[name="ExcludeLeaves"]:checked').val());
+            if ($('input[name="ExcludeLeaves"]:checked').val() == "e") {
+               
+                var vtype = $('#type').val();
+            
+                if (b[0] > 1) {
+                    alert("Select Only One Record");
+                    return false;
+                }
+                if ($(this).val() == "HolidayMaster") {
+                    $.get("@Url.Action("GetHolidayMaster", "GeostructureWiseHeadMaping")", { data: b[1],type:vtype }, function (data) {
+                        $.each(data.data, function (i, k) {
+
+                            $('#HolidayMasterlist').P2BLookUpEncapsulate('#HolidayMasterlist', 'HolidayMasterlist', k.id, k.val, 'HolidayMasterlist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                        });
+                    });
+                } else if ($(this).val() == "WeaklyoffMaster") {
+                 
+                    $.get("@Url.Action("GetWeaklyoffMaster", "GeostructureWiseHeadMaping")", { data: b[1], type: vtype }, function (data) {
+                        $.each(data.data, function (i, k) {
+
+                            $('#WeaklyoffMasterlist').P2BLookUpEncapsulate('#WeaklyoffMasterlist', 'WeaklyoffMasterlist', k.id, k.val, 'WeaklyoffMasterlist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                        });
+                    });
+                } else if ($(this).val() == "InCharge") {
+                    $.get("@Url.Action("GetInCharge", "GeostructureWiseHeadMaping")", { data: b[1], type: vtype }, function (data) {
+                        $.each(data.data, function (i, k) {
+
+                            $('#InChargelist').P2BLookUpEncapsulate('#InChargelist', 'InChargelist', k.id, k.val, 'InChargelist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+                        });
+                    });
+                }
+            }
+        });
+        $('.popup_radio_button').controlgroup();
+        //   $('input[type="radio"]').val([false]).button().button("refresh");
+
+    });
+</script>
+<style>
+    .Lookup-div {
+        display: none;
+    }
+
+    .struc_link {
+        padding: 2px;
+    }
+
+        .struc_link:hover {
+            color: #00897B;
+            text-decoration-line: underline;
+        }
+
+    .popup-content-icon-create {
+        display: block;
+    }
+
+    .transcation_btn {
+        width: 21px;
+        height: 21px;
+    }
+
+    .StrctSelectionClass {
+        float: left;
+    }
+
+    .grid_colllpase_height {
+        height: 43px;
+    }
+
+    .transactiondiv {
+        height: 289px;
+        float: left;
+    }
+
+    .section1, .section6 {
+        border: 0.1px solid gray;
+        padding: 3px;
+        margin: 2px;
+    }
+
+    .section2 {
+    }
+
+    .section3, .section4 {
+        float: left;
+        padding: 2px;
+    }
+
+    .icon-row {
+        position: relative;
+        top: -150px;
+        left: -41px;
+    }
+
+    .Heading_sec {
+        background-color: gainsboro;
+        padding: 3px;
+    }
+
+    #div3 {
+        padding: 5px;
+    }
+</style>
+<div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>*@
+                <div id="Grid_Form" hidden="true">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+        </div>
+    </div>
+    <div id="Create_Dialog">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTemp", name = "frmTemp" }))
+        {
+            <div class="section1">
+                <div class="Heading_sec">Select Action..?</div>
+                <div class="row4">
+                    <label class="popup-content-label">Mode :</label>
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ExcludeLeaves_radio1" name="ExcludeLeaves" value="c" /><label for="ExcludeLeaves_radio1">Create</label>
+                        <input type="radio" id="ExcludeLeaves_radio2" name="ExcludeLeaves" value="e" /><label for="ExcludeLeaves_radio2">Edit</label>
+                    </div>
+                </div>
+
+            </div>
+            @*<input type="radio" name="action" id="c" checked /><label for="c">Create</label>
+                <input type="radio" name="action" id="e" /><label for="e">Edit</label>*@
+            <div class="section1">
+                <div class="Heading_sec">Select GeoGraphical Structure ..!</div>
+                <div id="div3"></div>
+            </div>
+            <input hidden name="type" id="type" />
+            <div class="">
+                <div class="section2">
+                    <div class="transactiondiv">
+                        <div><label>Search : </label><input type="text" id="corporate-search" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontable" id="corporate-table">
+                            <tr><th><input type="checkbox" id="case-corporate" /></th><th>Data</th></tr>
+                        </table>
+                        <span class="btn-span" aria-hidden="true">
+                            @*<a data-p2bheadertooltip="Collapse">
+                                    <i class="fa fa-angle-double-down fa-fw fa-2x"></i>
+                                </a>*@
+                            <button class="transcation_btn transcation-refresh" data-type="corporate" id="">
+                                <span class="ui-icon ui-icon-refresh popup-content-iconmark"></span>
+                            </button>
+                            @*<button class="transcation_btn transcation-lookup" data-type="corporate" style="left: 15%;" id="">
+                                    <span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span>
+                                </button>*@
+                            @*<button id="load-region" class="loan-btn">Load Region</button>*@
+                        </span>
+                    </div>
+                </div>
+                <div class="section3">
+                    <label class="popup-content-label">Object :</label>
+                    <select id="Obj_drop" name="Obj_drop" class="drop" style="width:200px;">
+                        <option value="0">-Select-</option>
+                        <option value="HolidayMaster">HolidayMaster</option>
+                        <option value="WeaklyoffMaster">WeaklyoffMaster</option>
+                        <option value="InCharge">InCharge</option>
+                    </select>
+                </div>
+                <div class="section4">
+                    <div id="HolidayMaster-div" class="Lookup-div content_margine">
+                        <label class="popup-content-lable">HolidayMaster :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="HolidayMasterlist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup HolidayMaster" class="  popup-content-icon-lookup" id="Lookup-HolidayMaster-Company"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create HolidayMaster" class="popup-content-icon-create" id="Create-HolidayMaster-Company"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                            @*<button data-p2btooltip="Edit HolidayMaster" class="popup-content-icon-edit" id="Edit-HolidayMaster-Company"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove HolidayMaster" class="popup-content-icon-remove" id="Remove-HolidayMaster-Company"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div id="WeaklyoffMaster-div" class="Lookup-div content_margine">
+                        <label class="popup-content-lable">WeaklyoffMaster :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="WeaklyoffMasterlist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup WeaklyoffMaster" class="  popup-content-icon-lookup" id="Lookup-WeaklyoffMaster-Company"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @* <button data-p2btooltip="Create WeaklyoffMaster" class="popup-content-icon-create" id="Create-WeaklyoffMaster-Company"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                            @*   <button data-p2btooltip="Edit WeaklyoffMaster" class="popup-content-icon-edit" id="Edit-WeaklyoffMaster-Company"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove WeaklyoffMaster" class="popup-content-icon-remove" id="Remove-WeaklyoffMaster-Company"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div id="InCharge-div" class="Lookup-div content_margine">
+                        <label class="popup-content-lable">InCharge :</label>
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="InChargelist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup InCharge" class="  popup-content-icon-lookup" id="Lookup-InCharge-Company"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create InCharge" class="popup-content-icon-create" id="Create-InCharge-Company"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                            @*  <button data-p2btooltip="Edit InCharge" class="popup-content-icon-edit" id="Edit-InCharge-Company"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove InCharge" class="popup-content-icon-remove" id="Remove-InCharge-Company"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>

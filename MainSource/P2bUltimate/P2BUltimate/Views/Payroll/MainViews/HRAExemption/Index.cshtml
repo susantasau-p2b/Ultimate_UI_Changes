@@ -1,0 +1,789 @@
+﻿@{
+    ViewBag.Title = "HRA Exemption";
+}
+@model Payroll.HRATransT
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    #Lookup_FinancialYear_Calendar {
+        left: 46%;
+        top: 4.5%;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 859px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+
+<head>
+
+    <title></title>
+
+    <script>
+        $(document).ready(function (e) {
+            var dia;
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+
+            $('#Create_Dialog').P2BCreateDialog();
+
+            $('button').button();
+
+
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#LvNewReqGridPartial",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData","lvnewreq")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                $('#Grid-ReqDate').val(k.ReqDate);
+                                $('#Grid-FromDate').val(k.FromDate);
+                                $('#Grid-ToDate').val(k.ToDate);
+
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } 
+
+                else if ($(init).hasClass('ui-icon-pencil')) {
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#frmHRAExemptionGridPartial",
+                        htmlurl: "@Url.Action("GridPartial", "HRAExemption")",
+                        state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "HRAExemption")",
+                    submiturl: "@Url.Action("GridEditsave", "HRAExemption")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        ////debugger;
+                        console.log(data);
+                        
+                        
+                        $.each(data, function (i, k) {
+                            $('#Financialyear-edit').val(data[0].Financialyear);
+                       
+                            $('#City-edit').val(data[0].City);
+                            
+                        });
+                        $.each(data[1], function (i, k) {
+                            $('#Rent_ListPartial-edit').P2BLookUpEncapsulate('#Rent_ListPartial-edit', 'Rent_ListPartial-edit', k.Rentid, k.RentFulldetails, 'Rent_ListPartial-edit', '#Edit-Rent-HRAExemptionPartial,#Remove-Rent-HRAExemptionPartial', 'A');
+                        });
+                     
+                       
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+                else if ($(init).hasClass('ui-icon-trash')) {
+                    //return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+
+            $.fn.P2BSelectMenuAppendP = function (url1, forwardata1, forwardata21, drop21) {
+                //   ////debugger;
+                var init = jQuery(this);
+                var w = $(init).css('width');
+                var htm = '<option style=' + w + ' value=0 selected=false>-Select-</option>';
+                jQuery(init).empty().append(htm).selectmenu().selectmenu("refresh");
+                $.post(url1, { data: forwardata1, data2: forwardata21 }, function (data) {
+                    $.each(data, function (i, k) {
+                        console.log(i);
+                        console.log('------------------------------------');
+                        console.log(k);
+
+                    });
+                    jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+                });
+                // $("<span class='DropdownCode'>" + forwardata + "</span>").insertAfter(init);
+                // jQuery(drop21).empty().append(htm).selectmenu().selectmenu("refresh");
+            };
+
+            $('#Calendar_DDL').P2BSelectMenuAppend('@Url.Action("getCalendar", "HRAExemption")', "", ""); // To bind dropdown on page load
+
+
+            $('#Lookup_FinancialYear_Calendar').on('click', function () {
+                $('.dialog').AddDataToTextbox({
+                    appendTo: "#dispcalender",
+                    appendToId: "#Financial_id",
+                    lookupurl: "@Url.Action("GetCalendarDetails", "HRAExemption")",
+                    NoOfRecordToShow: "10",
+                    setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                    LookupDiv: "LookupDiv",
+                    lookuppagename: "lookup",
+                    pagename: "PageNavPosition",
+                    readonly: true,
+                });
+            });
+
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+            });
+            //Create Function
+            $('#Create').on("click", function (event) {
+                $.FormReset('#frmHRAExemption');
+                $.LoadEmpByDefault(true);
+
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create HRA Exemption', 'open', '@Url.Action("Create")', '#frmHRAExemption', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) {}, { datatablename: "#MyTable" });
+
+                $('#dispcalender').attr('readonly', 'readonly');
+                $('#EmpCity').attr('readonly', 'readonly');
+                event.preventDefault();
+            });
+
+            $('#Edit').on('click', function () {
+                //  AssignData();
+                //$.LoadEmpByDefault();
+                $('#frmHRAExemption').trigger("reset");
+                var b = localStorage.getItem('MyTable_selected');
+                var a = JSON.parse(b);
+                //data('datatable_selectedrow');
+                $('#section_emp').fadeOut();
+                $('#filterEmp').fadeOut();
+
+                console.log(a.Id);
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Employee Data ->" + JSON.stringify(a) + "", '#frmHRAExemption', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 546, 1113, '', '#Edit-Rent-HRAExemption,#Remove-Rent-HRAExemption,#View-Rent-HRAExemption', function (data) {
+                    var selected = data[3];
+
+                    console.log(data[0]);
+                    $.each(data[0], function (i, k) {
+
+                        console.log(k.FyCalendarFullDetails);
+                        $('#dispcalender').val(k.FyCalendarFullDetails);
+                        $('#EmpCity').val(k.CityFullDetails);
+                        $('#EmpCity').attr('readonly', 'readonly');
+
+                    });
+                    $.each(data[2], function (i, k) {
+
+                        $('#dispcalender').val(k.FyCalendarFullDetails);
+                        $('#dispcalender').attr('readonly', 'readonly');
+
+                    });
+
+                    $.each(data[1], function (i, k) {
+                        $('#Rent_List').P2BLookUpEncapsulate('#Rent_List', 'Rent_List', k.Rentid, k.RentFulldetails, 'Rent_List', '#Edit-Rent-HRAExemption,#Remove-Rent-HRAExemption', 'N');
+                    });
+
+
+                }, { datatablename: "#MyTable" });
+            });
+
+
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#MyTable').DataTable({
+                            "ajax": {
+                                "url": "@Url.Action("Emp_Grid", "LoanAdvRepaymentT")",
+                                "type": "post",
+                                "data": forwarddata,
+                            }
+                        }).load();
+                    },
+                    renderat: "#FormFilter",
+                });
+            });
+
+            $('#lblloader').hide();
+
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+
+            $('#Lookup_FinancialYear').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "HRAExemption")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmHRAExemption', 'N', '#remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            //partial page delete
+
+            $('#Lookup-Rent-HRAExemption').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetLookupRent", "HRAExemption")', '', 'LookupDiv', 'Rent Look Up Data', '#Rent_List', 'Rent_List', 5, 'Rent_List', '#frmHRAExemption', 'A', '#Remove-Rent-HRAExemption', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+
+            //////create partial
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('#Create-Rent-HRAExemption').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "HRAExemption")', 'Create Rent', 'open', '@Url.Action("CreateSave", "Rent")', '#frmRent', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmHRAExemption', '', function (data) {
+                    // to show data which is created in partial page
+
+                    $('#Rent_List').P2BLookUpEncapsulate('#Rent_List', 'Rent_List', data[0], data[1], 'Rent_List', '#Edit-Rent-HRAExemption,#Remove-Rent-HRAExemption', 'A');
+                   
+                });
+                event.preventDefault();
+            });
+
+            ////end
+
+            $('#Edit-Rent-HRAExemption').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#Rent_List').P2BGetTableDataonSelectedRow('#Rent_List', 0);
+                b = a[0];
+                console.log(b);
+                event.preventDefault();
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "HRAExemption")', '@Url.Action("Edit", "Rent")', b, '@Url.Action("EditSave", "Rent")', 'Edit Rent Numbers', '#frmRent', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmHRAExemption', '#Rent_List', 'Rent_List', 'Rent_List', 'A', '#Edit-Rent-HRAExemption,#Remove-Rent-HRAExemption', function (data) {
+
+                    $.each(data, function (i, k) {
+                        $('#frmRent').trigger('reset');
+                        $('#RentFromDate').val(k.RentFromDate);
+                        $('#RentToDate').val(k.RentToDate);
+                        $('#RentAmt').val(k.RentAmount);
+                    });
+                });
+
+            });
+
+            $('#Remove-Rent-HRAExemption').button().on('click', function (event) {
+                var a = [], b;
+                a = $('#Rent_List').P2BGetTableDataonSelectedRow('#Rent_List', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Rent_List', $('#Rent_List').val(), 200, 200, '#frmHRAExemption', '#Rent_List', '#Remove-Rent-HRAExemption');
+                event.preventDefault();
+            });
+
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+
+            $('.popup_radio_button').controlgroup();
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "LvNewReq")",
+                htmurl: "@Url.Action("GridPartial", "LvNewReq")",
+                columnname: ["Id", "Code", "Name"],
+                childheader: ["Id", "MonRentPaid", "TaxableHRA", "ExemptedHRA", "HRA1", "HRA2", "HRA3", "AHRA", "ABasic", "ASalary", "City_Id", "Financialyear_Id"],
+                childurl: "@Url.Action("Get_HRAExemption", "HRAExemption")",
+                tableheader: "HRA Exemption"
+            });
+
+
+            $('#Employee-Table').OnClickFormReset('#frmHRAExemption', '#Emp', function () {
+                $('#Emp').val();
+
+                //alert($("#Emp").val());
+                var Id = $("#Emp").val();
+                $.ajax({
+                    method: "POST",
+                    url: "@Url.Action("getCity")",
+                    data: { forwardata: Id },
+                    success: function (data) {
+                        $('#EmpCity').val(data.Citydesc);
+                    },
+                });
+
+
+                $.get("@Url.Action("getCalendar","HRAExemption")", function (data) {
+                    $('#dispcalender').val(data.Lvcalendardesc);
+                });
+            });
+
+        });
+    </script>
+
+    <style>
+        #lvdata {
+            float: right;
+            width: 52%;
+        }
+
+        #brandata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 805px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 57px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 810px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                        <label id="LabelCalendar" class="emplist_label">Calendar:</label>
+                        <select id="Calendar_DDL" name="Calendar_DDL" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                    </div>*@
+                @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>
+
+                @*<button class="button" id="Edit">Edit</button>*@
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>ID</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+        <div class="filter-div" id="filterEmp">
+            <label class="advance_filter_label">
+                Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                </span>
+            </label>
+            <div id="FormFilter"></div>
+        </div>
+
+        <div class="section1_Leave" id="section_emp">
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div>
+                        <label>Search:</label>
+                        <input type="text" id="Employee-Search" style="width: 425px;" />
+                    </div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                        <tr>
+                            <th><input type="checkbox" id="Case-Employee" /></th>
+                            <th>Employee</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmHRAExemption", name = "frmHRAExemption" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input type="text" id="Emp" name="Employee-Table" class="filter_structure_id" />
+            <div class="heading">Filter View</div>
+            <div class="section2_Leave">
+
+                <div class="heading">HRA Exemption Details</div>
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old" ></div>
+                    <label>Financial Year:</label>
+                    <input type="text" readonly id="dispcalender" style="width:270px" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                </div>
+                @*<div class="row3 content_margine">
+                        <div id="LvHeadlist_old"></div>
+                        @Html.LabelFor(m => m.LeaveHead, "City:", new { @class = "popup-content-label must" })
+                        <select class="drop must" name="LvHeadlist" id="LeaveHead_drop" style="width:200px"></select>
+
+                    </div>*@
+                <div class="row3 content_margine">
+                    <div id="LvHeadlist_old"></div>
+                    <label>City:</label>
+                    <input type="text" readonly id="EmpCity" style="width:270px ; margin:0px 0px 0px 7%" />
+
+                </div>
+                @*<div class="row3 content_margine">@Html.LabelFor(m => m.City, "City :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.City, new {id="EmpCity" ,@class = "popup-content-textbox " })</div>*@
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.HRAMonthRent, "Rent :", new { @class = "popup-content-label" })
+                    <div class="popup-content-table">
+                        <table class="lookuptableselected" id="Rent_List">
+                            <tr>
+                                <th>ID</th>
+                                <th>LookUp Selected Description</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="icon-row">
+                        <button data-p2btooltip="Select Rent Details" class="popup-content-icon-lookup" id="Lookup-Rent-HRAExemption"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Rent Details" class="popup-content-icon-create" id="Create-Rent-HRAExemption"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Rent Details" class="popup-content-icon-edit" id="Edit-Rent-HRAExemption"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Delete Rent Details" class="popup-content-icon-remove" id="Remove-Rent-HRAExemption"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</body>
+</html>

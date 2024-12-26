@@ -1,0 +1,699 @@
+﻿@{
+    ViewBag.Title = "PFMaster";
+}
+
+@model Payroll.PFMaster
+<style>
+    .icon-row {
+        position: relative;
+        left: 109px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        width: 150px;
+        float: left;
+        display: block;
+        margin: 1px;
+    }
+
+    .popup-content-textbox {
+        min-width: 150px;
+    }
+
+    .row2, .row6 {
+        width: 365px;
+        display: inline-block;
+    }
+
+    .rowminmax {
+        width: 426px;
+        display: inline-block;
+    }
+
+    .section6 {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 256px;
+        width: 877px;
+        margin: 4px auto;
+        position: absolute;
+        left: 4px;
+        top: 0px;
+    }
+
+    .section2 {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 493px;
+        width: 873px;
+        margin: 4px auto;
+        position: absolute;
+        top: 400px;
+        left: 4px;
+    }
+
+    .section_Method {
+        display: block;
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: -9px;
+        margin-bottom: 15px;
+        position: absolute;
+    }
+
+    .section_Method_EPFDeatils {
+        display: block;
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        position: absolute;
+        top: 120px;
+    }
+
+    .addons {
+        width: 485px;
+    }
+
+    .section_Method_EPSDETAILS {
+        display: block;
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        position: absolute;
+        top: 382px;
+    }
+
+    .section_Method_EDLISDetails {
+        display: block;
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        position: absolute;
+        top: 620px;
+    }
+</style>
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+        ColModel = ['EffectiveDate', 'EstablishmentID', 'Id'];
+        ColNames = ['Effective Date', 'Establishment ID', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = " PF Master ";
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#EffectiveDate').P2BDatePicker();
+        $('#EndDate,#RegDate').P2BDatePicker();
+
+        //----------------------------------------------------CREATE MAiN----------------------//
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (event) {
+            $('#frmPFMaster').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog(' ', '', '', '', 'Create PF Master', 'open', '@Url.Action("Create")', '#frmPFMaster', 'Message :', 'Request Falied :', '#JqGrid', 600, 900, '#EPSWagesList,#PFAdminWagesList,#PFEDLIWagesList,#PFInspWagesList,#PFWagesList', ' ', function (data) {
+                $('#PFTrustTypeList').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 438, ""); //438 lookupcode
+
+                event.preventDefault();
+            });
+
+
+        });
+
+        //-----------------------ENDCREATE--------------------//
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit", "PFMaster")', dt.Id, '@Url.Action("EditSave", "PFMaster")', "Edit PF Master  Data", '#frmPFMaster', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 900, '#EPSWagesList,#PFAdminWagesList,#PFEDLIWagesList,#PFInspWagesList,#PFWagesList', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#EPFAdminCharges').val(k.EPFAdminCharges);
+                    $('#EPFAdminMin').val(k.EPFAdminMin);
+                    $('#EPFInspCharges').val(k.EPFInspCharges);
+                    $('#EPFInspMin').val(k.EPFInspMin);
+                    $('#EDLIAdmin').val(k.EDLIAdmin);
+                    $('#EDLIAdminMin').val(k.EDLIAdminMin);
+                    $('#EDLISInsp').val(k.EDLISInsp);
+                    $('#EDLIInspMin').val(k.EDLIInspMin);
+                    $('#CompPFCeiling').val(k.CompPFCeiling);
+                    $('#CompPFNo').val(k.CompPFNo);
+                    $('#CPFPerc').val(k.CPFPerc);
+                    $('#EDLICharges').val(k.EDLICharges);
+                    $('#EmpPFPerc').val(k.EmpPFPerc);
+                    $('#EPFCeiling').val(k.EPFCeiling);
+                    $('#EPSCeiling').val(k.EPSCeiling);
+                    $('#EPSPerc').val(k.EPSPerc);
+                    $('#EstablishmentID').val(k.EstablishmentID);
+                    $('#InspCharges').val(k.InspCharges);
+                    $('#PaymentEDLIS').val(k.PaymentEDLIS);
+                    $('#PensionAge').val(k.PensionAge);
+                    if (k.EffectiveDate != null)
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    else
+                        $('#EffectiveDate').val();
+                    $('#EffectiveDate').attr('readonly', 'readonly');
+                    if (k.EndDate != null)
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    else
+                        $('#EndDate').val();
+                    if (k.RegDate != null)
+                        $('#RegDate').val(DateConvert(k.RegDate));
+                    else
+                        $('#RegDate').val();
+                    $('#PFTrustTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 438, k.PFTrustType_Id);
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EPSWagesList').P2BLookUpEncapsulate('#EPSWagesList', 'EPSWagesList', k.EPSWages_Id, k.EPSWages_FullDetails, 'EPSWagesList', '#Remove-EPSWages-PFMaster', 'N');
+                    $('#PFAdminWagesList').P2BLookUpEncapsulate('#PFAdminWagesList', 'PFAdminWagesList', k.PFAdminWages_Id, k.PFAdminWages_FullDetails, 'PFAdminWagesList', '#Remove-PFAdminWages-PFMaster', 'N');
+                    $('#PFEDLIWagesList').P2BLookUpEncapsulate('#PFEDLIWagesList', 'PFEDLIWagesList', k.PFEDLIWages_Id, k.PFEDLIWages_FullDetails, 'PFEDLIWagesList', '#Remove-PFEDLIWages-PFMaster', 'N');
+                    $('#PFInspWagesList').P2BLookUpEncapsulate('#PFInspWagesList', 'PFInspWagesList', k.PFInspWages_Id, k.PFInspWages_FullDetails, 'PFInspWagesList', '#Remove-PFInspWages-PFMaster', 'N');
+                    $('#PFWagesList').P2BLookUpEncapsulate('#PFWagesList', 'PFWagesList', k.PFWages_Id, k.PFWages_FullDetails, 'PFWagesList', '#Remove-PFWages-PFMaster', 'N');
+                });
+                //partial page bind
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View  PF Master Data', '#EPSWagesList,#PFAdminWagesList,#PFEDLIWagesList,#PFInspWagesList,#PFWagesList', '', 600, 900, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#EPFAdminCharges').val(k.EPFAdminCharges);
+                    $('#EPFAdminMin').val(k.EPFAdminMin);
+                    $('#EPFInspCharges').val(k.EPFInspCharges);
+                    $('#EPFInspMin').val(k.EPFInspMin);
+                    $('#EDLIAdmin').val(k.EDLIAdmin);
+                    $('#EDLIAdminMin').val(k.EDLIAdminMin);
+                    $('#EDLISInsp').val(k.EDLISInsp);
+                    $('#EDLIInspMin').val(k.EDLIInspMin);
+                    $('#CompPFCeiling').val(k.CompPFCeiling);
+                    $('#CompPFNo').val(k.CompPFNo);
+                    $('#CPFPerc').val(k.CPFPerc);
+                    $('#EDLICharges').val(k.EDLICharges);
+                    $('#EmpPFPerc').val(k.EmpPFPerc);
+                    $('#EPFCeiling').val(k.EPFCeiling);
+                    $('#EPSCeiling').val(k.EPSCeiling);
+                    $('#EPSPerc').val(k.EPSPerc);
+                    $('#EstablishmentID').val(k.EstablishmentID);
+                    $('#InspCharges').val(k.InspCharges);
+                    $('#PaymentEDLIS').val(k.PaymentEDLIS);
+                    $('#PensionAge').val(k.PensionAge);
+                    if (k.EffectiveDate != null)
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    else
+                        $('#EffectiveDate').val();
+                    if (k.EndDate != null)
+                        $('#EndDate').val(DateConvert(k.EndDate));
+                    else
+                        $('#EndDate').val();
+                    if (k.RegDate != null)
+                        $('#RegDate').val(DateConvert(k.RegDate));
+                    else
+                        $('#RegDate').val();
+                     $('#PFTrustTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 438, k.PFTrustType_Id);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#EPSWagesList').P2BLookUpEncapsulate('#EPSWagesList', 'EPSWagesList', k.EPSWages_Id, k.EPSWages_FullDetails, 'EPSWagesList', 'view', 'A');
+                    $('#PFAdminWagesList').P2BLookUpEncapsulate('#PFAdminWagesList', 'PFAdminWagesList', k.PFAdminWages_Id, k.PFAdminWages_FullDetails, 'PFAdminWagesList', 'view', 'A');
+                    $('#PFEDLIWagesList').P2BLookUpEncapsulate('#PFEDLIWagesList', 'PFEDLIWagesList', k.PFEDLIWages_Id, k.PFEDLIWages_FullDetails, 'PFEDLIWagesList', 'view', 'A');
+                    $('#PFInspWagesList').P2BLookUpEncapsulate('#PFInspWagesList', 'PFInspWagesList', k.PFInspWages_Id, k.PFInspWages_FullDetails, 'PFInspWagesList', 'view', 'A');
+                    $('#PFWagesList').P2BLookUpEncapsulate('#PFWagesList', 'PFWagesList', k.PFWages_Id, k.PFWages_FullDetails, 'PFWagesList', 'view', 'A');
+                });
+
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#EffectiveDate').oldVal(data[2].Name);
+                    $('#EndDate').oldVal(data[2].Code);
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        @*$('<div></div>').P2BPartialCreateModalDialog();
+         $('#Create-StatutoryEffectiveMonths-LWFMaster').on("click", function (event) {
+             $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("StatutoryEffectiveMonthspartial", "LWFMaster")', 'Create StatutoryEffectiveMonths', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+
+                 $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', data[0], data[1], 'StatutoryEffectiveMonthsList', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+             });
+             event.preventDefault();
+         });*@
+        //------------WagesRange
+        $('#Lookup-LWFWagesRange-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesRangeLKDetails", "WagesRange")', '', 'LookupDiv', ' Look Up Data', '#LWFWagesRangelist', 'LWFWagesRangelist', 5, 'LWFWagesRangelist', '#frmLWFMaster', 'A', '#Edit-LWFWagesRange-LWFMaster,#Remove-LWFWagesRange-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Create-LWFWagesRange-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "LWFMaster")', 'Create Wages Range', 'open', '@Url.Action("CreateSave", "WagesRange")', '#frmWagesRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#LWFWagesRangelist').P2BLookUpEncapsulate('#LWFWagesRangelist', 'LWFWagesRangelist', data[0], data[1], 'LWFWagesRangelist', '#Remove-LWFWagesRange-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-LWFWagesRange-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LWFWagesRangelist').P2BGetTableDataonSelectedRow('#LWFWagesRangelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LWFWagesRangelist', $('#LWFWagesRangelist').val(), 200, 200, '#frmLWFMaster', '#LWFWagesRangelist', '');
+            event.preventDefault();
+        });
+        //----------StateList----------------------------------------------//
+        $('#Lookup-States-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSateDetails", "State")', '', 'LookupDiv', ' Look Up Data', '#StateList', 'StateList', 5, 'StateList', '#frmLWFMaster', 'A', '#Remove-States-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-States-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "State")', 'Create State ', 'open', '@Url.Action("CreateLWFState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', data[0], data[1], 'StateList', '#Remove-States-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-States-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#StateList').P2BGetTableDataonSelectedRow('#StateList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StateList', $('#StateList').val(), 200, 200, '#frmLWFMaster', '#StateList', '');
+            event.preventDefault();
+        });
+
+        //------------------Statutoryeffectivemonths-------------------------------//
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-StatutoryEffectiveMonths-ESIC').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "LWFMaster")', 'Create Statutory Effective Months', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                // to show data which is created in partial page
+                $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', data[0], data[1], 'StatutoryEffectiveMonthsList', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Lookup-StatutoryEffectiveMonths-ESIC').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetlookupDetailsStatEffectivemonth", "StatutoryEffectiveMonths")', '', 'LookupDiv', 'Look Up Data', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 5, 'StatutoryEffectiveMonthsList', '#frmLWFMaster', 'A', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-StatutoryEffectiveMonths-LWFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "LWFMaster")', '@Url.Action("Edit", "StatutoryEffectiveMonths")', b, '@Url.Action("EditSave", "StatutoryEffectiveMonths")', 'Edit StatutoryEffectiveMonths Details', '#frmStatutoryEffectiveMonths', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLWFMaster', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'A', ' ', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmStatutoryEffectiveMonths').trigger('reset');
+                    $('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 200, k.EffectiveMonth_Id); // Dropdown bind
+
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+        @*$('#Remove-Level-Grade').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteLevel", "Level")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Postion_List', $('#Postion_List').val(), 200, 200, '#frmJob', '#Postion_List');
+            event.preventDefault();
+        });*@
+        $('#Remove-StatutoryEffectiveMonths-ESIC').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StatutoryEffectiveMonthsList', $('#StatutoryEffectiveMonthsList').val(), 200, 200, '#frmLWFMaster', '#StatutoryEffectiveMonthsList', '');
+            event.preventDefault();
+        });
+        //----------------------Wages Master
+
+        $('#Lookup-EPSWages-PFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#EPSWagesList', 'EPSWagesList', 5, 'EPSWagesList', '#frmPFMaster', 'N', '#Remove-EPSWages-PFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-EPSWages-PFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPFMaster', '', function (data) {
+                $('#EPSWagesList').P2BLookUpEncapsulate('#EPSWagesList', 'EPSWagesList', data[0], data[1], 'EPSWagesList', '#Remove-EPSWages-PFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-EPSWages-PFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#EPSWagesList').P2BGetTableDataonSelectedRow('#EPSWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EPSWagesList', $('#EPSWagesList').val(), 200, 200, '#frmPFMaster', '#EPSWagesList', '');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-PFAdminWages-PFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#PFAdminWagesList', 'PFAdminWagesList', 5, 'PFAdminWagesList', '#frmPFMaster', 'N', '#Remove-PFAdminWages-PFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-PFAdminWages-PFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPFMaster', '', function (data) {
+                $('#PFAdminWagesList').P2BLookUpEncapsulate('#PFAdminWagesList', 'PFAdminWagesList', data[0], data[1], 'PFAdminWagesList', '#Remove-PFAdminWages-PFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PFAdminWages-PFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#PFAdminWagesList').P2BGetTableDataonSelectedRow('#PFAdminWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PFAdminWagesList', $('#PFAdminWagesList').val(), 200, 200, '#frmPFMaster', '#PFAdminWagesList', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-PFEDLIWages-PFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#PFEDLIWagesList', 'PFEDLIWagesList', 5, 'PFEDLIWagesList', '#frmPFMaster', 'N', '#Remove-PFEDLIWages-PFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-PFEDLIWages-PFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPFMaster', '', function (data) {
+                $('#PFEDLIWagesList').P2BLookUpEncapsulate('#PFEDLIWagesList', 'PFEDLIWagesList', data[0], data[1], 'PFEDLIWagesList', '#Remove-PFEDLIWages-PFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PFEDLIWages-PFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#PFEDLIWagesList').P2BGetTableDataonSelectedRow('#PFEDLIWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PFEDLIWagesList', $('#PFEDLIWagesList').val(), 200, 200, '#frmPFMaster', '#PFEDLIWagesList', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-PFInspWages-PFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#PFInspWagesList', 'PFInspWagesList', 5, 'PFInspWagesList', '#frmPFMaster', 'N', '#Remove-PFInspWages-PFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-PFInspWages-PFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPFMaster', '', function (data) {
+                $('#PFInspWagesList').P2BLookUpEncapsulate('#PFInspWagesList', 'PFInspWagesList', data[0], data[1], 'PFInspWagesList', '#Remove-PFInspWages-PFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PFInspWages-PFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#PFInspWagesList').P2BGetTableDataonSelectedRow('#PFInspWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PFInspWagesList', $('#PFInspWagesList').val(), 200, 200, '#frmPFMaster', '#PFInspWagesList', '');
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-PFWages-PFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#PFWagesList', 'PFWagesList', 5, 'PFWagesList', '#frmPFMaster', 'N', '#Remove-PFWages-PFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-WagesMaster-PFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PFWagesList').P2BGetTableDataonSelectedRow('#PFWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit PF Wages Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPFMaster', '#PFWagesList', 'PFWagesList', 'PFWagesList', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-EPSWages-PFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#EPSWagesList').P2BGetTableDataonSelectedRow('#EPSWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit EPS Wages Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPFMaster', '#EPSWagesList', 'EPSWagesList', 'EPSWagesList', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-PFEDLIWages-PFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PFEDLIWagesList').P2BGetTableDataonSelectedRow('#PFEDLIWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit EDLI Wages Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmPFMaster', '#PFEDLIWagesList', 'PFEDLIWagesList', 'PFEDLIWagesList', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+        $('#Create-PFWages-PFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmPFMaster', '', function (data) {
+                $('#PFWagesList').P2BLookUpEncapsulate('#PFWagesList', 'PFWagesList', data[0], data[1], 'PFWagesList', '#Remove-PFWages-PFMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PFWages-PFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#PFWagesList').P2BGetTableDataonSelectedRow('#PFWagesList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PFInspWagesList', $('#PFWagesList').val(), 200, 200, '#frmPFMaster', '#PFWagesList', '');
+            event.preventDefault();
+        });
+
+        $('#Code').MaxLength(10).ForceOnlyAlphaNumeric();
+        $('#Name').MaxLength(50);
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $('#EPFCeiling,#EPSCeiling,#PaymentEDLIS,#PensionAge,#CompPFCeiling').MaxLength(10).ForceOnlyNumeric();
+        $('#AdminCharges,#CPFPerc,#EmpPFPerc,#EPSPerc,#EDLICharges,#InspCharges').ForcePercent().MaxLength(5);
+        $('#EstablishmentID').ForceOnlyAlphaNumeric();
+        $('#PensionAge').MaxLength(3);
+        $('#EstablishmentID').ForceOnlyNumeric();
+        $('#EstablishmentID').MaxLength(10);
+        $('#CompPFNo').ForceOnlyNumeric();
+        $('#CompPFNo').MaxLength(10);
+        $('#EPFAdminCharges').ForceOnlyNumeric();
+        $('#EPFAdminCharges').MaxLength(10);
+        $('#EDLIAdmin').ForceOnlyNumeric();
+        $('#EDLIAdmin').MaxLength(10);
+        $('#EPFAdminMin').ForceOnlyNumeric();
+        $('#EPFAdminMin').MaxLength(10);
+        $('#EPFInspCharges').ForceOnlyNumeric();
+        $('#EPFInspCharges').MaxLength(10);
+        $('#EPFInspMin').ForceOnlyNumeric();
+        $('#EPFInspMin').MaxLength(10);
+        $('#EDLIAdminMin').ForceOnlyNumeric();
+        $('#EDLIAdminMin').MaxLength(10);
+        $('#EDLISInsp').ForceOnlyNumeric();
+        $('#EDLISInsp').MaxLength(10);
+        $('#EPFInspMin').ForceOnlyNumeric();
+        $('#EPFInspMin').MaxLength(10);
+        $('#EDLIInspMin').ForceOnlyNumeric();
+        $('#EDLIInspMin').MaxLength(10);
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $("#EffectiveDate,#RegDate").keypress(function (event) { event.preventDefault(); });
+
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorized</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create ESIC">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPFMaster", name = "frmPFMaster" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="section_Method">
+            <div class="heading">PF Master Details</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.EstablishmentID, "Establishment ID:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EstablishmentID, new { @class = "popup-content-textbox", style = "padding-left: px;margin-left: 5px;" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.CompPFNo, "Company PF No:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CompPFNo, new { @class = "popup-content-textbox must" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.RegDate, "Registered Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.RegDate, new { @class = "popup-content-textbox must" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.EffectiveDate, "Effective Date:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.CPFPerc, "CPF %:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CPFPerc, new { @class = "popup-content-textbox must" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.PFTrustType, "PF Trust Type:", new { @class = "popup-content-label must" })<select id="PFTrustTypeList" name="PFTrustTypeList" class="selectmenu must" style="width:161px;"><option value="0">-Select-</option></select></div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.CompPFCeiling, "Company PF Ceiling:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.CompPFCeiling, new { @class = "popup-content-textbox must" })</div>
+        </div>
+        <div class="section_Method_EPFDeatils">
+            <div class="heading">EPF (Employee Provident Fund) Details</div>
+            <div class="row6 content_margine addons">
+                <div id="PFWagesList_old"></div>
+                @Html.LabelFor(m => m.EPFWages, "PFWages:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PFWagesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup PFWages Details" class="button popup-content-icon-lookup" id="Lookup-PFWages-PFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create PFWages Details" class="button popup-content-icon-create" id="Create-PFWages-PFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-WagesMaster-PFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove PFWages Details" class="button popup-content-icon-remove" id="Remove-PFWages-PFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <br />
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EmpPFPerc, "Employee PF %:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EmpPFPerc, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPFCeiling, "EPF Ceiling:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPFCeiling, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPFAdminCharges, "EPF Admin Charges:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPFAdminCharges, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPFAdminMin, "EPF Admin Min:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPFAdminMin, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPFInspCharges, "EPF Inspection Charges:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPFInspCharges, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPFInspMin, "EPF Inspection Min:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPFInspMin, new { @class = "popup-content-textbox must" })</div>
+        </div>
+        <div class="section_Method_EPSDETAILS">
+            <div class="heading">EPS Details</div>
+            <div class="row6 content_margine addons">
+                <div id="EPSWagesList_old"></div>
+                @Html.LabelFor(m => m.EPSWages, "EPSWages:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="EPSWagesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup EPSWages Details" class="button popup-content-icon-lookup" id="Lookup-EPSWages-PFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create EPSWages Details" class="button popup-content-icon-create" id="Create-EPSWages-PFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-EPSWages-PFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove EPSWages Details" class="button popup-content-icon-remove" id="Remove-EPSWages-PFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <br />
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPSPerc, "EPS %:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPSPerc, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EPSCeiling, "EPS Ceiling:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EPSCeiling, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.PensionAge, "Pension Age:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PensionAge, new { @class = "popup-content-textbox must" })</div>
+        </div>
+        <div class="section_Method_EDLISDetails">
+            <div class="heading">EDLIS Details</div>
+            <div class="row6 content_margine addons">
+                <div id="PFEDLIWages_old"></div>
+                @Html.LabelFor(m => m.PFEDLIWages, "EDLIWages:", new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="PFEDLIWagesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup PFEDLIWages Details" class="button popup-content-icon-lookup" id="Lookup-PFEDLIWages-PFMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create PFEDLIWages Details" class="button popup-content-icon-create" id="Create-PFEDLIWages-PFMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-PFEDLIWages-PFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove PFEDLIWages Details" class="button popup-content-icon-remove" id="Remove-PFEDLIWages-PFMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <br />
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EDLIAdmin, "EDLI Admin:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EDLIAdmin, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EDLIAdminMin, "EDLI Admin Min:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EDLIAdminMin, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EDLISInsp, "EDLI Inspection:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EDLISInsp, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EDLIInspMin, "EDLI Inspection Min:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EDLIInspMin, new { @class = "popup-content-textbox must" })</div>
+            <div class="row6 content_margine">@Html.LabelFor(m => m.EDLICharges, "EDLI Charges:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EDLICharges, new { @class = "popup-content-textbox must" })</div>
+        </div>
+
+    }
+</div>  

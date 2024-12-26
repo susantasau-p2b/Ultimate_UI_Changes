@@ -1,0 +1,661 @@
+﻿@{
+    ViewBag.Title = "SalHead Formula";
+}
+@model Payroll.SalHeadFormula
+<style>
+    .icon-row {
+        left: 58px;
+        position: relative;
+        top: -149px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 88px;
+    }
+
+    .popup-content-label-short {
+        display: block;
+        float: left;
+        width: 87px;
+    }
+
+    .popup-content-textbox {
+        width: 87px;
+    }
+
+    .row1 {
+        width: 431px;
+    }
+
+    .row2, .row3 {
+        display: inline-block;
+    }
+
+    .row2 {
+        width: 198px;
+    }
+
+    .popup-row {
+        width: 446px;
+        margin: 1px 0px 0px 69px;
+    }
+
+    .name {
+        width: 293px;
+    }
+
+    .radio_btn_width {
+        margin: 10px 0px 0px -73px;
+        width: 495px;
+    }
+</style>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                @*<button class="button" id="Autho">Authorised</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Name</th>
+                                            <th>CeilingMin</th>
+                                            <th>CeilingMax</th>
+                                            <th>DependRule</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    @*<tfoot>
+                                            <tr>
+                                                <th>DD</th>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>CeilingMin</th>
+                                                <th>CeilingMax</th>
+                                                <th>DependRule</th>
+                                            </tr>
+                                        </tfoot>*@
+                                </table>
+                            </div>
+                        </div>
+                        @*<table id="JqGrid"></table>
+                            <div id="pager2"></div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="WagesLKDiv">
+                <div title="LookUp Data">
+                    <div class="lookupdiv_Wages"></div>
+                </div>
+                <div id="pageNavPosition_wages">
+
+                </div>
+            </div>*@
+
+        <div class="dialog_Wages">
+            <div title="LookUp Data">
+                <div class="lookupdiv_Wages"></div>
+            </div>
+            <div id="pageNavPosition_Wages">
+
+            </div>
+        </div>
+
+    </div>
+</body>
+<div id="Create_Dialog">
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "FormSalHeadFormula", name = "FormSalHeadFormula" }))
+    {
+
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        <input name="geo_id" id="geo_id" class="filter_structure_id" />
+        <input name="pay_id" id="pay_id" class="filter_structure_id" />
+        <input name="fun_id" id="fun_id" class="filter_structure_id" />
+        <div style="float:left;">
+            <div >
+                <label id="lblAgrment" class="popup-content-label must">Formula type:</label>
+                <select id="Formulatype_dropview" name="Formulatype_dropview" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+            </div>
+            <div class="row1 content_margine">@Html.LabelFor(m => m.Name, "Name:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox name must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.CeilingMin, "Min Ceiling:", new { @class = "popup-content-label-short must" })@Html.TextBoxFor(m => m.CeilingMin, new { @class = "popup-content-textbox must" })</div>
+            <div class="row2 content_margine">@Html.LabelFor(m => m.CeilingMax, "Max Ceiling:", new { @class = "popup-content-label-short must" })@Html.TextBoxFor(m => m.CeilingMax, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row4 content_margine">
+                @Html.LabelFor(m => m.SalWages, new { @class = "popup-content-label" })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="WagesList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select Wages" class="popup-content-icon-lookup" id="Lookup-Wages-SalHeadFormula"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Wages" class="popup-content-icon-create" id="Create-Wages-SalHeadFormula"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Wages" class="popup-content-icon-edit" id="Edit-Wages-SalHeadFormula"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Wages" class="popup-content-icon-remove" id="Remove-Wages-SalHeadFormula"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="View Wages" class="popup-content-icon-view" id="view-Wages-SalHeadFormula"><span class="ui-icon ui-icon-extlink popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="popup-row">
+                <div class="popup_radio_button radio_btn_width">
+                    <input type="radio" id="Slabwise" name="radio" value="1" /><label for="Slabwise">Slab Wise</label>
+                    <input type="radio" id="amtwise" name="radio" value="2" /><label for="amtwise">Amount Wise</label>
+                    <input type="radio" id="per" name="radio" value="3" /><label for="per">Percentage Wise</label>
+                    <input type="radio" id="service" name="radio" value="4" /><label for="service">Service Wise</label>
+                    <input type="radio" id="vdarule" name="radio" value="5" /><label for="vdarule">VDA Rule</label>
+                    <input type="radio" id="basicrule" name="radio" value="6" /><label for="basicrule">BASIC Rule</label>
+                </div>
+            </div>
+            <div id="load_div" style="display:none;"></div>
+
+        </div>
+
+    }
+</div>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dia;
+        $('#FromDate,#ToDate').P2BDatePicker();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['Id', 'EmpCode', 'EmpName'];
+        ColNames = ['Id', 'EmpCode', 'EmpName'];
+        SortName = 'Id';
+        Caption = 'SalHeadFormula';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#CeilingMax').ForceAmount().MaxLength(10);
+        $('#CeilingMin').ForceAmount().MaxLength(10);
+        //  $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Formula_Grid", "SalHeadFormula")",
+            editurl: "@Url.Action("EditGridDetails", "SalHeadFormula")",
+            htmurl: "@Url.Action("partial", "SalHeadFormula")",
+            submiturl: "@Url.Action("GridEditSave", "SalHeadFormula")",
+            columnname: ["Name", "CeilingMin", "CeilingMax", "DependRule", "Id"],
+            childheader: ["GeoStruct", "PayStruct", "FuncStruct", "Id"],
+            childurl: "@Url.Action("Get_FormulaStructDetails", "SalHeadFormula")",
+            tableheader: "Salary Head Formula",
+            childurlColumnNo: "5"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            // console.log($(init).parents('tr:eq(0)'));
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //var element = $(init).parents('tr:eq(0)');
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            //   console.log(element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "Edit",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                console.log(id);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwardata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        /* --SalHeadFormula CRUD Start */
+        $('#Create_Dialog').P2BCreateDialog();
+        // $('#Name').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+
+        $('#Create').on("click", function (event) {
+            $('#FormSalHeadFormula').trigger("reset");
+            $('#load_div').empty();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Filter Show Page', 'open', '@Url.Action("create")', '#FormSalHeadFormula', 'Message :', 'Request Falied :', '#JqGrid', 500, 665, '', '', function (data) { }, { datatablename: "#MyTable" });
+            $('#Formulatype_dropview').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 131, "");
+            $('#Formulatype_dropview').prop('disabled', false);
+            $('#CeilingMax').on('focusout', function (e) {
+                if (!$('#CeilingMin').val()) {
+                    alert('Enter Min Celing!');
+                    $('#CeilingMax').val('');
+                    return false;
+                    // e.preventDefault();
+                }
+                if ($(this).val()) {
+                    var a = $.StartEndDateCheck({
+                        startdate: '#CeilingMin',
+                        enddate: '#CeilingMax',
+                    });
+                    if (a == 0) {
+                        alert("Ceiling max Should Be Grater Than Ceiling min..!"); $('#CeilingMax').val('');
+                    }
+                }
+            });
+        });
+        $('#Edit').on('click', function () {
+            //  AssignData();
+            //$.LoadEmpByDefault();
+            $('#FormSalHeadFormula').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            //data('datatable_selectedrow');
+            console.log(a.Id);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Salary Head Formula Data", '#FormSalHeadFormula', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#WagesList,#WageRangeList,#ServRangeList,#CPIRuleList,#BasicRuleList', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula,#View-Wages-SalHeadFormula', function (data) {
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+                    $('#CeilingMin').val(k.CeilingMin);
+                    $('#CeilingMax').val(k.CeilingMax);
+                    $('#Formulatype_dropview').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 131, k.FormulaType_Id);
+                    $('#Formulatype_dropview').prop('disabled', true);
+                });
+
+                $.each(data[0], function (i, k) {
+                    $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', k.Wages_id, k.Wages_val, 'WagesList', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula', 'N');
+                });
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#Slabwise').prop('checked', 'checked');
+                    $('#amtwise,#per,#service,#vdarule,#basicrule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("Slabwise", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#WageRangeList').P2BLookUpEncapsulate('#WageRangeList', 'WageRangeList', k.WagesRange_id, k.WagesRange_val, 'WageRangeList', '#Edit-LookupValues-Lookup', 'A');
+                        });
+                    }).show();
+                    //  $('#Create-WageRange-SalHeadFormula,#Lookup-WageRange-SalHeadFormula').button("enable");
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#amtwise').prop('checked', 'checked');
+                    $('#Slabwise, #per,#service,#vdarule,#basicrule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("Amtwise", "SalHeadFormula")', function () {
+                        $('#SalAmount').val(data[5]);
+                    }).show();
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#per').prop('checked', 'checked');
+                    $('#Slabwise,#amtwise,#service,#vdarule,#basicrule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("Perwise", "SalHeadFormula")', function () {
+                        $('#SalPercent').val(data[5]);
+                    }).show();
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#service').prop('checked', 'checked');
+                    $('#Slabwise,#amtwise,#per,#vdarule,#basicrule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("Servicewise", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#ServRangeList').P2BLookUpEncapsulate('#ServRangeList', 'ServRangeList', k.ServRange_id, k.ServRange_val, 'ServRangeList', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula', 'A');
+                        });
+                        $('#Create-ServRange-SalHeadFormula,#Lookup-ServRange-SalHeadFormula').button("enable");
+                    }).show();
+                }
+
+                if (selected == "5") {
+                    $('#load_div').trigger('reset');
+                    $('#vdarule').prop('checked', 'checked');
+                    $('#Slabwise,#amtwise,#per,#service,#basicrule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("vdarule", "SalHeadFormula")', function () {
+
+                        $.each(data[1], function (i, k) {
+                            $('#CPIRuleList').P2BLookUpEncapsulate('#CPIRuleList', 'CPIRuleList', k.CPIRule_id, k.CPIRule_val, 'CPIRuleList', '#Edit-LookupValues-Lookup', 'A');
+                        });
+                    }).show();
+                    // $('#Create-WageRange-SalHeadFormula,#Lookup-WageRange-SalHeadFormula').button("enable");
+                }
+
+                if (selected == "6") {
+                    $('#load_div').trigger('reset');
+                    $('#basicrule').prop('checked', 'checked');
+                    $('#Slabwise,#amtwise,#per,#service,#vdarule').prop('disabled', 'disabled');
+                    $('#load_div').load('@Url.Action("basicrule", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#BasicRuleList').P2BLookUpEncapsulate('#BasicRuleList', 'BasicRuleList', k.BASICRule_id, k.BASICRule_val, 'BasicRuleList', '#Edit-LookupValues-Lookup', 'N');
+                        });
+                    }).show();
+                    // $('#Create-WageRange-SalHeadFormula,#Lookup-WageRange-SalHeadFormula').button("enable");
+                }
+            }, { datatablename: "#MyTable" });
+        });
+
+        $('.drop').selectmenu().selectmenu("menuWidget");
+       // To bind dropdown on page load
+
+
+        $('#View').button().click(function (event) {
+            // AssignData();
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Salary Head Formula Data', '#WagesList,#WageRangeList,#ServRangeList', '#Lookup-Wages-SalHeadFormula,#Create-Wages-SalHeadFormula,#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula,#Lookup-WagesRange-SalHeadFormula,#Create-WagesRange-SalHeadFormula,#Lookup-ServRange-SalHeadFormula,#Create-ServRange-SalHeadFormula', 500, 620, '', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                //console.log(data[2]);
+                var selected = data[3];
+
+                $.each(data[0], function (i, k) {
+                    $('#Name').val(k.Name);
+                    $('#Name').attr('readonly', 'readonly');
+                    $('#CeilingMin').val(k.CeilingMin);
+                    $('#CeilingMax').val(k.CeilingMax);
+                    $('#Formulatype_dropview').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 131, k.FormulaType_Id);
+                    $('#Formulatype_dropview').prop('disabled', true);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', k.Wages_id, k.Wages_val, 'WagesList', 'view', 'N');
+                });
+
+                if (selected == "1") {
+                    $('#load_div').trigger('reset');
+                    $('#Slabwise').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("Slabwise", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#WageRangeList').P2BLookUpEncapsulate('#WageRangeList', 'WageRangeList', k.WagesRange_id, k.WagesRange_val, 'WageRangeList', '#Lookup-WagesRange-SalHeadFormula', 'A');
+                        });
+                        $('#Lookup-WagesRange-SalHeadFormula,#Create-WagesRange-SalHeadFormula,#Edit-WageRange-SalHeadFormula,#Remove-WageRange-SalHeadFormula,#View-WageRange-SalHeadFormula').button("disable");
+                    }).show();
+
+                }
+
+                if (selected == "2") {
+                    $('#load_div').trigger('reset');
+                    $('#amtwise').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("Amtwise", "SalHeadFormula")', function () {
+                        $.each(data[5], function (i, k) {
+                            $('#SalAmount').val(k.Amount);
+                        });
+                    }).show();
+                }
+
+                if (selected == "3") {
+                    $('#load_div').trigger('reset');
+                    $('#per').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("Perwise", "SalHeadFormula")', function () {
+                        $.each(data[5], function (i, k) {
+                            $('#SalPercent').val(k.Percent);
+                        });
+                    }).show();
+                }
+
+                if (selected == "4") {
+                    $('#load_div').trigger('reset');
+                    $('#service').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("Servicewise", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#ServRangeList').P2BLookUpEncapsulate('#ServRangeList', 'ServRangeList', k.ServRange_id, k.ServRange_val, 'ServRangeList', '', 'A');
+                        });
+                        $('#Create-ServRange-SalHeadFormula,#Lookup-ServRange-SalHeadFormula').button("disable");
+                    }).show();
+                }
+
+                if (selected == "5") {
+                    $('#load_div').trigger('reset');
+                    $('#vdarule').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("vdarule", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#CPIRuleList').P2BLookUpEncapsulate('#CPIRuleList', 'CPIRuleList', k.CPIRule_id, k.CPIRule_val, 'CPIRuleList', '#Lookup-VDARule-SalHeadFormula', 'N');
+                        });
+                        $('#Lookup-VDARule-SalHeadFormula,#Create-VDARule-SalHeadFormula,#Edit-VDARule-SalHeadFormula,#View-VDARule-SalHeadFormula,#Remove-VDARule-SalHeadFormula').button("disable");
+                    }).show();
+
+                }
+
+
+                if (selected == "6") {
+                    $('#load_div').trigger('reset');
+                    $('#basicrule').prop('checked', 'checked');
+                    $('#load_div').load('@Url.Action("basicrule", "SalHeadFormula")', function () {
+                        $.each(data[1], function (i, k) {
+                            $('#BasicRuleList').P2BLookUpEncapsulate('#BasicRuleList', 'BasicRuleList', k.BASICRule_id, k.BASICRule_val, 'BasicRuleList', '#Edit-LookupValues-Lookup', 'N');
+                        });
+                        $('#Lookup-BASICRule-SalHeadFormula,#Create-BASICRule-SalHeadFormula,#Edit-BASICRule-SalHeadFormula,#Remove-BASICRule-SalHeadFormula,#View-BASICRule-SalHeadFormula').button("disable");
+                    }).show();
+                    //    $('#Create-WageRange-SalHeadFormula,#Lookup-WageRange-SalHeadFormula').button("enable");
+                }
+
+            });
+        });
+
+        $('#Delete').button().click(function (event) {
+            $('#FormSalHeadFormula').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#FormSalHeadFormula').P2BDeleteModalDialog('@Url.Action("Delete","SalHeadformula")', a.Name, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '', 200, 200, { datatablename: "#MyTable" });
+        });
+
+        /* SalHeadFormula CRUD End*/
+
+        /*WagesMaster CRUD Start*/
+
+        @*$('#Lookup-Address-Corporate').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#AddressList', 'AddressList', 5, 'AddressList', '#frmCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+
+        $('#Lookup-Wages-SalHeadFormula').on('click', function (event) {
+            $('.dialog_Wages').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "SalHeadFormula")', '', 'lookupdiv_Wages', 'Wages Look Up Data', '#WagesList', 'WagesList', 5, 'WagesList', '#FormSalHeadFormula', 'N', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula', 'Lookup_table', 'pageNavPosition_Wages');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-Wages-SalHeadFormula').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', 'Create Wages Master', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '', '', '', '#frmWages', '#Edit-RateMaster-Wages,#Remove-RateMaster-Wages', function (data) {
+                $('#WagesList').P2BLookUpEncapsulate('#WagesList', 'WagesList', data[0], data[1], 'WagesList', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+
+        //Wages Edit
+
+        $('#Edit-Wages-SalHeadFormula').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#WagesList').P2BGetTableDataonSelectedRow('#WagesList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CreateWages_partial", "SalHeadFormula")', '@Url.Action("edit", "Wages")', b, '@Url.Action("Editsave", "Wages")', 'Edit Wages', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#FormSalHeadFormula', '#WagesList', 'WagesList', 'WagesList', 'N', '', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmWages').trigger("reset");
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                    // $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.rate_id, k.RateCode, 'RateMasterlist', '#Remove-RateMaster-Wages', 'N');
+
+                });
+                $.each(data[1], function (i, k) {
+                    //$('#frmWages').trigger("reset");
+                    //$('#WagesName').val(k.WagesName);
+                    //$('#Percentage').val(k.Percentage);
+                    //$('#WagesCeilingMin').val(k.CeilingMin);
+                    //$('#WagesCeilingMax').val(k.CeilingMax);
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages', 'A');
+
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+        //function (deleteurl, deletedata, forwarddata, deletemessage, deletesuccessmessage, deleteerrormessage, selectfield, optionvalue, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup) {
+        $('#Remove-Wages-SalHeadFormula').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#WagesList').P2BGetTableDataonSelectedRow('#WagesList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#WagesList').P2BGetTableDataonSelectedRow('#WagesList', 0);
+            console.log("Verify...");
+
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#WagesList', $('#WagesList').val(), 200, 200, '#FormSalHeadFormula', '#WagesList', '#Edit-Wages-SalHeadFormula,#Remove-Wages-SalHeadFormula,#View-Wages-SalHeadFormula');
+            event.preventDefault();
+        });
+
+        $('#View-Wages-SalHeadFormula').on('click', function (e) {
+            var a = [], b;
+            a = $('#WagesList').P2BGetTableDataonSelectedRow('#WagesList', 0);
+            b = a[0];
+            $('<div></div>').P2bViewPartialDialog({
+                htmurl: '@Url.Action("CreateWages_partial", "SalHeadFormula")',
+                btnid: '#View-Wages-SalHeadFormula',
+                editurl: "@Url.Action("edit", "Wages")",
+                height: 'auto',
+                width: 'auto',
+                returndatafunction: function (data) {
+                    $.each(data, function (i, k) {
+                        $('#WagesName').val(k.WagesName);
+                        $('#Percentage').val(k.Percentage);
+                        $('#WagesCeilingMin').val(k.CeilingMin);
+                        $('#WagesCeilingMax').val(k.CeilingMax);
+                        $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.rate_id, k.RateCode, 'RateMasterlist', '#Remove-RateMaster-Wages', 'N');
+                    });
+                },
+                editdata: b,
+            });
+            e.preventDefault();
+        });
+        var dt;
+
+        /*WagesMaster CRUD End*/
+
+
+        $('.popup_radio_button').on('change', function () {
+            var selected = $(".popup_radio_button input[type='radio']:checked").val();
+            if (selected == "1") {
+                $('#load_div').load('@Url.Action("Slabwise", "SalHeadFormula")').show();
+            }
+            if (selected == "2") {
+                $('#load_div').load('@Url.Action("Amtwise", "SalHeadFormula")').show();
+            }
+            if (selected == "3") {
+                $('#load_div').load('@Url.Action("Perwise", "SalHeadFormula")').show();
+            }
+            if (selected == "4") {
+                $('#load_div').load('@Url.Action("Servicewise", "SalHeadFormula")').show();
+            }
+            if (selected == "5") {
+                $('#load_div').load('@Url.Action("vdarule", "SalHeadFormula")').show();
+            }
+            if (selected == "6") {
+                $('#load_div').load('@Url.Action("basicrule", "SalHeadFormula")').show();
+            }
+        });
+        $('#Name').ValidateTextBox({ maxlength: 50, AlphaNum: true });
+        //$('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        $('#CeilingMin').ForceOnlyNumeric();
+        $('#CeilingMax').ForceOnlyNumeric();
+        $('.popup_radio_button').controlgroup();
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                },
+                renderat: "#FormFilter",
+            });
+        });
+        //$.LoadEmpByDefault();
+    });
+</script>

@@ -1,0 +1,123 @@
+﻿@{
+    Layout = null;
+}
+@model P2b.Global.ContactDetails
+<style>
+    .contact_popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 59%;
+    }
+
+    .contact_popup-content-label {
+        display: block;
+        margin: 1px;
+        float: left;
+        width: 95px;
+    }
+
+    .contact_row {
+        width: 397px;
+    }
+
+    .con_icon-row {
+        position: absolute;
+        left: 64px;
+        top: 83px;
+    }
+</style>
+<div class="ContactNosLKDiv">
+    <div title="LookUp Data">
+        <div class="lookupdiv_ContactNos"></div>
+    </div>
+    <div id="pageNavPosition_ContactNos">
+
+    </div>
+</div>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmContactDetails", name = "frmContactDetails" }))
+    {
+
+        <div class="contact_row content_margine">@Html.LabelFor(m => m.EmailId, "Email Id :", new { @class = "contact_popup-content-label must" }) @Html.TextBoxFor(m => m.EmailId, new { @class = "contact_popup-content-textbox must", @maxlength = "100" })</div>
+        <div class="contact_row content_margine">@Html.LabelFor(m => m.Website, "Website :", new { @class = "contact_popup-content-label" }) @Html.TextBoxFor(m => m.Website, new { @class = "contact_popup-content-textbox", @maxlength = "2000" })</div>
+        <div class="contact_row content_margine">@Html.LabelFor(m => m.FaxNo, "Fax NO :", new { @class = "contact_popup-content-label" }) @Html.TextBoxFor(m => m.FaxNo, new { @class = "contact_popup-content-textbox", @maxlength = "15" })</div>
+        <div class="contact_row content_margine">
+            @Html.LabelFor(m => m.ContactNumbers, "Contact No :", new { @class = "contact_popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="ContactNos_List">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="con_icon-row icon-row">
+                <button data-p2btooltip="Lookup Contact Numbers" class="popup-content-icon-lookup" id="lookup-ContactNo-ContDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Contact Numbers" class="popup-content-icon-create" id="create-ContactNo-ContDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Contact Numbers" class="popup-content-icon-edit" id="edit-ContactNo-ContDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Delete Contact Numbers" class="popup-content-icon-remove" id="remove-ContactNo-ContDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+    }
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#EmailId').ForceEmail();
+        $('#EmailId').MaxLength(30);
+        $('#Website').MaxLength(2000);
+        $('#Website').ForceURL();
+        $('#FaxNo').MaxLength(15);
+        // $('#FaxNo').ForceFaxNo();
+        $('#FaxNo').ForceOnlyNumeric();
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('button').button();
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#create-ContactNo-ContDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', '@Url.Action("CreateSave", "ContactNumbers")', '#frmContactNo', 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '', '', '', '#frmContactDetails', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+                $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0], data[1], 'ContactNos_List', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#lookup-ContactNo-ContDetails').button().on('click', function (event) {
+            $('.ContactNosLKDiv').P2BLookUpModal('@Url.Action("Get_ContactNumbersLookupValue", "ContactNumbers")', '', 'lookupdiv_ContactNos', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#frmContactDetails', 'A', '', 'lookupdiv_ContactNos', 'pageNavPosition_ContactNos');
+            event.preventDefault();
+        });
+
+        $('#edit-ContactNo-ContDetails').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            b = a[0];
+            console.log(b);
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', '@Url.Action("Edit", "ContactNumbers")', b, '@Url.Action("EditSave","ContactNumbers")', 'Edit Contact Numbers', '#frmContactNo', b, 'Message :', 'Request Falied :', '#jqgrid', 200, 300, '#frmContactDetails', '#ContactNos_List', 'ContactNos_List', 'ContactNos_List', 'A', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails', function (data) {
+
+                $.each(data, function (i, k) {
+                    $('#frmContactNo').trigger('reset');
+                    $('#MobileNo').val(k.MobileNo);
+                    $('#LandlineNo').val(k.LandlineNo);
+                    $('#STDCode').val(k.STD);
+                });
+            });
+
+        });
+
+
+        $('#remove-ContactNo-ContDetails').button().on('click', function (event) {
+            var a = [], b;
+            a = $('#Contact_List').P2BGetTableDataonSelectedRow('#Contact_List', 0);
+            b = a[0];
+            var c = [], d;
+            c = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            d = c[0];
+            // deleteurl, deletedata, forwarddata, deletemessage, deletesuccessmessage, deleteerrormessage, selectfield, optionvalue, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, btndisable) {
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "ContactNumbers")', d, b, 'Are you sure you want to remove record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#frmContactDetails', '#ContactNos_List', '#edit-ContactNo-ContDetails,#remove-ContactNo-ContDetails');
+            event.preventDefault();
+
+        });
+
+    });
+</script>

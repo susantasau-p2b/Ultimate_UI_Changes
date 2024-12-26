@@ -1,0 +1,497 @@
+﻿@{
+    ViewBag.Title = "Regime Scheme Transaction";
+}
+
+@model Payroll.RegimiScheme
+
+
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 106px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 115px;
+    }
+    .popup-content-label1 {
+        display: block;
+        float: left;
+        width: 115px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 430px;
+    }
+
+    .row9 {
+        width: 386px;
+        display: inline-flex;
+        float: right;
+        margin-top: -32px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .date-picker {
+        z-index: 999;
+    }
+
+    .employeeselectiondiv {
+        float: left;
+    }
+
+    .addons {
+        height: 246px;
+    }
+    .section_Method1 {
+        display: block;
+        border: 1px solid #ddd;
+        height: 213px;
+        width: 483px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 566px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+    
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .popup-content-icon-lookupGrid {
+        height: 20px;
+        left: -1px;
+        margin: auto;
+        width: 20px;
+    }
+</style>
+
+
+<script>
+
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#edit-Level-Grade,#remove-Level-Grade";
+        ColModel = ['EmpCode', 'Emp Name', 'Financialyear', 'SchemeType', 'Id'];
+        ColNames = ['Code', 'Name', 'Financialyear', 'SchemeType', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = "Regime Scheme Transaction"
+        $('#jqgrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#load').on('click', function (e) {
+            $('#jqgrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+        function AssignData() {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+        }
+
+
+
+        $('#advance-filter-symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    //$('#employee-table').P2BTransactionTableDynamic('#employee-search', '#case-employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#pay_id').val(data.PayStruct);
+                    //$('#fun_id').val(data.FunStruct);
+                }, hierarchy: true,
+                renderat: "#fromFilter",
+            });
+
+            //console.log($('#fromFilter')[0]);
+        });
+
+        $('#create').on("click", function (event) {
+
+            $('#frmEmpRegimiScheme').trigger("reset");
+            $('#Empl_list_h').fadeIn();
+            //$.LoadEmpByDefault();
+
+            $.LoadEmpByDefaultWOGeoId(false, "");
+
+            $('#list-employee').P2BCreateDialog('', '', '', '', 'Create Financial year wise Regime Scheme', 'open', '@Url.Action("Create")', '#frmEmpRegimiScheme', 'Message :', 'Request Falied :', '#jqgrid', 700, 1250, '', '', function (data) { });
+
+            event.preventDefault();
+        });
+
+        $('#edit').on('click', function (e) {
+            AssignData();
+            $('#dvAdvFilter').fadeOut();
+            $('#Empl_list_h').fadeOut();
+            $('#list-employee').P2BEditModalDialog('@Url.Action("Edit")?param=' + $('#Financial_id').val(), dt.Id, '@Url.Action("EditSave")?param=' + dt.EmpCode, "Edit Financial year wise Regime Scheme Information->" + JSON.stringify(dt) + "", '#frmEmpRegimiScheme', dt.Id, 'Message : ', 'Request Falied :', '#jqgrid', 700, 1050, '', '', function (data) {
+                //$.each(data[0], function (i, k) {
+                $('#frmEmpRegimiScheme').trigger('reset');
+                $('#RegimiSchemelist').P2BLookUpEncapsulate('#RegimiSchemelist', 'RegimiSchemelist', data[0].Scheme_id, data[0].FinancialYear_id, 'RegimiSchemelist', '#edit-RegimiScheme-Location,#remove-RegimiScheme-Location', 'N');
+                //});
+            });
+        });
+
+
+        @*$('#edit').on('click', function (e) {
+            AssignData();
+            // $.LoadEmpByDefault();
+            $('#dvAdvFilter').fadeOut();
+            $('#Empl_list_h').fadeOut();
+            $('#list-employee').P2BEditModalDialog('@Url.Action("Edit")?param=' + $('#Financial_id').val(), dt.Id, '@Url.Action("EditSave")?param=' + $('#Financial_id').val(), dt.Id, "Edit Financial year wise Regime Scheme Information->" + JSON.stringify(dt) + "", '#frmEmpRegimiScheme', dt.Id, 'Message : ', 'Request Falied :', '#jqgrid', 700, 1250, '', '', function (data) {
+                //  $.each(data[0], function (i, k) {
+
+                $('#frmEmpRegimiScheme').trigger('reset');
+
+                $('#RegimiSchemelist').P2BLookUpEncapsulate('#RegimiSchemelist', 'RegimiSchemelist', data[0].Scheme_id, data[0].FinancialYear_id, 'RegimiSchemelist', '#edit-RegimiScheme-Location,#remove-RegimiScheme-Location', 'N');
+
+            });
+            e.preventDefault();
+        });*@
+
+        $('#view').on('click', function (e) {
+
+            AssignData();
+            $.LoadEmpByDefault();
+
+            $('#list-employee').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View Financial year wise Regime Scheme Information->" + JSON.stringify(dt) + "", '#frmEmpRegimiScheme', '', 400, 1050, '', '', '', '', '', '', '', '', function (data) {
+
+
+                $('#frmEmpRegimiScheme').trigger('reset');
+
+
+                // if ($('#FinancialYear_drop option:selected').text() == "LWP")
+
+                $('#dvAdvFilter').fadeOut();
+                $('#Empl_list_h').fadeOut();
+
+            });
+
+            e.preventDefault();
+        });
+
+        $('#lookup-RegimiScheme-Location').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsRegimi", "EmpRegimiScheme")', '', 'lookupdiv', 'Regime Look Up Data', '#RegimiSchemelist', 'RegimiSchemelist', 5, 'RegimiSchemelist', '#frmEmpRegimiScheme', 'N', '#edit-RegimiScheme-Location,#remove-RegimiScheme-Location', 'lookup_table', 'pageNavPosition');
+            event.preventDefault();
+        });
+        $('#create-RegimiScheme-Location').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "RegimiScheme")', 'Create Regime Details', 'open', '@Url.Action("Create", "RegimiScheme")', '#frmRegimiScheme', 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '', '', '', '#frmEmpRegimiScheme', '', function (data) {
+                $('#RegimiSchemelist').P2BLookUpEncapsulate('#RegimiSchemelist', 'RegimiSchemelist', data[0], data[1], 'RegimiSchemelist', '#edit-RegimiScheme-Location,#remove-RegimiScheme-Location', 'N');
+                $('#FinancialYeardrop1').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "RegimiScheme")', "", '');
+                $('#Schemedrop2').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3036, "");
+            });
+            event.preventDefault();
+        });
+        $('#edit-RegimiScheme-Location').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#RegimiSchemelist').P2BGetTableDataonSelectedRow('#RegimiSchemelist', 0);
+            b = a[0];
+            console.log(b);
+
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "RegimiScheme")', '@Url.Action("Edit", "RegimiScheme")', b, '@Url.Action("EditSave", "RegimiScheme")', 'Edit Regime Details', '#frmRegimiScheme', b, 'Message :', 'Request Falied :', '#jqgrid', 400, 500, '#frmEmpRegimiScheme', '#RegimiSchemelist', 'RegimiSchemelist', 'RegimiSchemelist', 'N', '#remove-RegimiScheme-HolidayCalendar1,#edit-RegimiScheme-HolidayCalendar1', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmRegimiScheme').trigger('reset');
+                    $('#FinancialYeardrop1').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendarRegime", "RegimiScheme")', "", k.Financialyear_Id);
+                    @*$('#Schemedrop2').P2BSelectMenuAppend("@Url.Action("PopulateDropDownListCalendarRegime", "RegimiScheme")", "", k.Scheme_Id);*@
+                    $('#Schemedrop2').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3036, k.Scheme_Id);
+
+                });
+
+
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+        $('#remove-RegimiScheme-Location').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#HOCalendarlist').P2BGetTableDataonSelectedRow('#HOCalendarlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#RegimiSchemelist').P2BGetTableDataonSelectedRow('#RegimiSchemelist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#RegimiSchemelist', $('#RegimiSchemelist').val(), 200, 200, '#frmEmpRegimiScheme', '#RegimiSchemelist', '#edit-RegimiScheme-Location,#remove-RegimiScheme-Location');
+            event.preventDefault();
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+      $('#delete').button().click(function (event) {
+            dt = $('#jqgrid').P2BGrid.P2BEdDelV('#jqgrid', 'Id');
+            $('#frmEmpRegimiScheme').P2BDeleteModalDialog('@Url.Action("Delete", "EmpRegimiScheme")?param=' + dt.EmpCode + '-' + $('#Financial_id').val(), dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#jqgrid', 200, 200);
+        });
+
+
+        $('#list-employee').P2BGridDialog();
+        $('#edit_model_dialog').P2BGridDialog();
+
+
+        $('#load').on('click', function (e) {
+            // alert($('#Financial_id').val());
+
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Financial Year.");
+                return false;
+            }
+            $('#jqgrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#process').on('click', function (e) {
+           
+            $.ajax({
+                url: "@Url.Action("Regimiupdate", "EmpRegimiScheme")",
+                method: "POST",
+          //  data: $('#frmEmpList').serialize() + "&ReleaseDate=" + $('#ReleaseDate_Id').val() + "&EmpId=" + selectedid + "&ProcessIcrementDate=" + ProcessIncrmentdate,
+            beforeSend: function () {
+                ajaxloaderv2('body');
+            },
+            success: function (data) {
+                if (data != null) {
+                    alert(data.responseText);
+                }
+            },
+            complete: function () {
+                $('.ajax_loder').remove();
+            }
+            });
+
+            e.preventDefault();
+        });
+
+        $('#lookup_FinancialYear_Calendar').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "ITProjection")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                lookupdiv: "lookupdiv",
+                lookuppagename: "lookup",
+                pagename: "pageNavPosition",
+                readonly: true,
+            });
+        });
+
+
+        var ReturnStructIds1 = function (filterid, returnfun) {
+            $.ajax({
+                method: "Get",
+                url: "Transcation/ByDefaultLoadEmp",
+                success: function (data) {
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    var data = {
+                        GeoStruct: $('#geo_id').val() || null,
+                        PayStruct: $('#pay_id').val() || null,
+                        FunStruct: $('#fun_id').val() || null,
+                        Filter: filterid || null,
+                    };
+                    returnfun(data);
+                }
+            });
+        };
+
+        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        $('#FromDate').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('#ToDate').datepicker({ dateFormat: 'dd/mm/yy' });
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget');
+    });
+
+
+
+</script>
+
+<div class="form_bg">
+    <div class="form_input">
+        <div class="button_container">
+            <div style="float: left; width: 338px;"> 
+                <label id="lblPayMonth" class="popup-content-label must">Financial Year:</label>
+                <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+
+                <button data-p2btooltip="Lookup FinancialYear Details" class="popup-content-icon-lookupGrid" id="lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+
+            </div>
+            <button class="button" id="load">Load</button> 
+            <button class="button" id="create">Create</button>
+            @*<button class="button" id="view">View</button>*@
+                <button class="button" id="edit">Edit</button>
+                <button class="button" id="delete">Delete</button>
+               <button class="button" id="process">Process2024</button>
+            <div id="grid_form">
+                <div>
+                    <table id="jqgrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="lookupdiv" id="lookup"></div>
+    </div>
+    <div id="pageNavPosition">
+
+    </div>
+</div>
+<div id="list-employee">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpRegimiScheme", name = "frmEmpRegimiScheme" }))
+    {
+        
+            <input id="autho_action" type="hidden" name="autho_action" />
+            <input id="autho_allow" type="hidden" name="autho_allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+      
+            <div class="section_Method" id="dvAdvFilter">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="advance-filter-symbol"></span></label>
+                    <div id="fromFilter"></div>
+                </div>
+            </div>
+        <div class="section_Method1">
+            <div class="heading">Financial year wise Regimi Scheme Define</div>
+ 
+            <div class="row2 content_margine">
+                @*@Html.LabelFor(m => m.RegimiScheme, "Regimi Scheme Details :", new { @class = "popup-content-label" })*@
+                <label class="popup-content-label1">Regime Scheme:</label>
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" style="margin-left: 147px;" id="RegimiSchemelist">
+                        <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup Regime Scheme Details" class="popup-content-icon-lookup" id="lookup-RegimiScheme-Location"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Regime Scheme Details" class="popup-content-icon-create" id="create-RegimiScheme-Location"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Regime Scheme Details" class="popup-content-icon-edit" id="edit-RegimiScheme-Location"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Regime Scheme Details" class="popup-content-icon-remove" id="remove-RegimiScheme-Location"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+         
+        </div>
+        <div class="section_Method" id="Empl_list_h" >
+            <div class="heading">Employee List</div>
+            <div class="employeeselectiondiv">
+                <div class="transactiondivnew dynamic addons" style="float:left">
+                    <div><label>Search : </label><input type="text" id="employee-search" style="width: 425px;" /></div>
+                    <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="employee-table">
+                        <tr><th><input type="checkbox" id="case-employee" /></th><th>Employee</th></tr>
+                    </table> 
+                </div> 
+            </div>
+        </div>
+    }
+</div>
+ 

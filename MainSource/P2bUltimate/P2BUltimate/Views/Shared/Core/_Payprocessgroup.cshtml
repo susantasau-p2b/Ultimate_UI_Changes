@@ -1,0 +1,144 @@
+﻿@{
+    Layout = null;
+}
+@model P2b.Global.PayProcessGroup
+@*<link href="~/Content/Payprocessgroup/Payprocessgroup.css" rel="stylesheet" />*@
+<style>
+
+    .icon-row {
+        position: relative;
+        left: 53px;
+        top: -150px;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 100px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 402px;
+    }
+    .row1 {
+        width: 264px;
+    }
+</style>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css("height", "100px");
+        //for (var i = 0; i <= 30; i++) {
+        //    var j = i + 1;
+        //    $('#PayDate_drop').append("<option value='" + j + "'>" + j + "</option>");
+        //}
+        //$('#PayDate_drop').selectmenu().selectmenu("refresh").selectmenu('menuWidget').css('height', '100px');
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PayProcessGroup-PayrollPeriod').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PayrollPeriod_partial", "PayrollPeriod")', 'Create PayrollPeriod', 'open', '@Url.Action("Create", "PayrollPeriod")', '#frmPayrollPeriod', 'Message :', 'Request Falied :', '#JqGrid', 250, 355, '', '', '', '#frmPayProcessGroup', '', function (data) {
+                $('#PayrollPeriodlist').P2BLookUpEncapsulate('#PayrollPeriodlist', 'PayrollPeriodlist', data[0], data[1], 'PayrollPeriodlist', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', 'A');
+                //$('#PayrollPeriodlist').P2BLookUpEncapsulate('#PayrollPeriodlist', 'PayrollPeriodlist', data[0], data[1], 'PayrollPeriodlist');
+            });
+          
+            event.preventDefault();
+        });
+
+        $('#Edit-PayProcessGroup-PayrollPeriod').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PayrollPeriodlist').P2BGetTableDataonSelectedRow('#PayrollPeriodlist', 0);
+            b = a[0];
+
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PayrollPeriod_partial", "PayrollPeriod")', '@Url.Action("Edit", "PayrollPeriod")', b, '@Url.Action("EditSave", "PayrollPeriod")', 'Edit PayrollPeriod', '#frmPayrollPeriod', b, 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '#frmPayProcessGroup', '#PayrollPeriodlist', 'PayrollPeriodlist', 'PayrollPeriodlist', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#frmPayrollPeriod').trigger('reset');
+                    //$('#Name').val(k.Name);
+                  // alert(k.StartDate);
+                    // $('#ToDate_drop').val(k.StartDate);
+                //  $('#StartDate_drop').P2BSelectMenuAppend("@@Url.Action("PopulateDropDownList", "PayrollPeriod")", k.id, k.StartDate);
+                    $('#PayDate_drop1').val(k.PayDate);
+                    $('#ToDate_drop').val(k.EndDate);
+                   $('#StartDate_drop').val(k.StartDate);
+                  
+                });
+
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Lookup-PayProcessGroup-PayrollPeriod').button().on('click', function (event) {
+           //$('.dialog').P2BLookUpModal('@@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetailsList', 'ContactDetailsList', 5, 'ContactDetailsList', '#frmCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'Lookup_table', 'PageNavPosition');
+            $('.dialog_PayrollPeriod').P2BLookUpModal('@Url.Action("GetPayrollPeriodLKDetails", "PayProcessGroup")', '', 'lookupdiv_PayrollPeriod', 'PayrollPeriod Look Up Data', '#PayrollPeriodlist', 'PayrollPeriodlist', 5, 'PayrollPeriodlist', '#frmPayProcessGroup', 'N', '', 'Lookup_table1', 'pageNavPosition_PayrollPeriod');
+            event.preventDefault();
+        });
+
+        $('#LookUp_Skill_empAcademicDtl').on('click', function (event) {
+            //alert ('Show Hobby')
+            $('.Lookup_Increment').P2BLookUpModal('@Url.Action("GetSkillLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#SkillList', 'SkillList', 5, 'SkillList', '#frmEmpAcademicInfo', 'A', '#Remove_Skill_empAcademicDtl,#Edit_Skill_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+
+        });
+
+        $('#Remove-PayProcessGroup-PayrollPeriod').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            //var a = [], b;
+            //a = $('#PayrollPeriodlist').P2BGetTableDataonSelectedRow('#PayrollPeriodlist', 0);
+            //b = a[0];
+            //console.log(b);
+
+            var selectedRows = [];
+
+            selectedRows = $('#PayrollPeriodlist').P2BGetTableDataonSelectedRow('#PayrollPeriodlist', 0);
+
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "Medicine")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LookupValueslist', $('#PayrollPeriodlist').val(), 200, 200, '#frmPayProcessGroup', '#PayrollPeriodlist');
+            event.preventDefault();
+        });
+
+        //$('#PayDate_drop,#PayFrequency_drop').selectmenu().selectmenu("menuWidget");
+
+        $('#PayFrequency_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 421, "");
+        $('#PayDate_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 550, "");
+        
+    });
+</script>
+<div class="dialog_PayrollPeriod">
+    <div title="LookUp Data">
+        <div class="lookupdiv_PayrollPeriod"></div>
+    </div>
+    <div id="pageNavPosition_PayrollPeriod">
+
+    </div>
+</div>
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPayProcessGroup", name = "frmPayProcessGroup" })) 
+    { 
+    <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must"})</div>
+    <div class="row3 content_margine">@Html.LabelFor(m => m.PayMonthConcept, "Pay Month Concept :", new { @class = "popup-content-label" })<select class="selectmenu" style="width:120px" id="PayDate_drop" name="PayDate_drop"><option>-Select-</option></select></div>
+    <div class="row3 content_margine">@Html.LabelFor(m => m.PayFrequency, "Pay Frequency :", new { @class = "popup-content-label must" })<select class="selectmenu must" style="width:120px" id="PayFrequency_drop" name="PayFrequency_drop"><option>-Select-</option></select></div>
+    @*<div class="pay_row2 content_margine">@Html.LabelFor(m => m.PayDate, "Pay Date :", new { @class = "pay_popup-content-label" })<select class="drop" id="PayDate_drop" name="PayDate_drop"><option>-Select-</option></select></div>*@
+    @*<div class="pay_row2 content_margine">@Html.LabelFor(m => m.PayFrequency, "Pay Frequency :", new { @class = "pay_popup-content-label" })<select class="drop" id="PayFrequency_drop" name="PayFrequency_drop"><option></option></select></div>*@
+    <div class="row3 content_margine">@Html.LabelFor(m => m.PayrollPeriod, "Payroll Period :", new { @class = "popup-content-label" })  
+    <div class="popup-content-table">
+    <table class="lookuptableselected" id="PayrollPeriodlist">
+         <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+ </table>
+</div>
+        <div class="icon-row">
+            <button data-p2btooltip="LookUp PayrollPeriod" class="popup-content-icon-lookup" id="Lookup-PayProcessGroup-PayrollPeriod"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+            <button data-p2btooltip="Create PayrollPeriod" class="popup-content-icon-create" id="Create-PayProcessGroup-PayrollPeriod"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+            @*<button data-p2btooltip="Edit PayrollPeriod" class="popup-content-icon-edit" id="Edit-PayProcessGroup-PayrollPeriod"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+            <button data-p2btooltip="Remove PayrollPeriod" class="popup-content-icon-remove" id="Remove-PayProcessGroup-PayrollPeriod"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+        </div>
+    </div>
+    }
+</div>
+

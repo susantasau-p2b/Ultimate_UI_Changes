@@ -1,0 +1,493 @@
+﻿@{
+    ViewBag.Title = "NoticePeriodProcess";
+}
+@model EMS.NoticePeriodProcess
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 130px;
+            top: -150px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 270px;
+        }
+        .popup-content-label1 {
+            display: block;
+            float: left;
+            width: 175px;
+        }
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 548px;
+        }
+
+        .row2 {
+            display: inline-block;
+            width: 333px;
+        }
+
+        .add-dialog-content {
+            float: right;
+            right: 0;
+            width: 678px;
+        }
+
+        .form-of-element {
+            display: block;
+            border: #DEDEDE solid 0.1px;
+            width: auto;
+            height: 351px;
+            padding: 5px 2px;
+            margin-top: 3px;
+        }
+
+        .select_div {
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+              
+                @*<button class="button" id="add">Add</button>*@
+             
+                <button class="button" id="Create">Create</button>
+                <button class="button" data-typeofbtn="process" id="View">View</button>
+                <button class="button" data-typeofbtn="release" id="Edit">Edit</button>
+                <button class="button" data-typeofbtn="delete" id="Delete">Delete</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @*<div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                       
+                    </table>
+                </div>
+            </div>
+          
+        </div>
+    </div>*@
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmNoticePeriodProcess", name = "frmNoticePeriodProcess" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="BlockId" type="hidden" name="BlockId" />
+            <input id="geo_id" name="geo_id" class="filter_structure_id" />
+            <input id="pay_id" name="pay_id" class="filter_structure_id" />
+            <input id="fun_id" name="fun_id" class="filter_structure_id" />
+            <div class="filter-div">
+                <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                <div id="FormFilter"></div>
+            </div>
+            <div class="form-of-element">
+
+                <div class="fileremployee" id="Empl_list_h">
+                    <div class=" employee-transcationdiv" style="float:left">
+                    <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                    <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                        <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                    </table>
+                </div>
+                </div>
+
+                <div class="add-dialog-content">
+                    @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.ResignDate, "Resign Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ResignDate, new { @class = "popup-content-textbox must", @maxlength = "10" })
+                    </div>*@
+                    <div class="row3 content_margine" >
+                        @Html.LabelFor(m => m.NoticePeriod_Object, "Notice Period Object :", new { @class = "popup-content-label1" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="NoticePeriodlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Lookup Notice Period object Details" class="popup-content-icon-lookup" id="Lookup-NoticePeriod-Object"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Holiday Calendar Details" class="popup-content-icon-create" id="Create-HOCalendar-Location"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Holiday Calendar Details" class="popup-content-icon-edit" id="Edit-HOCalendar-Location"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove Holiday Calendar Details" class="popup-content-icon-remove" id="Remove-NoticePeriod-Object"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LastWorkDateByComp, "Last Working Date By Company Policy :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LastWorkDateByComp, new { @class = "popup-content-textbox must", @maxlength = "10", @readonly = "readonly" })
+                    </div>
+                   
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsNoticePeriodWaived, "Is Notice Period Waived :", new { @class = "popup-content-label must" })
+                        <div class="popup_radio_button radio_button_div_3">
+                            <span class="popup_radio_button radio_button_div_1">
+                                <input type="radio" id="radio5" name="IsNoticePeriodWaived" value="true" /><label for="radio5">Yes</label>
+                                <input type="radio" id="radio6" name="IsNoticePeriodWaived" value="false" checked="checked" /><label for="radio6">No</label>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="RequestAckdiv1" class="row3 content_margine">
+                        @Html.LabelFor(m => m.WaiveDays, "Waive Days  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.WaiveDays, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LastWorkDateApproved, "Last Working Date Approved by company :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LastWorkDateApproved, new { @class = "popup-content-textbox must", @maxlength = "10" })
+                    </div>
+
+                    
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsLeaveAdjustInNoticePeriodRecovery, "Is Leave adjust in Notice Period Recovery :", new { @class = "popup-content-label must" })
+                        <div class="popup_radio_button radio_button_div_2">
+                            <span class="popup_radio_button radio_button_div_2">
+                                <input type="radio" id="radio3" name="IsLeaveAdjustInNoticePeriodRecovery" value="true" /><label for="radio3">Yes</label>
+                                <input type="radio" id="radio4" name="IsLeaveAdjustInNoticePeriodRecovery" value="false" checked="checked" /><label for="radio4">No</label>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="requestackdiv2" class="row3 content_margine">
+                        @Html.LabelFor(m => m.LeaveAdjustDays, "Leave Adjust Days  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LeaveAdjustDays, new { @class = "popup-content-textbox must" })
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Reason, "Reason  :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Reason, new { @class = "popup-content-textbox must" })
+                    </div>
+
+
+                   
+
+                    @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.IsRequestAck, "Is Request Ack :", new { @class = "popup-content-label must" })
+                        <div class="popup_radio_button radio_button_div_1">
+                            <span class="popup_radio_button radio_button_div_1">
+                                <input type="radio" id="radio1" name="IsRequestAck" value="true" /><label for="radio1">Yes</label>
+                                <input type="radio" id="radio2" name="IsRequestAck" value="false" checked="checked" /><label for="radio2">No</label>
+                            </span>
+                        </div>
+                    </div>
+                                       
+                    <div id="RequestAckdiv1" class="row3 content_margine">
+                        @Html.LabelFor(m => m.RequestAckDate, "Request Ack Date :", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.RequestAckDate, new { @class = "popup-content-textbox", @maxlength = "10" })
+                    </div>*@
+
+
+                   
+
+                    
+                  
+
+                    
+
+                    
+                    @*<div class="row2 select_div content_margine"><label class="popup-content-label must">LTC Block</label><input name="txtLTCBlock" type="text" id="txtLTCBlock" /></div>
+                        <div class="row2 select_div content_margine">@Html.LabelFor(m => m.LTC_TYPE, "LTC Type :", new { @class = "popup-content-label must" })<select id="LTCTypelist" name="LTCTypelist" class="drop must" style="width:159px;"><option value="0">-Select-</option></select></div>
+                        <div class="row2 content_margine">
+                            @Html.LabelFor(m => m.LvNewReq, "Leave Requisition:", new { @class = "popup-content-label must" })<select id="LvReqList" name="LvReqList" style="width:161px;" class="drop must"><option value="0">-Select-</option></select>
+                        </div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.DateOfAppl, "Requisition Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.DateOfAppl, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.TravelStartDate, "Travel Start Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelStartDate, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.TravelEndDate, "Travel End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TravelEndDate, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.ProposedPlace, "Proposed Place :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProposedPlace, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.LTC_Eligible_Amt, "LTC Eligible Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTC_Eligible_Amt, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.LTCAdvAmt, "LTC Advance Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTCAdvAmt, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.LTCSanctionedAmt, "LTC Sanctioned Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.LTCSanctionedAmt, new { @class = "popup-content-textbox must" })</div>
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.Remark, "Remark :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Remark, new { @class = "popup-content-textbox must" })</div>*@
+
+
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Code', 'Name', 'LastWorkDateByComp', 'LastWorkDateApproved', 'Id'];
+        ColNames = ['Code', 'Name', 'LastWorkDateByComp', 'LastWorkDateApproved', 'Id'];
+        SortName = 'Id';
+        Caption = 'Notice Period Process';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#WaiveDays').ForceAmount().MaxLength(8);
+        $('#WaiveDays').attr("value", "0");
+        $('#LeaveAdjustDays').attr("value", "0");
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        $('#LastWorkDateByComp').attr("readonly", "readonly");
+
+        $('input[name="IsNoticePeriodWaived"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $("#RequestAckdiv1").fadeOut();
+                $("#WaiveDays").val("0");
+            }
+            else {
+               
+                $("#RequestAckdiv1").fadeIn();
+
+            }
+        });
+
+        $('input[name="IsLeaveAdjustInNoticePeriodRecovery"]:radio').change(function () {
+            if (this.value == "false") {
+
+                $("#requestackdiv2").fadeOut();
+                $("#LeaveAdjustDays").val("0");
+            }
+            else {
+
+                $("#requestackdiv2").fadeIn();
+
+            }
+        });
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+        $('#WaiveDays').on('change', function (event) {
+            var e = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+           
+            $.ajax({
+                url: '@Url.Action("GetPolicyDate", "NoticePeriodProcess")',
+                method: "POST",
+                data: $('#frmNoticePeriodProcess').serialize() + '&data=' + e,
+                beforeSend: function () {
+                    ajaxloaderv2('body');
+                },
+                success: function (data) {
+                    $.each(data, function (i, k) {
+
+                        $("#LastWorkDateApproved").val(k.LastWorkDateApproved);
+
+                    });
+
+                },
+                complete: function () {
+                    $('.ajax_loder').remove();
+                }
+            });
+            event.preventDefault();
+
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    //console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#CreateRelease_dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#Empl_list_h').fadeIn();
+            $('#frmNoticePeriodProcess').trigger("reset");
+            $.LoadEmpByDefault(true, '#txtPayMonth');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Notice Period Process', 'open', '@Url.Action("Create")', '#frmNoticePeriodProcess', 'Message :', 'Request Falied :', '#JqGrid', 570, 1055, '', '', function (data) { }, '');
+
+
+
+
+            event.preventDefault();
+
+        });
+
+        $('#Edit').on('click', function () {
+
+            AssignData();
+            $('#Empl_list_h').fadeOut();
+            @*$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Resignation Request Data", '#frmNoticePeriodProcess', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 570, 1055, '#AddressList,#ContactDetailsList', '', function (data) {*@
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")?param=' + dt.Code, dt.Id, '@Url.Action("EditSave")?param=' + dt.Code, "Edit Notice Period Process->" + JSON.stringify(dt) + "", '#frmNoticePeriodProcess', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 570, 1055, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+
+                    $('#Reason').val(k.Reason);
+                    $('#LeaveAdjustDays').val(k.LeaveAdjustDays);
+                    $('#WaiveDays').val(k.WaiveDays);
+                    //$('#RequestAckDate').val(DateConvert(k.RequestAckDate));
+                    $('#LastWorkDateByComp').val(DateConvert(k.LastWorkDateByComp));
+                    $('#LastWorkDateApproved').val(DateConvert(k.LastWorkDateApproved));
+                    //$('#ResignDate').val(DateConvert(k.ResignDate));
+                   // $('[name="IsRequestAck"]').val([k.IsRequestAck]).button().button("refresh");
+                    $('[name="IsLeaveAdjustInNoticePeriodRecovery"]').val([k.IsLeaveAdjustInNoticePeriodRecovery]).button().button("refresh");
+                    $('[name="IsNoticePeriodWaived"]').val([k.IsNoticePeriodWaived]).button().button("refresh");
+                });
+
+                //partial page bind
+                
+                $.each(data[1], function (i, k) {
+                    $('#NoticePeriodlist').P2BLookUpEncapsulate('#NoticePeriodlist', 'NoticePeriodlist', k.Id, k.PolicyName, 'NoticePeriodlist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+
+                });
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+
+
+
+
+            });
+
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Empl_list_h').fadeOut();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Notice Period Process', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 570, 1055, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+
+                    $('#Reason').val(k.Reason);
+                    $('#LeaveAdjustDays').val(k.LeaveAdjustDays);
+                    $('#WaiveDays').val(k.WaiveDays);
+                  //  $('#RequestAckDate').val(DateConvert(k.RequestAckDate));
+                    $('#LastWorkDateByComp').val(DateConvert(k.LastWorkDateByComp));
+                    $('#LastWorkDateApproved').val(DateConvert(k.LastWorkDateApproved));
+                  //  $('#ResignDate').val(DateConvert(k.ResignDate));
+                  //  $('[name="IsRequestAck"]').val([k.IsRequestAck]).button().button("refresh");
+                    $('[name="IsLeaveAdjustInNoticePeriodRecovery"]').val([k.IsLeaveAdjustInNoticePeriodRecovery]).button().button("refresh");
+                    $('[name="IsNoticePeriodWaived"]').val([k.IsNoticePeriodWaived]).button().button("refresh");
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#NoticePeriodlist').P2BLookUpEncapsulate('#NoticePeriodlist', 'NoticePeriodlist', k.Id, k.PolicyName, 'NoticePeriodlist', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
+
+                });
+                $('#Autho_Allow').val(data[3]);
+
+            });
+        });
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Lookup-NoticePeriod-Object').button().on('click', function (event) {
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            if (a.val == "" || a.length == 0) {
+                alert("Please select Employee");
+                return false;
+            }
+       
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsNoticeobject", "NoticePeriodProcess")?Empid=' + a, '', 'LookupDiv', 'NoticePeriod Look Up Data', '#NoticePeriodlist', 'NoticePeriodlist', 5, 'NoticePeriodlist', '#frmNoticePeriodProcess', 'A', '#Edit-HOCalendar-Location,#Remove-NoticePeriod-Object', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                // alert($(this).val());
+                var id = $(this).val();
+                $.get("@Url.Action("GetEmpLastworkdaybyComp")", { data: id }, function (data) {
+                  
+                    if (data == null)
+                    {
+                       
+                        $('#LastWorkDateByComp').val().attr("readonly", "readonly");
+                        $('#LastWorkDateApproved').val();
+
+                    } else
+                    {
+                        
+                        $('#LastWorkDateByComp').val(data).attr("readonly", "readonly");
+                        $('#LastWorkDateApproved').val(data);
+                    }
+                   
+                });
+
+            }
+        });
+
+        $('#Remove-NoticePeriod-Object').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#NoticePeriodlist').P2BGetTableDataonSelectedRow('#NoticePeriodlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#NoticePeriodlist').P2BGetTableDataonSelectedRow('#NoticePeriodlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#NoticePeriodlist', $('#NoticePeriodlist').val(), 200, 200, '#frmNoticePeriodProcess', '#NoticePeriodlist', '#Edit-HOCalendar-Location,#Remove-NoticePeriod-Object');
+            event.preventDefault();
+        });
+        $(function () {
+            //$('#Date-edit,#DateOfCloser-edit,#DateOfMaturity-edit').P2BDatePicker();
+            $('button').button();
+            $('.popup_radio_button').controlgroup();
+            $('#RequestAckDate,#LastWorkDateApproved,#ResignDate').P2BDatePicker();
+        });
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+    });
+</script>

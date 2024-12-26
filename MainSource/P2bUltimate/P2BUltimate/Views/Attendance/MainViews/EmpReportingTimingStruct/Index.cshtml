@@ -1,0 +1,528 @@
+﻿@{
+    ViewBag.Title = "Emp Reporting Timing Struct";
+}
+@model Attendance.EmpReportingTimingStruct
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+
+    <style>
+        #lvdata {
+            float: right;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 70px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 112px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .row5 {
+            width: 282px;
+            display: inline-flex;
+        }
+
+        .row2 {
+            width: 250px;
+            display: inline-block;
+            /*! margin-left: -89px; */
+            position: absolute;
+            left: 191px;
+            top: 137px;
+        }
+
+        .loader {
+            width: 299px;
+            /*! display: inline-flex; */
+            /*! margin-left: -89px; */
+        }
+
+        .addwidth {
+            width: 453px;
+            height: 58px;
+        }
+
+        #process {
+            top: 29px;
+            left: 76px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 554px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 554px;
+            width: 610px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function (e) {
+            $('button').button();
+            var dt;
+            var btndisablename = "";
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                    returnat: function (data) {
+                        console.log(data);
+                        var forwarddata = JSON.stringify(data);
+                        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+
+                    },
+                    renderat: "#FormFilter", hierarchy: true,
+                });
+                //console.log($('#FormFilter')[0]);
+            });
+
+
+            $('#MyTable').MultiLevelInlineEditGrid({
+                url: "@Url.Action("Emp_Grid", "EmpReportingTimingStruct")",
+                htmurl: "@Url.Action("GridPartial", "EmpReportingTimingStruct")",
+                columnname: ["Code", "Name", "Id"],
+                childheader: ["EffectiveDate", "EndDate", "ReportingTimingStruct", "Applicable", "Id"],
+                childurl: "@Url.Action("Get_EmpRepoTimingStructData", "EmpReportingTimingStruct")",
+                tableheader: "Emp Timing Structure Assignment",
+                childurlColumnNo: "3"
+            });
+
+            $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+                var parent_element = $(init).parents('td:last').parent().prev();
+                console.log(id);
+                console.log(htmurl);
+                console.log(parent_element);
+                var dt = $('#MyTable').DataTable();
+                var htmlcomponant = {
+                    init: init,
+                    Id: id,
+                    idx: parentid,
+                    htmurl: htmurl,
+                    editurl: editurl,
+                    submiturl: submiturl,
+                };
+                if ($(init).hasClass('ui-icon-newwin')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: htmurl,
+                        state: "open",
+                        mode: "View",
+                        editurl: "@Url.Action("GridEditData", "EmpReportingTimingStruct")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                $('#Grid-ReqDate').val(k.ReqDate);
+                                $('#Grid-FromDate').val(k.FromDate);
+                                $('#Grid-ToDate').val(k.ToDate);
+                                $('#Grid-TotalDays').val(k.TotalDays);
+                                $('#Grid-Reason').val(k.Reason);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-pencil')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        height: 'auto',
+                        width: 'auto',
+                        form: "#EditGridForm",
+                        htmlurl: "@Url.Action("GridPartial", "EmpReportingTimingStruct")",
+                        state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("GridEditData", "EmpReportingTimingStruct")",
+                        submiturl: "@Url.Action("GridEditsave", "EmpReportingTimingStruct")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                            $.each(data, function (i, k) {
+                                //console.log(k.MonthlyInstallmentAmount);
+                                $('#Edit-InstallmentPaid').val(k.InstallmentPaid);
+                                //$('#Edit-MonthlyPricipalAmount').val(k.MonthlyPricipalAmount);
+                            });
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                } else if ($(init).hasClass('ui-icon-trash')) {
+                    return false;
+                    $('<div></div>').PartialCreateDialog({
+                        state: "open",
+                        mode: "Delete",
+                        submiturl: "@Url.Action("GridDelete")",
+                        forwarddata: id,
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                    });
+                }
+            };
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+            $('#Create_Dialog').P2BCreateDialog();
+            $('#Create').button().on("click", function (e) {
+                $('#frmEmpReportingTimingStruct').trigger('reset');
+                //$.LoadEmpByDefault();
+                $.LoadEmpByDefaultWOGeoId(false, "");
+                $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Emp Reporting Timing Struct ', 'open', '@Url.Action("create") ', '#frmEmpReportingTimingStruct', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', btndisablename, function (data) { }, { datatablename: "#MyTable" });
+                $('#EffectiveDate').attr('readonly', true);
+                $('#EndDate').attr('readonly', true);
+                e.preventDefault();
+            });
+
+            $('#Lookup-ReportingTimingStruct-EmpReportingTimingStruct').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetReportingTimingStructLKDetails", "EmpReportingTimingStruct")', '', 'LookupDiv', 'Reporting Timing Struct Look Up Data', '#ReportingTimingStructlist', 'ReportingTimingStructlist', 5, 'ReportingTimingStructlist', '#frmEmpReportingTimingStruct', 'N', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+
+            $('<div></div>').P2BPartialCreateModalDialog();
+            $('#Create-ReportingTimingStruct-EmpReportingTimingStruct').on("click", function (event) {
+                $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Index", "ReportingTimingStruct")', 'Create Reporting Timing Struct', 'open', '@Url.Action("Create", "ReportingTimingStruct")', '#frmReportingTimingStruct', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmEmpReportingTimingStruct', '', function (data) {
+                    // to show data which is created in partial page
+                    $('#ReportingTimingStructlist').P2BLookUpEncapsulate('#ReportingTimingStructlist', 'ReportingTimingStructlist', data[0], data[1], 'ReportingTimingStructlist', '', 'N');
+                });
+                event.preventDefault();
+            });
+
+
+            $('#Edit-ReportingTimingStruct-EmpReportingTimingStruct').button().on("click", function (event) {
+                var a = [], b;
+                a = $('#ReportingTimingStructlist').P2BGetTableDataonSelectedRow('#ReportingTimingStructlist', 0);
+                b = a[0];
+                //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+                $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Index", "ReportingTimingStruct")', '@Url.Action("Edit", "ReportingTimingStruct")', b, '@Url.Action("EditSave", "ReportingTimingStruct")', 'Edit Reporting Timing Struct Data', '#frmReportingTimingStruct', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmEmpReportingTimingStruct', '#ReportingTimingStructlist', 'ReportingTimingStructlist', 'ReportingTimingStructlist', 'N', '', function (data) {
+                    // setTimeout(function () {
+                    //to bind data according to selected id
+                    $.each(data[0], function (i, k) {
+                        $('#frmReportingTimingStruct').trigger("reset");
+                        $('[name="GeographicalAppl"]').val([k.GeographicalAppl]).button().button("refresh");
+                        console.log(k.GeographicalAppl);
+                        if (k.GeographicalAppl == false) {
+                            $('#hidelv').fadeOut();
+                        }
+                        else {
+                            $('#hidelv').fadeIn();
+
+                        }
+                        $('[name="IsTimeRoaster"]').val([k.IsTimeRoaster]).button().button("refresh");
+                        $('[name="IndividualAppl"]').val([k.IndividualAppl]).button().button("refresh");
+
+                        if (k.IndividualAppl == false) {
+                            $('#hide').fadeOut();
+                        }
+                        else {
+                            $('#hide').fadeIn();
+
+                        }
+                        $('#RSName').val(k.RSName);
+                        $('#GeoGraphList-drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 604, k.GeoGraphList_Id);
+                    });
+                    $.each(data[1], function (i, k) {
+                        $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.GeoGraphList_Id, k.GeoGraphList_val, 'TimingPolicylist', '', 'N');
+                    });
+                });
+                event.preventDefault();
+            });
+
+           
+
+            //partial page delete
+            $('#Remove-ReportingTimingStruct-EmpReportingTimingStruct').button().on('click', function (event) {
+                //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                //var a = [], b;
+                //a = $('#ReportingTimingStructlist').P2BGetTableDataonSelectedRow('#ReportingTimingStructlist', 0);
+                //b = a[0];
+                var selectedRows = [];
+                selectedRows = $('#ReportingTimingStructlist').P2BGetTableDataonSelectedRow('#ReportingTimingStructlist', 0);
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ReportingTimingStructlist', $('#ReportingTimingStructlist').val(), 200, 200, '#frmEmpReportingTimingStruct', '#ReportingTimingStructlist', '');
+                event.preventDefault();
+            });
+
+            $('#Edit').on('click', function () {
+                AssignData();
+                $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Emp Reporting Timing Struct Data", '#frmEmpReportingTimingStruct', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 650, 1200, '#ReportingTimingStructlist', '', function (data) {
+                    // setTimeout(function () {
+                    $.each(data[0], function (i, k) {
+                        console.log(k.EffectiveDate);
+                        if (k.EffectiveDate != null) {
+                            $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                        }
+                        if (k.EndDate != null) {
+                            $('#EndDate').val(DateConvert(k.EndDate));
+                        }
+                        //   $('#Code').attr('readonly', 'readonly');
+                    });
+                    $.each(data[1], function (i, k) {
+                        console.log(k.GeoGraphList_Id);
+                        $('#ReportingTimingStructlist').P2BLookUpEncapsulate('#ReportingTimingStructlist', 'ReportingTimingStructlist', k.GeoGraphList_Id, k.GeoGraphList_val, 'ReportingTimingStructlist', '', 'N');
+                    });
+                    //$.each(data[1], function (i, k) {
+                    //    $('#TimingPolicylist').P2BLookUpEncapsulate('#TimingPolicylist', 'TimingPolicylist', k.GeoGraphList_Id, k.GeoGraphList_val, 'TimingPolicylist', '', 'N');
+                    //});
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
+            });
+
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+                event.preventDefault();
+            });
+
+
+            $('#EffectiveDate').P2BDatePicker();
+            $('#EndDate').P2BDatePicker();
+
+            $('#Autho').makeDisable('#Create,#Edit,#Delete');
+            //$('.popup_radio_button').controlgroup();
+            $('.drop').selectmenu().selectmenu('menuWidget');
+        });
+    </script>
+</head>
+
+<body>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                @*<div style="float:left">
+                            <label id="LabelCalendar" class="emplist_label">Calendar:</label>
+                            <select id="Calendar_DDL" name="Calendar_DDL" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                        </div>*
+                    @*<button class="button" id="Load">Load</button>*@
+                <button class="button" id="Create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>Employee Code</th>
+                                <th>Employee Name</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvNewReq">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmEmpReportingTimingStruct", name = "frmEmpReportingTimingStruct" }))
+        {
+            <div class="heading">Filter View</div>
+
+            <div class="filter-div">
+                <label class="advance_filter_label">
+                    Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol">
+                    </span>
+                </label>
+                <div id="FormFilter"></div>
+            </div>
+
+            <div class="section1_Leave">
+                <div class="heading">Employee List</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div>
+                            <label>Search:</label>
+                            <input type="text" id="Employee-Search" style="width: 425px;" />
+                        </div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                            <tr>
+                                <th><input type="checkbox" id="Case-Employee" /></th>
+                                <th>Employee</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+
+            <div class="heading">Filter View</div>
+            <div class="section2_Leave">
+
+                <div class="heading">Reporting Timing Structure Details</div>
+                <div>@Html.LabelFor(m => m.EffectiveDate, "Effective Date :", new { @class = "must must popup-content-label" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox must" })</div>
+                @*    <div>@Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "must must popup-content-label" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox " })</div>*@
+                <div class="row1 content_margine">
+                    <div id="ReportingTimingStructlist_old"></div>
+                    @Html.LabelFor(m => m.ReportingTimingStruct, "Reporting Timing Struct :", new { @class = "popup-content-label must" })
+                    <div class="popup-content-table" >
+                        <table class="lookuptableselected" id="ReportingTimingStructlist">
+                            <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                        </table>
+                    </div>
+                    <div class="icon-row itsec_icon-row">
+                        <button data-p2btooltip="LookUp Reporting Timing Struct" class="popup-content-icon-lookup" id="Lookup-ReportingTimingStruct-EmpReportingTimingStruct"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Create Reporting Timing Struct" class="popup-content-icon-create" id="Create-ReportingTimingStruct-EmpReportingTimingStruct"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Edit Reporting Timing Struct" class="popup-content-icon-edit" id="Edit-ReportingTimingStruct-EmpReportingTimingStruct"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                        <button data-p2btooltip="Remove Reporting Timing Struct" class="popup-content-icon-remove" id="Remove-ReportingTimingStruct-EmpReportingTimingStruct"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

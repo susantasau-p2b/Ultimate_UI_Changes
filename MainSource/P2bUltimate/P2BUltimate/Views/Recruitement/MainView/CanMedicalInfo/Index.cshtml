@@ -1,0 +1,770 @@
+﻿@{
+    ViewBag.Title = "CanMedicalInfo";
+}
+@model P2b.Global.EmpMedicalInfo
+<html>
+
+
+<head>
+    <title></title>
+    <style>
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            width: 148px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .popup-content-label-2 {
+            width: 100px;
+            display: block;
+            float: left;
+            margin: 1px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 688px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 2px solid #ddd;
+            height: 1054px;
+            width: 531px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+            padding-left: 11px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 106px;
+            top: -146px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 471px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .row6 {
+            width: 370px;
+            display: inline-block;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorise</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog_address">
+        <div title="LookUp Data">
+            <div class="lookupdiv_address"></div>
+        </div>
+        <div id="pageNavPosition_address">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmCanMedicalInfo", name = "frmCanMedicalInfo" }))
+        {
+            <div class="section_Method" id="section_emp">
+                <div class="heading" style="width:1065px">Candidate List</div>
+
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left" id="asd">
+                        <div><label>Search : </label><input type="text" id="Candidate-search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Candidate_table" style="height: 1035px">
+                            <tr><th><input type="checkbox" id="Case-Employee" class="Chck_emp" /></th><th>Candidate</th></tr>
+                        </table>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <div class="section2_Leave">
+                <div class=" " style="width: 506px;">
+                    <input id="Autho_Action" type="hidden" name="Autho_Action" />
+                    <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+
+                    <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.BloodGroup, "Blood Group :", new { @class = "popup-content-label must" })<select id="BloodGrouplist" name="BloodGrouplist" class="drop must" style="width:161px;"><option></option></select></div>
+
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.Height, "Height :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Height, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.Weight, "Weight :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Weight, new { @class = "popup-content-textbox must" })</div>
+
+
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Allergy, "Allergy :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Alergylist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp Allergy Details" class="popup-content-icon-lookup" id="Lookup-Alergy-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Allergy Details" class="popup-content-icon-create" id="Create-Alergy-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Allergy Details" class="popup-content-icon-edit" id="Edit-Alergy-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Allergy Details" class="popup-content-icon-remove" id="Remove-Alergy-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Disease, "Disease :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Diseaselist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp Disease Details" class="popup-content-icon-lookup" id="Lookup-Disease-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Disease Details" class="popup-content-icon-create" id="Create-Disease-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Disease Details" class="popup-content-icon-edit" id="Edit-Disease-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Disease Details" class="popup-content-icon-remove" id="Remove-Disease-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.Doctor, "Doctor :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="Doctorlist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp Doctor Details" class="popup-content-icon-lookup" id="Lookup-Doctor-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create Doctor Details" class="popup-content-icon-create" id="Create-Doctor-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit Doctor Details" class="popup-content-icon-edit" id="Edit-Doctor-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove Doctor Details" class="popup-content-icon-remove" id="Remove-Doctor-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.EmergencyContact, "Emergency Contact No :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="EmergencyContactlist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp EmergencyContact Details" class="popup-content-icon-lookup" id="Lookup-EmergencyContact-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create EmergencyContact Details" class="popup-content-icon-create" id="Create-EmergencyContact-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit EmergencyContact Details" class="popup-content-icon-edit" id="Edit-EmergencyContact-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove EmergencyContact Details" class="popup-content-icon-remove" id="Remove-EmergencyContact-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.HospitalAddress, "Hospital Address :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="HospitalAddressList">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp HospitalAddress Details" class="popup-content-icon-lookup" id="Lookup-HospitalAddress-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create HospitalAddress Details" class="popup-content-icon-create" id="Create-HospitalAddress-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit HospitalAddress Details" class="popup-content-icon-edit" id="Edit-HospitalAddress-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove HospitalAddress Details" class="popup-content-icon-remove" id="Remove-HospitalAddress-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.HospitalContactDetails, "Hospital Contact Details :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="HospitalContactDetailslist">
+                                <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="LookUp HospitalContactDetails Details" class="popup-content-icon-lookup" id="Lookup-HospitalContactDetails-EmpMedicalInfo"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create HospitalContactDetails Details" class="popup-content-icon-create" id="Create-HospitalContactDetails-EmpMedicalInfo"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit HospitalContactDetails Details" class="popup-content-icon-edit" id="Edit-HospitalContactDetails-EmpMedicalInfo"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove HospitalContactDetails Details" class="popup-content-icon-remove" id="Remove-HospitalContactDetails-EmpMedicalInfo"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.PreferredHospital, "Preferred Hospital :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.PreferredHospital, new { @class = "popup-content-textbox" })
+
+                    </div>
+                </div>
+            </div>
+            <div class="emplist_row">
+                <div id="Grid_Form2">
+
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+
+        $('button').button();
+
+        $('.popup_radio_button').controlgroup();
+        var dt;
+        var btndisable_Alergy = '#Edit-Alergy-EmpMedicalInfo,#Remove-Alergy-EmpMedicalInfo';
+        var btndisable_Disease = '#Edit-Disease-EmpMedicalInfo,#Remove-Disease-EmpMedicalInfo';
+        var btndisable_Doctor = '#Edit-Doctor-EmpMedicalInfo,#Remove-Doctor-EmpMedicalInfo';
+        var btndisable_EmergencyContact = '#Edit-EmergencyContact-EmpMedicalInfo,#Remove-EmergencyContact-EmpMedicalInfo';
+        var btndisable_HospitalAddress = '#Edit-HospitalAddress-EmpMedicalInfo,#Remove-HospitalAddress-EmpMedicalInfo';
+        var btndisable_HospitalContactDetails = '#Edit-HospitalContactDetails-EmpMedicalInfo,#Remove-HospitalContactDetails-EmpMedicalInfo';
+        var btndisable_all = btndisable_Alergy + ',' + btndisable_Disease + ',' + btndisable_Doctor + ',' + btndisable_EmergencyContact + ',' + btndisable_HospitalAddress + ',' + btndisable_HospitalContactDetails;
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name', 'Height', 'Weight'];
+        ColNames = ['Id', 'Name', 'Height', 'Weight'];
+        SortName = 'Id';
+        Caption = 'Employee Medical Information Details';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#Create').button().on("click", function (e) {
+            //console.log(btndisable_all);
+            $('#frmCanMedicalInfo').trigger('reset');
+            //  $.LoadCanByDefault(true,"02/2017");
+            $.LoadCanByDefault();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Candidate Medical Information', 'open', '@Url.Action("create") ', '#frmCanMedicalInfo', 'Message :', 'Request Falied :', '#JqGrid', 700, 1155, '#Alergylist,#Diseaselist,#Doctorlist,#EmergencyContactlist,#HospitalContactDetailslist,#HospitalAddressList', "", function (data) { });
+            $('#BloodGrouplist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 108, "");
+            e.preventDefault();
+        });
+
+
+        $('#Delete').button().click(function (e) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#frmCanMedicalInfo').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            e.preventDefault();
+        });
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            $('#section_emp').fadeOut();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Employee Medical Information->" + JSON.stringify(dt) + "", '#frmCanMedicalInfo', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 700, 1050, '#Alergylist,#Diseaselist,#Doctorlist,#EmergencyContactlist,#HospitalContactDetailslist,#HospitalAddressList', btndisable_all, function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmCanMedicalInfo').trigger('reset');
+                    $('#Height').val(k.Height);
+                    $('#Weight').val(k.Weight);
+                    $('#PreferredHospital').val(k.PreferredHospital);
+
+                    $('#BloodGrouplist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 108, k.BloodGroup_Id);
+                });
+
+
+                $.each(data[1], function (i, k) {
+                    $('#HospitalContactDetailslist').P2BLookUpEncapsulate('#HospitalContactDetailslist', 'HospitalContactDetailslist', k.HospitalContactDetails_Id, k.FullContactDetails, 'HospitalContactDetailslist', btndisable_HospitalContactDetails, 'N');
+                    $('#HospitalAddressList').P2BLookUpEncapsulate('#HospitalAddressList', 'HospitalAddressList', k.HospitalAddress_Id, k.HospitalAddress_FullAddress, 'HospitalAddressList', btndisable_HospitalAddress, 'N');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Diseaselist').P2BLookUpEncapsulate('#Diseaselist', 'Diseaselist', k.Disease_id, k.Disease_val, 'Diseaselist', btndisable_Disease, 'A');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Alergylist').P2BLookUpEncapsulate('#Alergylist', 'Alergylist', k.Allergy_id, k.Allergy_val, 'Alergylist', btndisable_Alergy, 'A');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Doctorlist').P2BLookUpEncapsulate('#Doctorlist', 'Doctorlist', k.Doctor_id, k.Doctor_val, 'Doctorlist', btndisable_Doctor, 'A');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmergencyContactlist').P2BLookUpEncapsulate('#EmergencyContactlist', 'EmergencyContactlist', k.EMCN_id, k.EMCN_val, 'EmergencyContactlist', btndisable_EmergencyContact, 'A');
+                });
+
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+
+            });
+            e.preventDefault();
+        });
+
+
+        //-------------------------------------------------------View--------------------------------------------------------------S
+        var Viewbtndisable = btndisable_all + ',' + '#Create-Alergy-EmpMedicalInfo,#Lookup-Alergy-EmpMedicalInfo,#Create-Disease-EmpMedicalInfo,#Lookup-Disease-EmpMedicalInfo,#Create-Doctor-EmpMedicalInfo,#Lookup-Doctor-EmpMedicalInfo,#Create-EmergencyContact-EmpMedicalInfo,#Lookup-EmergencyContact-EmpMedicalInfo,#Create-HospitalAddress-EmpMedicalInfo,#Lookup-HospitalAddress-EmpMedicalInfo,#Create-HospitalContactDetails-EmpMedicalInfo,#Lookup-HospitalContactDetails-EmpMedicalInfo';
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#section_emp').fadeOut();
+            // $('div [name="frmLookup"]').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Lookup Dialog', '#LookupValueslist', '#Lookup-LookupValues-Lookup,#Create-LookupValues-Lookup,#Edit-LookupValues-Lookup', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, "View Employee Medical Information ->" + JSON.stringify(dt) + "", '#HospitalContactDetailslist,#HospitalAddressList,#Diseaselist,#Alergylist,#Doctorlist,#EmergencyContactlist', Viewbtndisable, 700, 1050, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#frmCanMedicalInfo').trigger('reset');
+                    $('#Autho_Action').val(k.Action);
+                    $('#Height').val(k.Height);
+                    $('#Weight').val(k.Weight);
+                    $('#PreferredHospital').val(k.PreferredHospital);
+                    $('#BloodGrouplist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 108, k.BloodGroup_Id);
+                });
+
+
+                $.each(data[1], function (i, k) {
+                    $('#HospitalContactDetailslist').P2BLookUpEncapsulate('#HospitalContactDetailslist', 'HospitalContactDetailslist', k.HospitalContactDetails_Id, k.HospitalAddress_FullAddress, 'HospitalContactDetailslist', 'view', 'N');
+                    $('#HospitalAddressList').P2BLookUpEncapsulate('#HospitalAddressList', 'HospitalAddressList', k.HospitalAddress_Id, k.HospitalAddress_FullAddress, 'HospitalAddressList', 'view', 'N');
+                });
+
+
+
+
+                $.each(data[1], function (i, k) {
+                    $('#Diseaselist').P2BLookUpEncapsulate('#Diseaselist', 'Diseaselist', k.Disease_id, k.Disease_val, 'Diseaselist', 'view', 'A');
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Alergylist').P2BLookUpEncapsulate('#Alergylist', 'Alergylist', k.Allergy_id, k.Allergy_val, 'Alergylist', 'view', 'A');
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', 'view', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', 'view', 'N');
+                });
+
+
+
+                $.each(data[1], function (i, k) {
+                    $('#Doctorlist').P2BLookUpEncapsulate('#Doctorlist', 'Doctorlist', k.Doctor_id, k.Doctor_val, 'Doctorlist', 'view', 'A');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#EmergencyContactlist').P2BLookUpEncapsulate('#EmergencyContactlist', 'EmergencyContactlist', k.EMCN_id, k.EMCN_val, 'EmergencyContactlist', 'view', 'A');
+                });
+
+                if ($("#Autho").hasClass('auto_active')) {
+                    $.each(data[2], function (i, k) {
+                        $('#Height').StickNote(data[2].Height);
+                        $('#Weight').StickNote(data[2].Weight);
+                        $('#PreferredHospital').StickNote(data[2].PreferredHospital);
+                        $('#BloodGrouplist').StickNote(data[2].BloodGroup_Val);
+                        $('#HospitalAddressList').StickNote(data[2].HospitalAddress_Val);
+                        $('#HospitalContactDetailslist').StickNote(data[2].HospitalContactDetails_Val);
+                    });
+                }
+            });
+            event.preventDefault();
+        });
+        //----------------------Create partial--------------------------------------------------------
+        $('#Create-Alergy-EmpMedicalInfo').on('click', function (e) {
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', 'Create Dialog', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCorporate', '#ContactNo_Edit', function (data) {*@
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', 'Create Allergy', 'open', '@Url.Action("Create", "Allergy")', '#frmAllergy', 'Message :', 'Request Falied :', '#JqGrid', 370, 500, '', '', '', '#frmCanMedicalInfo', '', function (data) {
+                $('#Alergylist').P2BLookUpEncapsulate('#Alergylist', 'Alergylist', data[0], data[1], 'Alergylist', btndisable_Alergy, 'A');
+
+            });
+            e.preventDefault();
+        });
+        $('#Create-Disease-EmpMedicalInfo').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', 'Create Disease', 'open', '@Url.Action("Create", "Disease")', '#frmDisease', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCanMedicalInfo', '', function (data) {
+                $('#Diseaselist').P2BLookUpEncapsulate('#Diseaselist', 'Diseaselist', data[0], data[1], 'Diseaselist', btndisable_Disease, 'N');
+            });
+            e.preventDefault();
+        });
+
+        $('#Create-Doctor-EmpMedicalInfo').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Doctor_partial", "EmpMedicalInfo")', 'Create Doctor', 'open', '@Url.Action("Create", "Doctor")', '#frmDoctor', 'Message :', 'Request Falied :', '#JqGrid', 500, 550, '', '', '', '#frmCanMedicalInfo', '', function (data) {
+                // to show data which is created in partial page
+                $('#Doctorlist').P2BLookUpEncapsulate('#Doctorlist', 'Doctorlist', data[0], data[1], 'Doctorlist', '#Edit-Doctor-EmpMedicalInfo,#Remove-Doctor-EmpMedicalInfo', 'N');
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Create-EmergencyContact-EmpMedicalInfo').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("EmergencyContact_partial", "EmpMedicalInfo")', 'Create EmergencyContact', 'open', '@Url.Action("Create", "EmergancyContact")', '#frmEmergencyContact', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#frmCanMedicalInfo', '', function (data) {
+                $('#EmergencyContactlist').P2BLookUpEncapsulate('#EmergencyContactlist', 'EmergencyContactlist', data[0], data[1], 'EmergencyContactlist', '#Edit-EmergencyContact-EmpMedicalInfo,#Remove-EmergencyContact-EmpMedicalInfo', 'N');
+
+            });
+            e.preventDefault();
+        });
+
+        $('#Create-HospitalAddress-EmpMedicalInfo').on('click', function (e) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("HospitalAddress_partial", "EmpMedicalInfo")', 'Create Hospital Address', 'open', '@Url.Action("Create", "Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 470, '', '', '', '#frmCanMedicalInfo', 'Edit-HospitalAddress-EmpMedicalInfo', function (data) {
+                $('#HospitalAddressList').P2BLookUpEncapsulate('#HospitalAddressList', 'HospitalAddressList', data[0], data[1], 'HospitalAddressList', btndisable_HospitalAddress, 'N');
+            });
+            e.preventDefault();
+        });
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-HospitalContactDetails-EmpMedicalInfo').button().on("click", function (event) {
+            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "EmpMedicalInfo")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+                $('#HospitalContactDetailslist').P2BLookUpEncapsulate('#HospitalContactDetailslist', 'HospitalContactDetailslist', data[0], data[1], 'HospitalContactDetailslist', '#Edit-HospitalContactDetails-EmpMedicalInfo,#Remove-HospitalContactDetails-EmpMedicalInfo', 'N');
+            });
+            event.preventDefault();
+        });
+        //-------------------------Lokkup Partial---------------------------------------------------------
+        $('#Lookup-Alergy-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetAllergyDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Allergy', '#Alergylist', 'Alergylist', 5, 'Alergylist', '#frmCanMedicalInfo', 'A', btndisable_Alergy, '#lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+
+        $('#Lookup-Disease-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetDiseaseDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Up Data', '#Diseaselist', 'Diseaselist', 5, 'Diseaselist', '#frmCanMedicalInfo', 'N', btndisable_Disease, '#lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+        $('#Lookup-Doctor-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetDoctorDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Up Data', '#Doctorlist', 'Doctorlist', 5, 'Doctorlist', '#frmCanMedicalInfo', 'N', btndisable_Doctor, 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+
+        $('#Lookup-EmergencyContact-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetEmergencyContactDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Up Data', '#EmergencyContactlist', 'EmergencyContactlist', 5, 'EmergencyContactlist', '#frmCanMedicalInfo', 'N', btndisable_EmergencyContact, 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+
+
+        $('#Lookup-HospitalAddress-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetHospitalAddressDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Up Data', '#HospitalAddressList', 'HospitalAddressList', 5, 'HospitalAddressList', '#frmCanMedicalInfo', 'N', btndisable_HospitalAddress, 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+
+        $('#Lookup-HospitalContactDetails-EmpMedicalInfo').button().on('click', function (e) {
+            $('.dialog_address').P2BLookUpModal('@Url.Action("GetHospitalContactDetails", "EmpMedicalInfo")', '', 'lookupdiv_address', 'Look Up Data', '#HospitalContactDetailslist', 'HospitalContactDetailslist', 5, 'HospitalContactDetailslist', '#frmCanMedicalInfo', 'N', btndisable_HospitalContactDetails, 'lookupbasicscale_table', 'pageNavPosition_address');
+            e.preventDefault();
+        });
+        //------------------------------Remove partial-------------------------------------------------
+        $('#Remove-Alergy-EmpMedicalInfo').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#Alergylist').P2BGetTableDataonSelectedRow('#Alergylist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Alergylist', $('#Alergylist').val(), 200, 200, '#frmCanMedicalInfo', '#Alergylist');
+            event.preventDefault();
+        });
+        $('#Remove-Disease-EmpMedicalInfo').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#Diseaselist').P2BGetTableDataonSelectedRow('#Diseaselist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Diseaselist', $('#Diseaselist').val(), 200, 200, '#frmCanMedicalInfo', '#Diseaselist');
+            event.preventDefault();
+        });
+        $('#Remove-Doctor-EmpMedicalInfo').button().on('click', function (event) {
+            //  dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#Doctorlist').P2BGetTableDataonSelectedRow('#Doctorlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Doctorlist', $('#Doctorlist').val(), 200, 200, '#frmCanMedicalInfo', '#Doctorlist');
+            event.preventDefault();
+        });
+        $('#Remove-EmergencyContact-EmpMedicalInfo').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#EmergencyContactlist').P2BGetTableDataonSelectedRow('#EmergencyContactlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#EmergencyContactlist', $('#EmergencyContactlist').val(), 200, 200, '#frmCanMedicalInfo', '#EmergencyContactlist');
+            event.preventDefault();
+        });
+        $('#Remove-HospitalAddress-EmpMedicalInfo').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#HospitalAddressList').P2BGetTableDataonSelectedRow('#HospitalAddressList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HospitalAddressList', $('#HospitalAddressList').val(), 200, 200, '#frmCanMedicalInfo', '#HospitalAddressList');
+            event.preventDefault();
+        });
+
+
+        $('#Remove-HospitalContactDetails-EmpMedicalInfo').button().on('click', function (event) {
+            // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#HospitalContactDetailslist').P2BGetTableDataonSelectedRow('#HospitalContactDetailslist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HospitalContactDetailslist', $('#ContactDetailsList').val(), 200, 200, '#frmCanMedicalInfo', '#HospitalContactDetailslist', '#Edit-HospitalContactDetails-EmpMedicalInfo,#Remove-HospitalContactDetails-EmpMedicalInfo');
+            event.preventDefault();
+        });
+
+
+        //---------------Edit partial-----------------------------------------------------------------------------
+
+
+
+        $('#Edit-Alergy-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Alergylist').P2BGetTableDataonSelectedRow('#Alergylist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Allergy")', b, '@Url.Action("EditSave", "Allergy")', 'Edit Allergy ', '#frmAllergy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCanMedicalInfo', '#Alergylist', 'Alergylist', 'Alergylist', 'N', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmAllergy').trigger('reset');
+                    $('#Name').val(k.Name);
+                    $('#Details').val(k.Details);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Medicinelist').P2BLookUpEncapsulate('#Medicinelist', 'Medicinelist', k.Medicine_Id, k.Medicine_FullDetails, 'Medicinelist', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-Disease-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Diseaselist').P2BGetTableDataonSelectedRow('#Diseaselist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Disease")', b, '@Url.Action("EditSave", "Disease")', 'Edit Disease', '#frmDisease', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCanMedicalInfo', '#Diseaselist', 'Diseaselist', 'Diseaselist', 'N', '#Edit-Disease-EmpMedicalInfo,#Remove-Disease-EmpMedicalInfo', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmDisease').trigger('reset');
+                    $('#Name').val(k.Name);
+                    // $('#FullDetailss').val(k.FullDetails);
+
+                    $('#DiseaseTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 300, k.DiseaseType_Id);
+
+                });
+                $.each(data[1], function (i, k) {
+                    //  $('#Medicinelist').P2BLookUpEncapsulate('#Medicinelist', 'Medicinelist', k.Id, k.Medicine_FullDetails, 'Medicinelist');
+
+                    $('#Medicinelist1').P2BLookUpEncapsulate('#Medicinelist1', 'Medicinelist1', k.Medicine_Id, k.Medicine_FullDetails, 'Medicinelist1', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Edit-Doctor-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Doctorlist').P2BGetTableDataonSelectedRow('#Doctorlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Doctor_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Doctor")', b, '@Url.Action("Editsave", "Doctor")', 'Edit Doctor ', '#frmDoctor', b, 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#frmCanMedicalInfo', '#Doctorlist', 'Doctorlist', 'Doctorlist', 'N', '#Edit-Doctor-EmpMedicalInfo, Remove-Doctor-EmpMedicalInfo', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmDoctor').trigger('reset');
+                    //$('#Name').val(k.Name);
+                    $('#Qualification').val(k.Qualification);
+                    $('#MeetingTime').val(k.MeetingTime);
+
+                    $('#Specializationlist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 301, k.Specialization_Id);
+                    $('#DoctorCategorylist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 302, k.DoctorCategory_Id);
+
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Doctor,#Remove-Address-Doctor', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-Doctor,#Remove-ContactDetails-Doctor', 'N');
+                    $('#Namelist').P2BLookUpEncapsulate('#Namelist', 'Namelist', k.Name_Id, k.Name_FullName, 'Namelist', '#Edit-Name-Doctor,#Remove-Name-Doctor', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-EmergencyContact-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#EmergencyContactlist').P2BGetTableDataonSelectedRow('#EmergencyContactlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("EmergencyContact_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "EmergancyContact")', b, '@Url.Action("Editsave", "EmergancyContact")', 'Edit EmergencyContact ', '#frmEmergencyContact', b, 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#frmCanMedicalInfo', '#EmergencyContactlist', 'EmergencyContactlist', 'EmergencyContactlist', 'N', '#Edit-EmergencyContact-EmpMedicalInfo, Remove-EmergencyContact-EmpMedicalInfo', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmEmergencyContact').trigger('reset');
+                    $('#Name').val(k.Name);
+                    //alert(k.Specialization_Id);
+                    $('#Relationlist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 107, k.Specialization_Id);
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-EmergencyContact,#Remove-Address-EmergencyContact', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '#Edit-ContactDetails-EmergencyContact,#Remove-ContactDetails-EmergencyContact', 'N');
+                    $('#Namelist').P2BLookUpEncapsulate('#Namelist', 'Namelist', k.Name_Id, k.Name_FullName, 'Namelist', '#Edit-Name-EmergencyContact,#Remove-Name-EmergencyContact', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+
+
+        $('#Edit-HospitalAddress-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#HospitalAddressList').P2BGetTableDataonSelectedRow('#HospitalAddressList', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCanMedicalInfo', '#HospitalAddressList', 'HospitalAddressList', 'HospitalAddressList', 'N', '#Edit-HospitalAddress-EmpMedicalInfo,#Remove-HospitalAddress-EmpMedicalInfo', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#FormAddress').trigger("reset");
+                    $('#Address1').val(k.Address1);
+                    $('#Address2').val(k.Address2);
+                    $('#Address3').val(k.Address3);
+                    $('#Landmark').val(k.Landmark);
+                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
+                    $('#StateList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
+                    $('#StateRegionList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
+                    $('#DistrictList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
+                    $('#TalukaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
+                    $('#CityList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
+                    $('#AreaList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Edit-HospitalContactDetails-EmpMedicalInfo').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#HospitalContactDetailslist').P2BGetTableDataonSelectedRow('#HospitalContactDetailslist', 0);
+            b = a[0];
+            console.log(b);
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("HospitalContactDetails_partial", "EmpMedicalInfo")', '@Url.Action("Editcontactdetails_partial", "EmpMedicalInfo")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit HospitalContactDetails', '#frmContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCanMedicalInfo', '#HospitalContactDetailslist', 'HospitalContactDetailslist', 'HospitalContactDetailslist', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    $('#frmContactDetails').trigger('reset');
+                    $('#EmailId').val(k.EmailId);
+                    $('#Website').val(k.Website);
+                    $('#FaxNo').val(k.FaxNo);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+                });
+                // }, 3000);
+            });
+            event.preventDefault();
+        });
+
+
+
+        $('#Weight').ForceOnlyNumeric();
+        $('#Weight').MaxLength(3);
+        $('#Height').MaxLength(4);
+        $('#Height').ForcePercent();
+        $('#PreferredHospital').ForceOnlyAlphaNumeric();
+        $('#PreferredHospital').MaxLength(100);
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('.popup_radio_button').controlgroup();
+        $('.date').P2BDatePicker();
+        $('.drop').selectmenu().selectmenu("menuWidget");
+
+
+
+
+
+        $('#Relationlist').selectmenu().selectmenu("menuWidget");
+        $('.popup_radio_button').controlgroup();
+        $('#Categorylist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+
+
+</script>

@@ -1,0 +1,295 @@
+﻿
+            catch (DataException e)
+
+            {
+                var exp = e.InnerException.InnerException.Message.ToString();
+                return Json(new {Success=false,msg = exp,JsonRequestBehavior.AllowGet});
+               
+            }
+			-------------------------------------------------------------------
+
+   public ActionResult GetLookupDetails(string data)
+        {
+            using (DataBaseContext db = new DataBaseContext())
+            {
+                var fall = db.LookupValue.Where(e => e.IsActive == true).ToList();
+                IEnumerable<LookupValue> all;
+                if (!string.IsNullOrEmpty(data))
+                {
+                    all = db.LookupValue.ToList().Where(d => d.LookupVal.Contains(data));
+                }
+                else
+                {
+                    var list1 = db.Lookup.ToList().SelectMany(e => e.LookupValues);
+                    var list2 = fall.Except(list1);
+                    var r = (from ca in list2 select new { srno = ca.Id, lookupvalue = ca.LookupVal }).Distinct();
+                    return Json(r, JsonRequestBehavior.AllowGet);
+                }
+
+                var result = (from c in all
+                              select new { c.Id, c.LookupVal }).Distinct();
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+			------------------------------------------------------------------------------------
+			  public ActionResult P2BGrid(P2BGrid_Parameters gp)
+        {
+            try
+            {
+                DataBaseContext db = new DataBaseContext();
+                int pageIndex = gp.rows * Convert.ToInt32(gp.page) - gp.rows;
+                int pageSize = gp.rows;
+                int totalPages = 0;
+                int totalRecords = 0;
+                int ParentId = 2;
+                var jsonData = (Object)null;
+                var LKVal = db.Lookup.ToList();
+                IEnumerable<Lookup> IE;
+                if (!string.IsNullOrEmpty(gp.searchField))
+                {
+                    IE = LKVal;
+                    if (gp.searchOper.Equals("eq"))
+                    {
+                       jsonData = IE.Select(a => new { a.Id, a.Code, a.Name }).Where((e => (e.Id.ToString() == gp.searchString) || (e.Code == gp.searchString) || (e.Name.ToLower() == gp.searchString.ToLower())));
+                    }
+                    if (pageIndex > 1)
+                    {
+                        int h = pageIndex * pageSize;
+                        jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Id, a.Code, a.Name }).ToList();
+                    }
+                    totalRecords = IE.Count();
+                }
+                else
+                {
+                    IE = LKVal;
+                    Func<Lookup, string> orderfuc = (c =>
+                                                               gp.sidx == "ID" ? c.Id.ToString() :
+                                                               gp.sidx == "Code" ? c.Code :
+                                                               gp.sidx == "Name" ? c.Name : "");
+                    if (gp.sord == "asc")
+                    {
+                        IE = IE.OrderBy(orderfuc);
+                        jsonData = IE.Select(a => new Object[] { a.Id, a.Code, a.Name }).ToList();
+                    }
+                    else if (gp.sord == "desc")
+                    {
+                        IE = IE.OrderByDescending(orderfuc);
+                        jsonData = IE.Select(a => new Object[] { a.Id, a.Code, a.Name }).ToList();
+                    }
+                    if (pageIndex > 1)
+                    {
+                        int h = pageIndex * pageSize;
+                        jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Id, a.Code, a.Name }).ToList();
+                    }
+                    totalRecords = LKVal.Count();
+                }
+                if (totalRecords > 0)
+                {
+                    totalPages = (int)Math.Ceiling((float)totalRecords / (float)gp.rows);
+                }
+                if (gp.page > totalPages)
+                {
+                    gp.page = totalPages;
+                }
+                var JsonData = new
+                {
+                    page = gp.page,
+                    rows = jsonData,
+                    records = totalRecords,
+                    total = totalPages,
+                    p2bparam = ParentId
+                };
+                return Json(JsonData, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+		--------------------------------------------------------------------------------------------------------
+		  StringBuilder sb = new StringBuilder("");
+                foreach (ModelState modelState in ModelState.Values)
+                {
+                    foreach (ModelError error in modelState.Errors)
+                    {
+                        sb.Append(error.ErrorMessage);
+                        sb.Append("." + "\n");
+                    }
+                }
+                var errorMsg = sb.ToString();
+                return Json(new Object[] { "", "", errorMsg, JsonRequestBehavior.AllowGet });
+
+				------------------------------------------------------------------------------------------------------
+				to add requred mark (astrict"*") 
+				 to assign label add a class name as-must
+				requirement css file-popup_form.css
+				--------------------------------------------------------------------------
+	for cancel validation 
+	--controller code--
+	This is for One to many
+	{
+	  public class Lookup_lookupval
+        {
+            public Array lookupval_id { get; set; }
+            public Array lookupval_val { get; set; }
+
+        }
+        [HttpPost]
+        public ActionResult Edit(int data)
+        {
+            List<Lookup_lookupval> return_data = new List<Lookup_lookupval>();
+            var lookup = db.Lookup.Include(e => e.LookupValues).Where(e => e.Id == data).ToList();
+            var r = (from ca in lookup
+                     select new
+                     {
+                         Id = ca.Id,
+                         Name = ca.Name,
+                         Code = ca.Code
+
+                     }).Distinct();
+            var a = db.Lookup.Include(e => e.LookupValues).Where(e => e.Id == data).Select(e => e.LookupValues).ToList();
+            foreach (var ca in a)
+            {
+                return_data.Add(
+            new Lookup_lookupval
+            {
+                lookupval_id = ca.Select(e => e.Id.ToString()).ToArray(),
+                lookupval_val = ca.Select(e => e.LookupVal).ToArray()
+            });
+            }
+            return this.Json(new Object[] { r, return_data, JsonRequestBehavior.AllowGet });
+        }
+		}
+		One to One {
+		
+		.Select(e => new
+                {
+                    Address_FullAddress = e.Address.FullAddress == null ? "" : e.Address.FullAddress,
+                    Add_Id = e.Address.Id == null ? "" : e.Address.Id.ToString(),
+                    Cont_Id = e.ContactDetails.Id == null ? "" : e.ContactDetails.Id.ToString(),
+                    FullContactDetails = e.ContactDetails.FullContactDetails == null ? "" : e.ContactDetails.FullContactDetails
+                }).ToList();
+
+		}
+		----------------------------------------------------
+		Html Script
+		$.each(data[1], function (i, k) {
+                    for (i = 0; i < k.lookupval_id.length && i < k.lookupval_val.length; i++) {
+                        $('#LookupValueslist').P2BLookUpEncapsulate('#LookupValueslist', 'LookupValueslist', k.lookupval_id[i], k.lookupval_val[i], 'LookupValueslist');
+                    }
+                });
+		Note:
+		in return url 2nd parameter must be the lookuptable data
+		for eg:
+		above return url contains return_data which contain lookuptable data 
+		-------------------------------------
+		To Set Radio Button 
+		$('[name="YourButtonName"]').val([true]).button().button("refresh");
+		--------------------------------------------------------------
+		   $('#Code').on("focusout", function () {
+            $.ajax({
+                method: "Get",
+                url: "@Url.Action("checkCode")",
+                data: { data: $('#Code').val() },
+                success: function (d) {
+                    if (d == "1") {
+                        var pos=$('#Code').offset();
+                        $("<div>" + "Already Exits " + "</div>").appendTo("body").css({ left: pos.left + 130, top: pos.top }).addClass("error");
+                    } else {
+                        $('.error').remove();
+                    }
+                }
+            });
+        });
+	----------------------------------------------------------------------------------
+For Validation
+to make required field 
+use must class at texbox
+For Exp:
+   @Html.LabelFor(m => m.Code, "Code:", new { @class = "popup-content-label must" })
+   @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" })
+   --------------------------------------------------------------------------------------
+   to show the old data on pages 
+   use function-OldVal();
+   and use 3 url Parameter
+   $('#Autho').makeDisable('#Create,#Edit,#Delete');
+     if ($("#Autho").hasClass('auto_active')) {
+                    $.each(data[2], function (i, k) {
+                        $('#Name').Oldval(k.Name);
+                        $('#Code').Oldval(k.Code);
+                        $('#Type').Oldval(k.Type);
+                        $('[id="radio4"]').Oldval(k.OnAttend);
+                        $('[id="radio6"]').Oldval(k.OnLeave);
+                        $('[id="radio8"]').Oldval(k.InPayslip);
+                        $('[id="radio10"]').Oldval(k.InITax);
+                    });
+                }
+            });
+ -----------------------------------------------------------------------------------------
+ Onsalhead Page
+$('#Autho').onClickGrid('#JqGrid', 'salhead/P2BGrid', 'corporate/P2BGrid');
+--------------------------------------------------------------------------------------------
+to show old lookup data
+use fun- Oldlookupval
+eg.
+$('#AddressList_Old').Oldlookupval(k.basic_scale_details_val);
+ create the div as following
+
+  <div class="row3 content_margine">
+                <div id="AddressList_Old"></div>
+                @Html.LabelFor(m => m.Address, "Address :", new { @class = "popup-content-label" })  
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="AddressList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Select Address" class="  popup-content-icon-lookup" id="Lookup-Address-Corporate"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-Address-Corporate"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-Address-Corporate"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Address" class="popup-content-icon-remove" id="Remove-Address-Corporate"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+                
+        </div>
+----------------------------------------------------------------------------------------------
+o show old Drop data
+use fun- oldDropval
+eg.
+$('#Category').oldDropval(k.basic_scale_details_val);
+---------------------------------------------------------------------------------------------
+p2bencapsulate validation multiple allowed or not allowed 
+pass last parameter A=Allowed
+					N=NotAllowed
+$('#ITSubInvestmentlist').P2BLookUpEncapsulate('#ITSubInvestmentlist', 'ITSubInvestmentlist', data[0], data[1], 'ITSubInvestmentlist', '#Edit-ITInvestment-ITSubInvestment,#Remove-ITInvestment-ITSubInvestment', 'N');
+---------------------------------------------------------------------------------------------------
+  //$('' + tabledvalues + '').on('click', 'tbody', function (e) {
+        //    var all_child = $(this)[0].children;
+        //    //console.log(e.target);
+        //    if (e.target.tagName!='TH') {
+        //        var goal = e.target;
+        //        if (!$(goal).parent('tr').hasClass('selectedtr')) {
+        //            $.each(all_child, function (e) {
+        //                $(this).removeClass('selectedtr');
+        //            });
+        //            $(goal).parent('tr').addClass('selectedtr');
+        //        }
+        //        else {
+        //            $(goal).parent('tr').removeClass('selectedtr');
+        //        }
+        //    }
+        //});
+		---------------------------------------------------------------------------------------------------
+		for code
+		$('#txt_box1').ValidateTextBox({maxlength: 5, AlphaNum: 0 });
+		for name
+		--------------------------------------------------------------------------------------------------
+		Standard line no
+		3516,
+		3542
+		ln3568,col104
+		ln3576,col104
+
+		pages tobe chage on Site
+RptView	ln194,col84	2	3
+_Layout.cshtml	ln192,col 2	2	3
+----------------------------------------------------------------------------------------------------------------------------------
+  jsonData = IE.Where(e => e.Employee.EmpCode.Contains(gp.searchString)).Select(a => new Object[] { a.Id, a.Employee.EmpCode, a.Employee.EmpName.FullNameFML, a.EffectiveDate, a.EndDate, a.PayScaleAgreement_Id, a.struct_Id }).ToList();

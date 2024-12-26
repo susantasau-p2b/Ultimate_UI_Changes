@@ -1,0 +1,90 @@
+@{
+    Layout = null;
+}
+@model CMS_SPS.PersonnelModelObject
+@*<link href="~/Content/staginant/staginant.css" rel="stylesheet" />*@
+<script>
+     $(document).ready(function () {
+        $('button').button();
+         $('#PersonnelModellist').selectmenu().selectmenu("menuWidget");
+
+        $('#Create-CompetencyEvaluationModel').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("CompetencyEvaluationModelPartial", "CompetencyEvaluationModel")', 'Evaluation Model', 'open', '@Url.Action("Create", "CompetencyEvaluationModel")', '#frmCompetencyEvaluationModel', 'Message :', 'Request Falied :', '#JqGrid', 300, 550, '', '', '', '#frmPersonnelModelObject', '', function (data) {
+                $('#Criterialist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 501, "");
+                $('#CriteriaTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 503, "");
+                $('#DataStepslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 504, "");
+                $('#CompetencyEvaluationModelList').P2BLookUpEncapsulate('#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', data[0], data[1], 'CompetencyEvaluationModelList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+        $('#Edit-CompetencyEvaluationModel').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#CompetencyEvaluationModelList').P2BGetTableDataonSelectedRow('#CompetencyEvaluationModelList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("CompetencyEvaluationModelPartial", "CompetencyEvaluationModel")', '@Url.Action("Edit", "CompetencyEvaluationModel")', b, '@Url.Action("Editsave", "CompetencyEvaluationModel")', 'Edit Evaluation Model', '#frmCompetencyEvaluationModel', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmPersonnelModelObject', '#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#Criterialist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 501, k.Criteria_Id);
+                    $('#CriteriaTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 503, k.CriteriaType_Id);
+                    $('#DataStepslist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 504, k.DataSteps_Id);
+                    $('[name="DataStepsAppl"]').val([k.DataStepsAppl]).button().button("refresh");
+                    $('#InitialValue').val(k.InitialValue);
+                });
+            });
+            event.preventDefault();
+        });
+        $('#Remove-CompetencyEvaluationModel').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#CompetencyEvaluationModelList').P2BGetTableDataonSelectedRow('#CompetencyEvaluationModelList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CompetencyEvaluationModelList').P2BGetTableDataonSelectedRow('#CompetencyEvaluationModelList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CompetencyEvaluationModelList', $('#CompetencyEvaluationModelList').val(), 200, 200, '#frmPersonnelModelObject', '#CompetencyEvaluationModelList');
+            event.preventDefault();
+        });
+
+        $('#Lookup-CompetencyEvaluationModel').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupCompetencyEvaluationModel", "CompetencyEvaluationModel")', '', 'LookupDiv', ' Look Up Data', '#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', 5, 'CompetencyEvaluationModelList', '#frmPersonnelModelObject', 'A', '#Remove-Witness-Witness', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+         $('#PersonnelModellist').on('selectmenuchange', function () {
+             var valueId = $("#PersonnelModellist option:selected").val();
+             $.ajax({
+                 url: '@Url.Action("Personnel", "PersonnelModelObject")?valueId=' + valueId,
+                 type: "post",
+                 success: function (data) {
+                 },
+             });
+         });
+
+
+    });
+</script>
+
+<div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPersonnelModelObject", name = "frmPersonnelModelObject" }))
+    {<div class="row3 content_margine">
+            @Html.LabelFor(m => m.PersonnelModel, "Personnel Model Object:", new { @class = "popup-content-label must" })
+            <select class="drop must" style="width:180px;" name="PersonnelModellist" id="PersonnelModellist">
+                <option></option>
+            </select>
+        </div>
+
+        <div class=" row3 content_margine">
+            @Html.LabelFor(m => m.CompetencyEvaluationModel, "Evaluation Model :", new { @class = "popup-content-label must" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="CompetencyEvaluationModelList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup CompetencyEvaluationModel" class=" popup-content-icon-lookup" id="Lookup-CompetencyEvaluationModel"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create CompetencyEvaluationModel " class=" popup-content-icon-create" id="Create-CompetencyEvaluationModel"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit CompetencyEvaluationModel" class=" popup-content-icon-edit" id="Edit-CompetencyEvaluationModel"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Delete CompetencyEvaluationModel" class=" popup-content-icon-remove" id="Remove-CompetencyEvaluationModel"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+    }
+</div>

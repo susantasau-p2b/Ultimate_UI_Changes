@@ -1,0 +1,367 @@
+﻿@{
+    ViewBag.Title = "ESIC";
+}
+
+@model Payroll.ESICMaster
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+        ColModel = ['WagesPay', 'WagesQualify', 'Id'];
+        ColNames = ['WagesPay', 'WagesQualify', 'Id'];
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        Caption = " ESIC ";
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#EffectiveDate').P2BDatePicker();
+        $('#EndDate').P2BDatePicker();
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').button().on("click", function (event) {
+            $('#frmESIC').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog(' ', '', '', '', 'Create LWF Master', 'open', '@Url.Action("Create")', '#frmESIC', 'Message :', 'Request Falied :', '#JqGrid', 600, 750, '#StatutoryEffectiveMonthsList,#WageMasterPayList,#WageMasterQualifyList', ' ', function (data) {
+                event.preventDefault();
+            });
+        });
+
+        $('#Edit').on('click', function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit ESIC  Data", '#frmESIC', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 600, 750, '#StatutoryEffectiveMonthsList,#WageMasterPayList,#WageMasterQualifyList', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+
+                    if (k.EffectiveDate != null) {
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    }
+                    $('#WageMasterPayList').P2BLookUpEncapsulate('#WageMasterPayList', 'WageMasterPayList', k.WageMasterPay_Id, k.WageMasterPay_FullDetails, 'WageMasterPayList', '#Remove-WageMasterPay-ESIC', 'N');
+                    $('#WageMasterQualifyList').P2BLookUpEncapsulate('#WageMasterQualifyList', 'WageMasterQualifyList', k.WagesMasterQualify_Id, k.WageMasterQualify_FullDetails, 'WageMasterQualifyList', '#Remove-WageMasterQualify-ESIC', 'N');
+
+                });
+                $.each(data[1], function (i, k) {
+                    $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', k.StatutoryEffectiveMonths_Id, k.StatutoryEffectiveMonths_Details, 'StatutoryEffectiveMonthsList', '', 'A');
+                    $('#Locationlist').P2BLookUpEncapsulate('#Locationlist', 'Locationlist', k.Location_Id, k.LoactionFulldetails, 'Locationlist', '', 'A');
+                });
+               
+            });
+            event.preventDefault();
+        });
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ESIC Data', '#StatutoryEffectiveMonthsList,#WageMasterPayList,#WageMasterQualifyList', '', 600, 750, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    if (k.EffectiveDate != null) {
+                        $('#EffectiveDate').val(DateConvert(k.EffectiveDate));
+                    }
+                    $('#WageMasterPayList').P2BLookUpEncapsulate('#WageMasterPayList', 'WageMasterPayList', k.WageMasterPay_Id, k.WageMasterPay_FullDetails, 'WageMasterPayList', 'view', 'N');
+                    $('#WageMasterQualifyList').P2BLookUpEncapsulate('#WageMasterQualifyList', 'WageMasterQualifyList', k.WagesMasterQualify_Id, k.WageMasterQualify_FullDetails, 'WageMasterQualifyList', 'view', 'N');
+                });
+                $.each(data[1], function (i, k) {
+                    $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', k.StatutoryEffectiveMonths_Id, k.StatutoryEffectiveMonths_Details, 'StatutoryEffectiveMonthsList', 'view', 'A');
+                    $('#Locationlist').P2BLookUpEncapsulate('#Locationlist', 'Locationlist', k.Location_Id, k.LoactionFulldetails, 'Locationlist', 'view', 'A');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+        $('#Lookup-LWFWagesRange-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesRangeLKDetails", "WagesRange")', '', 'LookupDiv', ' Look Up Data', '#LWFWagesRangelist', 'LWFWagesRangelist', 5, 'LWFWagesRangelist', '#frmLWFMaster', 'A', '#Edit-LWFWagesRange-LWFMaster,#Remove-LWFWagesRange-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+
+        $('#Create-LWFWagesRange-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("WagesRangepartial", "LWFMaster")', 'Create Wages Range', 'open', '@Url.Action("CreateSave", "WagesRange")', '#frmWagesRange', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#LWFWagesRangelist').P2BLookUpEncapsulate('#LWFWagesRangelist', 'LWFWagesRangelist', data[0], data[1], 'LWFWagesRangelist', '#Remove-LWFWagesRange-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-LWFWagesRange-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LWFWagesRangelist').P2BGetTableDataonSelectedRow('#LWFWagesRangelist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LWFWagesRangelist', $('#LWFWagesRangelist').val(), 200, 200, '#frmLWFMaster', '#LWFWagesRangelist', '');
+            event.preventDefault();
+        });
+        //----------StateList----------------------------------------------//
+        $('#Lookup-States-LWFMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSateDetails", "State")', '', 'LookupDiv', ' Look Up Data', '#StateList', 'StateList', 5, 'StateList', '#frmLWFMaster', 'A', '#Remove-States-LWFMaster', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-States-LWFMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "State")', 'Create State ', 'open', '@Url.Action("CreateLWFState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                $('#StateList').P2BLookUpEncapsulate('#StateList', 'StateList', data[0], data[1], 'StateList', '#Remove-States-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-States-LWFMaster').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#StateList').P2BGetTableDataonSelectedRow('#StateList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StateList', $('#StateList').val(), 200, 200, '#frmLWFMaster', '#StateList', '');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-StatutoryEffectiveMonths-ESIC').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "StatutoryEffectiveMonths")', 'Create Statutory Effective Months', 'open', '@Url.Action("Create", "StatutoryEffectiveMonths")', '#frmStatutoryEffectiveMonths', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLWFMaster', '', function (data) {
+                // to show data which is created in partial page 
+                $('#dvGender').hide();
+                $('#StatutoryEffectiveMonthsList').P2BLookUpEncapsulate('#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', data[0], data[1], 'StatutoryEffectiveMonthsList', '#Edit-StatutoryEffectiveMonths-LWFMaster,#Remove-StatutoryEffectiveMonths-LWFMaster', 'A');
+            });
+            event.preventDefault();
+        });
+
+        @*$('#Lookup-StatutoryEffectiveMonths-ESIC').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetStatutoryEffectiveMonths", "StatutoryEffectiveMonths")', '', 'LookupDiv', 'Look Up Data', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 5, 'StatutoryEffectiveMonthsList', '#frmLWFMaster', 'A', '#Remove-StatutoryEffectiveMonths-ESIC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });*@
+        $('#Lookup-StatutoryEffectiveMonths-ESIC').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetStatutoryEffectiveMonths", "StatutoryEffectiveMonths")', '', 'LookupDiv', 'Statutory Effective', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 5, 'StatutoryEffectiveMonthsList', '#frmESIC', 'A', '#Remove-StatutoryEffectiveMonths-ESIC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Edit-StatutoryEffectiveMonths-LWFMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("StatutoryEffectiveMonthspartial", "LWFMaster")', '@Url.Action("Edit", "StatutoryEffectiveMonths")', b, '@Url.Action("EditSave", "StatutoryEffectiveMonths")', 'Edit StatutoryEffectiveMonths Details', '#frmStatutoryEffectiveMonths', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLWFMaster', '#StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'StatutoryEffectiveMonthsList', 'A', ' ', function (data) { 
+                $('#dvGender').hide();
+                $.each(data[0], function (i, k) {                    
+                    $('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 437, k.EffectiveMonth_Id); // Dropdown bind
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#StatutoryWageRangelist').P2BLookUpEncapsulate('#StatutoryWageRangelist', 'StatutoryWageRangelist', k.StatutoryEffectiveMonthsWagesRange_Id, k.StatutoryEffectiveMonthsWagesRange_Fulldetails, 'StatutoryEffectiveMonthsList', '', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Remove-StatutoryEffectiveMonths-ESIC').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#StatutoryEffectiveMonthsList').P2BGetTableDataonSelectedRow('#StatutoryEffectiveMonthsList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#StatutoryEffectiveMonthsList', $('#StatutoryEffectiveMonthsList').val(), 200, 200, '#frmESIC', '#StatutoryEffectiveMonthsList', '');
+            event.preventDefault();
+        });
+        $('#Lookup-WageMasterPay-ESIC').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#WageMasterPayList', 'WageMasterPayList', 5, 'WageMasterPayList', '#frmESIC', 'N', '#Edit-WageMasterPay-ESIC,#Remove-WageMasterPay-ESIC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-WageMasterPay-ESIC').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmESIC', '', function (data) {
+                $('#WageMasterPayList').P2BLookUpEncapsulate('#WageMasterPayList', 'WageMasterPayList', data[0], data[1], 'WageMasterPayList', '#Remove-WageMasterPay-ESIC', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-WageMasterPay-ESIC').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#WageMasterPayList').P2BGetTableDataonSelectedRow('#WageMasterPayList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#WageMasterPayList').P2BGetTableDataonSelectedRow('#WageMasterPayList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WageMasterPayList', $('#WageMasterPayList').val(), 200, 200, '#frmESIC', '#WageMasterPayList', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-WageMasterQualify-ESIC').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesLKDetails", "wages")', '', 'LookupDiv', ' Look Up Data', '#WageMasterQualifyList', 'WageMasterQualifyList', 5, 'WageMasterQualifyList', '#frmESIC', 'N', '#Edit-WageMasterQualify-ESIC,#Remove-WageMasterQualify-ESIC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Create-WageMasterQualify-ESIC').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create Wages Master Pay', 'open', '@Url.Action("CreateSave", "wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmESIC', '', function (data) {
+                $('#WageMasterQualifyList').P2BLookUpEncapsulate('#WageMasterQualifyList', 'WageMasterQualifyList', data[0], data[1], 'WageMasterQualifyList', '#Remove-WageMasterQualify-ESIC', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-WageMasterQualify-ESIC').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#WageMasterQualifyList').P2BGetTableDataonSelectedRow('#WageMasterQualifyList', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#WageMasterQualifyList').P2BGetTableDataonSelectedRow('#WageMasterQualifyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WageMasterQualifyList', $('#WageMasterQualifyList').val(), 200, 200, '#frmESIC', '#WageMasterQualifyList', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LocationObj-ESIC').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLoactionObjDetails", "ESICMaster")', '', 'LookupDiv', ' Look Up Data', '#Locationlist', 'Locationlist', 5, 'Locationlist', '#frmESIC', 'A', '#Edit-WageMasterQualify-ESIC,#Remove-WageMasterQualify-ESIC', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LocationObj-ESIC').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#Locationlist').P2BGetTableDataonSelectedRow('#Locationlist', 0);
+            //b = a[0];
+
+            var selectedRows = [];
+            selectedRows = $('#Locationlist').P2BGetTableDataonSelectedRow('#Locationlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Locationlist', $('#Locationlist').val(), 200, 200, '#frmESIC', '#Locationlist', '');
+            event.preventDefault();
+        });
+        $('#Code').ValidateTextBox({ maxlength: 10, AlphaNum: true });
+        $('#Name').MaxLength(50);
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create ESIC">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmESIC", name = "frmESIC" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row2 content_margine">@Html.LabelFor(m => m.EffectiveDate, "EffectiveDate :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EffectiveDate, new { @class = "popup-content-textbox-short must" })</div>
+        @*<div class="row2 content_margine">@Html.LabelFor(m => m.EndDate, "EndDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.EndDate, new { @class = "popup-content-textbox-short" })</div>*@
+        <div class="row2 content_margine">
+            <div id="LocationObj_old"></div>
+            @Html.LabelFor(m => m.Location, "LocationObj :", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="Locationlist">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup LocationObj" class="button popup-content-icon-lookup" id="Lookup-LocationObj-ESIC"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                @*   <button data-p2btooltip="Create LocationObj" class="button popup-content-icon-create" id="Create-LocationObj-ESIC"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                @*<button data-p2btooltip="Edit Statutory EffectiveMonths Details" class="button popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove LocationObj" class="button popup-content-icon-remove" id="Remove-LocationObj-ESIC"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="row2 content_margine">
+            <div id="StatutoryEffectiveMonthsList_old"></div>
+            @Html.LabelFor(m => m.ESICStatutoryEffectiveMonths, "EffectiveMonths:", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="StatutoryEffectiveMonthsList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup Statutory EffectiveMonths Details" class="button popup-content-icon-lookup" id="Lookup-StatutoryEffectiveMonths-ESIC"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create Statutory EffectiveMonths Details" class="button popup-content-icon-create" id="Create-StatutoryEffectiveMonths-ESIC"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Edit Statutory EffectiveMonths Details" class="button popup-content-icon-edit" id="Edit-StatutoryEffectiveMonths-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Remove Statutory EffectiveMonths Details" class="button popup-content-icon-remove" id="Remove-StatutoryEffectiveMonths-ESIC"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+        <div class="row2 content_margine">
+            <div id="WageMasterPayList_old"></div>
+            @Html.LabelFor(m => m.WageMasterPay, "Wages Pay:", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="WageMasterPayList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup WageMasterPay Details" class="button popup-content-icon-lookup" id="Lookup-WageMasterPay-ESIC"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create WageMasterPay Details" class="button popup-content-icon-create" id="Create-WageMasterPay-ESIC"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove WageMasterPay Details" class="button popup-content-icon-remove" id="Remove-WageMasterPay-ESIC"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+        <div class="row2 content_margine">
+            <div id="WageMasterQualify_old"></div>
+            @Html.LabelFor(m => m.WageMasterQualify, "Wages Qualify:", new { @class = "popup-content-label" })
+            <div class="popup-content-table">
+                <table class="lookuptableselected" id="WageMasterQualifyList">
+                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                </table>
+            </div>
+            <div class="icon-row">
+                <button data-p2btooltip="Lookup WageMasterQualify Details" class="button popup-content-icon-lookup" id="Lookup-WageMasterQualify-ESIC"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                <button data-p2btooltip="Create WageMasterQualify Details" class="button popup-content-icon-create" id="Create-WageMasterQualify-ESIC"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                @*<button data-p2btooltip="Edit WagesMaster Details" class="button popup-content-icon-edit" id="Edit-WagesMaster-LWFMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                <button data-p2btooltip="Remove WageMasterQualify Details" class="button popup-content-icon-remove" id="Remove-WageMasterQualify-ESIC"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+            </div>
+        </div>
+
+
+
+
+    }
+</div>

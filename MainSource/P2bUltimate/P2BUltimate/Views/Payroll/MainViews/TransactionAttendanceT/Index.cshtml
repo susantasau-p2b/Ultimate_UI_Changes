@@ -1,0 +1,358 @@
+﻿@{
+    ViewBag.Title = "AttendanceT";
+}
+
+@model Payroll.AttendanceT
+
+
+<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 60px;
+        top: -150px;
+    }
+</style>
+
+<script>
+
+
+    $(document).ready(function (e) {
+         $('button').button();
+
+         var ColNames = [];
+         var ColModel = [];
+         var SortName, Caption, url, width, height;
+         var btndisablenames = "#Edit-Level-Grade,#Remove-Level-Grade";
+         ColModel = ['Id', 'Code', 'Name'];
+         ColNames = ['Id', 'Code', 'Name'];               
+         url = '@Url.Action("P2BGrid")';
+         width = 1000;
+         height = 150;     
+         $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        
+         function AssignData() {
+             dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+     
+
+         }
+
+         //$(function () {
+         //    $(".datepicker").datepicker({ dateFormat: 'dd-mm-yy' }).val();
+         //});
+         $('#calender').P2BDatePicker();
+         $('#Create_Dialog').P2BCreateDialog();
+         $('#Create').button().on("click", function () {
+             $('#grid_Display').hide();
+             $('#frmFunctionalT').trigger("reset");
+             $('#Create_Dialog').P2BCreateDialog(' ', 0, '', '', 'Create AttendanceT', 'open', '@Url.Action("Create")', '#frmAttendanceT', 'Message :', 'Request Falied :', '#JqGrid', 800, 800, '#Levellist', '#Edit-Level-Grade,#Remove-Level-Grade', function (data) {
+                 event.preventDefault();
+             });
+         });
+
+
+
+        // Main page edit
+         $('#Edit').on('click', function () {
+             AssignData();
+             $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmGrade', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 380, 620, '#Levellist', btndisablenames, function (data) {
+
+                 $.each(data[0], function (i, k) {
+                     console.log(k.Code);
+                     $('#Code').val(k.Code);
+                     $('#Code').attr('readonly', 'readonly');
+                     $('#Name').val(k.Name);
+                 });
+
+                 //partial page bind
+                 $.each(data[1], function (i, k) {
+                     $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', k.Level_Id, k.Level_FullDetails, 'Levellist', '#Edit-Level-Grade,#Remove-Level-Grade','N');
+                 });
+                 //alert(data[3]);
+                 $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                 // }, 2000);
+             });
+         });
+
+
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#Levellist', '#Lookup-Level-Grade,#Create-Level-Grade,#Edit-Level-Grade,#Remove-Level-Grade', 500, 620, '#Autho', '@Url.Action("AuthSave")',dt.Id,'','', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Code').val(k.Code);
+                    $('#Name').val(k.Name);
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', k.Level_Id, k.Level_FullDetails, 'Levellist','','N');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').oldVal(data[2].Name);
+                    $('#Code').oldVal(data[2].Code);
+                    $('#LevelList_old').oldLookupVal(data[2].Level_Val);
+                }
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+         $('<div></div>').P2BPartialCreateModalDialog();
+         $('#Create-Level-Grade').on("click", function (event) {
+             //$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "Medicine")', 'Create Medicine Details', 'open', '@Url.Action("Create", "Medicine")', '#frmMedicine', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmAllergy', '', function (data) {
+             @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "TrainingInstitute")', 'Create ContactDetails Details', 'open', '@Url.Action("Create", "ContactDetails")', '#frmContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 300, 400, '', '', '', 'frmTrainingInstitute', '', function (data) {
+                 $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', data[0], data[1], 'ContactDetailsList', '#Edit-ContactDetails-Disease,#Remove-ContactDetails-Disease', 'A');*@
+             $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("LevelPartial", "Grade")', 'Create Level', 'open', '@Url.Action("CreateSave", "Level")', '#frmLevel', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmGrade', '', function (data) {
+
+                 $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', data[0], data[1], 'Levellist', '#Edit-Level-Grade,#Remove-Level-Grade', 'A');
+             });
+             event.preventDefault();
+         });
+
+
+        $('#loookup-Level-Grade').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLevel", "Grade")', '', 'LookupDiv', 'Look Up Data', '#Levellist', 'Levellist', 5, 'Levellist', '#frmGrade', 'N', '#Edit-Level-Corporate,#Remove-Level-Corporate', 'Lookup_table', 'PageNavPosition');
+             event.preventDefault();
+         });
+
+
+
+        $('#Edit-Level-Grade').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            event.preventDefault();
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("LevelPartial", "Grade")', '@Url.Action("EditLevel_partial", "Level")', b, '@Url.Action("EditSave", "Level")', 'Edit Level', '#frmLevel', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#frmGrade', '#Edit-Level-Grade,#Remove-Level-Grade', '#Levellist', 'Levellist', 'Levellist', function (data) {
+                setTimeout(function () {
+                    $.each(data, function (i, k) {
+                        $('#frmLevel').trigger('reset');
+                        $('#Name').val(k.Name);
+                        $('#Code').val(k.Code);
+                        $('#Levellist').P2BLookUpEncapsulate('#Levellist', 'Levellist', k.Id, k.Name,k.Code, 'Levellist');
+                    })
+                }, 2000);
+            });
+        });
+
+
+        $('#Remove-Level-Grade').button().on('click', function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
+            var a = [], b;
+            a = $('#Levellist').P2BGetTableDataonSelectedRow('#Levellist', 0);
+            b = a[0];
+            console.log(b);
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteLevel", "Level")', b, dt.ID, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Postion_List', $('#Postion_List').val(), 200, 200, '#frmJob', '#Postion_List');
+            event.preventDefault();
+        });
+        $('#Btndisplay').button().on('click', function (event) {
+            $('#grid_Display').show();
+        });
+
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $("#Code").ForceOnlyAlphaNumeric();
+        $("#Name").ForceOnlyAlpha();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+        $.fn.P2BTransactionTableDynamic = function (IDofinputsearch, IDofCheckbox, urldatatoload, forwardata, formname) {
+
+            var init = $(this);
+            console.log(init);
+            var datatoserverside = [];
+            if (forwardata == '' || forwardata == null) {
+                datatoserverside = ["9999999999"];
+            }
+            else {
+                datatoserverside = forwardata
+            }
+            var searchon = function () {
+                jQuery(IDofinputsearch).on('keyup', function (e) {
+                    var value = jQuery(this).val().toUpperCase().toLowerCase();
+                    var $rows = $('#' + init.attr('id') + ' tr');
+                    if (value == '') {
+                        $rows.show(500);
+                        return false;
+                    }
+                    $rows.each(function (index) {
+                        if (index !== 0) {
+                            var $row = $(this);
+                            var column2 = $row.find("td").eq(2).text().toUpperCase().toLowerCase();
+                            if ((column2.indexOf
+                                (value) > -1)) {
+                                $row.show(500);
+                            }
+                            else {
+                                $row.hide(500);
+                            }
+                        }
+                    });
+                });
+            };
+            function checkboselection() {
+
+                $(IDofCheckbox).on('click', function (e) {
+                    var b = init.attr('id');
+                    var count = $("#" + b + " tr").filter(function () {
+                        return $(this).css('display') == 'none';
+                    }).length;
+                    if (this.checked) {
+                        $('#' + b + ' .case').each(function () {
+                            if (count > 0) {
+                                var data = $("#" + b + " tr").filter(function () {
+                                    return $(this).css('display') == 'none';
+                                }).find('.case').removeAttr('checked').checked = false;
+                                var data_1 = $("#" + b + " tr:not(:first-child)").filter(function () {
+                                    return $(this).css('display') !== 'none';
+                                }).addClass('selectedtr').find('.case').attr('checked', 'checked').prop('checked', true).checked = true;
+                                if (this.checked) {
+                                    var abcdert = jQuery(this).val();
+                                    console.log(value);
+
+                                }
+                            }
+                            else {
+                                $('#' + b + ' .case').attr('checked', 'checked');
+                                this.checked = true;
+                                var value_checked = jQuery('#' + b + ' .case:checked').parent('td').parent('tr');
+                                value_checked.addClass('selectedtr');
+                                if (this.checked) {
+                                    var abcd = jQuery(this).val();
+                                }
+                                else {
+                                    alert('No Data Found');
+                                }
+                            }
+                        });
+                    } else {
+                        $('#' + b + ' .case').each(function (e) {
+                            var value_unchecked = jQuery(this).parent('td').parent('tr');
+                            value_unchecked.removeClass('selectedtr');
+                            $('#' + b + ' .case').removeAttr('checked');
+                            this.checked = false;
+                        });
+                    }
+                });
+
+                $(document).on('click', '#' + init.attr('id') + ' .case', function (e) {
+                    if (this.checked) {
+                        var d = jQuery(this).val();
+                        var value_checked = jQuery('.case:checked').parent('td').parent('tr');
+                        value_checked.addClass('selectedtr');
+                    }
+                    else {
+                        var value_unchecked = jQuery(this).parent('td').parent('tr');
+                        value_unchecked.removeClass('selectedtr');
+                    }
+                    if ($('.case:checked').length == $('.case').length) {
+                        $(IDofCheckbox).prop('checked', true);
+                    } else {
+                        $(IDofCheckbox).prop('checked', false);
+                    }
+                });
+            };
+            var append_btn = function (appendtable) { };
+            var dataload = jQuery.ajax({
+                url: urldatatoload,
+                type: 'POST',
+                cache: false,
+                data: $(formname).serialize() + "&data=" + forwardata
+            });
+            dataload.done(function (data) {
+                if (data.data != null) {
+                    $('#' + data.tablename + '').parent('div.transactiondiv').parents('div').show();
+                    $.each(data.data, function (i, k) {
+                        jQuery('#' + data.tablename + '').append('<tr tabindex="1"><td><input type="checkbox" class="case" name=' + data.tablename + ' value=' + k.code + ' /></td><td style="display:none;">' + k.code + '</td><td>' + k.value + '</td></tr>').insertAfter(jQuery('#' + data.tablename + '').closest('tr'));
+                    });
+                } else {
+                    //  $('#' + data.tablename + '').parent('div.transactiondiv').parents('div').show();
+                    $.each(data, function (i, k) {
+                        jQuery(init).append('<tr tabindex="1"><td><input type="checkbox" class="case" name=' + $(init).attr('id') + ' value=' + k.code + ' /></td><td style="display:none;">' + k.code + '</td><td>' + k.value + '</td></tr>').insertAfter(jQuery(init).closest('tr'));
+                    });
+                }
+                searchon();
+                checkboselection();
+                append_btn();
+            });
+        };
+
+        $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '', '@Url.Action("GetLookupEmp", "EmpSalStruct")', '', '#frmAttendanceT')
+
+        $('#PayProcessGroup').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "TransactionAttendanceT")", "", "");
+
+
+    });
+</script>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <button class="button" id="Create">Create</button>
+            <button class="button" id="View">View</button>
+            <button class="button" id="Edit">Edit</button>
+            <button class="button" id="Delete">Delete</button>
+            <button class="button" id="Autho">Authorised</button>
+            <div id="Grid_Form">
+                <div>
+
+                    <table id="JqGrid"></table>
+                    <div id="pager2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog">
+    <div title="LookUp Data">
+        <div class="LookupDiv"></div>
+    </div>
+    <div id="PageNavPosition">
+
+    </div>
+</div>
+
+<div id="Create_Dialog" title="Create Attendance T">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmAttendanceT", name = "frmAttendanceT" }))
+    {
+        <input id="Autho_Action" type="hidden" name="Autho_Action" />
+        <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+        <div class="row3 content_margine">@Html.LabelFor(m => m.calender, "Calender:", new { @class = "popup-content-label " }) @Html.TextBoxFor(m => m.calender, new { @class = "Popup-content-textbox datepicker" })</div>
+        
+        <div class="row3 content_margine">@Html.LabelFor(m => m.PayProcessGroup, "ProcessGroup:", new { @class = "popup-content-label must" }) <select class="selectmenu" id="PayProcessGroup" name="PayProcessGroup" style="width:120px"><option>-Select-</option></select></div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.MonthDays, "MonthDays :", new { @class = "popup-content-label must" })<select class="selectmenu" id="MonthDays" name="MonthDays" style="width:120px"><option>-Select-</option></select></div>
+        <div class="row3 content_margine">@Html.LabelFor(m => m.PaybleDays, "PaybleDays :", new { @class = "popup-content-label must" })<select class="selectmenu" id="PaybleDays" name="PaybleDays" style="width:120px"><option>-Select-</option></select></div>
+        <div class="row3 content_margine">
+           @Html.LabelFor(m => m.Employee, "Employee:", new { @class = "popup-content-label" })
+            <div class="transactiondiv">
+                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                <table cellspacing="0" cellpadding="1" class="transactiontable" id="Employee-Table">
+                    <tr><th><input type="checkbox" id="case-department" /></th><th>Employee</th></tr>
+                </table>
+                <span class="btn-span" aria-hidden="true">
+                    @*<button id="load-next" class="loan-btn" data-tabletype="unit">LoadNext</button>*@
+                </span>
+
+            </div>
+
+
+        </div>
+        
+        
+        
+        
+   
+    }
+</div>

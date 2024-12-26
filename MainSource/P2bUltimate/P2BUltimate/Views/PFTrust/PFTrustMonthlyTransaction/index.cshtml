@@ -1,0 +1,279 @@
+﻿<link href="~/Content/Unit/Unit.css" rel="stylesheet" />
+
+<style>
+    .transactiondivnew > div {
+        display: inline-block;
+        margin: 0 auto;
+        padding: 4px;
+    }
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 470px;
+        width: 480px;
+        margin: 4px auto;
+        position: absolute;
+    }
+        .transactiondivnew > div > input {
+            box-sizing: initial;
+            display: inline-block;
+            margin: 0 auto;
+            width: 110px;
+        }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 400px;
+        border-collapse: collapse;
+    }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+</style>
+
+<div class="Form_Bg">
+    <div class="Form_Input">
+        <div class="Button_Container">
+            <label class="must" style="float:left;margin-right:12px;">PayMonth:</label>
+            <input type="text"  name="txtPayMonth" id="txtPayMonth" style="width: 70px; float:left;" />
+           
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="upload" style="width:152px">Upload From Payroll</button>
+           
+        </div>
+        <div id="Grid_Form" style="margin-top: 20px; position:relative">
+            <div>
+                <table id="JqGrid"></table>
+                <div id="pager2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="Create_dialog">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmPFTrustMonthlyTranction", name = "frmPFTrustMonthlyTranction" }))
+    {
+        <input id="geo_id" class="filter_structure_id" name="geo_id" />
+        <input id="pay_id" class="filter_structure_id" name="pay_id" />
+        <input id="fun_id" class="filter_structure_id" name="fun_id" />
+        <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="filter_structure_id" />
+        <div class="filter-div" id="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+   
+        <div class="heading">Employee List</div>
+        <div class="employeeselectiondiv">
+            <div class="transactiondivnew dynamic addons" style="float:left">
+                <div><label>Search : </label><input type="text" id="Employee-Search" style="width: 380px;" /></div>
+                <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="Employee-Table">
+                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                </table>
+
+            </div>
+            <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+            <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+            <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+        </div>
+    
+        
+        <div class="content_margine">
+            <label class="popup-content-label must" style="width:120px">Upload Month:</label>
+            <input type="text" name="UploadMonth" id="UploadMonth" class="date-picker" />
+        </div>
+    }
+</div>
+
+<script>
+    $(document).ready(function (e) {
+       
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Emp Code', 'Emp Name', 'PF No.', 'Own PF', 'Owner PF', 'Pension', 'VPF', 'MonthYear', 'Posting Date', 'Id'];
+        ColNames = ['Emp Code', 'Emp Name', 'PF No.', 'Own PF', 'Owner PF', 'Pension', 'VPF', 'MonthYear', 'Posting Date', 'Id'];
+        SortName = 'Id';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height,'#pager2', { multiple: true, rowNum: 30, selectall: true });
+        $('#Create_dialog').P2BGridDialog();
+        @*$('#Load').on("click", function (event) {
+
+            $('#SubjectList').P2BSelectMenuAppend('@Url.Action("GetWageMonth", "PFECRSummaryR")', "", "");
+            event.preventDefault();
+        });*@
+
+        $('#txtPayMonth').MonthYearPicker();
+        if ($("#txtPayMonth").val() == "") {
+            var dt = new Date();
+            var month = dt.getMonth() + 1;
+            month = month < 10 ? '0' + month : '' + month;
+            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+        }
+        //document.getElementById("myDiv").style.margin = "-22px 0px 0px 140px";
+        //document.getElementById("Grid_Form").style.margin = "20px 0px 0px 20px";
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h_PFT?geo_id=' + forwarddata + '', "");
+
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+        });
+
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        var checking = '';
+        $('#upload').on("click", function (event) {
+            ajaxloaderv2('body');
+            $.post('@Url.Action("ProcessForNewEmpPFTrust", "PFTrustMonthlyTransaction")', function (data, status) {
+                checking = data + status;
+                //console.log(checking);
+                if (data="Created.") {
+                    $('.ajax_loder').remove();
+                }
+                if (checking == "alert('Please Upload PF Balance and Try Again...!!!')success") {
+                    return false;
+                }
+               
+                else {
+                    $('#frmPFTrustMonthlyTranction').trigger("reset");
+                    $('#upload').ProcessConfirmation({
+                        confirmurl: "@Url.Action("ChkProcess")",
+                        month: "#txtPayMonth",
+                        msg: "You have already upload PF!,Do You Want to Re upload..?Please Confirm..!",
+                        status: function (data) {
+                            if (data == true) {
+                                $.LoadEmpByDefaultPFTRUST(false, "");
+                                $('#Create_dialog').P2BCreateDialog('', '', '', '', 'Create PFTrust Monthly Tranction', 'open', '@Url.Action("CreatePFMthlyTEmployeeWise")', '#frmPFTrustMonthlyTranction', 'Message :', 'Request Falied :', '#JqGrid', 590, 900, '', '', function (data) { });
+                                $('#UploadMonth').MonthYearPicker();
+                            }
+                        }
+                    });
+                    event.preventDefault();
+                }
+
+            });
+            });
+
+
+        $('#Load').on('click', function (e) {
+            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+        });
+
+        //function ajaxloaderv2(cameform) {
+        //    $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        //};
+        @*$('#upload').on('click', function (e) {
+
+            //var a = $.GetGridSelctedvalue("#JqGrid", "Id");
+
+            //if ($('#emp_Id').val()) {
+            //    console.log($('#emp_Id').val())
+            //    a = $('#emp_Id').val();
+            //    console.log(a);
+            //}
+            //else {
+            //    a = a.toString();
+            //}
+
+            // a = a != null ? a.toString() : $('#emp_Id').val();
+            $('#upload').ProcessConfirmation({
+                confirmurl: "@Url.Action("ChkProcess", "PFTrustMonthlyTransaction")",
+                month: "#txtPayMonth",
+                msg: "You have already upload PF!,Do You Want to Re upload..?Please Confirm..!",
+                status: function (data) {
+                    if (data == true) {
+
+                        $.ajax({
+                            method: "POST",
+                            url: "@Url.Action("UploadPFdataMonthly", "PFTrustMonthlyTransaction")",
+                            data: { month: $("#txtPayMonth").val() },
+                            beforeSend: function () {
+                                ajaxloaderv2('body');
+                            },
+                            success: function (data) {
+                                $('<div></div>').P2BMessageModalDialog1('ui-icon-info', data.responseText);
+                            },
+                            error: function (data) {
+                                $('<div></div>').P2BMessageModalDialog1('ui-icon-alert', data.responseText);
+                                $('#emp_Id').val("");
+                            }, complete: function (data) {
+                                $('#JqGrid').trigger('reloadGrid');
+                                $('.ajax_loder').remove();
+                                $('#emp_Id').val("");
+                            }
+                        });
+                    }
+                }
+            });
+            e.preventDefault();
+        });*@
+
+        @*$.LoadEmpByDefault(false, '');
+        $('#Create_dialog').P2BGridDialog();
+        $('#Create').on("click", function (event) {
+            $('#frmPFTrustMonthlyTranction').trigger("reset");
+            $('#Create_dialog').P2BCreateDialog('', '', '', '', 'Create PFTrust Monthly Tranction', 'open', '@Url.Action("CreateEmployeeWise")', '#frmPFTrustMonthlyTranction', 'Message :', 'Request Falied :', '#JqGrid', 590, 800, '', '', function (data) { });
+            $('#UploadMonth').MonthYearPicker();
+            event.preventDefault();
+        });*@
+        //$('#SubjectList').selectmenu().selectmenu("menuWidget");
+
+    });
+</script>
+
+@*<script>
+        $(document).ready(function (e) {
+
+            $('button').button();
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['Emp Code', 'Emp Name', 'PF No.', 'Own PF', 'Owner PF', 'Pension', 'VPF', 'Posting Date','ID'];
+            ColNames = ['', '', '', '', '', '', '', '', ''];
+            SortName = 'Id';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 300;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+
+
+            $('#Load').on("click", function (event) {
+
+                $('#SubjectList').P2BSelectMenuAppend('@Url.Action("GetWageMonth", "PFECRSummaryR")', "", "");
+                event.preventDefault();
+            });
+
+
+            $('#SubjectList').selectmenu().selectmenu("menuWidget");
+        });
+    </script>*@

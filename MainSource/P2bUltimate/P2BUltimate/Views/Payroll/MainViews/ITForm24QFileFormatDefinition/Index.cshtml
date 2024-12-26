@@ -1,0 +1,220 @@
+﻿@{
+    ViewBag.Title = "ITForm24QFileFormatDefinition";
+}
+@model Payroll.ITForm24QFileFormatDefinition
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Corpoarte">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmITForm24QFileForDef", name = "frmITForm24QFileForDef" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.Form24QFileType, "File Type :", new { @class = "popup-content-label must" })<select id="FileTypelist" name="FileTypelist" class="must" style="width:161px;"><option></option></select></div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.SrNo, "Sr No. :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.SrNo, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Field, "Field :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Field, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.ExcelColNo, "Excel Col No :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ExcelColNo, new { @class = "popup-content-textbox must" })</div>
+            <div class="dropdown_row1 row3 content_margine">@Html.LabelFor(m => m.DataType, "DataType :", new { @class = "popup-content-label" })<select id="DataTypelist" name="DataTypelist" style="width:161px;"><option></option></select></div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Size, "Size :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Size, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.InputType, "InputType :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.InputType, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Narration, "Narration :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox must" })</div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#SrNo').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#SrNo').ForceOnlyNumeric();
+        // $('#Name').ForceOnlyAlpha();
+        // $('#Name').MaxLength(50);
+
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-SalaryHead-ITForm12BACaptionMapping,#Remove-SalaryHead-ITForm12BACaptionMapping";
+        ColModel = ['SrNo', 'Form24QFileType', 'Field', 'ExcelColNo', 'Id'];
+        ColNames = ['SrNo', 'Form24QFileType', 'Field', 'ExcelColNo', 'Id'];
+        SortName = 'Id';
+        Caption = 'ITForm24QFileFormatDefinition';
+        url = '@Url.Action("P2BGrid")';
+        width = 1001;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        $('#Create').on("click", function (event) {
+            $('#frmITForm24QFileForDef').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Form24Q File Format', 'open', '@Url.Action("Create")', '#frmITForm24QFileForDef', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', btndisablenames, function (data) { });
+            $('#FileTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 608, ""); // To bind dropdown on page load
+            $('#DataTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 609, ""); // To bind dropdown on page load
+            event.preventDefault();
+        });
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit File Format Data", '#frmITForm24QFileForDef', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', btndisablenames, function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.SrNo);
+                    $('#SrNo').val(k.SrNo);
+                    $('#Field').val(k.Field);
+                    $('#ExcelColNo').val(k.ExcelColNo);
+                    $('#Size').val(k.Size);
+                    $('#InputType').val(k.InputType);
+                    $('#Narration').val(k.Narration);
+                    $('#SrNo').attr('readonly', 'readonly');
+                    $('#FileTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 608, k.FileType_Id); // Dropdown bind
+                    $('#DataTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 609, k.DataType_Id); // Dropdown bind
+                });
+
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View frmITForm12BACaptionMaking Data', '#AddressList,#ContactDetailsList', '#Lookup-SalaryHead-ITForm12BACaptionMapping,#Create-SalaryHead-ITForm12BACaptionMapping,#Edit-SalaryHead-ITForm12BACaptionMapping,#Remove-SalaryHead-ITForm12BACaptionMapping,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#SrNo').val(k.SrNo);
+                    $('#Field').val(k.Field);
+                    $('#ExcelColNo').val(k.ExcelColNo);
+                    $('#Size').val(k.Size);
+                    $('#InputType').val(k.InputType);
+                    $('#Narration').val(k.Narration);
+                     $('#FileTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 608, k.FileType_Id); // Dropdown bind
+                    $('#DataTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 609, k.DataType_Id); // Dropdown bind
+                });
+
+              
+            });
+            });
+
+            //delete main page
+            $('#Delete').button().click(function (event) {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        $('#Btn-Upload-Data').on('click', function (e) {
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+        $('#FileTypelist').selectmenu().selectmenu("menuWidget");
+        $('#DataTypelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

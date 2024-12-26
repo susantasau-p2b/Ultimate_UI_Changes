@@ -1,0 +1,995 @@
+﻿@{
+    ViewBag.Title = "Leave Debit Policy";
+}
+@model Leave.LvDebitPolicy
+<!DOCTYPE html>
+
+
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('.popup_radio_button').controlgroup();
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#PolicyName').ValidateTextBox({ maxlength: 25, name: true, alphanum: true });
+
+        $('#hideshowcombinedleavehead').hide();
+
+        $('#PrefixGraceCount').ForceOnlyNumeric();
+        $('#PrefixGraceCount').MaxLength(10);
+        $('#MaxUtilDays').ForceOnlyNumeric();
+        $('#MaxUtilDays').MaxLength(10);
+        $('#MinUtilDays').ForceOnlyNumeric();
+        $('#MinUtilDays').MaxLength(10);
+        $('#YearlyOccurances').ForceOnlyNumeric();
+        $('#YearlyOccurances').MaxLength(10);
+        $('#PreDays').ForceOnlyNumeric();
+        $('#PreDays').MaxLength(10);
+        $('#PostDays').ForceOnlyNumeric();
+        $('#LVReqexemptmaxcelling').ForceOnlyNumeric();
+        $('#LVReqseqexemptCount').ForceOnlyNumeric();
+        $('#LVReqseqexemptCount').MaxLength(10);
+        $('#LVReqexemptmaxcelling').MaxLength(10);
+        $('#PostDays').MaxLength(10);
+        $('#YearlyOccurances').ForceOnlyNumeric();
+        $('#YearlyOccurances').MaxLength(10);
+        $('#AboveServiceMaxYears').ForceOnlyNumeric();
+        $('#AboveServiceMaxYears').MaxLength(10);
+        $('#PrefixGraceCount').ForceOnlyNumeric();
+        $('#PrefixGraceCount').MaxLength(10);
+        $('#PrefixMaxCount').ForceOnlyNumeric();
+        $('#PrefixMaxCount').MaxLength(10);
+        $('#ApplyFutureGraceMonths').ForceOnlyNumeric();
+        $('#ApplyFutureGraceMonths').MaxLength(10);
+        $('#ApplyPastGraceMonths').ForceOnlyNumeric();
+        $('#ApplyPastGraceMonths').MaxLength(10);
+
+        $('#PrefixGraceCount').attr("value", "0");
+        $('#PrefixMaxCount').attr("value", "0");
+        $('#ApplyFutureGraceMonths').attr("value", "0");
+        $('#ApplyPastGraceMonths').attr("value", "0");
+        $('#MaxUtilDays').attr("value", "0");
+        $('#MinUtilDays').attr("value", "0");
+        $('#PreDays').attr("value", "0");
+        $('#LVReqseqexemptCount').attr("value", "0");
+        $('#LVReqexemptmaxcelling').attr("value", "0");
+        $('#YearlyOccurances').attr("value", "0");
+
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['PolicyName', 'MaxUtilDays', 'MinUtilDays', 'YearlyOccurances', 'Id', ];
+        ColNames = ['Policy Name', 'Max Util Days', 'Min Util Days', 'Yearly Occurances', 'Id', ];
+        SortName = 'Id';
+        Caption = 'Leave Debit Policy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmLvDebitPolicy').trigger("reset");
+            $('#hideshowcombinedleavehead').hide();
+            $('#hideshowPreApply').hide();
+            $('#hideshowPostApply').hide();
+            $('#hideshowPrefixSuffix').hide();
+            $('#hideshowLvSharingPolicy').hide();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Debit Policy', 'open', '@Url.Action("Create")', '#frmLvDebitPolicy', 'Message :', 'Request Falied :', '#JqGrid', 800, 800, '#CombineLeaveHeadslist', "", function (data) { });
+            // $('#CreditDatelist').P2BSelectMenuAppend('@@Url.Action("GetLookupValue", "lookup")', 402, ""); // To bind dropdown on page load
+            $('#Lookup_LvheadDetails').attr('disabled', false);
+            $('[name="Combined"]').val([false]).button().button("refresh");
+            $('[name="Sharing"]').val([false]).button().button("refresh");
+            $('[name="PreApplyPrefixSuffix"]').val([false]).button().button("refresh");
+            $('[name="PostApplyPrefixSuffix"]').val([false]).button().button("refresh");
+            $('[name="PrefixSuffix"]').val([false]).button().button("refresh");
+            $('#PreDays').prop("disabled", true);
+            $('#PostDays').prop("disabled", true);
+            $('#txtlvhead').attr('readonly', 'readonly');
+
+            event.preventDefault();
+        });
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        // Main page edit
+        $('#Edit').on('click', function (e) {
+            AssignData();
+
+
+            @*$('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#AddressList,#ContactDetailsList,#PayscaleList', btndisablenames, function (data) {*@
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Leave Debit Policy Data", '#frmLvDebitPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 800, '#CombineLeaveHeadslist', "", function (data) {
+                $('#Head_id').val(data[0].Lvhead_Id);
+                $('#txtlvhead').attr('readonly', 'readonly');
+                $('#txtlvhead').val(data[0].Lvhead_FullDetails);
+                $('#PolicyName').attr('readonly', 'readonly');
+                $('#MaxUtilDays').val(data[0].MaxUtilDays);
+                $('#MinUtilDays').val(data[0].MinUtilDays);
+                $('#PolicyName').val(data[0].PolicyName);
+                $('#PrefixGraceCount').val(data[0].PrefixGraceCount);
+                $('#PrefixMaxCount').val(data[0].PrefixMaxCount);
+                $('#YearlyOccurances').val(data[0].YearlyOccurances);
+                $('#ApplyFutureGraceMonths').val(data[0].ApplyFutureGrace);
+                $('#ApplyPastGraceMonths').val(data[0].ApplyPastGrace);
+                $('[name="Combined"]').val([data[0].Combined]).button().button("refresh");
+                if (data[0].Combined == true) {
+                    $('#hideshowcombinedleavehead').fadeIn();
+                }
+                else {
+                    $('#hideshowcombinedleavehead').fadeOut();
+                }
+                $('[name="HalfDayAppl"]').val([data[0].HalfDayAppl]).button().button("refresh");
+                $('[name="HolidayInclusive"]').val([data[0].HolidayInclusive]).button().button("refresh");
+                $('[name="IsHalfDaySession"]').val([data[0].IsHalfDaySession_WaiveOffPrefixSuffix]).button().button("refresh");
+                $('[name="PostApplied"]').val([data[0].PostApplied]).button().button("refresh");
+                $('[name="PostApplyPrefixSuffix"]').val([data[0].PostApplyPrefixSuffix]).button().button("refresh");
+                $('#PostDays').val(data[0].PostDays);
+                $('[name="PreApplied"]').val([data[0].PreApplied]).button().button("refresh");
+                $('[name="PreApplyPrefixSuffix"]').val([data[0].PreApplyPrefixSuffix]).button().button("refresh");
+                $('#PreDays').val(data[0].PreDays);
+                $('[name="PrefixSuffix"]').val([data[0].PrefixSuffix]).button().button("refresh");
+                $('[name="Sandwich"]').val([data[0].Sandwich]).button().button("refresh");
+
+                $('[name="ReqseqAppl"]').val([data[0].IsLVReqSeqexemptAppl]).button().button("refresh");
+                $('[name="ExemptAppl"]').val([data[0].IsLVCertExemptAppl]).button().button("refresh");
+
+                $('[name="Sharing"]').val([data[0].Sharing]).button().button("refresh");
+                $('#Lookup_LvheadDetails').attr('disabled', 'disabled');
+                $('[name="IsCertificate"]').val([data[0].IsCertificateAppl]).button().button("refresh");
+                $('#MinLvDays').val(data[0].MinLvDays);
+
+                $('#LVReqseqexemptCount').val(data[0].LVReqseqexemptCount);
+                $('#LVReqexemptmaxcelling').val(data[0].LVReqexemptmaxcelling);
+
+                $('#PrefixSuffixActionlist').P2BLookUpEncapsulate('#PrefixSuffixActionlist', 'PrefixSuffixActionlist', data[0].PrefixSuffixAction_Id, data[0].PrefixSuffixAction_FullDetails, 'PrefixSuffixActionlist', '#Edit-PrefixSuffixAction-LvDebitPolicy,#Remove-PrefixSuffixAction-LvDebitPolicy', 'N');
+                $('#PreApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', data[0].PreApplyPrefixSuffixAction_Id, data[0].PreApplyPrefixSuffixAction_FullDetails, 'PreApplyPrefixSuffixActionlist', '#Edit-PreApplyPrefixSuffix-LvDebitPolicy,#Remove-PreApplyPrefixSuffix-LvDebitPolicy', 'N');
+                $('#PostApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', data[0].PostApplyPrefixSuffixAction_Id, data[0].PostApplyPrefixSuffixAction_FullDetails, 'PostApplyPrefixSuffixActionlist', '#Edit-PostApplyPrefixSuffix-LvDebitPolicy,#Remove-PostApplyPrefixSuffix-LvDebitPolicy', 'N');
+                if ([data[0].PostApplyPrefixSuffix] == "false")
+                {
+                    $('#hideshowPostApply').fadeOut();
+                }
+                if ([data[0].PreApplyPrefixSuffix] == "false")
+                {
+                    $('#hideshowPreApply').fadeOut();
+                }
+                if ([data[0].PrefixSuffix] == "false")
+                {
+                    $('#hideshowPrefixSuffix').fadeOut();
+                }
+                if ([data[0].Sharing] == "false") {
+                    $('#hideshowLvSharingPolicy').fadeOut();
+                }
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    //$('#CombineLeaveHeadslist').P2BLookUpEncapsulate('#CombineLeaveHeadslist', 'CombineLeaveHeadslist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'CombineLeaveHeadslist', 'view', 'A');
+                    $('#CombineLeaveHeadslist').P2BLookUpEncapsulate('#CombineLeaveHeadslist', 'CombineLeaveHeadslist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'CombineLeaveHeadslist', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#LvSharingPolicylist').P2BLookUpEncapsulate('#LvSharingPolicylist', 'LvSharingPolicylist', k.LvSharingPolicy_Id, k.LvSharingPolicy_FullDetails, 'LvSharingPolicylist', '#Edit-LvSharingPolicy-LvDebitPolicy,#Remove-LvSharingPolicy-LvDebitPolicy', 'A');
+                });
+                $('#Autho_Allow').val(data[3]);
+            });
+            e.preventDefault();
+        });
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Leave Debit Policy Data', '', '', 500, 800, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    //console.log(k.Code);
+                    $('#Head_id').val(data[0].Lvhead_Id);
+                    $('#txtlvhead').attr('readonly', 'readonly');
+                    $('#txtlvhead').val(data[0].Lvhead_FullDetails);
+                    $('#PolicyName').attr('readonly', 'readonly');
+                    $('#MaxUtilDays').val(data[0].MaxUtilDays);
+                    $('#MinUtilDays').val(data[0].MinUtilDays);
+                    $('#PolicyName').val(data[0].PolicyName);
+                    $('#PrefixGraceCount').val(data[0].PrefixGraceCount);
+                    $('#PrefixMaxCount').val(data[0].PrefixMaxCount);
+                    $('#YearlyOccurances').val(data[0].YearlyOccurances);
+                    $('#ApplyFutureGraceMonths').val(data[0].ApplyFutureGrace);
+                    $('#ApplyPastGraceMonths').val(data[0].ApplyPastGrace);
+                    $('#Remove-CombineLeaveHeads-LvDebitPolicy').attr('readonly', 'readonly');
+                    $('[name="Combined"]').val([data[0].Combined]).button().button("refresh");
+                    if (data[0].Combined == true) {
+                        $('#hideshowcombinedleavehead').fadeIn();
+                    }
+                    else {
+                        $('#hideshowcombinedleavehead').fadeOut();
+                    }
+                    $('[name="HalfDayAppl"]').val([data[0].HalfDayAppl]).button().button("refresh");
+                    $('[name="HolidayInclusive"]').val([data[0].HolidayInclusive]).button().button("refresh");
+                    $('[name="IsHalfDaySession"]').val([data[0].IsHalfDaySession_WaiveOffPrefixSuffix]).button().button("refresh");
+                    $('[name="PostApplied"]').val([data[0].PostApplied]).button().button("refresh");
+                    $('[name="PostApplyPrefixSuffix"]').val([data[0].PostApplyPrefixSuffix]).button().button("refresh");
+                    $('#PostDays').val(data[0].PostDays);
+                    $('[name="PreApplied"]').val([data[0].PreApplied]).button().button("refresh");
+                    $('[name="PreApplyPrefixSuffix"]').val([data[0].PreApplyPrefixSuffix]).button().button("refresh");
+                    $('#PreDays').val(data[0].PreDays);
+                    $('[name="PrefixSuffix"]').val([data[0].PrefixSuffix]).button().button("refresh");
+                    $('[name="Sandwich"]').val([data[0].Sandwich]).button().button("refresh");
+
+                    $('[name="ReqseqAppl"]').val([data[0].IsLVReqSeqexemptAppl]).button().button("refresh");
+                    $('[name="ExemptAppl"]').val([data[0].IsLVCertExemptAppl]).button().button("refresh");
+
+                    $('[name="IsCertificate"]').val([data[0].IsCertificateAppl]).button().button("refresh");
+                    $('#MinLvDays').val(data[0].MinLvDays);
+                    $('#LVReqseqexemptCount').val(data[0].LVReqseqexemptCount);
+                    $('#LVReqexemptmaxcelling').val(data[0].LVReqexemptmaxcelling);
+
+                    $('#PrefixSuffixActionlist').P2BLookUpEncapsulate('#PrefixSuffixActionlist', 'PrefixSuffixActionlist', data[0].PrefixSuffixAction_Id, data[0].PrefixSuffixAction_FullDetails, 'PrefixSuffixActionlist', '#Edit-PrefixSuffixAction-LvDebitPolicy,#Remove-PrefixSuffixAction-LvDebitPolicy', 'N');
+                    $('#PreApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', data[0].PreApplyPrefixSuffixAction_Id, data[0].PreApplyPrefixSuffixAction_FullDetails, 'PreApplyPrefixSuffixActionlist', '#Edit-PreApplyPrefixSuffix-LvDebitPolicy,#Remove-PreApplyPrefixSuffix-LvDebitPolicy', 'N');
+                    $('#PostApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', data[0].PostApplyPrefixSuffixAction_Id, data[0].PostApplyPrefixSuffixAction_FullDetails, 'PostApplyPrefixSuffixActionlist', '#Edit-PostApplyPrefixSuffix-LvDebitPolicy,#Remove-PostApplyPrefixSuffix-LvDebitPolicy', 'N');
+                    if ([data[0].PostApplyPrefixSuffix] == "false") {
+                        $('#hideshowPostApply').fadeOut();
+                    }
+                    if ([data[0].PreApplyPrefixSuffix] == "false") {
+                        $('#hideshowPreApply').fadeOut();
+                    }
+                    if ([data[0].PrefixSuffix] == "false") {
+                        $('#hideshowPrefixSuffix').fadeOut();
+                    }
+                    if ([data[0].Sharing] == "false") {
+                        $('#hideshowLvSharingPolicy').fadeOut();
+                    }
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#CombineLeaveHeadslist').P2BLookUpEncapsulate('#CombineLeaveHeadslist', 'CombineLeaveHeadslist', k.LvHeadObj_Id, k.LvHeadObj_FullDetails, 'CombineLeaveHeadslist', 'view', 'A');
+                });
+
+                $.each(data[2], function (i, k) {
+                    $('#LvSharingPolicylist').P2BLookUpEncapsulate('#LvSharingPolicylist', 'LvSharingPolicylist', k.LvSharingPolicy_Id, k.LvSharingPolicy_FullDetails, 'LvSharingPolicylist', '#Edit-LvSharingPolicy-LvDebitPolicy,#Remove-LvSharingPolicy-LvDebitPolicy', 'A');
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+        /* Address button click*/
+
+        //To get data in Lookup
+        $('#Lookup-CombineLeaveHeads-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvDebitPolicy")', '', 'LookupDiv', 'ConvertLeaveHead Look Up Data', '#CombineLeaveHeadslist', 'CombineLeaveHeadslist', 5, 'CombineLeaveHeadslist', '#frmLvDebitPolicy', 'A', '#Remove-CombineLeaveHeads-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        // PArtial page create
+        $('<div></div>').P2BPartialCreateModalDialog();
+        //partial page delete
+        $('#Remove-CombineLeaveHeads-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#CombineLeaveHeadslist').P2BGetTableDataonSelectedRow('#CombineLeaveHeadslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#CombineLeaveHeadslist').P2BGetTableDataonSelectedRow('#CombineLeaveHeadslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CombineLeaveHeadslist', $('#CombineLeaveHeadslist').val(), 200, 200, '#frmLvDebitPolicy', '#CombineLeaveHeadslist', '#Remove-CombineLeaveHeads-LvDebitPolicy');
+            event.preventDefault();
+        });
+
+        /* ContactDetails button click*/
+        $('<div></div>').P2BPartialCreateModalDialog();
+
+
+        $('#CreditDatelist').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#PreDays').prop("disabled", true);
+        $('#PostDays').prop("disabled", true);
+        $('input[name="PreApplied"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#PreDays').prop("disabled", true);
+                $('#PreDays').val("0");
+            }
+            else {
+                $('#PreDays').prop("disabled", false);
+            }
+        });
+
+        $('input[name="PostApplied"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#PostDays').prop("disabled", true);
+                $('#PostDays').val("0");
+            }
+            else {
+                $('#PostDays').prop("disabled", false);
+            }
+        });
+
+        $('input[name="Combined"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowcombinedleavehead').fadeOut();
+            }
+            else {
+                $('#hideshowcombinedleavehead').fadeIn();
+            }
+        });
+
+        $('input[name="Sharing"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowLvSharingPolicy').fadeOut();
+            }
+            else {
+                $('#hideshowLvSharingPolicy').fadeIn();
+            }
+        });
+
+        $('input[name="PreApplyPrefixSuffix"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowPreApply').fadeOut();
+            }
+            else {
+                $('#hideshowPreApply').fadeIn();
+            }
+        });
+
+        $('input[name="PostApplyPrefixSuffix"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowPostApply').fadeOut();
+            }
+            else {
+                $('#hideshowPostApply').fadeIn();
+            }
+        });
+
+        $('input[name="PrefixSuffix"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#hideshowPrefixSuffix').fadeOut();
+            }
+            else {
+                $('#hideshowPrefixSuffix').fadeIn();
+            }
+        });
+
+        $('#Lookup-LvHead-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupLvHeadObj", "LvDebitPolicy")', '', 'LookupDiv', 'LeaveHeads Look Up Data', '#LeaveHeadslist', 'LeaveHeadslist', 5, 'LeaveHeadslist', '#frmLvDebitPolicy', 'A', '#Remove-LvHead-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-LvHead-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LeaveHeadslist').P2BGetTableDataonSelectedRow('#LeaveHeadslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LeaveHeadslist').P2BGetTableDataonSelectedRow('#LeaveHeadslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LeaveHeadslist', $('#LeaveHeadslist').val(), 200, 200, '#frmLvDebitPolicy', '#LeaveHeadslist', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup-LvSharingPolicy-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLvSharingPolicyLKDetails", "LvDebitPolicy")', '', 'LookupDiv', 'LeaveSharingPolicy Look Up Data', '#LvSharingPolicylist', 'LvSharingPolicylist', 5, 'LvSharingPolicylist', '#frmLvDebitPolicy', 'A', '#Remove-LvSharingPolicy-LvDebitPolicy,#Edit-LvSharingPolicy-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-LvSharingPolicy-LvDebitPolicy').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "LvDebitPolicy")', 'Create Leave Sharing Policy', 'open', '@Url.Action("Create", "LvSharingPolicy")', '#frmLvSharingPolicy', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLvDebitPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#LvSharingPolicylist').P2BLookUpEncapsulate('#LvSharingPolicylist', 'LvSharingPolicylist', data[0], data[1], 'LvSharingPolicylist', '#Edit-LvSharingPolicy-LvDebitPolicy,#Remove-LvSharingPolicy-LvDebitPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-LvSharingPolicy-LvDebitPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#LvSharingPolicylist').P2BGetTableDataonSelectedRow('#LvSharingPolicylist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "LvDebitPolicy")', '@Url.Action("edit", "LvSharingPolicy")', b, '@Url.Action("Editsave", "LvSharingPolicy")', 'Edit LvSharingPolicy', '#frmLvSharingPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLvDebitPolicy', '#LvSharingPolicylist', 'LvSharingPolicylist', 'LvSharingPolicylist', 'A', '#Edit-LvSharingPolicy-LvDebitPolicy,#Remove-LvSharingPolicy-LvDebitPolicy', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmLvSharingPolicy').trigger("reset");
+                    $('#MinDayAppl').val(k.MinDayAppl);
+                    $('#MaxDayAppl').val(k.MaxDayAppl);
+                    $('#Preference').val(k.Preference);
+                    $('[name="IsPartial"]').val([k.IsPartial]).button().button("refresh");
+                    $('#LvHead_drop').P2BSelectMenuAppend('@Url.Action("GetLookupLvHeadObjNew", "LvDebitPolicy")', k.LvHead_Id, k.LvHead_Id);
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-LvSharingPolicy-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#LvSharingPolicylist').P2BGetTableDataonSelectedRow('#LvSharingPolicylist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#LvSharingPolicylist').P2BGetTableDataonSelectedRow('#LvSharingPolicylist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvSharingPolicylist', $('#LvSharingPolicylist').val(), 200, 200, '#frmLvDebitPolicy', '#LvSharingPolicylist', '');
+            event.preventDefault();
+        });
+
+        //prefixsuffix_pefixsufixaction
+        $('#Lookup-PrefixSuffixAction-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPrefixSuffixActionLKDetails", "LvDebitPolicy")', '', 'LookupDiv', 'PrefixSuffixAction Look Up Data', '#PrefixSuffixActionlist', 'PrefixSuffixActionlist', 5, 'PrefixSuffixActionlist', '#frmLvDebitPolicy', 'A', '#Remove-PrefixSuffixAction-LvDebitPolicy,#Edit-PrefixSuffixAction-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PrefixSuffixAction-LvDebitPolicy').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', 'Create Prefix Suffix Action', 'open', '@Url.Action("Create", "PrefixSuffixAction")', '#frmPrefixSuffixAction', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLvDebitPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#PrefixSuffixActionlist').P2BLookUpEncapsulate('#PrefixSuffixActionlist', 'PrefixSuffixActionlist', data[0], data[1], 'PrefixSuffixActionlist', '#Edit-PrefixSuffixAction-LvDebitPolicy,#Remove-PrefixSuffixAction-LvDebitPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-PrefixSuffixAction-LvDebitPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PrefixSuffixActionlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', '@Url.Action("edit", "PrefixSuffixAction")', b, '@Url.Action("Editsave", "PrefixSuffixAction")', 'Edit PrefixSuffixAction', '#frmPrefixSuffixAction', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLvDebitPolicy', '#PrefixSuffixActionlist', 'PrefixSuffixActionlist', 'PrefixSuffixActionlist', 'A', '#Edit-PrefixSuffixAction-LvDebitPolicy,#Remove-PrefixSuffixAction-LvDebitPolicy', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmPrefixSuffixAction').trigger("reset");
+                    $('[name="IsFixedDayDebit"]').val([k.IsFixedDayDebit]).button().button("refresh");
+                    if (k.IsFixedDayDebit == true)
+                    {
+                        $('#FixedDebitDay').attr('disabled', false);
+                    }
+
+                    $('#FixedDebitDay').val(k.FixedDebitDay);
+                    $('[name="IsActualDayDebit"]').val([k.IsActualDayDebit]).button().button("refresh");
+                    $('[name="IsWaiveOffDayDebit"]').val([k.IsWaiveOffDayDebit]).button().button("refresh");
+                    if (k.IsWaiveOffDayDebit == true) {
+                        $('#WaiveOffDebitDay').attr('disabled', false);
+                    }
+                    $('#WaiveOffDebitDay').val(k.WaiveOffDebitDay);
+
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PrefixSuffixAction-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PrefixSuffixActionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PrefixSuffixActionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PrefixSuffixActionlist', $('#PrefixSuffixActionlist').val(), 200, 200, '#frmLvDebitPolicy', '#PrefixSuffixActionlist', '');
+            event.preventDefault();
+        });
+
+        //PreApply prefix suffix
+        $('#Lookup-PreApplyPrefixSuffixAction-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPrefixSuffixActionLKDetails", "LvDebitPolicy")', '', 'LookupDiv', 'PreApplyPrefixSuffix Look Up Data', '#PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', 5, 'PreApplyPrefixSuffixActionlist', '#frmLvDebitPolicy', 'A', '#Remove-PreApplyPrefixSuffix-LvDebitPolicy,#Edit-PreApplyPrefixSuffix-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PreApplyPrefixSuffixAction-LvDebitPolicy').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', 'Create Leave Sharing Policy', 'open', '@Url.Action("Create", "PrefixSuffixAction")', '#frmPrefixSuffixAction', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLvDebitPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#PreApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', data[0], data[1], 'PreApplyPrefixSuffixActionlist', '#Edit-PreApplyPrefixSuffix-LvDebitPolicy,#Remove-PreApplyPrefixSuffix-LvDebitPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-PreApplyPrefixSuffixAction-LvDebitPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PreApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PreApplyPrefixSuffixActionlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', '@Url.Action("edit", "PrefixSuffixAction")', b, '@Url.Action("Editsave", "PrefixSuffixAction")', 'Edit PrefixSuffixAction', '#frmPrefixSuffixAction', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLvDebitPolicy', '#PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', 'PreApplyPrefixSuffixActionlist', 'A', '#Edit-PreApplyPrefixSuffixAction-LvDebitPolicy,#Remove-PreApplyPrefixSuffixAction-LvDebitPolicy', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmPrefixSuffixAction').trigger("reset");
+                    $('[name="IsFixedDayDebit"]').val([k.IsFixedDayDebit]).button().button("refresh");
+                    if (k.IsFixedDayDebit == true) {
+                        $('#FixedDebitDay').attr('disabled', false);
+                    }
+
+                    $('#FixedDebitDay').val(k.FixedDebitDay);
+                    $('[name="IsActualDayDebit"]').val([k.IsActualDayDebit]).button().button("refresh");
+                    $('[name="IsWaiveOffDayDebit"]').val([k.IsWaiveOffDayDebit]).button().button("refresh");
+                    if (k.IsWaiveOffDayDebit == true) {
+                        $('#WaiveOffDebitDay').attr('disabled', false);
+                    }
+                    $('#WaiveOffDebitDay').val(k.WaiveOffDebitDay);
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PreApplyPrefixSuffixAction-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PreApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PreApplyPrefixSuffixActionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PreApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PreApplyPrefixSuffixActionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PreApplyPrefixSuffixActionlist', $('#PreApplyPrefixSuffixActionlist').val(), 200, 200, '#frmLvDebitPolicy', '#PreApplyPrefixSuffixActionlist', '');
+            event.preventDefault();
+        });
+
+        //PostApply PrefixSuffix Action
+
+        $('#Lookup-PostApplyPrefixSuffixAction-LvDebitPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPrefixSuffixActionLKDetails", "LvDebitPolicy")', '', 'LookupDiv', 'PrefixSuffixAction Look Up Data', '#PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', 5, 'PostApplyPrefixSuffixActionlist', '#frmLvDebitPolicy', 'A', '#Remove-PostApplyPrefixSuffixAction-LvDebitPolicy,#Edit-PostApplyPrefixSuffixAction-LvDebitPolicy', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-PostApplyPrefixSuffixAction-LvDebitPolicy').on("click", function (event) {
+
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', 'Create Prefix Suffix Action', 'open', '@Url.Action("Create", "PrefixSuffixAction")', '#frmPrefixSuffixAction', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmLvDebitPolicy', '', function (data) {
+                // to show data which is created in partial page
+                $('#PostApplyPrefixSuffixActionlist').P2BLookUpEncapsulate('#PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', data[0], data[1], 'PostApplyPrefixSuffixActionlist', '#Edit-PostApplyPrefixSuffixAction-LvDebitPolicy,#Remove-PostApplyPrefixSuffixAction-LvDebitPolicy', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-PostApplyPrefixSuffixAction-LvDebitPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PostApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PostApplyPrefixSuffixActionlist', 0);
+            b = a[0];
+            //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("PartialPrefix", "LvDebitPolicy")', '@Url.Action("edit", "PrefixSuffixAction")', b, '@Url.Action("Editsave", "PrefixSuffixAction")', 'Edit PostApplyPrefixSuffix', '#frmPrefixSuffixAction', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmLvDebitPolicy', '#PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', 'PostApplyPrefixSuffixActionlist', 'A', '#Edit-PostApplyPrefixSuffixAction-LvDebitPolicy,#Remove-PostApplyPrefixSuffixAction-LvDebitPolicy', function (data) {
+                // setTimeout(function () {
+                //to bind data according to selected id
+                $.each(data[0], function (i, k) {
+                    $('#frmPrefixSuffixAction').trigger("reset");
+                    $('[name="IsFixedDayDebit"]').val([k.IsFixedDayDebit]).button().button("refresh");
+                    if (k.IsFixedDayDebit == true) {
+                        $('#FixedDebitDay').attr('disabled', false);
+                    }
+
+                    $('#FixedDebitDay').val(k.FixedDebitDay);
+                    $('[name="IsActualDayDebit"]').val([k.IsActualDayDebit]).button().button("refresh");
+                    $('[name="IsWaiveOffDayDebit"]').val([k.IsWaiveOffDayDebit]).button().button("refresh");
+                    if (k.IsWaiveOffDayDebit == true) {
+                        $('#WaiveOffDebitDay').attr('disabled', false);
+                    }
+                    $('#WaiveOffDebitDay').val(k.WaiveOffDebitDay);
+                });
+                //}, 3000);
+
+
+            });
+            event.preventDefault();
+        });
+
+        $('#Remove-PostApplyPrefixSuffixAction-LvDebitPolicy').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            //var a = [], b;
+            //a = $('#PostApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PostApplyPrefixSuffixActionlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PostApplyPrefixSuffixActionlist').P2BGetTableDataonSelectedRow('#PostApplyPrefixSuffixActionlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PostApplyPrefixSuffixActionlist', $('#PostApplyPrefixSuffixActionlist').val(), 200, 200, '#frmLvDebitPolicy', '#PostApplyPrefixSuffixActionlist', '');
+            event.preventDefault();
+        });
+
+        $('#Lookup_LvheadDetails').on('click', function () {
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtlvhead",
+                appendToId: "#Head_id",
+                lookupurl: "@Url.Action("GetLookupLvHeadObj", "LvDebitPolicy")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+
+    });
+</script>
+
+<html>
+
+<head>
+    <title></title>
+
+    <style>
+        .icon-row {
+            position: relative;
+            left: 112px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 156px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 600px;
+        }
+
+        .row4 {
+            width: 750px;
+            display: inline-flex;
+        }
+
+        .namepush {
+            margin-right: 30px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 340px;
+            display: inline-flex;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .lblwidth {
+            width: 110px;
+        }
+
+        .Clblwidth {
+            width: 111px;
+        }
+
+        .Cnamepush {
+            margin-right: 127px;
+        }
+
+        #Lookup_LvheadDetails {
+            right: -249px;
+            position: absolute;
+            top: 48px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorized</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create LvDebitPolicy">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmLvDebitPolicy", name = "frmLvDebitPolicy" }))
+        {
+
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="section_Method">
+                <div class="heading">Debit Policy Details</div>
+                <div class="row2 content_margine">
+                    @Html.LabelFor(m => m.PolicyName, "Policy Name:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.PolicyName, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row2 content_margine">
+                    <label id="lbllvhead" class="popup-content-label must">LvHead:</label>
+                    <input name="txtlvhead" type="text" id="txtlvhead" class="date-picker must" />
+                    <input type="text" id="Head_id" name="Head_id" class="filter_structure_id" />
+
+                    <button data-p2btooltip="Lookup Head Details" class="button popup-content-icon-lookup" id="Lookup_LvheadDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.MaxUtilDays, "Max util Days:", new { @class = "popup-content-label must" })
+                    @Html.TextBoxFor(m => m.MaxUtilDays, new { @class = "popup-content-textbox must" })
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.MinUtilDays, "Min Util Days:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.MinUtilDays, new { @class = "popup-content-textbox must" })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.YearlyOccurances, "Yearly Occurances:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.YearlyOccurances, new { @class = "popup-content-textbox must" })</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.HalfDayAppl, "Half Day Applicable:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="HalfDayAppl_radio1" name="HalfDayAppl" value="true" /><label for="HalfDayAppl_radio1">Yes</label>
+                        <input type="radio" id="HalfDayAppl_radio2" name="HalfDayAppl" value="false" checked="checked" /><label for="HalfDayAppl_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsHalfDaySession_WaiveOffPrefixSuffix, "IsHalfDaySession :", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="IsHalfDaySession_radio1" name="IsHalfDaySession" value="true" /><label for="IsHalfDaySession_radio1">Yes</label>
+                        <input type="radio" id="IsHalfDaySession_radio2" name="IsHalfDaySession" value="false" checked="checked" /><label for="IsHalfDaySession_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.HolidayInclusive, "Holiday Inclusive:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="HolidayInclusive_radio1" name="HolidayInclusive" value="true" /><label for="HolidayInclusive_radio1">Yes</label>
+                        <input type="radio" id="HolidayInclusive_radio2" name="HolidayInclusive" value="false" checked="checked" /><label for="HolidayInclusive_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Sandwich, "Sandwich:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Sandwich_radio1" name="Sandwich" value="true" /><label for="Sandwich_radio1">Yes</label>
+                        <input type="radio" id="Sandwich_radio2" name="Sandwich" value="false" checked="checked" /><label for="Sandwich_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PreApplied, "Pre Applied:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="PreApplied_radio1" name="PreApplied" value="true" /><label for="PreApplied_radio1">Yes</label>
+                        <input type="radio" id="PreApplied_radio2" name="PreApplied" value="false" checked="checked" /><label for="PreApplied_radio2">No</label>
+                    </div>
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PreDays, "Pre Days:", new { @class = "popup-content-label " })
+                    @Html.TextBoxFor(m => m.PreDays, new { @class = "popup-content-textbox" })
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PostApplied, "Post Applied:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="PostApplied_radio1" name="PostApplied" value="true" /><label for="PostApplied_radio1">Yes</label>
+                        <input type="radio" id="PostApplied_radio2" name="PostApplied" value="false" checked="checked" /><label for="PostApplied_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PostDays, "Post Days:", new { @class = "popup-content-label " })
+                    @Html.TextBoxFor(m => m.PostDays, new { @class = "popup-content-textbox" })
+                </div>
+
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsCertificateAppl, "Certificate Appl :", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="IsCertificate_radio1" name="IsCertificate" value="true" /><label for="IsCertificate_radio1">Yes</label>
+                        <input type="radio" id="IsCertificate_radio2" name="IsCertificate" value="false" checked="checked" /><label for="IsCertificate_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsLVCertExemptAppl, "LV Cert Exempt Appl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Exempt_radio1" name="ExemptAppl" value="true" /><label for="Exempt_radio1">Yes</label>
+                        <input type="radio" id="Exempt_radio2" name="ExemptAppl" value="false" checked="checked" /><label for="Exempt_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsLVReqSeqexemptAppl, "LV Reqseq Exempt Appl:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Reqseq_radio1" name="ReqseqAppl" value="true" /><label for="Reqseq_radio1">Yes</label>
+                        <input type="radio" id="Reqseq_radio2" name="ReqseqAppl" value="false" checked="checked" /><label for="Reqseq_radio2">No</label>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.LVReqseqexemptCount, "LV Reqseq Exempt Appl Count:", new { @class = "popup-content-label " })
+                    @Html.TextBoxFor(m => m.LVReqseqexemptCount, new { @class = "popup-content-textbox" })
+                </div>
+                <div class="row3 content_margin">
+                    @Html.LabelFor(m => m.LVReqexemptmaxcelling, "LV Reqseq Exempt Max Celling:", new { @class = "popup-content-label ", @style = "margin-left: -156px;" })
+                    @Html.TextBoxFor(m => m.LVReqexemptmaxcelling, new { @class = "popup-content-textbox" })
+                </div>
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.MinLvDays, "Min Leave Days For Certificate:", new { @class = "popup-content-label" })
+                    @Html.TextBoxFor(m => m.MinLvDays, new { @class = "popup-content-textbox" })
+                </div>
+
+            </div>
+            //--prefix
+            <div class="section_Method">
+                <div class="heading">Prefix</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PrefixSuffix, "Prefix Suffix:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="PrefixSuffix_radio1" name="PrefixSuffix" value="true" /><label for="PrefixSuffix_radio1">Yes</label>
+                        <input type="radio" id="PrefixSuffix_radio2" name="PrefixSuffix" value="false" checked="checked" /><label for="PrefixSuffix_radio2">No</label>
+                    </div>
+                </div>
+                <div id="hideshowPrefixSuffix">
+                    <div class="row3 content_margine">
+                        
+                        @Html.LabelFor(m => m.PrefixSuffix_PrefixSuffixAction, "Prefix Suffix Action :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="PrefixSuffixActionlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select PrefixSuffixAction" class="  popup-content-icon-lookup" id="Lookup-PrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create PrefixSuffixAction" class="popup-content-icon-create" id="Create-PrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit PrefixSuffixAction" class="popup-content-icon-edit" id="Edit-PrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove PrefixSuffixAction" class="popup-content-icon-remove" id="Remove-PrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PreApplyPrefixSuffix, "Pre Apply Prefix Suffix:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="PreApplyPrefixSuffix_radio1" name="PreApplyPrefixSuffix" value="true" /><label for="PreApplyPrefixSuffix_radio1">Yes</label>
+                        <input type="radio" id="PreApplyPrefixSuffix_radio2" name="PreApplyPrefixSuffix" value="false" checked="checked" /><label for="PreApplyPrefixSuffix_radio2">No</label>
+                    </div>
+                </div>
+                <div id="hideshowPreApply">
+                    <div class="row3 content_margine">
+                        
+                        @Html.LabelFor(m => m.PreApplyPrefixSuffix_PrefixSuffixAction, "PreApply Prefix Suffix Action :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="PreApplyPrefixSuffixActionlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select PreApplyPrefixSuffixAction" class="popup-content-icon-lookup" id="Lookup-PreApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create PreApplyPrefixSuffixAction" class="popup-content-icon-create" id="Create-PreApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit PreApplyPrefixSuffixAction" class="popup-content-icon-edit" id="Edit-PreApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove PreApplyPrefixSuffixAction" class="popup-content-icon-remove" id="Remove-PreApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.PostApplyPrefixSuffix, "Post Apply Prefix Suffix:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="PostApplyPrefixSuffix_radio1" name="PostApplyPrefixSuffix" value="true" /><label for="PostApplyPrefixSuffix_radio1">Yes</label>
+                        <input type="radio" id="PostApplyPrefixSuffix_radio2" name="PostApplyPrefixSuffix" value="false" checked="checked" /><label for="PostApplyPrefixSuffix_radio2">No</label>
+                    </div>
+                </div>
+                <div id="hideshowPostApply">
+                    <div class="row3 content_margine"> 
+                        @Html.LabelFor(m => m.PostApplyPrefixSuffix_PrefixSuffixAction, "Post Apply PrefixSuffix Action :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="PostApplyPrefixSuffixActionlist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select PrefixSuffixAction" class="  popup-content-icon-lookup" id="Lookup-PostApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create PrefixSuffixAction" class="popup-content-icon-create" id="Create-PostApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit PrefixSuffixAction" class="popup-content-icon-edit" id="Edit-PostApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove PrefixSuffixAction" class="popup-content-icon-remove" id="Remove-PostApplyPrefixSuffixAction-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PrefixGraceCount, "Prefix Grace Count:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.PrefixGraceCount, new { @class = "popup-content-textbox " })</div>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.PrefixMaxCount, "Prefix Max Count:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.PrefixMaxCount, new { @class = "popup-content-textbox " })</div>
+
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ApplyFutureGraceMonths, "Apply Future Leave Grace in Month:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ApplyFutureGraceMonths, new { @class = "popup-content-textbox " })</div><br>
+                <div class="row3 content_margine">@Html.LabelFor(m => m.ApplyPastGraceMonths, "Apply Past Leave Grace in Month:", new { @class = "popup-content-label " })@Html.TextBoxFor(m => m.ApplyPastGraceMonths, new { @class = "popup-content-textbox " })</div>
+            </div>
+            <div class="section_Method">
+                <div class="heading">Combined</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.Combined, "Combined:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Combined_radio1" name="Combined" value="true" /><label for="Combined_radio1">Yes</label>
+                        <input type="radio" id="Combined_radio2" name="Combined" value="false" checked="checked" /><label for="Combined_radio2">No</label>
+                    </div>
+                </div>
+                <div id="hideshowcombinedleavehead">
+                    <div class="row3 content_margine">
+                        <div id="CombineLeaveHeadslist_old"></div>
+                        @Html.LabelFor(m => m.CombinedLvHead, "Combine Leave Heads :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="CombineLeaveHeadslist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select CombineLeaveHeads" class="  popup-content-icon-lookup" id="Lookup-CombineLeaveHeads-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            @*<button data-p2btooltip="Create Address" class="popup-content-icon-create" id="Create-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                                <button data-p2btooltip="Edit Address" class="popup-content-icon-edit" id="Edit-ConvertLeaveHead-LvEncashReq"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>*@
+                            <button data-p2btooltip="Remove CombineLeaveHeads" class="popup-content-icon-remove" id="Remove-CombineLeaveHeads-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section_Method">
+                <div class="heading">Sharing</div>
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsDebitShare, "Debit Share:", new { @class = "popup-content-label " })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="Sharing_radio1" name="Sharing" value="true" /><label for="Sharing_radio1">Yes</label>
+                        <input type="radio" id="Sharing_radio2" name="Sharing" value="false" checked="checked" /><label for="Sharing_radio2">No</label>
+                    </div>
+                </div>
+                <div id="hideshowLvSharingPolicy">
+                    <div class="row3 content_margine">
+                        <div id="LvSharingPolicylist_old"></div>
+                        @Html.LabelFor(m => m.LvSharingPolicy, "Leave Sharing Policy :", new { @class = "popup-content-label" })
+                        <div class="popup-content-table">
+                            <table class="lookuptableselected" id="LvSharingPolicylist">
+                                <tr><th>Id</th><th>LookUp Selected Description</th></tr>
+                            </table>
+                        </div>
+                        <div class="icon-row">
+                            <button data-p2btooltip="Select LvSharingPolicy" class="  popup-content-icon-lookup" id="Lookup-LvSharingPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Create LvSharingPolicy" class="popup-content-icon-create" id="Create-LvSharingPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Edit LvSharingPolicy" class="popup-content-icon-edit" id="Edit-LvSharingPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                            <button data-p2btooltip="Remove LvSharingPolicy" class="popup-content-icon-remove" id="Remove-LvSharingPolicy-LvDebitPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+</html>

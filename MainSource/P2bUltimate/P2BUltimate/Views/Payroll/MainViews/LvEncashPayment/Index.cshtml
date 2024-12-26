@@ -1,0 +1,695 @@
+﻿@{
+    ViewBag.Title = "LvEncashPayment";
+}
+@model Payroll.LvEncashPayment
+<html>
+
+<head>
+
+    <title></title>
+    <script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var SortName, Caption, url, width, height, dt;
+        ColDisplayNames = ['Employee Code', 'Employee Name', 'Encash Days', 'LeaveEncashMentDetails', 'LvEncashId', 'Id'];
+        ColDisplayModel = [ 'Employee Code', 'Employee Name', 'Encash Days', 'LeaveEncashMentDetails', 'LvEncashId', 'Id'];
+        url = '@Url.Action("P2BInlineGrid")';
+        width = 1000;
+        height = 150;
+        Caption_one = "Functional Attendance",
+        Caption_second = "Employee List",
+        urlD = '@Url.Action("LoadEmp")';
+        widthD = 850;
+        heightD = 200;
+
+        $('#JqGridNew').P2BGrid1(ColDisplayNames, ColDisplayModel, SortName, Caption_second, urlD, widthD, heightD, '#pager22', { multiple: true, rowNum: 30, selectall: true });
+        function ajaxloaderv2(cameform) {
+            $('<div style="width: 100%;height: 100%;position: fixed;top: 0;left: 0;background-color: #0000;z-index:998;"><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999" aria-hidden="true"></i></div>').appendTo(cameform);
+        };
+        var ajaxLoderRemove = function (init) {
+            if (!init) {
+                $('.ajax_loder').parents('div').remove();
+            } else {
+                $(init).find("div .ajax_loder").remove();
+            }
+            $(window).off('beforeunload');
+        };
+        $.GetGridSelctedvalue = function (Gridname, col) {
+            //console.log(Gridname);
+            //alert("sdasd");
+            var a = jQuery(Gridname).jqGrid('getGridParam', 'selarrrow');
+            // console.log(a);
+            if (a.length != 0) {
+                var selected_ids = [];
+                for (var i = 0; i < a.length; i++) {
+                    if (col != undefined) {
+                        selected_ids.push(jQuery(Gridname).jqGrid('getCell', a[i], col));
+                    } else {
+                        selected_ids.push(jQuery(Gridname).jqGrid('getRowData', a[i]));
+                    }
+                }
+                return selected_ids;
+            } else {
+                //alert("Select Row..!");
+                return 0;
+            }
+        };
+
+        $.fn.mymonthfun = function () {
+            const month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+            const d = new Date();
+            let mnth = month[d.getMonth()];
+            let yer = d.getFullYear();
+            var monthyear = (mnth + "/" + yer);
+            $(this).val(monthyear);
+        };
+        $.fn.mydatefun = function () {
+            const month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+            const d = new Date();
+            let mnth = month[d.getMonth()];
+            let yer = d.getFullYear();
+            let day = d.getDate();                     
+            var daymonthyear = (day + "/" +mnth + "/" + yer);
+            $(this).val(daymonthyear);
+        };
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "LvEncashPayment")",
+            htmurl: "@Url.Action("partial", "LvEncashPayment")",
+            columnname: ["Code", "Name", "Id"],
+            childheader: ["AmountPaid", "PaymentDate", "PaymentMonth", "ProcessMonth", "TDSAmount", "IsCancel", "Id"],
+            childurl: "@Url.Action("Get_LvEncashPaymentDetails", "LvEncashPayment")",
+            tableheader: "Leave Encash Payment",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            // console.log($(init).parents('tr:eq(0)'));
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //var element = $(init).parents('tr:eq(0)');
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            //   console.log(element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-LvEncashPayment-partial",
+                    htmlurl: "@Url.Action("GridPartial", "LvEncashPayment")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("EditGridDetails", "LvEncashPayment")",
+                    submiturl: "@Url.Action("GridEditSave", "LvEncashPayment")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#LvEncashPayment-AmountPaid').val(k.AmountPaid);
+                            $('#LvEncashPayment-OtherDeduction').val(k.OtherDeduction);
+                            $('#LvEncashPayment-TDSAmount').val(k.TDSAmount);
+                            $('#LvEncashPayment-IsCancel').val(k.IsCancel);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                
+                $.get("@Url.Action("EditGridDetails", "LvEncashPayment")", {data:id},  function (data) {
+                   
+
+                  
+                    
+                    if (data.IsCancel == true)
+                    {
+                        alert("You can not Edit Cancelled Record");
+                        
+                    }
+                    else if (data.TrClosed == true) {
+                        alert("You can not Edit this Record because this payment has Released");
+
+                    }
+                   else
+                    {
+                      
+                        $('<div></div>').PartialCreateDialog({
+                            height: 'auto',
+                            width: 'auto',
+                            form: "#frm-LvEncashPayment-partial",
+                            htmlurl: "@Url.Action("partial", "LvEncashPayment")",
+                            state: "open",
+                        mode: "Edit",
+                        editurl: "@Url.Action("EditGridDetails", "LvEncashPayment")",
+                        submiturl: "@Url.Action("GridEditSave", "LvEncashPayment")",
+                        editdata: id,
+                        forwarddata: id,
+                        returndatafunction: function (data) {
+                           
+                           // $.each(data, function (i, k) {
+                              
+                         
+
+                            $('#LvEncashPayment-AmountPaid').val(data.AmountPaid);
+                            $('#LvEncashPayment-OtherDeduction').val(data.OtherDeduction);
+                            $('#LvEncashPayment-TDSAmount').val(data.TDSAmount);
+                            $('#LvEncashPayment-IsCancel').val(data.IsCancel);
+                            //});
+                        },
+                        submitfun: function (data) {
+                            var row = dt.row(parent_element);
+                            if (row.child.isShown()) {
+                                parent_element.removeClass('details');
+                                row.child.hide();
+                            }
+                        }
+                        });
+
+                        
+                    }
+                    
+                });
+             
+                
+              
+              
+
+                
+
+
+
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                //  return false;
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    // forwarddata: id,
+                    forwarddata: [id, parentid],
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+
+        //-------------------------Release Grid----------------------------------------//
+
+
+
+        //  a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
+        $('#lblloader').hide();
+        $.LoadEmpByDefault();
+        $('#FromDate').P2BDatePicker();
+        $('#ToDate').P2BDatePicker();
+        $('#ReleaseDate').P2BDatePicker();
+
+
+        $('#OtherDeduction').ForceOnlyNumeric().MaxLength(8);
+        $('#TDSAmount').attr('readonly', 'readonly');
+        $('#TDSAmount').ForceOnlyNumeric().MaxLength(8);
+
+        $('#process').on('click', function (e) {
+            ////debugger;
+            var lvdataid = $.GetGridSelctedvalue('#JqGridNew', "LvEncashId");
+            var employeeid = $.GetGridSelctedvalue('#JqGridNew', "Id");
+            // $('#lblloader').show();
+            var newDivConfirm = $(document.createElement('div'));
+            var htmltag = '<p><span class="ui-icon ui-icon-alert" style="float:left;margin-right:10px"></span> ' + "Are You Sure You Want To Delete Record..?" + '';
+            htmltag += '</p>';
+            newDivConfirm.html(htmltag);
+            newDivConfirm.dialog({
+                autoOpen: false,
+                title: "Delete Confirmation !",
+                height: 200,
+                width: 200,
+                modal: true,
+                beforeClose: function () {
+                    newDivConfirm.remove();
+                },
+                buttons: {
+                    Confirm: function () {
+                        $.post({
+                            url: "@Url.Action("LvEncashCancel")",
+                            data: "&LeaveEncashId=" + lvdataid + "&EmployeeId=" + employeeid,
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        success: function (data) {
+                            ////debugger;
+                            ajaxLoderRemove();
+                            if (data.success == true) {
+                                var newDiv = $(document.createElement('div'));
+                                var htmltag = '<p><span class="ui-icon ui-icon-check" style="float:left;margin-right:10px"></span> ' + data.responseText + '';
+                                htmltag += '</p>';
+                                newDiv.html(htmltag);
+                                newDiv.dialog({
+                                    autoOpen: false,
+                                    title: "Information",
+                                    height: 150, width: 250, modal: true,
+                                    buttons: {
+                                        Ok: function (e) {
+                                            newDiv.dialog("close");
+                                            newDiv.remove();
+                                            jQuery(newDivConfirm).dialog("close");
+                                            jQuery('#JqGridNew').trigger('reloadGrid');
+                                            //jQuery(griddialog).dialog("close");
+                                        }
+                                    }
+                                });
+                                newDiv.dialog('open');
+                                $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+                            } else {
+                                var newDiv = $(document.createElement('div'));
+                                var htmltag = '<p><span class="ui-icon ui-icon-alert" style="float:left;margin-right:10px"></span> ' + data.responseText + '';
+                                htmltag += '</p>';
+                                newDiv.html(htmltag);
+                                newDiv.dialog({
+                                    autoOpen: false,
+                                    title: "Information",
+                                    height: 150, width: 250, modal: true,
+                                    buttons: {
+                                        Ok: function (e) {
+                                            //if (obj.gridreloadname != null) {
+                                            // jQuery(obj.gridreloadname).trigger('reloadGrid');
+                                            //}
+                                            newDiv.dialog("close");
+                                            newDiv.remove();
+                                            jQuery(newDivConfirm).dialog("close");
+                                            // jQuery(griddialog).dialog("close");
+                                        }
+                                    }
+                                });
+                                newDiv.dialog('open');
+                                $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+                            }
+
+                        },
+                        complete: function (data) {
+                            $('#lblloader').hide();
+                        }
+                    });
+                    },
+                    Cancel: function () {
+                        jQuery(newDivConfirm).dialog("close");
+                    }
+                }
+            });
+            newDivConfirm.dialog('open');
+            e.preventDefault();
+        });
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#pay_id').val(data.PayStruct);
+                    //$('#fun_id').val(data.FunStruct);
+                },
+                renderat: "#FormFilter", hierarchy: true,
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+
+
+       // $('#Create_Dialog').P2BCreateDialog();
+        $('#list-employee').P2BGridDialog();
+        //Create Function
+        $('#add').on("click", function (event) {
+            $('#frmInsuranceDetailsT').trigger("reset");
+            //$('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Encash Payment', 'open', '@@Url.Action("Create")', '#frmInsuranceDetailsT', 'Message :', 'Request Falied :', '#JqGrid', 600, 1200, '#AddressList,#ContactDetailsList', '', function (data) { }, { datatablename: "#MyTable" });
+           // $('#Frequencylist').P2BSelectMenuAppend('@@Url.Action("GetLookupValue", "lookup")', 402, "");
+            // $('#OperationStatuslist').P2BSelectMenuAppend('@@Url.Action("GetLookupValue", "lookup")', 402, "");
+            //$('#JqGridNew').trigger('reloadGrid');
+            $("#JqGridNew").setGridParam({ datatype: 'json', url: urlD }).trigger("reloadGrid");
+            
+            $('#list-employee').P2BGridDialog({
+                maindialogtitle: "Create FunctAttendanceT",
+                submiturl: "@Url.Action("create")",
+                form: "#frmInsuranceDetailsT",
+            height: 575,
+            width: 900,
+            title: "Create LeaveEncashment Payment ",
+            state: "open",
+            gridname: "#JqGridNew",
+            gridfunction: "GetGridSelctedvalue",
+           // refreshgrid: "#MyTable"
+            });
+            $('#ProcessMonth').mymonthfun();
+            $('#PaymentDate').mydatefun();
+            $('#PaymentMonth').mymonthfun();
+            $('#AmountPaid').attr('readonly', 'readonly');
+            event.preventDefault();
+        });
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                //alert($(this).val());
+                var id = $(this).val();
+                $('#LvEncashReqList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownStructureList", "LvEncashPayment")", "", id);
+
+            }
+        });
+        $('#Lookup-InsuranceProduct-InsuranceDetailsT').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetInsuranceDetailsTDetails", "InsuranceDetailsT")', '', 'LookupDiv', 'EncashReq Look Up Data', '#InsuranceProductlist', 'InsuranceProductlist', 5, 'InsuranceProductlist', '#frmInsuranceDetailsT', 'N', '#Remove-InsuranceProduct-InsuranceDetailsT', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Remove-InsuranceProduct-InsuranceDetailsT').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#InsuranceProductlist').P2BGetTableDataonSelectedRow('#InsuranceProductlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvEncashReqlist', $('#InsuranceProductlist').val(), 200, 200, '#frmInsuranceDetailsT', '#InsuranceProductlist', '');
+            event.preventDefault();
+        });
+        // Main page edit
+
+        $('#Lookup_LvEncashReq').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetlvencashreqLKDetails", "LvEncashPayment")', '', 'LookupDiv', ' Look Up Data', '#LvEncashReqList', 'LvEncashReqList', 5, 'LvEncashReqList', '#frmInsuranceDetailsT', 'N', '#remove_LvEncashReq', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#remove_LvEncashReq').button().on('click', function (event) {
+            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            var a = [], b;
+            a = $('#LvEncashReqList').P2BGetTableDataonSelectedRow('#LvEncashReqList', 0);
+            b = a[0];
+            $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#LvEncashReqList', $('#LvEncashReqList').val(), 200, 200, '#frmInsuranceDetailsT', '#LvEncashReqList', '');
+            event.preventDefault();
+        });
+
+        $('#PaymentDate').P2BDatePicker();
+
+
+        $('#ProcessMonth').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+
+            dateFormat: 'mm/yy',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('mm/yy', new Date(year, month, 1)));
+            }
+        });
+
+        $('#PaymentMonth').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            stepMonths: true,
+
+            dateFormat: 'mm/yy',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('mm/yy', new Date(year, month, 1)));
+            }
+        });
+        $('.popup_radio_button').controlgroup();
+        $('#OperationStatuslist').selectmenu().selectmenu("menuWidget");
+        $('#Frequencylist').selectmenu().selectmenu("menuWidget");
+        $('#LvEncashReqList').selectmenu().selectmenu("menuWidget");
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+    </script>
+    <style>
+        .icon-row {
+            position: absolute;
+            left: 56px;
+            top: 55px;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        element {
+            width:280px;
+            margin-bottom: 7.5px;
+            margin-top: 11.5px;
+        }
+
+        .row4 {
+            width: 402px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        #process {
+            width: 131px;
+        }
+
+        .addmargin {
+            margin-left: -137px;
+        }
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+        .section1_YearlyPT {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 539px;
+            width: 417px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 647px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 300px;
+            width: 581px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="add">Add</button>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="Container" class="container">
+        <div id="Demo">
+            <table id="MyTable" class="datatable-inline" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>DD</th>
+                        <th>EmployeeCode</th>
+                        <th>EmployeeName</th>
+                        <th>ID</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>DD</th>
+                        <th>EmployeeCode</th>
+                        <th>EmployeeName</th>
+                        <th>ID</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="list-employee">
+        <div class="btn-action-class">
+
+        </div>
+        <div class="emplist_row">
+            <div id="Grid_Form2">
+                <div>
+                    <table id="JqGridNew"></table>
+                    <div id="pager22"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Create_Dialog" title="Create InsuranceDetailsT ">
+
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmInsuranceDetailsT", name = "frmInsuranceDetailsT" }))
+            {
+              
+                <input id="Autho_Action" type="hidden" name="Autho_Action" />
+                <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+                @*<input id="emp_Id" class="filter_structure_id" name="emp_Id" />*@
+               
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.ProcessMonth, "Process Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessMonth, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.PaymentDate, "Payment Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PaymentDate, new { @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.PaymentMonth, "Payment Month:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.PaymentMonth, new { @class = "popup-content-textbox must" })</div>
+                   <div class="row3 content_margine">@Html.LabelFor(m => m.OtherDeduction, "Other Deduction:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OtherDeduction, new { @Value = "0", @class = "popup-content-textbox must" })</div>
+                  <button class="button" id="process">LeaveEncashCancel</button>
+
+                    @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.LvEncashReq, "Leave Encashent Requisition:", new { @class = "popup-content-label" })<select id="LvEncashReqList" name="LvEncashReqList" style="width:161px;"><option></option></select>
+                    </div>*@
+                
+                    @*<div class="row2 content_margine">
+
+                            <div id="LvEncashReqList_old"></div>
+                            @Html.LabelFor(m => m.LvEncashReq, "LvEncashReq:", new { @class = "popup-content-label" })
+                            <div class="popup-content-table">
+                                <table class="lookuptableselected" id="LvEncashReqList">
+                                    <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                                </table>
+                            </div>
+                            <div class="icon-row">
+                                <button data-p2btooltip="Lookup LvEncashReq Details" class="button popup-content-icon-lookup" id="Lookup_LvEncashReq"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+
+                                <button data-p2btooltip="Remove LvEncashReq Details" class="button popup-content-icon-remove" id="remove_LvEncashReq"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                            </div>
+
+
+                        </div>*@
+                    @*<div class="row4 content_margine">
+                        @Html.LabelFor(m => m.AmountPaid, "Amount Paid:", new { @class = "popup-content-label must" })
+                        @Html.TextBoxFor(m => m.AmountPaid, new { @class = "popup-content-textbox must addmargin", @readonly = "readonly" })
+                        <button class="button" id="process">Process</button>
+                        <div id="loading_img" class="loader content_margine">
+                            <label id="lblloader" style="color: red; display: block; position: absolute; left: 427px; top: 65px;">Processing...</label>
+                        </div>
+                    </div>*@
+
+                    @*<div class="row2 content_margine">@Html.LabelFor(m => m.TDSAmount, "TDS Amount:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.TDSAmount, new { @Value = "0", @class = "popup-content-textbox must" })</div>
+                    <div class="row3 content_margine">@Html.LabelFor(m => m.OtherDeduction, "Other Deduction:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.OtherDeduction, new { @Value = "0", @class = "popup-content-textbox must" })</div>*@
+
+            }
+        </div>
+    </div>
+
+
+</body>
+</html>

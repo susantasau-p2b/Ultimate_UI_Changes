@@ -1,0 +1,333 @@
+@{
+    ViewBag.Title = "AppraisalPotentialModel";
+}
+@model CMS_SPS.AppraisalPotentialModel
+<html>
+<head>
+    <title></title>
+    <style>
+        .popup-content-label {
+            width: 170px;
+            display: block;
+            float: left;
+        }
+
+        .popup-content-textbox {
+            width: 120px;
+        }
+
+        .row1 {
+            width: 320px;
+        }
+
+        .horizontal_row3, .radio_button_div_1 {
+            display: inline-block;
+        }
+
+        .row3 {
+            width: 477px;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 127px;
+            position: relative;
+            top: -121px;
+        }
+
+        .popup-content-table {
+            right: 120px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>ModelCode</th>
+                                <th>ModelName</th>
+                                <th>ModelDescription</th>
+                                <th>CreatedDate</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <th>DD</th>
+                                    <th>ID</th>
+                                    <th>EmployeeCode</th>
+                                    <th>EmployeeName</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+            </div>
+            @*<table id="JqGrid"></table>
+                <div id="pager2"></div>*@
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmAppraisalPotentialModel", name = "frmAppraisalPotentialModel" }))
+        {
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.Code, "Model Code :", new { @class = "popup-content-label must", @maxlength = "10" })
+                @Html.TextBoxFor(m => m.Code, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelName, "Model Name :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelName, new { @class = "popup-content-textbox must", @maxlength = "50" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.ModelDescription, "Model Description :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(m => m.ModelDescription, new { @class = "popup-content-textbox must" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.CreatedDate, "Created Date :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.CreatedDate, new { @class = "popup-content-textbox" })
+            </div>
+            <div class=" row3 content_margine">
+                @Html.LabelFor(m => m.AppraisalPotentialModelObject, "Potential Object :", new { @class = "popup-content-label must " })
+                <div class="popup-content-table">
+                    <table class="lookuptableselected" id="AppraisalPotentialModelObjectList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Lookup AppraisalPotentialModelObject" class=" popup-content-icon-lookup" id="Lookup-AppraisalPotentialModelObject"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create AppraisalPotentialModelObject " class=" popup-content-icon-create" id="Create-AppraisalPotentialModelObject"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit  AppraisalPotentialModelObject" class=" popup-content-icon-edit" id="Edit-AppraisalPotentialModelObject"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete AppraisalPotentialModelObject" class=" popup-content-icon-remove" id="Remove-AppraisalPotentialModelObject"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#Code').ValidateTextBox({ maxlength: 10 });
+        $('#ModelName').ValidateTextBox({ maxlength: 25 });
+        $('#ModelDescription').ValidateTextBox({ maxlength: 50 });
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("AppraisalPotentialModel_Grid")",
+            columnname: ["Code", "ModelName", "ModelDescription", "CreatedDate", "Id", ],
+            childheader: ["AppraisalPotentialModel", "EvaluationModel", "Id"],
+            childurl: "@Url.Action("A_AppraisalPotentialModel_Grid", "AppraisalPotentialModel")",
+            tableheader: "Potential Model",
+            childurlColumnNo: "5"
+        });
+
+        @*$.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            var parent_element = $(init).parents('td:last').parent().prev();
+            console.log(parent_element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#Edit-loanadvrequest",
+                    htmlurl: "@Url.Action("GridPartial", "LoanAdvRequest")",
+                    state: "open",
+                    mode: "View",
+                    editurl: "@Url.Action("GridEditData", "LoanAdvRequest")",
+                    submiturl: "@Url.Action("GridEditSave", "LoanAdvRequest")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                // //debugger
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: '35%',
+                    form: "#frmBA_SubCategory",
+                    htmlurl: "@Url.Action("Partial", "BA_Category")",
+                    state: "open",
+                    mode: "Edit",
+                    editurl: "@Url.Action("GridEditData", "BA_Category")",
+                    submiturl: "@Url.Action("GridEditSave", "BA_Category")",
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (returndata) {
+                        $.each(returndata.returndata, function (i, k) {
+                            $('#SubCode').val(k.Code);
+                            $('#SubName').val(k.Name);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("Delete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };*@
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        $('#Create_Dialog').P2BCreateDialog();
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $.FormReset('#frmAppraisalPotentialModel');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Appraisal Potential Model Object', 'open', '@Url.Action("Create")', '#frmAppraisalPotentialModel', 'Message :', 'Request Falied :', '#JqGrid', 520, 520, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#CreatedDate').TodayDate();
+            $('#CreatedDate').attr("readonly", "readonly");
+            event.preventDefault();
+        });
+
+        $('#Create-AppraisalPotentialModelObject').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("AppraisalPotentialModelPartial", "AppraisalPotentialModel")', 'Create Potential Model Object', 'open', '@Url.Action("Create", "AppraisalPotentialModelObject")', '#frmAppraisalPotentialModelObject', 'Message :', 'Request Falied :', '#JqGrid', 300, 550, '', '', '', '#frmAppraisalPotentialModel', '', function (data) {
+                @*$('#AppraisalPotentialModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, "");*@
+                $('#AppraisalPotentialModellist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "AppraisalPotentialModel")', '', "");
+                $('#AppraisalPotentialModelObjectList').P2BLookUpEncapsulate('#AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', data[0], data[1], 'AppraisalPotentialModelObjectList', '#Edit-WOCalendar-Location,#Remove-WOCalendar-Location', 'A');
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function () {
+            $('#frmAppraisalPotentialModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', a.Id, '@Url.Action("EditSave")', "Edit Appraisal Potential Mode Object", '#frmAppraisalPotentialModel', a.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmAppraisalPotentialModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AppraisalPotentialModelObjectList').P2BLookUpEncapsulate('#AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', k.AppraisalPotentialModelObject_Id, k.AppraisalPotentialModelObject_FullDetails, 'AppraisalPotentialModelObjectList', '#Edit-HOCalendar-Department,#Remove-HOCalendar-Department', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+        $('#View').on('click', function () {
+            $('#frmAppraisalPotentialModel').trigger("reset");
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', a.Id, 'View Appraisal Potential Mode Object', '#AppraisalPotentialModelObjectList', '', 455, 590, '#Autho', '@Url.Action("AuthSave")', a.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#frmAppraisalPotentialModel').trigger("reset");
+                    $('#Code').val(k.Code);
+                    $('#ModelName').val(k.ModelName);
+                    $('#ModelDescription').val(k.ModelDescription);
+                    $('#CreatedDate').val(k.CreatedDate);
+                    $('#CreatedDate').attr("readonly", "readonly");
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                    $('#AppraisalPotentialModelObjectList').P2BLookUpEncapsulate('#AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', k.AppraisalPotentialModelObject_Id, k.AppraisalPotentialModelObject_FullDetails, 'AppraisalPotentialModelObjectList', 'view', 'A');
+                });
+            }, { datatablename: "#MyTable" });
+
+        });
+        $('#Edit-AppraisalPotentialModelObject').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#AppraisalPotentialModelList').P2BGetTableDataonSelectedRow('#AppraisalPotentialModelObjectList', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("AppraisalPotentialModelPartial", "AppraisalPotentialModel")', '@Url.Action("Edit", "AppraisalPotentialModelObject")', b, '@Url.Action("Editsave", "AppraisalPotentialModelObject")', 'Edit Potential Model Object', '#frmAppraisalPotentialModelObject', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 560, '#frmAppraisalPotentialModel', '#AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', 'N', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    @*$('#AppraisalPotentialModellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 505, k.AppraisalPotentialModelObject_Id);*@
+                    $('#AppraisalPotentialModellist').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "AppraisalPotentialModel")", "", k.AppraisalPotentialModelObject_Id, '');
+                    $('#CompetencyEvaluationModelList').P2BLookUpEncapsulate('#CompetencyEvaluationModelList', 'CompetencyEvaluationModelList', k.CompetencyEvaluationModel_Id, k.CompetencyEvaluationModelDetails, 'CompetencyEvaluationModelList', '#Remove-ContactDetails-Location,#Edit-ContactDetails-Location', 'N');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Delete').button().click(function (event) {
+            $.FormReset('#frmAppraisalPotentialModel');
+            var b = localStorage.getItem('MyTable_selected');
+            var a = JSON.parse(b);
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', a.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200, { datatablename: "#MyTable" });
+            event.preventDefault();
+        });
+
+        $('#Lookup-AppraisalPotentialModelObject').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupAppraisalPotentialModelObject", "AppraisalPotentialModel")', '', 'LookupDiv', ' Potential Model Object Look Up Data', '#AppraisalPotentialModelObjectList', 'AppraisalPotentialModelObjectList', 5, 'AppraisalPotentialModelObjectList', '#frmAppraisalPotentialModel', 'A', '#Remove-Witness-Witness', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Remove-AppraisalPotentialModelObject').button().on('click', function (event) {
+            //var a = [], b;
+            //a = $('#AppraisalPotentialModelObjectList').P2BGetTableDataonSelectedRow('#AppraisalPotentialModelObjectList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows=$('#AppraisalPotentialModelObjectList').P2BGetTableDataonSelectedRow('#AppraisalPotentialModelObjectList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('',selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AppraisalPotentialModelObjectList', $('#AppraisalPotentialModelObjectList').val(), 200, 200, '#frmAppraisalPotentialModel', '#AppraisalPotentialModelObjectList');
+            event.preventDefault();
+        });
+
+        $('.popup_radio_button').controlgroup();
+    });
+</script>
+
+
+

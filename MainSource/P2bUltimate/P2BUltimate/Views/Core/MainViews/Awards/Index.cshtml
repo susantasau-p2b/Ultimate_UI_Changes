@@ -1,0 +1,217 @@
+﻿@{
+    ViewBag.Title = "Awards";
+}
+@model P2b.Global.Awards
+
+
+
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 100px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 402px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Awards">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmAwards", name = "frmAwardsCreate" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Name, "Name :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Name, new { @class = "popup-content-textbox must" })</div>
+            <div class="row3 content_margine">@Html.LabelFor(m => m.Details, "Details :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Details, new { @class = "popup-content-textbox must" })</div>
+
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.IssueDate, "Issue Date :", new { @class = "popup-content-label" })
+                @Html.TextBoxFor(m => m.IssueDate, new { @class = "popup-content-textbox "})
+            </div>
+        }
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        $('#Name').ForceOnlyAlphaNumeric();
+      
+        $('#Name').ValidateTextBox({ maxlength: 25, name: true });
+        $('#Details').MaxLength(50);
+       
+    });
+    $(document).ready(function (e) {
+        $('button').button();
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColModel = ['Id', 'Name', 'IssueDate'];
+        ColNames = ['Id', 'Name', 'IssueDate'];
+        SortName = 'Id';
+        Caption = 'Awards';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#IssueDate').P2BDatePicker();
+        var dt;
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+
+        }
+      
+        $('#Create_Dialog').P2BCreateDialog();
+
+        //Create Function
+        $('#Create').on("click", function (event) {
+            $('#frmAwards').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Awards', 'open', '@Url.Action("Create")', '#frmAwards', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) { });
+            event.preventDefault();
+        });
+
+
+        // Main page edit
+        $('#Edit').on('click', function () {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Data", '#frmAwards', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '', '', function (data) {
+                // setTimeout(function () {
+                $.each(data[0], function (i, k) {
+                    console.log(k.Name);
+                    $('#Name').val(k.Name);
+                    $('#Details').val(k.Details);
+              
+
+                    if (k.IssueDate != null)
+                    { $('#IssueDate').val(DateConvert(k.IssueDate)); }
+              
+                });
+
+                //partial page bind
+                $.each(data[1], function (i, k) {
+                });
+                //alert(data[3]);
+                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                // }, 2000);
+            });
+        });
+
+
+        //View main page
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Name').val(k.Name);
+                    $('#Details').val(k.Details);
+
+                    if (k.IssueDate != null)
+                    { $('#IssueDate').val(DateConvert(k.IssueDate)); }
+                });
+
+                $.each(data[1], function (i, k) {
+                });
+
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    $('#Name').oldVal(data[2].Name);
+                    $('#Details').oldVal(data[2].Details);
+                    $('#IssueDate').oldVal(data[2].IssueDate);
+
+                }
+                //}, 2000);
+            });
+        });
+
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+    });
+
+</script>

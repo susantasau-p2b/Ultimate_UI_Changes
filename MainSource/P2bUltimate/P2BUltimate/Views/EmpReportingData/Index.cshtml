@@ -1,0 +1,195 @@
+﻿@{
+    ViewBag.Title = "EmpReportingData";
+}
+@model P2b.Global.EmpReportingData
+
+<style>
+    .icon-row {
+        position: relative;
+        left: 84px;
+        top: -150px;
+    }
+
+    #BusinessType-button {
+        font-size: 9px;
+        padding-top: 1px;
+        font-weight: bold;
+    }
+
+    .popup-content-label {
+        display: block;
+        float: left;
+        width: 130px;
+    }
+
+    .popup-content-textbox {
+        margin-bottom: 1px;
+        min-width: 150px;
+    }
+
+    .row3 {
+        width: 505px;
+    }
+
+    .row4 {
+        position: absolute;
+        top: 294px;
+        width: 400px;
+    }
+
+    .popup-content-textbox-long {
+        margin-bottom: 1px;
+        width: 290px;
+    }
+
+
+    .row2 {
+        width: 402px;
+    }
+
+    .section_Method {
+        border: 1px solid rgba(207, 207, 207, 0.91);
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .transactiontablenew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        /*width: 200px;*/
+        display: block;
+        overflow: auto;
+        height: 500px;
+        border-collapse: collapse;
+    }
+
+    .transactiondivnew {
+        border: 1px solid #c5c5c5;
+        margin: 0 auto;
+        width: 507px;
+        border-radius: 5px;
+        height: 32px;
+    }
+
+        .transactiondivnew > div {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 4px;
+        }
+
+            .transactiondivnew > div > input {
+                box-sizing: initial;
+                display: inline-block;
+                margin: 0 auto;
+                width: 108px;
+            }
+
+    .transactiontablenew th, .transactiontablenew td {
+        background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+        padding: 5px;
+        border-bottom: 1px solid #c5c5c5;
+        border-right: 1px solid #c5c5c5;
+        text-align: center;
+        color: rgba(114, 113, 113, 0.9);
+    }
+
+        .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+            margin: 0 auto;
+        }
+
+        .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+            height: 100%;
+            width: 100%;
+        }
+
+    .transactiontablenew tr:hover {
+        cursor: pointer;
+        background: #EEEEEE none repeat scroll 0 0;
+    }
+
+    .section1_Leave {
+        display: block;
+        border: 1.5px solid rgba(207, 207, 207, 0.91);
+        height: 867px;
+        width: 534px;
+        margin: 4px auto;
+        position: absolute;
+    }
+
+    .section2_Leave {
+        display: block;
+        border: 1px solid #ddd;
+        height: 859px;
+        width: 581px;
+        margin: 5px 4px;
+        position: absolute;
+        left: 546px;
+    }
+</style>
+<html>
+<body>
+    <div class="Button_Container">
+        <button id="ProcessBoss">ProcessEmpReportingData</button>
+        </div>
+        <div id="Grid_Form" style="margin-left:20px;margin-top:-3px">
+            <div>
+                <table id="JqGrid"></table>
+                <div id="pager2"></div>
+            </div>
+        </div>
+</body>
+
+</html>
+<script>
+    $(document).ready(function () {
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        ColNames = ['EmpCode', 'EmpName', 'FuncModules', 'FuncSubModules', 'AccessRights', 'ReportingStruct', 'BossData','Id'];
+        ColModel = ['EmpCode', 'EmpName', 'FuncModules', 'FuncSubModules', 'AccessRights', 'ReportingStruct', 'BossData','Id'];
+        SortName = 'Id';
+        Caption = 'Emp Reporting Data';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#ProcessBoss').click(function () {
+            ajaxloaderv2('body');
+            ProcessBossfun();
+        });
+
+        function ProcessBossfun() {
+            //alert("kk");
+            $.ajax({
+                url: "EmpReportingData/ProcessBossBtn/",
+                method: "GET",
+                success: function (data) {
+                    //console.log(data);
+                    if (data != null && data != "") {
+                        $('<div></div>').P2BMessageModalDialog('ui-icon-info', data);
+                    }
+                    
+                },
+                error: function (err) {
+                    console.error(err);
+                    $('<div></div>').P2BMessageModalDialog('ui-icon-info', err.statusText);
+                },
+                complete: function () {
+                    $('.ajax_loder').remove();
+                }
+            });
+        }
+
+    });
+</script>
+
+
+
+
+

@@ -1,0 +1,563 @@
+﻿@{
+    ViewBag.Title = "Yearly ManPower Budget";
+}
+@model Recruitment.ManPowerBudget
+
+<html>
+
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 53px;
+            top: -150px;
+        }
+
+        .popup-content-iconmark {
+            height: 16px;
+            left: 3px;
+            position: absolute;
+            top: -4px;
+            width: 17px;
+        }
+
+        .popup-content-drop-icon-lookup {
+            height: 18px;
+        }
+
+        #BusinessType-button {
+            font-size: 9px;
+            padding-top: 1px;
+            font-weight: bold;
+        }
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 124px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .row3 {
+            width: 460px;
+        }
+
+        .row4 {
+            position: absolute;
+            top: 294px;
+            width: 400px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+
+        .row2 {
+            width: 402px;
+        }
+
+        .DetailGrid {
+            border: 1px solid #51e7d0;
+            width: 300px;
+            height: 150px;
+            overflow: auto;
+            display: block;
+            border-radius: 6px;
+        }
+
+            .DetailGrid th {
+                background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            }
+
+            .DetailGrid th, .lookuptableselected td {
+                color: rgba(114, 113, 113, 0.9);
+                border-bottom-width: 1px;
+                border-bottom-color: #51e7d0;
+                border-bottom-style: solid;
+                width: 300px;
+                border-collapse: collapse;
+                height: 23px;
+                overflow: hidden;
+                padding: 1px 2px;
+                white-space: pre;
+                padding: 2px;
+                /*! text-align: left; */
+            }
+
+            .DetailGrid td {
+                /*//  float:left;*/
+            }
+
+        .ba {
+            padding-left: 35px;
+        }
+
+        .ab {
+            padding-left: 109px;
+            padding-right: -2px;
+            width: 117px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div style="float: left; width: 345px;">
+                    <label id="lblPayMonth" class="popup-content-label must">Recruitment Year:</label>
+                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" style="width:179px" />
+                    <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+                    <button data-p2btooltip="Lookup Recrutment Calendar Details" class="popup-content-drop-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                </div>
+                <button class="button" id="Load">Load</button>
+                <button class="button" id="Create">Create</button>
+                @*<button class="button" id="View">View</button>
+                    <button class="button" id="Edit">Edit</button>
+                    <button class="button" id="Delete">Delete</button>*@
+                <div id="Grid_Form">
+                    <div>
+                        <div id="Container" class="container">
+                            <div id="Demo">
+                                <table id="MyTable" class="display" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Division</th>
+                                            <th>Location</th>
+                                            <th>Department</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>DD</th>
+                                            <th>Division</th>
+                                            <th>Location</th>
+                                            <th>Department</th>
+                                            <th>ID</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv" id="Lookup"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create ManPower Budget">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmmanpowerbudget", name = "frmmanpowerbudgetEdit" }))
+        {
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            @*<div class="dropdown_row1 row3 content_margine">
+                    @Html.LabelFor(m => m.RecruitmentCalendar, "Calendar :", new { @class = "popup-content-label" })
+                    <select id="RecruitCalendardrop" style="width:200px" name="RecruitCalendardrop" class="drop"></select>
+                </div>*@
+            <div class="row3 content_margine">
+                <div id="FinancialYearList_old"></div>
+                @*@Html.LabelFor(m => m., "Financial year:", new { @class = "popup-content-labelM" })*@
+                <label class="popup-content-label">Recruitment Calendar :</label>
+                <input type="text" hidden id="dispcalender_id" class="popup-content-textbox" name="dispcalender_id" />
+                <input type="text" readonly id="dispcalender" class="popup-content-textbox " name="" style="width:300px" />
+            </div>
+            <div class="section_Method">
+                <div class="heading">Filter View</div>
+                <div class="filter-div">
+                    <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+                    <div id="FormFilter"></div>
+                </div>
+            </div>
+            <br />
+            @*<div class="row3 content_margine">
+                    @Html.LabelFor(m => m.BudgetAmount, "Budget Amount :", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.BudgetAmount, new { @class = "popup-content-textbox must" })
+                </div>*@
+            <div>
+                <table id="inline_JqGrid"></table>
+                <div id="inline_JqGrid_pager"></div>
+            </div>
+        }
+    </div>
+
+
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        //$('#txt_box1').ValidateTextBox({ maxlength: 5, AlphaNum: 0 });
+        $('#Date_Grid').P2BDatePicker();
+        $('#Code').ValidateTextBox({ maxlength: 10, alphanum: true });
+        $('#Code').MaxLength(10);
+        //$('#Name').ForceOnlyAlphaNumeric();
+        // $('#Name').MaxLength(50);
+        $('#Name').ValidateTextBox({ maxlength: 50, name: true });
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "#Edit-Address-Corporate,#Remove-Address-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate";
+        ColModel = ['BudgetAmount', 'SanctionedPosts', 'Id'];
+        ColNames = ['BudgetAmount', 'SanctionedPosts', 'Id'];
+        SortName = 'Id';
+        Caption = 'ManPower Budget';
+        // url = '@@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        //  $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+
+        var inline_ColNames = [];
+        var inline_ColModel = [];
+        var inline_SortName, inline_Caption, inline_url, inline_width, inline_height;
+        inline_ColModel = ['Id', 'Post', 'SanctionedPosts', 'BudgetAmount', 'Editable'];
+        inline_ColNames = ['Id', 'Post', 'SanctionedPosts', 'BudgetAmount', 'Editable'];
+        inline_SortName = 'Id';
+        inline_Caption = 'List';
+        // inline_url = '@@Url.Action("P2BInlineGrid")';
+        inline_url = 0;
+        inline_width = 900;
+        inline_height = 150;
+        var modified_data = {
+            data: []
+        };
+
+        var urlfilter = "@Url.Action("Formula_Grid", "ManPowerBudget")?Filterdata=" + $("#Financial_id").val();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+
+        $('#Load').on('click', function (e) {
+            ////debugger;
+            var v2 = $("#Financial_id").val();
+            var v1 = $("#txtPayMonth").val();
+            if (v1 == "") {
+                $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Batch!");
+                return false;
+            }
+            $('#MyTable').DataTable().ajax.url('./ManPowerBudget/Formula_Grid?Filterdata=' + $("#Financial_id").val()).load();
+        });
+
+
+        $('#Create_Dialog').P2BGridDialog();
+        // $('#Create_Dialog').P2BCreateDialog();
+        //$('#Create_Dialog').P2BCreateDialog();
+        $('#Create').on("click", function (event) {
+            $('#Date').P2BDatePicker();
+            $('#frmmanpowerbudget').trigger("reset");
+            $('#RecruitCalendardrop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListCalendar", "HolidayCalendar")', "", '');
+            $.get("@Url.Action("getCalendar", "ManPowerBudget")", function (data) {
+                $('#dispcalender').val(data.Lvcalendardesc);
+                $('#dispcalender_id').val(data.Id);
+                console.log(data);
+            });
+            //$('#frmmanpowerbudget').trigger("reset");
+            //  $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create ', 'open', '@@Url.Action("Create")', '#frmmanpowerbudget', 'Message :', 'Request Falied :', '#JqGrid', 500, 720, '#AddressList', btndisablenames, function (data) { });
+            //  $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Leave Requisition', 'open', '@@Url.Action("Create")', '#frmLvNewReq', 'Message :', 'Request Falied :', '#JqGrid', 650, 1200, '', "", function (data) { }, { datatablename: "#MyTable" });
+            // $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create  ManpowerBudget', 'open', '@Url.Action("Process")', '#frmmanpowerbudget', 'Message :', 'Request Falied :', '#JqGrid', 500, 720, '', "", function (data) { }, { datatablename: "#MyTable" });
+            $('#Create_Dialog').P2BGridDialog({
+                title: "Create Manpower Budget",
+                submiturl: "@Url.Action("Process")",
+                form: "#frmmanpowerbudget",
+                height: 500,
+                width: 720,
+                state: "open",
+                gridname: "#inline_JqGrid",
+                editurl: "",
+                gridfunction: "GetGridSelctedvalue",
+                gridreloadname: "#JqGrid",
+                returnToGrid: "#inline_JqGrid",
+                refreshgrid: "#MyTable",
+            });
+            event.preventDefault();
+        });
+
+
+        $('#Advance-Filter-Symbol').on('click', function () {
+            $("<div></div>").FilterDialog({
+                width: 1000,
+                height: 400,
+                title: "Filter",
+                GeoUrl: "Transcation/Get_Geoid_Single",
+                FunUrl: "Transcation/Get_Funid_Single",
+                htmlurl: "@Url.Action("Advance_partialNew", "Transcation")",
+                returnat: function (data) {
+                    if (data.GeoStruct == null) {
+                        alert("Please Select Geostruct Filter");
+                        return false;
+                    }
+                    if (data.FunStruct == null) {
+                        alert("Please Select Funcstruct Filter");
+                        return false;
+                    }
+                    console.log(data);
+                    if (data.GeoStruct != null) {
+                        $('#geo_id').val(data.GeoStruct);
+                    }
+                    if (data.PayStruct != null) {
+                        $('#pay_id').val(data.PayStruct);
+                    }
+                    if (data.FunStruct != null) {
+                        $('#fun_id').val(data.FunStruct);
+                    }
+                    //console.log($('#geo_id').val());
+
+                    var Id_art = $("#geo_id").serialize();
+
+                    console.log(Id_art);
+                    var Id_art2 = $("#fun_id").val();
+                    // alert(Id_art);
+                    // var Id_Arr = $('#geo_id').val().split(",");
+                    ////debugger;
+                    var htm = "";
+                    inline_url = '@Url.Action("LoadEmp", "ManPowerBudget")';
+                    $('#inline_JqGrid').InlineEditGrid({
+                        ColNames: inline_ColNames,
+                        ColModel: inline_ColModel,
+                        SortName: inline_SortName,
+                        Caption: inline_Caption,
+                        url: inline_url,
+                        tablename: '#inline_JqGrid',
+                        eddelurl: '@Url.Action("edit")',
+                        width: inline_width,
+                        forwarddata: Id_art2,
+                        height: inline_height,
+                        //inlinePager: '#inline_JqGrid_pager',
+                        CheckCol: "Editable",
+                        EditableCol: ['SanctionedPosts', 'BudgetAmount'],
+                        selectall: true
+                    });
+                    //'@@Url.Action("GetShortListingLKDetails", "ResumeEvaluation")?forwardata=' + $('#Batch_Name').val(),
+                    //  $.each(Id_Arr, function (i, k) {
+                    @*$.ajax({
+                        method: "POST",
+                        url: "@Url.Action("GetFullDetals")",
+                        data: Id_art2,
+                        // data: { Data: k },
+                        success: function (data) {
+
+                            if (data.success == false) {
+                                alert("Please Select Funcstruct Filter");
+                                return false;
+                            }
+                            var v1 = data.data;
+
+
+                            $.each(v1, function (i, k) {
+
+                                htm += "<tr><td style='display:none'><input type=text name=funstruct_id  value= " + k.id + "></td> <td class=ba>" + k.fulldetails + "</td>" + "<td>" + "<input type=text name=funstruct_sanction value=0 class=ab>" + "</td>" + "<td>" + "<input type=text name=Budget_amount value=0 class=ab>" + "</td></tr>";
+
+                            });
+                            $(htm).appendTo("#inline_JqGrid_pager");
+                            // $(htm).appendTo("#inline_JqGrid");
+
+                            $('#inline_JqGrid').InlineEditGrid({
+                                ColNames: inline_ColNames,
+                                ColModel: inline_ColModel,
+                                SortName: inline_SortName,
+                                Caption: inline_Caption,
+                                url: inline_url,
+                                tablename: '#inline_JqGrid',
+                                eddelurl: '@Url.Action("edit")',
+                                width: inline_width,
+                                height: inline_height,
+                                //inlinePager: '#inline_JqGrid_pager',
+                                CheckCol: "Editable",
+                                EditableCol: ["Amount"],
+                            });
+                        }
+
+
+                    });*@
+
+                },
+                renderat: "#FormFilter",
+            });
+
+
+            event.preventDefault();
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View ManPowerBudget Data', '#AddressList,#ContactDetailsList', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#Autho_Action').val(k.Action);
+                    $('#Code').val(k.Code);
+                    $('#Name').val(k.Name);
+
+                });
+
+                $.each(data[1], function (i, k) {
+                    $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '', 'N');
+                    $('#ContactDetailsList').P2BLookUpEncapsulate('#ContactDetailsList', 'ContactDetailsList', k.Cont_Id, k.FullContactDetails, 'ContactDetailsList', '', 'N');
+                });
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Name').oldVal(data[2].Name);
+                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#AddressList_Old').oldLookupVal(data[2].Address_Val);
+                        $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
+                    }
+                }
+            });
+        });
+
+        $('#Load').on('click', function (e) {
+            // alert($('#Financial_id').val());
+
+            if (!$("#Financial_id").val()) {
+                alert("Please Select Financial Year.");
+                return false;
+            }
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Financial_id').val() });
+        });
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: urlfilter,
+            editurl: "@Url.Action("EditGridDetails", "ManPowerBudget")",
+            htmurl: "@Url.Action("partial", "ManPowerBudget")",
+            submiturl: "@Url.Action("GridEditSave", "ManPowerBudget")",
+            columnname: ["Division", "Location", "Department", "Id"],
+            childheader: ["PostName", "SanctionPost", "BudgetAmount", "Id"],
+            childurl: "@Url.Action("Get_FormulaStructDetails", "ManPowerBudget")",
+            tableheader: "ManpowerBudget",
+            childurlColumnNo: "4"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            // console.log($(init).parents('tr:eq(0)'));
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //var element = $(init).parents('tr:eq(0)');
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            //   console.log(element);
+            var dt = $('#MyTable').DataTable();
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                return false;
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#frm-YearlyPaymentT-partial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "View",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data) {
+                        $.each(data.data, function (i, k) {
+                            $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                            $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                            $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                            $('#yearlypayment-Narration').val(k.NarrationP);
+                        });
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-pencil')) {
+                $('<div></div>').PartialCreateDialog({
+                    height: 'auto',
+                    width: 'auto',
+                    form: "#YearlyManpowerBudgetPartial",
+                    htmlurl: htmurl,
+                    state: "open",
+                    mode: "Edit",
+                    editurl: editurl,
+                    submiturl: submiturl,
+                    editdata: id,
+                    forwarddata: id,
+                    returndatafunction: function (data1) {
+                        $.each(data1, function (i, k) {
+                            $('#SanctionedPosts').val(k.SanctionedPosts);
+                            $('#BudgetAmount').val(k.BudgetAmount);
+                        });
+                    },
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                console.log(id);
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwardata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+        //delete main page
+        $('#Delete').button().click(function (event) {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            $('#Create_Dialog').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+            event.preventDefault();
+        });
+
+
+        $('#Lookup_FinancialYear_Calendar').on('click', function () {
+            ////debugger;
+            $('.dialog').AddDataToTextbox({
+                appendTo: "#txtPayMonth",
+                appendToId: "#Financial_id",
+                lookupurl: "@Url.Action("GetCalendarDetails", "postdetails")",
+                NoOfRecordToShow: "10",
+                setnameofthelookupbyppage: "HusbandName_FName-lookup",
+                LookupDiv: "LookupDiv",
+                lookuppagename: "lookup",
+                pagename: "PageNavPosition",
+                readonly: true,
+            });
+        });
+
+        $('#edit_model_dialog').P2BGridDialog();
+        $('.popup_radio_button').controlgroup();
+        $('.drop').selectmenu().selectmenu('menuWidget').addClass('overflow');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+    });
+</script>

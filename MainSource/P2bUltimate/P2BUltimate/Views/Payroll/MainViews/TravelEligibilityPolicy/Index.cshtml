@@ -1,0 +1,364 @@
+﻿@{
+    ViewBag.Title = "TravelEligibilityPolicy";
+}
+@model Payroll.TravelEligibilityPolicy
+
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        var dt;
+        var ColNames = [];
+        var ColModel = [];
+        var SortName, Caption, url, width, height;
+        var btndisablenames = "";
+        ColModel = ['TA_TC_Elligibilty_Code', 'TA_Elligibility_Wages', 'Id'];
+        ColNames = ['TA_TC_Elligibilty_Code', 'TA_Elligibility_Wages', 'Id'];
+        SortName = 'Id';
+        Caption = 'TravelEligibilityPolicy';
+        url = '@Url.Action("P2BGrid")';
+        width = 1000;
+        height = 150;
+        $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
+        $('#Create_Dialog').P2BCreateDialog();
+
+        function AssignData() {
+            dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+        }
+
+        function DateConvert(JsonDate) {
+            var date = new Date(parseInt(JsonDate.substr(6)));
+            var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+            return displayDate;
+        };
+        $('#Create').on("click", function (event) {
+            $('#frmTravelEligibilityPolicy').trigger("reset");
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create TravelEligibility Policy', 'open', '@Url.Action("Create")', '#frmTravelEligibilityPolicy', 'Message :', 'Request Falied :', '#JqGrid', 500, 800, '#WagesRangeList,#PTWagesMasterlist,#Stateslist', '#Edit-PayProcessGroup-EmpOff,#Remove-PayProcessGroup-EmpOff', function (data) { });
+            event.preventDefault();
+        });
+
+        $('#Edit').on('click', function (e) {
+            AssignData();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit TravelEligibility Details", '#frmTravelEligibilityPolicy', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 510, 1008, '#PTWagesMasterlist,#WagesRangeList,#Stateslist', '', function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#TA_TC_Eligibilty_Code').val(k.Code);
+                    $('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', k.Wages_id, k.Wages_Fulldetails, 'PTWagesMasterlist', '#Remove-States', 'N');
+                   
+                });
+                $.each(data[1], function (i, k) {
+                    $('#TravelModeEligibilityPolicyList').P2BLookUpEncapsulate('#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', k.TravelModeEligibility_Id, k.TravelModeEligibilityFullDetails, 'TravelModeEligibilityPolicyList', '#Remove-StatutoryEffectiveMonths', 'A');
+                    $('#WagesRangeList').P2BLookUpEncapsulate('#WagesRangeList', 'WagesRangeList', k.WagesRange_Id, k.WagesRangeFullDetails, 'WagesRangeList', '#Remove-StatutoryEffectiveMonths', 'A');
+                });
+                $('#Autho_Allow').val(data[3]);
+            });
+            e.preventDefault();
+        });
+
+        $('#View').button().click(function (event) {
+            AssignData();
+            $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View TravelEligibility Policy Data', '#PTWagesMasterlist,#WagesRangeList,#TravelModeEligibilityPolicyList', '#Lookup-PTWagesMaster,#Create-PTWagesMaster,#Edit-PTWagesMaster,#Remove-PTWagesMaster,#Lookup-WagesRange,#Create-WagesRange,#Edit-WagesRange,#Remove-WagesRang,#Lookup-TravelModeEligibilityPolicy,#Edit-TravelModeEligibilityPolicy,#Remove-TravelModeEligibilityPolicy', 600, 1020, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                $.each(data[0], function (i, k) {
+                     $('#TA_TC_Eligibilty_Code').val(k.Code);
+                    $('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', k.Wages_id, k.Wages_Fulldetails, 'PTWagesMasterlist', 'view', 'N');
+                    $('#WagesRangeList').P2BLookUpEncapsulate('#WagesRangeList', 'WagesRangeList', k.WagesRange_Id, k.WagesRange_Fulldetails, 'WagesRangeList', 'view', 'N');                });
+
+                $.each(data[1], function (i, k) {
+                    $('#TravelModeEligibilityPolicyList').P2BLookUpEncapsulate('#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', k.TravelModeEligibility_Id, k.TravelModeEligibilityFullDetails, 'TravelModeEligibilityPolicyList', 'view', 'A');
+
+                });
+                //To bind old data if authorisation is true
+                if ($("#Autho").hasClass('auto_active')) {
+                    if (data[2] != null) {
+                        $('#Stateslist').oldDropval(data[2].State_Val);
+                        $('#ProcessTypeList').oldDropval(data[2].Process_Val);
+                        $('#PTWageRangelist_old').oldLookupVal(data[2].PTWageRange_Val);
+                        $('#PTWagesMasterlist_old').oldLookupVal(data[2].PTWagesMaster_Val);
+                        $('#WagesRangeList_old').oldLookupVal(data[2].StatutoryEffectiveMonths_Val);
+                    }
+                }
+            });
+            event.preventDefault();
+        });
+
+        $('#Lookup-PTWageRange').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetProcessPTWageRangeDetails", "PTaxMaster")', '', 'LookupDiv', 'Range Look Up Data', '#PTWageRangelist', 'PTWageRangelist', 5, 'PTWageRangelist', '#frmTravelEligibilityPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+        $('#Lookup-States').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetState", "PTaxMaster")', '', 'LookupDiv', 'Look Up Data', '#Stateslist', 'Stateslist', 5, 'Stateslist', '#frmTravelEligibilityPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-PTWagesMaster').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetails", "wages")', '', 'LookupDiv', 'Wage Master Look Up Data', '#PTWagesMasterlist', 'PTWagesMasterlist', 5, 'PTWagesMasterlist', '#frmTravelEligibilityPolicy', 'N', '', 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+       
+        $('#Lookup-WagesRange').button().on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetWagesRange", "TravelEligibilityPolicy")', '', 'LookupDiv', 'Wages Range', '#WagesRangeList', 'WagesRangeList', 5, 'WagesRangeList', '#frmTravelEligibilityPolicy', 'A',btndisablenames,'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('#Lookup-TravelModeEligibilityPolicy').on('click', function (event) {
+            $('.dialog').P2BLookUpModal('@Url.Action("GetTravelModeEligibilityPolicy", "TravelEligibilityPolicy")', '', 'LookupDiv', 'Wages Range', '#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', 5, 'TravelModeEligibilityPolicyList', '#frmTravelEligibilityPolicy', 'A', btndisablenames, 'Lookup_table', 'PageNavPosition');
+            event.preventDefault();
+        });
+
+        $('<div></div>').P2BPartialCreateModalDialog();
+        $('#Create-States').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "state")', 'Create State', 'open', '@Url.Action("CreateState", "State")', '#frmState', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTravelEligibilityPolicy', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+                // to show data which is created in partial page
+                $('#Stateslist').P2BLookUpEncapsulate('#Stateslist', 'Stateslist', data[0], data[1], 'Stateslist', '#Remove-States', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Create-PTWagesMaster').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "wages")', 'Create wages', 'open', '@Url.Action("CreateSave", "Wages")', '#frmWages', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmTravelEligibilityPolicy', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+                // to show data which is created in partial page
+                $('#PTWagesMasterlist').P2BLookUpEncapsulate('#PTWagesMasterlist', 'PTWagesMasterlist', data[0], data[1], 'PTWagesMasterlist', '#Remove-PTWagesMaster', 'N');
+            });
+            event.preventDefault();
+        });
+
+        $('#Create-WagesRange').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("WagesRangepartial", "WagesRange")', 'Create Wages Range', 'open', '@Url.Action("CreateSave", "WagesRange")', '#frmWagesRange', 'Message :', 'Request Falied :', '#JqGrid', 350, 600, '', '', '', '#frmTravelEligibilityPolicy', '', function (data) {
+                $('#WagesRangeList').P2BLookUpEncapsulate('#WagesRangeList', 'WagesRangeList', data[0], data[1], 'WagesRangeList', '#Remove-StatutoryEffectiveMonths', 'A');
+                
+            });
+
+            event.preventDefault();
+        });
+
+
+        $('#Edit-PTWagesMaster').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+            b = a[0];
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "wages")', '@Url.Action("Edit", "wages")', b, '@Url.Action("EditSave", "wages")', 'Edit Pt Wages Master Details', '#frmWages', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTravelEligibilityPolicy', '#PTWagesMasterlist', 'PTWagesMasterlist', 'PTWagesMasterlist', 'N', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', function (data) {
+                $.each(data[0], function (i, k) {
+                    console.log(data[0]);
+                    $('#frmWages').trigger('reset');
+                    $('#WagesName').val(k.WagesName);
+                    $('#Percentage').val(k.Percentage);
+                    $('#WagesCeilingMin').val(k.CeilingMin);
+                    $('#WagesCeilingMax').val(k.CeilingMax);
+                });
+                $.each(data[1], function (i, k) {
+                    $('#RateMasterlist').P2BLookUpEncapsulate('#RateMasterlist', 'RateMasterlist', k.Rate_id, k.Rate_val, 'RateMasterlist', '#Remove-RateMaster-Wages,#View-RateMaster-SalHeadFormula', 'A');
+                });
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-WagesRange').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#WagesRangeList').P2BGetTableDataonSelectedRow('#WagesRangeList', 0);
+            b = a[0];
+
+                @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("WagesRangepartial", "WagesRange")', '@Url.Action("EditWagesRange_partial", "WagesRange")', b, '@Url.Action("EditSave", "WagesRange")', 'Edit WagesRange Details', '#frmStatutoryEffectiveMonths', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTravelEligibilityPolicy', '#WagesRangeList', 'WagesRangeList', 'WagesRangeList', 'N', '#Remove-Range-StatutoryEffectiveMonths', function (data) {*@
+            @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("WagesRangepartial", "WagesRange")', '@Url.Action("EditWagesRange_partial", "WagesRange")', b, '@Url.Action("EditSave", "WagesRange")', 'Edit WagesRange', '#frmWagesRange', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, 'frmTravelEligibilityPolicy', '#WageRangeList', 'WageRangeList', 'WageRangeList', 'N', '', function (data) {*@
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("WagesRangepartial", "WagesRange")', '@Url.Action("EditWagesRange_partial", "WagesRange")', b, '@Url.Action("EditSave", "WagesRange")', 'Edit WagesRange', '#frmWagesRange', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTravelEligibilityPolicy', '#WagesRangeList', 'WagesRangeList', 'WagesRangeList', 'A', '#Remove-Range-StatutoryEffectiveMonths', function (data) {
+                $.each(data, function (i, k) {
+                    $('#RangeFrom').val(k.WageFrom);
+                    $('#RangeTo').val(k.WageTo);
+                    $('#Percentage').val(k.Percentage);
+                    $('#Amount').val(k.Amount);
+                    $('#txtCeilingMin').val(k.CeilingMin);
+                    $('#txtCeilingMax').val(k.CeilingMax);
+                    @*$('#EffectiveMonthList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 437, k.EffectiveMonth_Id);
+                    $('#Gender_drop').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 129, k.Gender_Id);
+                    $('#dvGender').show();*@
+
+                });
+                //$.each(data[1], function (i, k) {
+                //    $('#StatutoryWageRangelist').P2BLookUpEncapsulate('#StatutoryWageRangelist', 'StatutoryWageRangelist', k.StatutoryEffectiveMonthsWagesRange_Id, k.StatutoryEffectiveMonthsWagesRange_Fulldetails, 'StatutoryWageRangelist', '#Remove-Range-StatutoryEffectiveMonths', 'A');
+                //});
+                //$('Gender_drop').show();
+            });
+            event.preventDefault();
+        });
+
+        $('#Edit-TravelModeEligibilityPolicy').button().on("click", function (event) {
+            var a = [], b;
+            a = $('#TravelModeEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelModeEligibilityPolicyList', 0);
+            b = a[0];
+
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "TravelEligibilityPolicy")', '@Url.Action("Edit", "TravelModeEligibilityPolicy")', b, '@Url.Action("EditSave", "TravelModeEligibilityPolicy")', 'Edit TravelModeEligibilityPolicy Details', '#frmPartialTravelEligibiltyPolicy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmTravelEligibilityPolicy', '#TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', 'TravelModeEligibilityPolicyList', 'N', '#Remove-Range-StatutoryEffectiveMonths', function (data) {
+                $.each(data[0], function (i, k) {
+                    $('#TA_TM_Elligibilty_Code').val(k.Name);
+                    $('#travelmodelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 3001, k.travelmode);
+                    $('#classoftravellist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 3002, k.ClassofTravel); // Dropdown bind
+                });
+            });
+            event.preventDefault();
+        });
+        //$('<div></div>').P2BPartialCreateModalDialog();
+        @*$('#Create-EmpOff-PayProcessGroup').on("click", function (e) {
+			$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payprocessgroup_partial", "Payprocessgroup")', 'Create Payprocess Group', 'open', '@Url.Action("Create", "Payprocessgroup")', '#frmPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 250, 355, '', '', '', '#frmTravelEligibilityPolicy', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+
+				$('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', data[0], data[1], 'PayProcessGrouplist');
+			});
+			e.preventDefault();
+		});*@
+
+        $('#Delete').button().click(function (event) {
+            AssignData();
+            $('#frmTravelEligibilityPolicy').P2BDeleteModalDialog('@Url.Action("Delete")', dt.Id, 'Are you sure want to remove record???', 'Message : ', 'Request failed', '#JqGrid', 200, 200);
+        });
+
+        $('#Remove-WagesRange').button().on('click', function (event) {
+            //a = $('#WagesRangeList').P2BGetTableDataonSelectedRow('#WagesRangeList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#WagesRangeList').P2BGetTableDataonSelectedRow('#WagesRangeList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#WagesRangeList', $('#WagesRangeList').val(), 200, 200, '#frmTravelEligibilityPolicy', '#WagesRangeList');
+            event.preventDefault();
+        });
+        $('#Remove-TravelModeEligibilityPolicy').button().on('click', function (event) {
+            //a = $('#TravelModeEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelModeEligibilityPolicyList', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#TravelModeEligibilityPolicyList').P2BGetTableDataonSelectedRow('#TravelModeEligibilityPolicyList', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#TravelModeEligibilityPolicyList', $('#TravelModeEligibilityPolicyList').val(), 200, 200, '#frmTravelEligibilityPolicy', '#TravelModeEligibilityPolicyList');
+            event.preventDefault();
+        });
+        $('#Remove-States').button().on('click', function (event) {
+            //a = $('#Stateslist').P2BGetTableDataonSelectedRow('#Stateslist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#Stateslist').P2BGetTableDataonSelectedRow('#Stateslist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Stateslist', $('#Stateslist').val(), 200, 200, '#frmTravelEligibilityPolicy', '#Stateslist');
+            event.preventDefault();
+        });
+        $('#Remove-PTWagesMaster').button().on('click', function (event) {
+            //a = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+            //b = a[0];
+            var selectedRows = [];
+            selectedRows = $('#PTWagesMasterlist').P2BGetTableDataonSelectedRow('#PTWagesMasterlist', 0);
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PTWagesMasterlist', $('#PTWagesMasterlist').val(), 200, 200, '#frmTravelEligibilityPolicy', '#PTWagesMasterlist');
+            event.preventDefault();
+        });
+        $('.selectmenu').selectmenu().selectmenu("menuWidget").css({ "height": "auto" });
+        $('.popup_radio_button').controlgroup();
+        $('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');
+        $('#EffectiveDate').P2BDatePicker();
+
+    });
+</script>
+<html>
+<head>
+    <title></title>
+    <style>
+        .icon-row {
+            position: relative;
+            left: 120px;
+            top: -149px;
+        }
+
+        .row1 {
+            width: 459px;
+        }
+
+        .popup-content-textbox {
+            min-width: 122px;
+        }
+
+        .popup-content-label {
+            display: block;
+            margin: 1px;
+            float: left;
+            width: 157px;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="Create">Create</button>
+                <button class="button" id="View">View</button>
+                <button class="button" id="Edit">Edit</button>
+                <button class="button" id="Delete">Delete</button>
+                <button class="button" id="Autho">Authorised</button>
+                <div id="Grid_Form">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+    <div id="Create_Dialog">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmTravelEligibilityPolicy", name = "frmTravelEligibilityPolicy" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <div class="row1  content_margine ">
+                @Html.LabelFor(m => m.TA_TC_Eligibilty_Code, "TA_TC_Eligibilty_Code :", new { @class = "popup-content-label must" })
+                @Html.TextBoxFor(e => e.TA_TC_Eligibilty_Code, new { @class = "popup-content-textbox-short must", @readonly = true })
+            </div>
+            @*<div class="row1  content_margine ">
+                    @Html.LabelFor(m => m.EndDate, "End Date :", new { @class = "popup-content-label must" })@Html.TextBoxFor(e => e.EndDate, new { @class = "popup-content-textbox date must", @readonly = true })
+                </div>*@
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.TA_Eligibility_Wages, "TA_Eligibility_Wages:", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <div id="PTWagesMasterlist_old"></div>
+                    <table class="lookuptableselected" id="PTWagesMasterlist">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select Ta_Eligibility_Wages Details" class="popup-content-icon-lookup" id="Lookup-PTWagesMaster"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Ta_Eligibility_Wages Details" class="popup-content-icon-create" id="Create-PTWagesMaster"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Ta_Eligibility_Wages Details" class="popup-content-icon-edit" id="Edit-PTWagesMaster"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove Ta_Eligibility_Wages Details" class="popup-content-icon-remove" id="Remove-PTWagesMaster"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.WagesRange, "WagesRange:", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <div id="StatutoryEffectiveMonthslist_old"></div>
+                    <table class="lookuptableselected" id="WagesRangeList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select WagesRange Details" class="popup-content-icon-lookup" id="Lookup-WagesRange"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create WagesRange Details" class="popup-content-icon-create" id="Create-WagesRange"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit WagesRange Details" class="popup-content-icon-edit" id="Edit-WagesRange"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove WagesRange Details" class="popup-content-icon-remove" id="Remove-WagesRange"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+            <div class="row1 content_margine">
+                @Html.LabelFor(m => m.TravelModeEligibilityPolicy, "TravelModeEligibilityPolicy:", new { @class = "popup-content-label must" })
+                <div class="popup-content-table">
+                    <div id="StatutoryEffectiveMonthslist_old"></div>
+                    <table class="lookuptableselected" id="TravelModeEligibilityPolicyList">
+                        <tr><th>ID</th><th>LookUp Selected Description</th></tr>
+                    </table>
+                </div>
+                <div class="icon-row">
+                    <button data-p2btooltip="Select TravelModeEligibilityPolicy Details" class="popup-content-icon-lookup" id="Lookup-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    @*<button data-p2btooltip="Create TravelModeEligibilityPolicy Details" class="popup-content-icon-create" id="Create-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>*@
+                    <button data-p2btooltip="Edit TravelModeEligibilityPolicy Details" class="popup-content-icon-edit" id="Edit-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Remove TravelModeEligibilityPolicy Details" class="popup-content-icon-remove" id="Remove-TravelModeEligibilityPolicy"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                </div>
+            </div>
+
+        }
+    </div>
+</body>
+</html>

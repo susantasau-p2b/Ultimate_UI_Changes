@@ -1,0 +1,898 @@
+﻿@{
+    ViewBag.Title = "Other Service Book";
+}
+@model Payroll.OtherServiceBook
+<html>
+
+<head>
+  
+    <title></title>
+
+    <script>
+    $(document).ready(function (e) {
+        $('button').button();
+
+        var ColNames_release = [];
+        var ColModel_release = [];
+        var SortName_release, Caption_release, url_release, width_release, height_release;
+
+        ColNames_release = ['Emp Code', 'Emp Name', 'Activity', 'Process Date', 'Old FuncStruct', 'New FuncStruct', 'Old PayStruct', 'New PayStruct', 'Is Basic Change App', 'New Basic', 'Narration', 'ActivityId', 'Id'];
+        ColModel_release = ['Emp Code', 'Emp Name', 'Activity', 'Process Date', 'Old FuncStruct', 'New FuncStruct', 'Old PayStruct', 'New PayStruct', 'Is Basic Change App', 'New Basic', 'Narration', 'ActivityId', 'Id'];
+        SortName_release = 'Id';
+        Caption_release = 'Other Service Book';
+        // url_release = 'IncrementServiceBook/P2BGridRelease';
+        url_release = '@Url.Action("P2BGridRelease", "OtherServiceBook")'
+            width_release = 1000;
+            height_release = 150;
+
+            //  a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
+
+            $('#ProcessOthDate').P2BDatePicker();
+            $('#ToPeriod').P2BDatePicker();
+            $('#ReleaseDate').P2BDatePicker();
+
+             $('#divinline_jq').hide();
+            $('#note').hide();
+            $('#JqGrid_release').on('click', function () {
+                $('#divinline_jq').hide();
+                $('#note').hide();
+                setTimeout(function () {
+                    var EmpId = $.GetGridSelctedvalue("#JqGrid_release", "Id");
+                    var ActivityId = $.GetGridSelctedvalue("#JqGrid_release", "ActivityId");
+                    console.log(EmpId);
+                    $('#emp_Id').val(EmpId);
+                    $('#Activity_Id').val(ActivityId);
+                    
+                    $("#Earn1").empty();
+                    $("#EarnNew").empty();
+           
+                    $.get("@Url.Action("GetNonstdData")", { data: $('#emp_Id').val(), data1: $('#Activity_Id').val() }, function (data) {
+                        if (data.msg != "") {
+                            alert(data.msg);
+                        }
+                        if (data.Sal != "" && data.SalNew != "") {
+                            $('#divinline_jq').removeAttr("style");
+                            $('#note').show();
+                            var v1 = data.Sal;
+                            var v2 = data.SalNew;
+                            var elems = [];
+                            var elemsNew = [];
+                            $.each(v1, function (i, k) {
+                                $('#SalHeadCount').val(i);
+                                elems[i] = k.SalaryHead.Id;
+                                $("#Earn1").append("<li>" + "<p class=cb>" + k.SalaryHead.Name + "<div id='olddiv' style='margin-right: 23px;margin-top: -24px;'>" + "<input style ='width:50px; margin-left: 175px;' class='earnamt' disabled  name=Amt" + i + " value=" + k.Amount + " >" + "</input>" + "<input style='width:50px;' class='earnamt' disabled  value=" + k.FormulaEditable + " name=F" + i + " class=bc>" + "</div>" + "</li>");
+                            });
+
+
+                            $.each(v2, function (p, q) {
+                                $("#EarnNew").append("<li>" + "<p class=cb><div id='newdiv'><input class='earnamt' name=AmtNew" + p + " value=" + q.Amount + " >" + "</input>" + "<input class='earnamt' value=" + q.FormulaEditable + " name=FNew" + p + " class=bc>" + "</div>" + "</li>");
+                            });
+
+
+                            $('#input_hidden_field').val(elems);
+                        } else {
+                            $('#note').hide();
+                            $("#Earn1").empty();
+                            $("#EarnNew").empty();
+                            $('#divinline_jq').attr("display", "none");
+                        }
+                    });
+                }, 500);
+                //var dt_release = $('#JqGrid_release').P2BGrid.P2BEdDelV('#JqGrid_release', 'Id');
+                //$('#emp_Id').val(dt_release.EmpId);
+            });
+
+
+            $('#Advance-Filter-Symbol').on('click', function () {
+                $("<div></div>").FilterDialog({
+                    width: 1000,
+                    height: 400,
+                    title: "Filter",
+                    htmlurl: "@Url.Action("Advance_partial", "Transcation")",
+                returnat: function (data) {
+                    console.log(data);
+                    var forwarddata = JSON.stringify(data);
+                    $('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist_h?geo_id=' + forwarddata + '', "");
+                    //$('#Employee-Table').P2BTransactionTableDynamic('#Employee-Search', '#Case-Employee', './Transcation/Get_Employelist?geo_id=' + forwarddata + '', "");
+                    //$('#pay_id').val(data.PayStruct);
+                    //$('#fun_id').val(data.FunStruct);
+                }, hierarchy: true,
+                renderat: "#FormFilter",
+            });
+            //console.log($('#FormFilter')[0]);
+        });
+
+        $('#ReleaseDate').prop("disabled", true);
+        $('input[name="ReleaseFlag"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#ReleaseDate').prop("disabled", true);
+                $('#ReleaseDate').val("");
+            }
+            else {
+                $('#ReleaseDate').prop("disabled", false);
+                $('#ReleaseDate').TodayDate();
+            }
+        });
+
+
+        $('#Incr_NewBasic').prop("disabled", true);
+        $('input[name="BasicFlag"]:radio').change(function () {
+            if (this.value == "false") {
+                $('#Incr_NewBasic').prop("disabled", true);
+                $('#Incr_NewBasic').val("");
+            }
+            else {
+                $('#Incr_NewBasic').prop("disabled", false);
+
+
+            }
+        });
+        $('#Create_Dialog').P2BCreateDialog();
+        $('#CreateRelease_dialog').P2BCreateDialog();
+        $('#NewBasic').ForceOnlyNumeric();
+        $('#NewBasic').MaxLength(10);
+
+        $('#add').on("click", function (event) {
+            //$.LoadEmpByDefault(true);
+            $.LoadEmpByDefaultWOGeoId(true, "");
+            $('#frmOtherServiceBook').trigger("reset");
+            $('#NewFuncT-table').find('tr:gt(0)').remove();
+            $('#NewPayT-table').find('tr:gt(0)').remove();
+            $('#NewGeoT-table').find('tr:gt(0)').remove();
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Other Service Book', 'open', '@Url.Action("Create")', '#frmOtherServiceBook', 'Message :', 'Request Falied :', '#JqGrid', 600, 1150, '', '', function (data) { }, { datatablename: "#MyTable" });
+            $('#Incr_NewBasic').ForceOnlyNumeric();
+            $('#Incr_NewBasic').MaxLength(10);
+            $('#ProcessOthDate').attr('readonly', true);
+            @*$('#OtherActivitylist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 312, "");
+                $('#OldPayScalelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "OtherServiceBook")', "", ""); // To bind dropdown on page load
+                $('#NewPayScalelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "OtherServiceBook")', "", ""); // To bind dropdown on page load
+                $('#OldPayScaleAgreementlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleAgreementList", "OtherServiceBook")', "", ""); // To bind dropdown on page load
+                $('#NewPayScaleAgreementlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleAgreementList", "OtherServiceBook")', "", ""); // To bind dropdown on page load
+                //*@
+            event.preventDefault();
+        });
+
+
+        $('#txtNarrationRelease').prop("disabled", true);
+        $('#txtOthactivityrelease').prop("disabled", true);
+        $('#txtOldPayScalerelease').prop("disabled", true);
+        $('#txtNewPayScalerelease').prop("disabled", true);
+        $('#txtOldPayScaleAgreementrelease').prop("disabled", true);
+        $('#txtNewPayScaleAgreementrelease').prop("disabled", true);
+        $('#txtProcessOthDaterelease').prop("disabled", true);
+
+        $('#release').on("click", function (event) {
+
+            // $('#CreateRelease_dialog').P2BCreateDialog('', '', '', '', 'Create Release Yearly Payment', 'open', '@Url.Action("Create")', '#frmYearlyPaymentT', 'Message :', 'Request Falied :', '#JqGrid', 600, 850, '#AddressList,#ContactDetailsList', btndisablenames, function (data) { });
+            $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+            $('#CreateRelease_dialog').P2BGridDialog({
+                maindialogtitle: "Release OtherServiceBook",
+                submiturl: "@Url.Action("Release")",
+                form: "#frmOtherServBookRelease",
+                height: 555,
+                width: 1100,
+                state: "open",
+                gridname: "#JqGrid_release",
+                gridfunction: "GetGridSelctedvalue",
+            });
+            // To bind dropdown on page load
+            $.ajax({
+                success: function () {
+                    confirm('Please note that in the case of multiple selections of employee releases, the nonstandard salary component value has to be changed manually... ?');
+                }
+
+            });
+        });
+
+
+
+        $('.popup_radio_button').controlgroup();
+        $('.structclass').selectmenu().selectmenu("menuWidget");
+
+
+        $('#MyTable').MultiLevelInlineEditGrid({
+            url: "@Url.Action("Emp_Grid", "IncrementServiceBook")",
+            columnname: ["Code", "Name", "Id"],
+            childheader: ["Release", "ReleaseDate", "Activity", "ActivityDate", "OldFunc", "NewFunc", "OldPay", "NewPay", "Narration", "Id"], //"IsBasicChangeApp", "NewBasic",
+            childurl: "@Url.Action("Get_OthServBook", "OtherServiceBook")",
+            tableheader: "Other Service Book",
+            childurlColumnNo: "3"
+        });
+
+        $.DataTableChildManipulation = function (init, id, parentid, htmurl, editurl, submiturl) {
+            // console.log($(init).parents('tr:eq(0)'));
+            var parent_element = $(init).parents('td:last').parent().prev();
+            //var element = $(init).parents('tr:eq(0)');
+            console.log(id);
+            console.log(htmurl);
+            console.log(parent_element);
+            //   console.log(element);
+            var dt = $('#MyTable').DataTable();
+
+            var htmlcomponant = {
+                init: init,
+                Id: id,
+                idx: parentid,
+                htmurl: htmurl,
+                editurl: editurl,
+                submiturl: submiturl,
+            };
+            if ($(init).hasClass('ui-icon-newwin')) {
+                //    $('<div></div>').PartialCreateDialog({
+                //        height: 'auto',
+                //        width: 'auto',
+                //        form: "#frm-YearlyPaymentT-partial",
+                //        htmlurl: htmurl,
+                //        state: "open",
+                //        mode: "View",
+                //        editurl: editurl,
+                //        submiturl: submiturl,
+                //        editdata: id,
+                //        forwarddata: id,
+                //        returndatafunction: function (data) {
+                //            $.each(data.data, function (i, k) {
+                //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                //                $('#yearlypayment-Narration').val(k.NarrationP);
+                //            });
+                //        }
+                //    });
+                //} else if ($(init).hasClass('ui-icon-pencil')) {
+                //    $('<div></div>').PartialCreateDialog({
+                //        height: 'auto',
+                //        width: 'auto',
+                //        form: "#frm-YearlyPaymentT-partial",
+                //        htmlurl: htmurl,
+                //        state: "open",
+                //        mode: "Edit",
+                //        editurl: editurl,
+                //        submiturl: submiturl,
+                //        editdata: id,
+                //        forwarddata: id,
+                //        returndatafunction: function (data) {
+                //            $.each(data.data, function (i, k) {
+                //                $('#yearlypayment-AmountPaid').val(k.AmountPaidP);
+                //                $('#yearlypayment-TDSAmount').val(k.TDSAmountP);
+                //                $('#yearlypayment-OtherDeduction').val(k.OtherDeductionP);
+                //                $('#yearlypayment-Narration').val(k.NarrationP);
+                //            });
+                //        },
+                //        submitfun: function (data) {
+                //            var row = dt.row(parent_element);
+                //            if (row.child.isShown()) {
+                //                parent_element.removeClass('details');
+                //                row.child.hide();
+                //            }
+                //        }
+                //    });
+            } else if ($(init).hasClass('ui-icon-trash')) {
+                $('<div></div>').PartialCreateDialog({
+                    state: "open",
+                    mode: "Delete",
+                    submiturl: "@Url.Action("GridDelete")",
+                    forwarddata: id,
+                    submitfun: function (data) {
+                        var row = dt.row(parent_element);
+                        if (row.child.isShown()) {
+                            parent_element.removeClass('details');
+                            row.child.hide();
+                        }
+                    }
+                });
+            }
+        };
+
+        $('#OldFuncT-table').prop("disabled", true);
+        $('#OldPayT-table').prop("disabled", true);
+        $('#OldGeoT-table').prop("disabled", true);
+        $('#OldPayScalelist').prop("visible", false);//newly added 15042017
+        $('#NewPayScalelist').prop("visible", false);//newly added 15042017
+
+        @*$('#NewPayScalelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "OtherServiceBook")',"", ""); // To bind dropdown on page load*@
+        var Empdata = {
+            Get: $('#Emp').val(),
+            Set: function (data) {
+                $('#Emp').val(data);
+            },
+            Remove: function () {
+                $('#Emp').val()
+            }
+
+        };
+        $('#Employee-Table').on('click', 'input:checkbox:gt(0)', function (e) {
+            //  $('input[type="checkbox"]').not(this).prop("checked", false);
+            if (this.checked) {
+                var id = $(this).val();
+                Empdata.Set(id);
+                $('#NewFuncT-table').find('tr:gt(0)').remove();
+                $('#NewPayT-table').find('tr:gt(0)').remove();
+                $('#NewGeoT-table').find('tr:gt(0)').remove();
+
+                $('#OtherActivitylist').SelectMenuAppend('@Url.Action("PopulateDropDownActivityList", "OtherServiceBook")', id, "OTHERACTIVITY");
+                $('#OtherActivitylist').SelectMenuOnChange("@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")", "#otherpolicy_drop", id, "OTHERPOLICY");
+                //   $('#otherpolicy_drop').SelectMenuOnChange("@Url.Action("PopulateDropDownList")", "#leavingreason_drop", id, "OTHERACTIVITY");
+                //$('#OtherActivitylist').SelectMenuOnChange("@@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")", "#otherpolicy_drop", id, "OTHERPOLICY");
+
+                //$('#reasonleaving_drop').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+                @*$('#leavingreason_drop').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "OtherServiceBook")", '#leavingreason_drop', "");*@
+                @*$('#OtherActivitylist').SelectMenuAppend('@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', id, "OTHERACTIVITY");
+                    $('#OtherActivitylist').SelectMenuOnChange("@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")", "#reasonleaving_drop", id, "OTHERPOLICY");*@
+            }
+            else {
+                Empdata.Remove();
+                return false;
+            }
+        });
+        function appenddata(id) {
+
+            @*$.get("@Url.Action("Getstruct", "OtherServiceBook")", { data: id }, function (jsondata) {
+
+                    if (jsondata != null) {
+                        $.each(jsondata, function (i, k) {
+                            $.each(k.fun, function (i, k) {
+                                $("#OldFuncT-table").val(k.value);
+                            });
+                            $.each(k.pay, function (i, k) {
+                                $("#OldPayT-table").val(k.value);
+
+                            });
+                            $.each(k.geo, function (i, k) {
+                                $("#OldGeoT-table").val(k.value);
+
+                            });
+                        });
+                    }
+                });*@
+
+            $.post("@Url.Action("GetStruct", "OtherServiceBook")", { empid: id }, function (data) {
+
+                $.each(data[0], function (i, k) {
+                    $('#NewFuncT-table').P2BTransactionTableSelected([k.code]);
+                    if (k.value != null || k.value != "") {
+                        $("#OldFuncT-table").val(k.value);
+                    }
+                });
+                $.each(data[1], function (i, k) {
+                    $('#NewPayT-table').P2BTransactionTableSelected([k.code]);
+                    if (k.value != null || k.value != "") {
+                        $("#OldPayT-table").val(k.value);
+                    }
+                });
+                $.each(data[2], function (i, k) {
+                    $('#NewGeoT-table').P2BTransactionTableSelected([k.code]);
+                    if (k.value != null || k.value != "") {
+                        $("#OldGeoT-table").val(k.value);
+                    }
+                });
+            });
+        };
+        $('#OtherActivitylist').on('selectmenuopen', function () {
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+            console.log(a);
+            if (a != null && a.length > 0) {
+            } else {
+                alert('Select Employee..!');
+                $('#OtherActivitylist').selectmenu('refresh');
+            }
+        });
+
+        @*$('#OtherActivitylist').on('selectmenuchange', function () {
+              var act=  $('#OtherActivitylist option:selected').text();
+            //  alert(act);
+              $('#leavingreason_drop').SelectMenuAppend('@Url.Action("PopulateDropDownList", "OtherServiceBook")', act, "leavingreason_drop");
+            });*@
+
+        $('#otherpolicy_drop').on('selectmenuchange', function () {
+            ////debugger;
+            var a = $('#Employee-Table').P2BGetTableDataonSelectedRow('#Employee-Table', 1);
+
+            if (a != null && a.length > 0) {
+                $.post("@Url.Action("GetApplicableData")", { data: $(this).val(), data2: a[0] }, function (data) {
+                    @*$('#otherpolicy_drop').P2BSelectMenuOnChange("selectmenuchange", "@Url.Action("PopulateDropDownList", "OtherServiceBook")", '#leavingreason_drop', "");*@
+
+                    console.log("-------------------");
+                    console.log(data);
+                    console.log("-------------------");
+                    if (data != null) {
+
+                        var id = a[0];
+                        appenddata(id);
+
+                        var NameR = $('#OtherActivitylist option:selected').text();
+                        console.log(NameR);
+                        //alert(NameR);
+                        if (NameR.includes("RETIREMENT") || NameR.includes("EXPIRED") || NameR.includes("RESIGNED") || NameR.includes("TERMINATION")) {
+                            $('#Other_Narration').hide();
+                            // alert('r');
+                            //   $('#leavingreason_drop').P2BSelectMenuOnChange("selectmenuchange", "@@Url.Action("PopulateDropDownList", "OtherServiceBook")", '#leavingreason_drop', "");
+                            $('#leavingreason_drop').SelectMenuAppend('@Url.Action("PopulateDropDownList", "OtherServiceBook")', data[0].Id, "leavingreason_drop");
+                        } else {
+                            //$('#leavingreason_drop').find('option').remove().end().append('<option value="0"></option>');
+                            $('#leavingreason_drop').SelectMenuAppend('@Url.Action("", "")', data[0].Id, "");
+                            $('#Other_Narration').show();
+                        }
+                        @*$('#OldPayScaleAgreementlist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleAgreementList", "OtherServiceBook")', "", ""); // To bind dropdown on page load
+
+                             $('#OldPayScalelist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownPayscaleList", "OtherServiceBook")', "", ""); // To bind dropdown on page load*@
+
+                        $('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWGEO"], true);
+                        //    $('#OldGeoT-table').P2BTransactionTable('#OldGeoT-search', '#case-OldGeoT', '@@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWGEO"], true);
+
+
+                        //$('#NewGeoT-table').P2BTransactionTable('#NewGeoT-search', '#case-NewGeoT', '@@Url.Action("GetNewGeoStructDetails")', [id, "NewGeoT"], true);
+
+                        $('#NewPayT-table').P2BTransactionTable('#NewPay-search', '#case-Newpay', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWJOBSTATUS"], true);
+                        //  $('#OldPayT-table').P2BTransactionTable('#OldPay-search', '#case-Oldpay', '@@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "OLDJOBSTATUS"], true);
+
+                        $('#NewFuncT-table').P2BTransactionTable('#NewFuncT-search', '#case-NewFunct', '@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "NEWFUNC"], true);
+                        //        $('#OldFuncT-table').P2BTransactionTable('#OldFuncT-search', '#case-OldFunct', '@@Url.Action("PopulateDropDownFunction", "ServiceBookPolicy")', [id, "OLDFUNC"], true);
+                        @*$('#NewPayT-table').P2BTransactionTable('#NewPay-search', '#case-Newpay', '@Url.Action("GetNewPayStructDetails","ServiceBookPolicy")', "");
+
+                            $('#NewFuncT-table').P2BTransactionTable('#NewFuncT-search', '#case-NewFunct', '@Url.Action("GetNewFuncStructDetails","ServiceBookPolicy")', "");*@
+                        $.each(data, function (i, k) {
+                            //console.log(k.IsFuncSructChange);
+                            if (k.IsFuncStructChange == true) {
+                                $('#FunctStruct-div').show();
+                            } else {
+                                $('#FunctStruct-div').hide();
+                            }
+                            if (k.IsPayJobStatusChange == true) {
+                                $('#JobStatus-div').show();
+                            } else {
+                                $('#JobStatus-div').hide();
+                            }
+                        });
+                        $('#payscale-div,#Geo-div').hide();
+                    }
+
+
+                });
+            } else {
+                alert('Select Employee..!');
+                $('#otherpolicy_drop').selectmenu('refresh');
+            }
+        });
+
+        $('#Employee-Table').OnClickFormReset('#frmOtherServiceBook', '#Emp', function () {
+            $('#JobStatus-div').show();
+            $('#FunctStruct-div,#payscale-div,#Geo-div').show();
+
+        });
+
+        $('#leavingreason_drop').on('selectmenuchange', function () {
+            if ($('#leavingreason_drop option:selected').text() == "Other") {
+                $('#Other_Narration').show();
+            }
+            else { $('#Other_Narration').hide(); }
+        });
+
+        $('#Other_Narration').hide();
+
+        $('#Btn-Upload-Data').on('click', function (e) {
+            ////debugger;
+            $('<div></div>').PartialCreateDialog({
+                height: '500',
+                width: '700',
+                form: '#frmlookup',
+                title: 'Upload',
+                htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
+                state: "open",
+                mode: 'edit',
+                editurl: null,
+                submiturl: null,
+                editdata: 'a',
+                forwarddata: 'a',
+                returndatafunction: function (data) {
+                    console.log(data);
+                },
+                submitfun: function (data) {
+                    console.log(data);
+                }
+            });
+
+            e.preventDefault();
+        });
+
+    });
+    </script>
+
+    <style>
+        .without-btn {
+            height: 216px;
+        }
+
+        .icon-row {
+            position: relative;
+            left: 61px;
+            top: -150px;
+        }
+
+
+        .popup-content-label {
+            display: block;
+            float: left;
+            width: 101px;
+        }
+
+        .popup-content-textbox {
+            margin-bottom: 1px;
+            min-width: 150px;
+        }
+
+        .popup-content-textbox-long {
+            margin-bottom: 1px;
+            width: 290px;
+        }
+
+        .FormYearlypymentt {
+            margin-left: 298px;
+            margin-top: 15px;
+        }
+
+
+        .FormRelaseYearlypymentt {
+            margin-top: 10px;
+        }
+
+        .FormYearlypymentt {
+            margin-top: 10px;
+            height: 945.95px;
+        }
+
+        .newcontentdiv {
+            float: right;
+        }
+
+        .transactiontable {
+            height: 187px;
+        }
+
+
+        .oldstruct-div {
+            width: 192px;
+            float: left;
+            margin: 1px 105px;
+            position: relative;
+        }
+
+        .newstruct-div {
+            float: left;
+            width: 193px;
+            margin: 3px auto;
+        }
+
+        .oldstruct-label-class {
+            margin: 0 44px;
+            font-weight: bold;
+        }
+
+        .oldstruct-textarea-class {
+            height: 192px;
+        }
+
+        .row3 {
+            display: inline-block;
+            width: 563px;
+        }
+
+        .row1 {
+            /*display: inline-block;*/
+            width: 563px;
+        }
+        .newcontentdiv1 {
+            font-family: Verdana;
+            font-size: 1.2em;
+            float: right;
+        }
+        .row4 {
+            display: inline-block;
+            width: 510px;
+            right: 288px;
+            position: absolute;
+            top: 239px;
+        }
+
+        .earnamt1 {
+            float: right;
+            min-width;
+        }
+
+        .earnamt {
+            width: 50px;
+            /* Adjust as needed */
+            margin-left: 10px;
+            /* Adjust margin for spacing */
+        }
+
+        .earn-container {
+            margin-bottom: 10px; /* Adjust spacing between salary heads */
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <button class="button" id="add">Add</button>
+                <button class="button" id="release">Release</button>
+                <button class="button" id="Btn-Upload-Data">Upload</button>
+                @*   <button class="button" id="filterShow">filterShow</button>*@
+            </div>
+        </div>
+    </div>
+
+    <div id="Grid_Form">
+        <div>
+            <div id="Container" class="container">
+                <div id="Demo">
+                    <table id="MyTable" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>DD</th>
+                                <th>EmployeeCode</th>
+                                <th>EmployeeName</th>
+                                <th>ID</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="Create_Dialog" title="Create Other ServiceBook">
+        <div class="filter-div">
+            <label class="advance_filter_label">Advance Filter<span class="advance_filter_sysmbol_class_plus" id="Advance-Filter-Symbol"></span></label>
+            <div id="FormFilter"></div>
+        </div>
+        <div class="fileremployee">
+            <div class="employee-transcationdiv" style="float:left">
+                <div><label>Search : </label><input type="text" id="Employee-Search" /></div>
+                <table cellspacing="0" cellpadding="1" class="employee-transcationtable" id="Employee-Table">
+                    <tr><th><input type="checkbox" id="Case-Employee" /></th><th>Employee</th></tr>
+                </table>
+            </div>
+        </div>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmOtherServiceBook", name = "frmOtherServiceBook" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="geo_id" class="filter_structure_id" name="geo_id" />
+            <input id="pay_id" class="filter_structure_id" name="pay_id" />
+            <input id="fun_id" class="filter_structure_id" name="fun_id" />
+            <input type="text" id="Emp" class="filter_structure_id" name="Employee-Table" />
+            <div class="FormYearlypymentt">
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.OthServiceBookActivity, "Activity:", new { @class = "popup-content-label" })<select id="OtherActivitylist" class="structclass" name="OtherActivitylist" style="width:159px;"><option value="0">-Select-</option></select>
+                    <div class="newcontentdiv">
+                        @Html.LabelFor(m => m.ProcessOthDate, "ProcessDate:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ProcessOthDate, new { @class = "popup-content-textbox must" })
+                    </div>
+                </div>
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">OtherPolicy:</label><select id="otherpolicy_drop" class="structclass" name="otherpolicy" style="width:159px;"></select>
+                </div>
+                @*<div class="row3 content_margine">
+                   
+                </div>*@
+                <div id="payscale-div">
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OldPayScale, "Old Payscale:", new { @class = "popup-content-label" })<select id="OldPayScalelist" class="structclass" name="OldPayScalelist" style="width:159px;"><option value="0">-Select-</option></select>
+                        <div class="newcontentdiv">
+                            @Html.LabelFor(m => m.NewPayScale, "New Payscale:", new { @class = "popup-content-label" })<select id="NewPayScalelist" class="structclass" name="NewPayScalelist" style="width:159px;"><option value="0">-Select-</option></select>
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OldPayScaleAgreement, "OldAgreement:", new { @class = "popup-content-label" })<select id="OldPayScaleAgreementlist" class="structclass" name="OldPayScaleAgreementlist" style="width:159px;"><option value="0">-Select-</option></select>
+
+                        <div class="newcontentdiv">
+                            @Html.LabelFor(m => m.NewPayScaleAgreement, "NewAgreement:", new { @class = "popup-content-label" })<select id="NewPayScaleAgreementlist" class="structclass" name="NewPayScaleAgreementlist" style="width:159px;"><option value="0">-Select-</option></select>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="filterdivcollection"></div>
+                <div id="FunctStruct-div">
+
+                    <div class="oldstruct-div">
+
+                        <label class="oldstruct-label-class">Old FunctStruct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldFuncT-table"></textarea>
+                    </div>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv1 without-btn">
+                            <div><label>Search : </label><input type="text" id="NewFuncT-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewFuncT-table">
+                                <tr><th><input type="checkbox" id="case-NewFunct" /></th><th>New FunctStruct</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="JobStatus-div">
+
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old JobStatus</label>
+                        <textarea class="oldstruct-textarea-class" id="OldPayT-table"></textarea>
+
+                    </div>
+                    <div class="newstruct-div">
+                        <div class="transactiondiv1 without-btn">
+                            <div><label>Search : </label><input type="text" id="NewPay-search" /></div>
+                            <table cellspacing="0" cellpadding="1" class="transactiontable" id="NewPayT-table">
+                                <tr><th><input type="checkbox" id="case-Newpay" /></th><th>New JobStatus</th></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="Geo-div">
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old Geo Struct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldGeoT-table"></textarea>
+                    </div>
+                </div>
+
+
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.IsBasicChangeAppl, "IsBasicChange :", new { @class = "popup-content-label" })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="BasicFlag_radio1" name="BasicFlag" value="true" /><label for="BasicFlag_radio1">Yes</label>
+                        <input type="radio" id="BasicFlag_radio2" name="BasicFlag" value="false" checked="checked" /><label for="BasicFlag_radio2">No</label>
+                        <div class="newcontentdiv1">@Html.LabelFor(m => m.NewBasic, "NewBasic:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.NewBasic, new { @class = "popup-content-textbox", id = "Incr_NewBasic" })</div>
+                    </div>
+                   
+                </div>
+
+                <div class="row3 content_margine">
+                    <label class="popup-content-label">ReasonForLeaving:</label><select id="leavingreason_drop" class="structclass" name="leavingreason_drop" style="width:159px;"><option value="0">-Select-</option></select>
+                    <div class="newcontentdiv" id="Other_Narration">
+                        @Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-textbox" })
+                    </div>
+                </div>
+
+            </div>
+            
+           
+            @*<div class="row3 content_margine">
+                <label class="popup-content-label">ReasonForLeaving:</label><select id="leavingreason_drop" class="structclass" name="leavingreason" style="width:159px;"></select>
+                    <div class="newcontentdiv">
+                        <div class="row2 content_margine">@Html.LabelFor(m => m.Narration, "Narration:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.Narration, new { @class = "popup-content-narration must", id = "Other_Narration" })</div>
+                    </div>
+           </div>*@
+
+        }
+    </div>
+
+    <div id="CreateRelease_dialog" title="Create otherservicebook Release">
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmOtherServBookRelease", name = "frmOtherServBookRelease" }))
+        {
+            <input id="Autho_Action" type="hidden" name="Autho_Action" />
+            <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
+            <input id="emp_Id" class="filter_structure_id" name="emp_Id" />
+    <input id="Activity_Id" class="filter_structure_id" name="Activity_Id" />
+            <div class="Release_grid">
+                <div id="Grid_Form_release">
+                    <div>
+                        <table id="JqGrid_release"></table>
+                        <div id="pager2_release"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="FormRelaseYearlypymentt">
+                @*<div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OthServiceBookActivity, "Activity:", new { @class = "popup-content-label" })<input type="text" class="popup-content-textbox must" />
+                        <div class="newcontentdiv">
+                            @Html.LabelFor(m => m.ProcessOthDate, "ProcessOthDate:", new { @class = "popup-content-label must" })<input type="text" id="txtProcessOthDaterelease" name="txtProcessOthDaterelease" class="popup-content-textbox must" />
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OldPayScale, "Old Payscale:", new { @class = "popup-content-label" }) <input type="text" id="txtOldPayScalerelease" name="txtOldPayScalerelease" class="popup-content-textbox must" />
+                        <div class="newcontentdiv">
+                            @Html.LabelFor(m => m.NewPayScale, "New Payscale:", new { @class = "popup-content-label" }) <input type="text" id="txtNewPayScalerelease" name="txtNewPayScalerelease" class="popup-content-textbox must" />
+                        </div>
+                    </div>
+                    <div class="row3 content_margine">
+                        @Html.LabelFor(m => m.OldPayScaleAgreement, "OldAgreement:", new { @class = "popup-content-label" }) <input type="text" id="txtOldPayScaleAgreementrelease" name="txtOldPayScaleAgreementrelease" class="popup-content-textbox must" />
+
+                        <div class="newcontentdiv">
+                            @Html.LabelFor(m => m.NewPayScaleAgreement, "NewAgreement:", new { @class = "popup-content-label" }) <input type="text" id="txtNewPayScaleAgreementrelease" name="txtNewPayScaleAgreementrelease" class="popup-content-textbox must" />
+
+                        </div>
+                    </div>*@
+                <div class="row3 content_margine">
+                    @Html.LabelFor(m => m.ReleaseFlag, "Release Flag:", new { @class = "popup-content-label must" })
+                    <div class="popup_radio_button">
+                        <input type="radio" id="ProcessFlag_radio1" name="ReleaseFlag" value="true" /><label for="ProcessFlag_radio1">Yes</label>
+                        <input type="radio" id="ProcessFlag_radio2" name="ReleaseFlag" value="false" checked="checked" /><label for="ProcessFlag_radio2">No</label>
+                    </div>
+
+                </div>
+
+                <div class="row1 content_margine">@Html.LabelFor(m => m.ReleaseDate, "Release Date:", new { @class = "popup-content-label must" })@Html.TextBoxFor(m => m.ReleaseDate, new { @class = "popup-content-textbox must" })</div>
+
+                @*<div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old JobStatus</label>
+                        <textarea class="oldstruct-textarea-class" id="OldPayTRelease-table"></textarea>
+                    </div>*@
+
+                @*<div class="oldstruct-div">
+                        <label class="oldstruct-label-class">New Paystruct</label>
+                        <textarea class="oldstruct-textarea-class" id="NewPayTRelease-table"></textarea>
+                    </div>
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">Old FunctStruct</label>
+                        <textarea class="oldstruct-textarea-class" id="OldFuncTRelease-table"></textarea>
+                    </div>
+                    <div class="oldstruct-div">
+                        <label class="oldstruct-label-class">New FunctStruct</label>
+                        <textarea class="oldstruct-textarea-class" id="NewFuncTRelease-table"></textarea>
+                    </div>
+                    @*<div class="oldstruct-div">
+                            <label class="oldstruct-label-class">Old GeoStruct</label>
+                            <textarea class="oldstruct-textarea-class" id="OldGeoT-table"></textarea>
+                        </div>
+                        <div class="oldstruct-div">
+                            <label class="oldstruct-label-class">New GeoStruct</label>
+                            <textarea class="oldstruct-textarea-class" id="NewGeoT-table"></textarea>
+                        </div>*@
+            </div>
+              <div class="row3 content_margine" id="note"> 
+                    <label><b style="color:red">Note : Y-SalHeadFormula Applicable <br/>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N-SalHeadFormula Not Applicable</b> </label> 
+                </div>
+
+                <div class="row4 content_margine" id="divinline_jq" style="display:none"> 
+                    <input type="hidden" id="SalHeadCount" name="SalHeadCount" value="">
+                    <input type="hidden" id="input_hidden_field" name="input_hidden_field" value="">
+                    <table class="tbl" style="width: 850px; " id="tblinline">
+                        <tr>
+                            <td class="td1">
+                                <label><center><b style="margin-right:226px;">Old Structure</b></center></label>
+                            </td>
+                            <td class="td1">
+                                <label><center><b style="margin-right: 365px;">New Structure</b></center></label>
+                            </td>  
+                        </tr>
+                       
+                       
+                        <tr>
+                            <td class="td1" style="padding:10px;">
+                                <ul id="Earn1" float:left"></ul>
+                            </td>
+                            <td class="td1">
+                                <ul id="EarnNew" float:left"></ul>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+
+        }
+    </div>
+
+</body>
+</html>

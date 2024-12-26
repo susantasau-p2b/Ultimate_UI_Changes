@@ -1,0 +1,522 @@
+﻿@{
+    ViewBag.Title = "JV Process data";
+}
+@model Payroll.JVProcessData
+
+
+<html>
+<head>
+    <title></title>
+    <script>
+        $(function () {
+            $('button').button();
+            var ColNames = [];
+            var ColModel = [];
+            var SortName, Caption, url, width, height;
+            ColModel = ['BatchName', 'CreditAmount', 'DebitAmount', 'ProcessMonth', 'ProcessDate', 'ReleaseDate', 'JVFileName', 'Yearlypayfrom', 'Yearlypayto', 'Id'];
+            ColNames = ['Batch Name', 'Credit Amount', 'Debit Amount', 'Process Month', 'Process Date', 'Release Date', 'JV File Name', 'Yearlypayfrom', 'Yearlypayto', 'Id'];
+            SortName = 'Id';
+            Caption = 'JV Process';
+            url = '@Url.Action("P2BGrid")';
+            width = 1000;
+            height = 150;
+            $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#pager2');
+            function AssignData() {
+                dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+            }
+            var ColNamess = [];
+            var ColModels = [];
+            var SortName, Caption, url, width, height;
+            ColModels = ['Product Code', 'Creadit/Debit', 'Amount', 'Id'];
+            ColNamess = ['Batch Name', 'Creadit/Debit', 'Amount', 'Id'];
+            SortNames = 'Id';
+            Captions = 'JV Parameter';
+            urls = '@Url.Action("P2BGrid")';
+            widths = 500;
+            heights = 150;
+
+            // $('#checkifyearly').prop('checked', true);
+            $("#Showdivonview").hide();
+            $("#hideform").hide();
+            $('#dialog-Create').P2BCreateDialog();
+            $('#Create').button().on("click", function () {
+                $("#hideform").show();
+                $('#Showdivonview').hide();
+                $('#dialog-Create').trigger("reset");
+                @*$('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKInPayslipDetails", "JVProcessData")', "");*@
+
+                $('#dialog-Create').P2BCreateDialog('', '', '', '', 'Create JV File', 'open', '@Url.Action("Create", "JVProcessData")', '#dialog-Create', 'Message :', 'Request Falied :', '#JqGrid', 700, 556, '', "", function (data) {
+                });
+            });
+
+            $('#LoadParam').button().on("click", function (event) {
+                $('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKInPayslipDetails", "JVProcessData")?data=' + $('#PaymentBankC_drop').val(), "");
+            });
+
+            function DateConvert(JsonDate) {
+                var date = new Date(parseInt(JsonDate.substr(6)));
+                var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                return displayDate;
+            };
+
+
+            $('#AppearPayslip').val("True");
+            $('#checkifyearly').on('click', function (e) {
+                if ($('#checkifyearly').prop('checked')) {
+                    $('#AppearPayslip').val("True");
+                    $('#dvYear').fadeOut();
+                    // if ($('#checkifyearly :checked')) {
+                    $('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKInPayslipDetails", "JVProcessData")?data=' + $('#PaymentBankC_drop').val(), "");
+                } else {
+
+                    $('#dvYear').fadeIn();
+                    $('#AppearPayslip').val("false");
+                    $('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKNotInPayslipDetails", "JVProcessData")?data=' + $('#PaymentBankC_drop').val(), "");
+                }
+            });
+
+            $('#Load').on('click', function (e) {
+                $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+            });
+
+            $('#txtPayMonth').MonthYearPicker();
+
+            $('#Remove-jvparameters').button().on('click', function (event) {
+                // dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
+                var a = [], b;
+                a = $('#jvparameterslist').P2BGetTableDataonSelectedRow('#jvparameterslist', 0);
+                b = a[0];
+                $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#jvparameterslist', $('#jvparameterslist').val(), 200, 200, '#frmJvForm', '#jvparameterslist');
+                event.preventDefault();
+            });
+
+            $('#Lookup-jvname-jvform').on('click', function (event) {
+                $('.dialog').P2BLookUpModal('@Url.Action("GetJVNameLKInPayslipDetails")', '', 'LookupDiv', 'JVName Look Up Data', '#jvnamelist', 'jvnamelist', 5, 'jvnamelist', '#jvparameters', 'A', '', 'Lookup_table', 'PageNavPosition');
+                event.preventDefault();
+            });
+            $('#View').button().click(function (event) {
+                AssignData();
+                console.log(dt.Id);
+                @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+                $('#dialog-view').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View JV Data', '', '', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                    $.each(data[0], function (i, k) {
+                        if (k.ProcessDate != null) {
+                            $('#txtProcessDate').val(DateConvert(k.ProcessDate));
+                        }
+                        if (k.ReleaseDate != null) {
+                            $('#txtReleaseDate').val(DateConvert(k.ReleaseDate));
+                        }
+                        $('#txtBatchName').val(k.BatchName);
+                        $('#txtCreditAmount').val(k.CreditAmount);
+                        $('#txtDebitAmount').val(k.DebitAmount);
+                        $('#txtJVFileName').val(k.JVFileName);
+                        $('#txtProcessMonth').val(k.ProcessMonth);
+
+                    });
+                });
+                event.preventDefault();
+            });
+
+            $('#txtFromPeriod').P2BDatePicker();
+            $('#txtToPeriod').P2BDatePicker();
+            if ($("#txtPayMonth").val() == "") {
+                var dt = new Date();
+                var month = dt.getMonth() + 1;
+                month = month < 10 ? '0' + month : '' + month;
+                $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+            }
+
+            $('#Create-month').MonthYearPicker();
+            if ($("#Create-month").val() == "") {
+                //debugger
+                var dt = new Date();
+                var month = dt.getMonth() + 1;
+                month = month < 10 ? '0' + month : '' + month;
+                $("#Create-month").val(month + "/" + dt.getFullYear());
+            }
+
+            function month_name(dt) {
+                //date should be in format of (MM/dd/yyyy)
+                var mlist = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+                var chk = mlist[dt.getMonth()]
+                return chk;
+            };
+            // change keyup propertychange paste
+            $("#Create-month").on('change', function (e) {
+                // alert('dfsrfdfdfsrg');
+                //debugger
+                var mooo = $("#Create-month").val();
+                if (mooo != "") {
+                    //debugger
+                    var totalfullmonth = mooo.substr(0, 3) + '01/' + mooo.substr(3);
+                    //  var dt = new Date(totalfullmonth);
+                    var trt = month_name(new Date(totalfullmonth));
+                    $("#Batch").val(trt + mooo.substr(3));
+                }
+            });
+            $('#ArrFile').on("click", function (event) {
+                AssignData();
+                $.post("@Url.Action("ViewArrEcrFile")", { id: dt.Id }, function (data) {
+                    if (data != null && data != "") {
+
+                        $('#view_dialog').html(data).dialog({
+                            width: 600, height: 500
+                        });
+                    }
+                    else {
+                        $('#view_dialog').html("No data found").dialog({
+                            width: 600, height: 500
+                        });
+                    }
+                })
+
+                event.preventDefault();
+            });
+
+            $('#download_button').click(function (event) {
+                AssignData();
+                $.post("@Url.Action("Download")", { id: dt.Id }, function (data) {
+                    if (data != null && data != "") {
+                        window.location = '@Url.Action("DownloadFile", "JVProcessData")?fileName=' + data[0] + '&BatchName=' + data[1] + '&exist=' + data[2];
+                    }
+                    else {
+                        alert("Data Null");
+                    }
+                });
+                event.preventDefault();
+            });
+            function ajaxloaderv2(cameform) {
+                $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+            };
+            $('#CreateFile').button().on("click", function (event) {
+                AssignData();
+                $.ajax({
+                    url: "@Url.Action("CreateFile")",
+                    data: { PaymentBankId: $('#PaymentBank_drop').val(), mPayMonth: $('#txtPayMonth').val(), Id: dt.Id },
+                    beforeSend: function () {
+                        ajaxloaderv2('body');
+                    },
+                    success: function (data) {
+                        if (data != null) {
+                            alert(data.responseText);
+                        }
+                    },
+                    complete: function () {
+                        $('.ajax_loder').remove();
+                    }
+                });
+                event.preventDefault();
+            });
+
+            @*$.ajax({
+            url: "@Url.Action("ChkDist")",
+            success: function (data) {
+                if (data != null && data != "") {
+                    if (data == true) {
+                        $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("Polulate_PaymentBank", "JVProcessData")', "", "");
+                        //  $('#PaymentBankC_drop').P2BSelectMenuAppend('@Url.Action("Polulate_PaymentBank", "JVProcessData")', "", "");
+                        $('#dvDist').show();
+                        $('#dvPaymentBankC').show();
+                    }
+                    else {
+                        $('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKInPayslipDetails", "JVProcessData")', "");
+                        $('#dvDist').hide();
+                        $('#dvPaymentBankC').hide();
+                    }
+                }
+                else {
+                    $('#JVParameter-table').P2BTransactionTable('#JVParameter-search', '#case-jvparameter', '@Url.Action("GetJVNameLKInPayslipDetails", "JVProcessData")', "");
+                    $('#dvDist').hide();
+                    $('#dvPaymentBankC').hide();
+                }
+            },
+
+        });*@
+
+            $("#JVType_drop").on("selectmenuchange", function () {
+                if ($("#JVType_drop :selected").text().toUpperCase() == "DISTRIBUTED") {
+                    $('#dvDist').fadeIn();
+                    $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("Polulate_PaymentBank", "JVProcessData")', "", "");
+                }
+                else {
+                    $('#dvDist').fadeOut();
+                }
+            });
+
+            
+            $('#dvDist').fadeOut();
+            $('#dvYear').fadeOut();
+            $('.drop').selectmenu().selectmenu("menuWidget");
+            $('#PaymentBankC_drop').P2BSelectMenuAppend('@Url.Action("Polulate_PaymentBank", "JVProcessData")', "", "");
+            $('#JVType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, "");
+        });
+
+    </script>
+
+    <style>
+        .row1 {
+            display: block;
+        }
+
+        .row2 {
+            width: 402px;
+        }
+
+        .icon-row {
+            left: 86px;
+            position: absolute;
+            top: 51px;
+        }
+        
+        .popup-content-label {
+            width: 118px;
+            display: block;
+            float: left;
+        }
+
+        .section1_Leave {
+            display: block;
+            border: 1.5px solid rgba(207, 207, 207, 0.91);
+            height: 647px;
+            width: 534px;
+            margin: 4px auto;
+            position: absolute;
+        }
+
+        .section2_Leave {
+            display: block;
+            border: 1px solid #ddd;
+            height: 300px;
+            width: 581px;
+            margin: 5px 4px;
+            position: absolute;
+            left: 546px;
+        }
+
+        .transactiontablenew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            /*width: 200px;*/
+            display: block;
+            overflow: auto;
+            height: 500px;
+            border-collapse: collapse;
+        }
+
+        .transactiondivnew {
+            border: 1px solid #c5c5c5;
+            margin: 0 auto;
+            width: 507px;
+            border-radius: 5px;
+            height: 32px;
+        }
+
+            .transactiondivnew > div {
+                display: inline-block;
+                margin: 0 auto;
+                padding: 4px;
+            }
+
+                .transactiondivnew > div > input {
+                    box-sizing: initial;
+                    display: inline-block;
+                    margin: 0 auto;
+                    width: 108px;
+                }
+
+        .transactiontablenew th, .transactiontablenew td {
+            background: rgba(246, 246, 246, 0.64) none repeat scroll 0 0;
+            padding: 5px;
+            border-bottom: 1px solid #c5c5c5;
+            border-right: 1px solid #c5c5c5;
+            text-align: center;
+            color: rgba(114, 113, 113, 0.9);
+        }
+
+            .transactiontablenew th:nth-child(1) > input, .transactiontablenew td:nth-child(1) > input {
+                margin: 0 auto;
+            }
+
+            .transactiontablenew th:nth-child(2), .transactiontablenew td:nth-child(2) {
+                height: 100%;
+                width: 100%;
+            }
+
+        .transactiontablenew tr:hover {
+            cursor: pointer;
+            background: #EEEEEE none repeat scroll 0 0;
+        }
+
+        .addons {
+            height: 246px;
+        }
+
+        .section_Method {
+            border: 1px solid rgba(207, 207, 207, 0.91);
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #JVType_drop-button{
+            top:0.8em;
+        }
+        #PaymentBank_drop-button {
+            top: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+
+                <div class="Drop_container">
+                    <div class="For_Btn" style="width:59%;">
+                        <div style="float:left">
+                            <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
+                            <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                        </div>
+                        <button class="button" id="Load">Load</button>
+                        <button class="button" id="Create">Create</button>
+                        <button class="button" id="View">View</button>
+                        <button class="button" id="release">Release</button><br><br>
+                    </div>
+                    <div class="For_Drop" style="width:40%;float:right;margin-top:-3em;">
+                        <div style="float: left; margin-right: 3%;">
+                            <label id="lblType" class="emplist_label">JV Type:</label>
+                            <select id="JVType_drop" name="JVType_drop" class="drop" style="width:120px;top:0.8em;">
+                                <option value="0">-Select-</option>
+                            </select>
+                        </div>
+                        <div id="dvDist">
+                            <label id="lblBank" class="emplist_label">PaymentBank:</label>
+                            <select id="PaymentBank_drop" name="PaymentBank_drop" class="drop" style="width: 120px; top: 0.8em;"><option value="0">-Select-</option></select>
+                           
+                        </div>
+                        <button id="CreateFile">Create File</button>
+                    </div>
+                </div>
+
+
+                <div id="Grid_Form" style="bottom:2.5em;">
+                    <div>
+                        <table id="JqGrid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dialog">
+        <div title="LookUp Data">
+            <div class="LookupDiv"></div>
+        </div>
+        <div id="PageNavPosition">
+
+        </div>
+    </div>
+
+    <div id="view_dialog" title="File Data"></div>
+    <form name="dialog-view" style="display:none" id="dialog-view" method="post">
+
+        <div class="row2 content_margine">
+            <label id="lblBatchName" class="popup-content-label">BatchName</label>
+            <input type="text" id="txtBatchName" name="txtBatchName" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblCreditAmount" class="popup-content-label">CreditAmount</label>
+            <input type="text" id="txtCreditAmount" name="txtCreditAmount" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblDebitAmount" class="popup-content-label">DebitAmount</label>
+            <input type="text" id="txtDebitAmount" name="txtDebitAmount" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblProcessMonth" class="popup-content-label">ProcessMonth</label>
+            <input type="text" id="txtProcessMonth" name="txtProcessMonth" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblProcessDate" class="popup-content-label">ProcessDate</label>
+            <input type="text" id="txtProcessDate" name="txtProcessDate" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblReleaseDate" class="popup-content-label">ReleaseDate</label>
+            <input type="text" id="txtReleaseDate" name="txtReleaseDate" class="popup-content-textbox" />
+        </div>
+        <div class="row2 content_margine">
+            <label id="lblview" class="popup-content-label">JVFile</label>
+            <input type="text" id="txtJVFileName" name="txtJVFileName" class="popup-content-textbox" />
+            <button id="download_button">
+                Download
+            </button>
+        </div>
+    </form>
+
+    <form name="dialog-Create" style="display:none" id="dialog-Create" method="post">
+        <input id="AppearPayslip" type="hidden" name="AppearPayslip" />
+        <div class="row1">
+            <label class="popup-content-label must">Month :</label>
+            <input type="text" class="date must" id="Create-month" name="Create-month" />
+        </div>
+        <div id="dvYear">
+            <div class="row1">
+                <label id="lblFromPeriodRelease" class="popup-content-label">From Period:</label>
+                <input type="text" id="txtFromPeriod" name="txtFromPeriod" class="popup-content-textbox" />
+            </div>
+            <div class="row1">
+                <label id="lblToPeriodRelease" class="popup-content-label">To Period:</label>
+                <input type="text" id="txtToPeriod" name="txtToPeriod" class="popup-content-textbox" />
+            </div>
+        </div>
+            <div class="row1">
+                <label class="popup-content-label must">Batch :</label>
+                <input type="text" id="Batch" class="must" name="Batch" />
+            </div>
+
+            <div class="row1" id="dvPaymentBankC">
+                <label class="popup-content-label must">PaymentBank :</label>
+                <select id="PaymentBankC_drop" name="PaymentBankC_drop" class="drop" style="width:220px;"><option value="0">-Select-</option></select>
+                <button id="LoadParam">Load Parameter</button>
+            </div>
+
+            <div class="row1">
+                <input type="checkbox" id="checkifyearly" name="checkifyearly" checked="checked" />
+                <label> In PaySlip appeared Head </label>
+            </div>
+
+            <div class="section_Method">
+                <div class="heading">JVParameterList</div>
+                <div class="employeeselectiondiv">
+                    <div class="transactiondivnew dynamic addons" style="float:left">
+                        <div><label>Search : </label><input type="text" id="JVParameter-search" style="width: 425px;" /></div>
+                        <table cellspacing="0" cellpadding="1" class="transactiontablenew" id="JVParameter-table">
+                            <tr><th><input type="checkbox" id="case-jvparameter" /></th><th>JVParameterName</th></tr>
+                        </table>
+                    </div>
+                    <input name="geo_id" type="text" id="geo_id" class="struct_input_val" style="display:none" />
+                    <input name="pay_id" type="text" id="pay_id" class="struct_input_val" style="display:none" />
+                    <input name="fun_id" type="text" id="fun_id" class="struct_input_val" style="display:none" />
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+</form>
+    <form method="post" style="display:none" id="frm-release" name="frm-release">
+        <div class="row1">
+            <label class="popup-content-label">Release Date :</label>
+            <input type="text" class="date" name="ReleaseDate" />
+        </div>
+        <div class="row1">
+            <label class="popup-content-label">Comment :</label>
+            <input type="text" class="Comment" />
+        </div>
+    </form>
+</body>
+</html>

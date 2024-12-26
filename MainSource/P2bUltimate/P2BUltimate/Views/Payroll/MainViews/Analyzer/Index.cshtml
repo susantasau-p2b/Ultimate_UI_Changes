@@ -1,0 +1,163 @@
+﻿@{
+    ViewBag.Title = "Analyzer";
+}
+
+<html>
+<head>
+    <title></title>
+    <style>
+        .section2_Leave {
+            position: absolute;
+            margin-top: 22px;
+            margin-left: 91px;
+        }
+
+        #monthTable {
+            /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+            #monthTable td, #monthTable th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+        .monthTable-selected {
+            color: #8e6d87;
+            font-weight: bold;
+        }
+        /*#monthTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+        #monthTable tr:hover {
+            background-color: #ddd;
+        }
+
+        #monthTable th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #009282;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="Form_Bg">
+        <div class="Form_Input">
+            <div class="Button_Container">
+                <div class="row3 content_margine" style="width: 420px;">
+                    <div style="float:left"><label>QType:</label></div>
+                    <div style="float:left">
+                        <select class="drop" style="width:120px;" name="QTypelist" id="QTypelist">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row3 content_margine" style="width: 420px;">
+                    <div style="float:left"><label>QLabel:</label></div>
+                    <div style="float:left">
+                        <select class="drop" style="width:120px;" name="QLabellist" id="QLabellist">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                    @*<button class="button" id="iRun">Run</button>*@
+                    <a href="#" class="button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-typeofbtn="export" style="height: 24px; width: 145px;" id="iExportExcel">
+                        <span class="ui-button-text">Export To Excel</span>
+                    </a>
+                    @*<a href="#" class="button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-typeofbtn="export" style="height: 24px;" id="iExportPdf">
+                <span class="ui-button-text">ExporttoPdf</span>
+            </a>*@
+                    @*<button class="button" id="iExportExcel">ExporttoExcel</button>
+            <button class="button" id="iExportPdf">ExporttoPdf</button>*@
+                </div>
+        </div>
+    </div>
+    
+</body>
+</html>
+<script>
+    $(document).ready(function (e) {
+        $('button').button();
+        $('#QLabellist').selectmenu().selectmenu("menuWidget");
+        $('#QTypelist').selectmenu().selectmenu("menuWidget");
+        $('#QTypelist').P2BSelectMenuAppend('@Url.Action("GetQTypelistData", "Query_Analyzer")', "", "");
+        
+        $('#QTypelist').on('selectmenuchange', function () {
+            var ievalue = $("#QTypelist option:selected").text();
+            if (ievalue == "Engineer") {
+                var newDiv = $(document.createElement('div'));
+                var htmltag = '<input type = "password" id="passwordInput" />';
+                newDiv.html(htmltag);
+                newDiv.dialog({
+                    autoOpen: false,
+                    title: "CheckPassword",
+                    height: 250,
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        Submit: function () {
+                            var pwd = $('#passwordInput').val();  
+                            if (pwd == "P2b@1234") {
+                                alert('Password is Matched.');
+                                $('#QLabellist').P2BSelectMenuAppend('@Url.Action("GetQueryLabelData", "Analyzer")?Type=' + $("#QTypelist option:selected").text(), '', "");
+                                newDiv.dialog("close");
+                               
+                            }
+                            else {
+                                alert('Please enter proper password.');
+                            }
+                           
+                        }
+                    }
+                });
+
+                newDiv.dialog('open');
+            }
+            else { $('#QLabellist').P2BSelectMenuAppend('@Url.Action("GetQueryLabelData", "Analyzer")?Type=' + ievalue, '', ""); } 
+        });
+     
+        $('#iExportExcel').button().on("click", function (e) {
+            ajaxloaderv2('body');
+            var ivalue = $("#QLabellist option:selected").val();
+            if (ivalue != 0) {
+                console.log(ivalue.toString());
+                $('#iExportExcel').attr('href', "Analyzer/ExportToExcel?data=" + ivalue.toString());
+
+            } else if (ivalue == 0) {
+                alert("Please Select The Record");
+                return false;
+            } else
+                if (ivalue.length > 1) {
+                    alert("Please Select Only One Record");
+                    return false;
+                } 
+            $('.ajax_loder').remove();
+        });
+
+        function ajaxloaderv2(cameform) {
+            $('<a><i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw ajax_loder" style="color: rgba(27, 187, 173, 0.93);z-index:999;" aria-hidden="true"></i></a>').appendTo(cameform);
+        };
+
+        $('#iExportPdf').button().on("click", function (e) {
+
+            if (ivalue != 0) {
+                console.log(ivalue.toString());
+                $('#iExportPdf').attr('href', "Analyzer/ExportToPDF?data=" + ivalue.toString());
+
+            } else if (ivalue == 0) {
+                alert("Please Select The Record");
+                return false;
+            } else
+                if (ivalue.length > 1) {
+                    alert("Please Select Only One Record");
+                    return false;
+                }
+
+        });
+    });
+</script>
