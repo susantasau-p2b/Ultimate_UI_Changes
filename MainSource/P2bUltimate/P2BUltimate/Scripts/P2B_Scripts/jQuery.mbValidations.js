@@ -366,7 +366,7 @@
                 pos = $(control).next().offset();
                 parentdivpos = $(parentdiv).offset();
                 w = $(control).width();
-                console.log("Hi- ", pos.left, parentdivpos, control, parentdiv, w);
+                //console.log("Hi- ", pos.left, parentdivpos, control, parentdiv, w);
                 $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left + w });
             } else {
                 if ($(control).is(':checkbox')) {
