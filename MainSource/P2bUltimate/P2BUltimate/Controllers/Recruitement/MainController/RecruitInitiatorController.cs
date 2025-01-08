@@ -460,7 +460,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         db_data.RecruitBatchInitiator = null;
                     }
-                    // string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    // string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string CatVal = form["WFStatusdrop"] == "0" ? null : form["WFStatusdrop"];
                     if (CatVal != null)
                     {

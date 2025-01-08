@@ -957,7 +957,7 @@
                 },
                 inlinedit: {
                     inputClass: "ui-widget-content ui-corner-all",
-                    icon_edit_nav: "ui-icon-pencil",
+                    icon_Edit_nav: "ui-icon-pencil",
                     icon_add_nav: "ui-icon-plus",
                     icon_save_nav: "ui-icon-disk",
                     icon_cancel_nav: "ui-icon-cancel"
@@ -972,7 +972,7 @@
                     icon_cancel: "ui-icon-cancel"
                 },
                 navigator: {
-                    icon_edit_nav: "ui-icon-pencil",
+                    icon_Edit_nav: "ui-icon-pencil",
                     icon_add_nav: "ui-icon-plus",
                     icon_del_nav: "ui-icon-trash",
                     icon_search_nav: "ui-icon-search",
@@ -1073,7 +1073,7 @@
                 },
                 inlinedit: {
                     inputClass: 'form-control',
-                    icon_edit_nav: "glyphicon-edit",
+                    icon_Edit_nav: "glyphicon-edit",
                     icon_add_nav: "glyphicon-plus",
                     icon_save_nav: "glyphicon-save",
                     icon_cancel_nav: "glyphicon-Remove-circle"
@@ -1088,7 +1088,7 @@
                     icon_cancel: "glyphicon-Remove-circle"
                 },
                 navigator: {
-                    icon_edit_nav: "glyphicon-edit",
+                    icon_Edit_nav: "glyphicon-edit",
                     icon_add_nav: "glyphicon-plus",
                     icon_del_nav: "glyphicon-trash",
                     icon_search_nav: "glyphicon-search",
@@ -3388,6 +3388,7 @@
                     }
                 }
             }).bind('reloadGrid', function (e, opts) {
+
                 if (ts.p.treeGrid === true) { ts.p.datatype = ts.p.treedatatype; }
                 opts = opts || {};
                 if (opts.current) {
@@ -9254,7 +9255,7 @@
                 commonstyle = $.jgrid.styleUI[currstyle].common;
             p = $.extend({
                 edit: true,
-                editicon: styles.icon_edit_nav,
+                editicon: styles.icon_Edit_nav,
                 add: true,
                 addicon: styles.icon_add_nav,
                 del: true,
@@ -9382,7 +9383,7 @@
                         $(tbd).append("<div class='ui-pg-div'><span class='" + commonstyle.icon_base + " " + o.editicon + "'></span>" + o.edittext + "</div>");
                         $("tr", navtbl).append(tbd);
                         $(tbd, navtbl)
-                        .attr({ "title": o.edittitle || "", id: pEdit.id || "edit_" + elemids })
+                        .attr({ "title": o.edittitle || "", id: pEdit.id || "Edit_" + elemids })
                         .click(function () {
                             if (!$(this).hasClass(commonstyle.disabled)) {
                                 var sr = $t.p.selrow;
@@ -9490,6 +9491,9 @@
                                 if ($.isFunction(o.beforeRefresh)) { o.beforeRefresh.call($t); }
                                 $t.p.search = false;
                                 $t.p.resetsearch = true;
+                                var sdata = {};
+                                sdata['searchField'] = sdata['searchString'] = sdata['searchOper'] = "";
+                                $.extend($t.p.postData, sdata);
                                 try {
                                     if (o.refreshstate !== 'currentfilter') {
                                         var gID = $t.p.id;
@@ -9724,7 +9728,7 @@
                     }
                     if (p.edit) {
                         pEdit = pEdit || {};
-                        eid = pEdit.id || "edit_" + elemids;
+                        eid = pEdit.id || "Edit_" + elemids;
                         itm = $('<li class="ui-menu-item" role="presentation"><a class="' + commonstyle.cornerall + ' g-menu-item" tabindex="0" role="menuitem" id="' + eid + '">' + (p.edittext || p.edittitle) + '</a></li>').click(function () {
                             if (!$(this).hasClass(commonstyle.disabled)) {
                                 var sr = $t.p.selrow;
@@ -11507,7 +11511,7 @@
             icons = $.jgrid.styleUI[$t.p.styleUI].inlinedit;
             o = $.extend(true, {
                 edit: true,
-                editicon: icons.icon_edit_nav,
+                editicon: icons.icon_Edit_nav,
                 add: true,
                 addicon: icons.icon_add_nav,
                 save: true,

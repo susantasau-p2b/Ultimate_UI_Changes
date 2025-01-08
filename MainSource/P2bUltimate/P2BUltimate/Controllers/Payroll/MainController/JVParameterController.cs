@@ -299,7 +299,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                     string CreditDebitFlag = form["CreditDebitFlag"] != null ? form["CreditDebitFlag"] : "";
                     jv.CreditDebitFlag = CreditDebitFlag;
                     string salaryheadslist = form["salaryheadslist"] != null ? form["salaryheadslist"] : "";
-                    string Group_drop = form["Group_drop"] != null ? form["Group_drop"] : "";
+                    string GroupList_DDL = form["GroupList_DDL"] != null ? form["GroupList_DDL"] : "";
                     string Branch_drop = form["Branch_drop"] != null ? form["Branch_drop"] : "";
                     string NarrationFormat = form["NarrationFormat"] != null ? form["NarrationFormat"] : "";
                     jv.NarrationFormat = NarrationFormat;
@@ -316,9 +316,9 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         var value = db.Bank.Find(jv.PaymentBank_Id);
                         jv.PaymentBank = value;
                     }
-                    if (Group_drop != null && Group_drop != "-Select-")
+                    if (GroupList_DDL != null && GroupList_DDL != "-Select-")
                     {
-                        var value = db.LookupValue.Find(int.Parse(Group_drop));
+                        var value = db.LookupValue.Find(int.Parse(GroupList_DDL));
                         jv.JVGroup = value;
 
                     }
@@ -715,7 +715,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 {
                     string CreditDebitFlag = form["CreditDebitFlag"] != null ? form["CreditDebitFlag"] : "";
                     string salaryheadslist = form["salaryheadslist"] != null ? form["salaryheadslist"] : "";
-                    string Group_drop = form["Group_drop"] != null ? form["Group_drop"] : "";
+                    string GroupList_DDL = form["GroupList_DDL"] != null ? form["GroupList_DDL"] : "";
                     string Branch_drop = form["Branch_drop"] != null ? form["Branch_drop"] : "";
                     string PaymentBank_drop = form["PaymentBank_drop"] != null ? form["PaymentBank_drop"] : "";
                     string SourceType_drop = form["SourceType_drop"] != null ? form["SourceType_drop"] : "";
@@ -835,13 +835,13 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                             ModifiedBy = SessionManager.UserName,
                             ModifiedOn = DateTime.Now
                         };
-                        if (Group_drop != null)
+                        if (GroupList_DDL != null)
                         {
-                            if (Group_drop != "" && Group_drop != "0" && Group_drop != "-Select-")
+                            if (GroupList_DDL != "" && GroupList_DDL != "0" && GroupList_DDL != "-Select-")
                             {
-                                var val = db.LookupValue.Find(int.Parse(Group_drop));
+                                var val = db.LookupValue.Find(int.Parse(GroupList_DDL));
                                 jv.JVGroup = val;
-                                jv.JVGroup_Id = int.Parse(Group_drop);
+                                jv.JVGroup_Id = int.Parse(GroupList_DDL);
                                 var type = db.JVParameter.Include(e => e.JVGroup).Where(e => e.Id == data).SingleOrDefault();
                                 IList<JVParameter> typedetails = null;
                                 if (type.JVGroup != null)
@@ -898,7 +898,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         company_Id = Convert.ToInt32(Session["CompId"]);
                         var companypayroll = new CompanyPayroll();
                         companypayroll = db.CompanyPayroll.Include(a => a.JVParameter).Where(e => e.Company.Id == company_Id).SingleOrDefault();
-                        if (Group_drop == "535")
+                        if (GroupList_DDL == "535")
                         {
                             var CurCorp = db.JVParameter.Find(data);
                             TempData["CurrRowVersion"] = CurCorp.RowVersion;
@@ -1121,7 +1121,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
             public string JvName { get; set; }
             public string PaymentBank { get; set; }
             public string JVGroup { get; set; }
-            public string Credit_Debit { get; set; }
+            public string CrEdit_Debit { get; set; }
             public string BranchCode { get; set; }
             public string AccountNo { get; set; }
         }
@@ -1168,7 +1168,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                                     JvName = J.JVName != null ? J.JVName : "",
                                     PaymentBank = J.PaymentBank != null ? J.PaymentBank.FullDetails : "",
                                     JVGroup = J.JVGroup != null ? J.JVGroup.LookupVal : "",
-                                    Credit_Debit = J.CreditDebitFlag,
+                                    CrEdit_Debit = J.CreditDebitFlag,
                                     BranchCode = J.CreditDebitBranchCode != null ? J.CreditDebitBranchCode : "",
                                     AccountNo = J.AccountNo != null ? J.AccountNo : ""
 
@@ -1192,17 +1192,17 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                                   || (e.JvName.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                                   || (e.PaymentBank.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                                   || (e.JVGroup.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
-                                  || (e.Credit_Debit.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
+                                  || (e.CrEdit_Debit.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                                   || (e.BranchCode.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                                   || (e.AccountNo.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                                   || (e.Id.ToString().Contains(gp.searchString))
-                                  ).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.Credit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
+                                  ).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.CrEdit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
 
                         }
                         if (pageIndex > 1)
                         {
                             int h = pageIndex * pageSize;
-                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup, a.Credit_Debit, a.BranchCode, a.AccountNo, a.Id }).ToList();
+                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup, a.CrEdit_Debit, a.BranchCode, a.AccountNo, a.Id }).ToList();
                         }
                         totalRecords = IE.Count();
                     }
@@ -1220,7 +1220,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                                              gp.sidx == "Name" ? c.JvName.ToString() :
                                              gp.sidx == "PaymentBank" ? c.PaymentBank.ToString() :
                                              gp.sidx == "JVGroup" ? c.JVGroup.ToString() :
-                                             gp.sidx == "Credit_Debit" ? c.JVGroup.ToString() :
+                                             gp.sidx == "CrEdit_Debit" ? c.JVGroup.ToString() :
                                              gp.sidx == "BranchCode" ? c.JVGroup.ToString() :
                                              gp.sidx == "AccountNo" ? c.JVGroup.ToString() :
                                              "");
@@ -1228,17 +1228,17 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         if (gp.sord == "asc")
                         {
                             IE = IE.OrderBy(orderfuc);
-                            jsonData = IE.Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.Credit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
+                            jsonData = IE.Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.CrEdit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
                         }
                         else if (gp.sord == "desc")
                         {
                             IE = IE.OrderByDescending(orderfuc);
-                            jsonData = IE.Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.Credit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
+                            jsonData = IE.Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.CrEdit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
                         }
                         if (pageIndex > 1)
                         {
                             int h = pageIndex * pageSize;
-                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.Credit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
+                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.Jvcode, a.JvName, a.PaymentBank, a.JVGroup,a.CrEdit_Debit,a.BranchCode,a.AccountNo, a.Id }).ToList();
                         }
                         totalRecords = JVParameterList.Count();
                     }

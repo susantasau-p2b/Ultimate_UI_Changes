@@ -76,7 +76,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         //return this.Json(new Object[] { "", "", "BonusAct For This Year Already Exists.", JsonRequestBehavior.AllowGet });
                     }
 
-                    //string Values = form["PayScaleArealist"];
+                    //string Values = form["PayScaleAreaList"];
 
                     if (ModelState.IsValid)
                     {

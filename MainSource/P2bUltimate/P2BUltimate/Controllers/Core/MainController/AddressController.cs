@@ -74,7 +74,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     //  var Msg = new List<String>();
-                    string count = form["CountryList"] == "0" ? "" : form["CountryList"];
+                    string count = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
                     try
                     {
                         if (count != null)
@@ -86,7 +86,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                             }
                         }
 
-                        count = form["StateList"] == "0" ? "" : form["StateList"];
+                        count = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -96,7 +96,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                             }
                         }
 
-                        count = form["StateRegionList"] == "0" ? "" : form["StateRegionList"];
+                        count = form["StateRegionList_DDL"] == "0" ? "" : form["StateRegionList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -107,7 +107,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
 
 
-                        count = form["DistrictList"] == "0" ? "" : form["DistrictList"];
+                        count = form["DistrictList_DDL"] == "0" ? "" : form["DistrictList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -118,7 +118,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
 
 
-                        count = form["TalukaList"] == "0" ? "" : form["TalukaList"];
+                        count = form["TalukaList_DDL"] == "0" ? "" : form["TalukaList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -129,7 +129,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
 
 
-                        count = form["CityList"] == "0" ? "" : form["CityList"];
+                        count = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -140,7 +140,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
 
 
-                        count = form["AreaList"] == "0" ? "" : form["AreaList"];
+                        count = form["AreaList_DDL"] == "0" ? "" : form["AreaList_DDL"];
                         if (count != null)
                         {
                             if (count != "")
@@ -417,7 +417,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //                .Include(e => e.Taluka)
         //                .Where(e => e.Id == data).AsNoTracking().SingleOrDefault();
         //    String count = "";
-        //     count = form["CountryList"];
+        //     count = form["CountryList_DDL"];
 
         //    if (count != null && count != "" && count!="0")
         //    {
@@ -425,14 +425,14 @@ namespace P2BUltimate.Controllers.Core.MainController
         //        Addrs.Country = Country;
         //    }
 
-        //    count = form["StateList"];
+        //    count = form["StateList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        State State = db.State.Find(Convert.ToInt32(count));
         //        Addrs.State = State;
         //    }
 
-        //    count = form["StateRegionList"];
+        //    count = form["StateRegionList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        StateRegion StateRegion = db.StateRegion.Find(Convert.ToInt32(count));
@@ -440,7 +440,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    }
 
 
-        //    count = form["DistrictList"];
+        //    count = form["DistrictList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        District District = db.District.Find(Convert.ToInt32(count));
@@ -448,7 +448,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    }
 
 
-        //    count = form["TalukaList"];
+        //    count = form["TalukaList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        Taluka Taluka = db.Taluka.Find(Convert.ToInt32(count));
@@ -456,7 +456,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    }
 
 
-        //    count = form["CityList"];
+        //    count = form["CityList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        City City = db.City.Find(Convert.ToInt32(count));
@@ -464,7 +464,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    }
 
 
-        //    count = form["AreaList"];
+        //    count = form["AreaList_DDL"];
         //    if (count != null && count != "" && count != "0")
         //    {
         //        Area Area = db.Area.Find(Convert.ToInt32(count));
@@ -647,13 +647,13 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Country = form["CountryList"] == "0" ? "" : form["CountryList"];
-                    string State = form["StateList"] == "0" ? "" : form["StateList"];
-                    string StateRegion = form["StateRegionList"] == "0" ? "" : form["StateRegionList"];
-                    string District = form["DistrictList"] == "0" ? "" : form["DistrictList"];
-                    string Taluka = form["TalukaList"] == "0" ? "" : form["TalukaList"];
-                    string City = form["CityList"] == "0" ? "" : form["CityList"];
-                    string Area = form["AreaList"] == "0" ? "" : form["AreaList"];
+                    string Country = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
+                    string State = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
+                    string StateRegion = form["StateRegionList_DDL"] == "0" ? "" : form["StateRegionList_DDL"];
+                    string District = form["DistrictList_DDL"] == "0" ? "" : form["DistrictList_DDL"];
+                    string Taluka = form["TalukaList_DDL"] == "0" ? "" : form["TalukaList_DDL"];
+                    string City = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
+                    string Area = form["AreaList_DDL"] == "0" ? "" : form["AreaList_DDL"];
 
                     add.Country_Id = Country != null && Country != "" ? int.Parse(Country) : 0;
                     add.State_Id = State != null && State != "" ? int.Parse(State) : 0;

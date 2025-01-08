@@ -62,12 +62,12 @@
 				"create" : {
 					"separator_before"	: false,
 					"separator_after"	: true,
-					"_disabled"			: false, //(this.check("create_node", data.reference, {}, "last")),
+					"_disabled"			: false, //(this.check("Create_node", data.reference, {}, "last")),
 					"label"				: "Create",
 					"action"			: function (data) {
 						var inst = $.jstree.reference(data.reference),
 							obj = inst.get_node(data.reference);
-						inst.create_node(obj, {}, "last", function (new_node) {
+						inst.Create_node(obj, {}, "last", function (new_node) {
 							setTimeout(function () { inst.edit(new_node); },0);
 						});
 					}

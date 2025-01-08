@@ -366,8 +366,9 @@
                 pos = $(control).next().offset();
                 parentdivpos = $(parentdiv).offset();
                 w = $(control).width();
-                //console.log("Hi- ", pos.left, parentdivpos, control, parentdiv, w);
-                $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left + w });
+                console.log(control, pos.left, parentdivpos.left, w);
+                //$("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control));
+                $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left + w + 100 });
             } else {
                 if ($(control).is(':checkbox')) {
                     $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)); // If any issue then add '.css({ display: "inline-block" })' in the end or in the middle.

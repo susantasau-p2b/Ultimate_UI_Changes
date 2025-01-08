@@ -291,8 +291,8 @@ namespace P2BUltimate.Controllers.Training.MainController
                     string session = form["SessionListSch"];
                     string venue = form["VenueList"];
                     string expens = form["ExpensesList"];
-                    string place = form["CityList"];
-                    string state = form["StateList"];
+                    string place = form["CityList_DDL"];
+                    string state = form["StateList_DDL"];
                     string TrainingMaterial = form["TrainingMaterialList"];
                     //string EmpAssignSource = form["TrainingEmployeeSourceList"];
                     string FinancialYearList = form["Financial_id"] == "0" ? "" : form["Financial_id"];
@@ -709,8 +709,8 @@ namespace P2BUltimate.Controllers.Training.MainController
 
                     string Addrs = form["VenueList"] == "0" ? "" : form["VenueList"];
                     string exp = form["ExpensesList"] == "0" ? "" : form["ExpensesList"];
-                    string Cit = form["CityList"] == "0" ? "" : form["CityList"];
-                    string sta = form["StateList"] == "0" ? "" : form["StateList"];
+                    string Cit = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
+                    string sta = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
 
 
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;

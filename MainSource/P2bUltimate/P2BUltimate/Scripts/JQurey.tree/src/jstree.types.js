@@ -175,7 +175,7 @@
 			var m = obj && obj.id ? (more && more.origin ? more.origin : $.jstree.reference(obj.id)) : null, tmp, d, i, j;
 			m = m && m._model && m._model.data ? m._model.data : null;
 			switch(chk) {
-				case "create_node":
+				case "Create_node":
 				case "move_node":
 				case "copy_node":
 					if(chk !== 'move_node' || $.inArray(obj.id, par.children) === -1) {

@@ -88,8 +88,8 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string PayScaleType = form["PayScaleTypeList"] == "0" ? "" : form["PayScaleTypeList"];
-                    string RoundingList = form["RoundingList"] == "0" ? "" : form["RoundingList"];
+                    string PayScaleType = form["PayScaleTypeList_DDL"] == "0" ? "" : form["PayScaleTypeList_DDL"];
+                    string RoundingList_DDL = form["RoundingList_DDL"] == "0" ? "" : form["RoundingList_DDL"];
                     var ActualIndexAppl = form["ActualIndexAppl"];
                     NOBJ.ActualIndexAppl = Convert.ToBoolean(ActualIndexAppl);
                     int company_Id = 0;
@@ -101,9 +101,9 @@ namespace P2BUltimate.Controllers.Core.MainController
 
                     }
 
-                    if (RoundingList != null && RoundingList != "")
+                    if (RoundingList_DDL != null && RoundingList_DDL != "")
                     {
-                        var val = db.Lookup.Include(e => e.LookupValues).Where(e => e.Code == "422").FirstOrDefault().LookupValues.Where(e => e.Id == int.Parse(RoundingList)).FirstOrDefault();  //db.LookupValue.Find(int.Parse(RoundingList));
+                        var val = db.Lookup.Include(e => e.LookupValues).Where(e => e.Code == "422").FirstOrDefault().LookupValues.Where(e => e.Id == int.Parse(RoundingList_DDL)).FirstOrDefault();  //db.LookupValue.Find(int.Parse(RoundingList_DDL));
                         NOBJ.Rounding = val;
 
                     }
@@ -111,7 +111,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     {
                         if (PayScaleType != "")
                         {
-                            var val = db.Lookup.Include(e => e.LookupValues).Where(e => e.Code == "423").FirstOrDefault().LookupValues.Where(e => e.Id == int.Parse(RoundingList)).FirstOrDefault();  //db.LookupValue.Find(int.Parse(PayScaleType));
+                            var val = db.Lookup.Include(e => e.LookupValues).Where(e => e.Code == "423").FirstOrDefault().LookupValues.Where(e => e.Id == int.Parse(RoundingList_DDL)).FirstOrDefault();  //db.LookupValue.Find(int.Parse(PayScaleType));
                             NOBJ.PayScaleType = val;
                         }
                     }
@@ -123,10 +123,10 @@ namespace P2BUltimate.Controllers.Core.MainController
                         // return this.Json(new Object[] { "", "", "Select PayScaleType", JsonRequestBehavior.AllowGet });
                     }
 
-                    //string Values = form["PayScaleArealist"];
+                    //string Values = form["PayScaleAreaList"];
                     NOBJ.PayScaleArea = null;
                     List<Location> OBJ = new List<Location>();
-                    string Values = form["PayScaleArealist"];
+                    string Values = form["PayScaleAreaList"];
 
                     if (Values != null)
                     {
@@ -500,19 +500,19 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string TypeOBJ = form["PayScaleTypeList"] == "0" ? "" : form["PayScaleTypeList"];
-                    string RoundingList = form["RoundingList"] == "0" ? "" : form["RoundingList"];
-                    string AreaOBJ = form["PayScaleArealist"] == "0" ? "" : form["PayScaleArealist"];
+                    string TypeOBJ = form["PayScaleTypeList_DDL"] == "0" ? "" : form["PayScaleTypeList_DDL"];
+                    string RoundingList_DDL = form["RoundingList_DDL"] == "0" ? "" : form["RoundingList_DDL"];
+                    string AreaOBJ = form["PayScaleAreaList"] == "0" ? "" : form["PayScaleAreaList"];
                     var ActualIndexAppl = form["ActualIndexAppl"];
                     P.ActualIndexAppl = Convert.ToBoolean(ActualIndexAppl);
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
                     P.PayScaleType_Id = TypeOBJ != null && TypeOBJ != "" ? int.Parse(TypeOBJ) : 0;
-                    P.Rounding_Id = RoundingList != null && RoundingList != "" ? int.Parse(RoundingList) : 0;
+                    P.Rounding_Id = RoundingList_DDL != null && RoundingList_DDL != "" ? int.Parse(RoundingList_DDL) : 0;
 
                     var db_data = db.PayScale.Include(e => e.PayScaleArea.Select(r => r.LocationObj)).Include(e => e.PayScaleType).Where(e => e.Id == data).SingleOrDefault();
                     List<Location> LocationDetails = new List<Location>();
-                    string Values = form["PayScaleArealist"];
+                    string Values = form["PayScaleAreaList"];
 
                     if (Values != null)
                     {

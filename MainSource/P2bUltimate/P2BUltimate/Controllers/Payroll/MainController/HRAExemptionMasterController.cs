@@ -169,7 +169,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
         //        {
         //            var id = Convert.ToInt32(data);
         //            bool Closer = Convert.ToBoolean(form["Closer2"]);
-        //            string Location = form["Location_drop"] == "0" ? "" : form["Location_drop"];
+        //            string Location = form["LocationList_DDL"] == "0" ? "" : form["LocationList_DDL"];
         //            if (Location != null && Location != "")
         //            {
         //                int ContId = Convert.ToInt32(Location);

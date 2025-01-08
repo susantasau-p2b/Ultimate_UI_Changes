@@ -46,7 +46,7 @@ namespace P2BUltimate.Controllers.Training.MainController
                 try
                 {
 
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["Address_List"] == "0" ? "" : form["Address_List"];
                     string ContactDetails = form["Contact_List"] == "0" ? "" : form["Contact_List"];
                     string employee = form["Employee-Table"] == "0" ? null : form["Employee-Table"];
@@ -393,7 +393,7 @@ namespace P2BUltimate.Controllers.Training.MainController
             c.Address_Id = Addrs != null && Addrs != "" ? int.Parse(Addrs) : 0;
             c.ContactDetails_Id = ContactDetails != null && ContactDetails != "" ? int.Parse(ContactDetails) : 0;
 
-            string Facultytype = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+            string Facultytype = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
 
             c.FacultyType_Id = Facultytype != null && Facultytype != "" ? int.Parse(Facultytype) : 0;
 

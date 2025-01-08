@@ -431,7 +431,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
             {
                 var selectlistjson = new
                 {
-                    SelectlistType = "Corporate_drop",
+                    SelectlistType = "CorporateList_DDL",
                     selectlist = new SelectList(a, "Id", "Name", "")
                 };
                 return selectlistjson;
@@ -443,7 +443,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 {
                     var selectlistjson = new
                     {
-                        SelectlistType = "Region_drop",
+                        SelectlistType = "RegionList_DDL",
                         selectlist = new SelectList(b, "Id", "Name", "")
                     };
                     return selectlistjson;
@@ -455,7 +455,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Company_drop",
+                            SelectlistType = "CompanyList_DDL",
                             selectlist = new SelectList(c, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -467,7 +467,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Division_drop",
+                                SelectlistType = "DivisionList_DDL",
                                 selectlist = new SelectList(d, "Id", "Name", "")
                             };
                             return selectlistjson;
@@ -479,7 +479,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Location_drop",
+                                    SelectlistType = "LocationList_DDL",
                                     selectlist = new SelectList(e, "Id", "Name", "")
                                 };
                                 return selectlistjson;
@@ -491,7 +491,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                 {
                                     var selectlistjson = new
                                     {
-                                        SelectlistType = "Department_drop",
+                                        SelectlistType = "DepartmentList_DDL",
                                         selectlist = new SelectList(f, "Id", "Name", "")
                                     };
                                     return selectlistjson;
@@ -503,7 +503,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                     {
                                         var selectlistjson = new
                                         {
-                                            SelectlistType = "Group_drop",
+                                            SelectlistType = "GroupList_DDL",
                                             selectlist = new SelectList(g, "Id", "Name", "")
                                         };
                                         return selectlistjson;
@@ -515,7 +515,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                         {
                                             var selectlistjson = new
                                             {
-                                                SelectlistType = "Unit_drop",
+                                                SelectlistType = "UnitList_DDL",
                                                 selectlist = new SelectList(h, "Id", "Name", "")
                                             };
                                             return selectlistjson;
@@ -705,7 +705,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
             {
                 var selectlistjson = new
                 {
-                    SelectlistType = "Job_drop",
+                    SelectlistType = "JobList_DDL",
                     selectlist = new SelectList(a, "Id", "Name", "")
                 };
                 return selectlistjson;
@@ -717,7 +717,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 {
                     var selectlistjson = new
                     {
-                        SelectlistType = "JobPosition_drop",
+                        SelectlistType = "JobPositionList_DDL",
                         selectlist = new SelectList(a, "Id", "Name", "")
                     };
                     return selectlistjson;
@@ -1084,7 +1084,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Region_drop",
+                            SelectlistType = "RegionList_DDL",
                             selectlist = new SelectList(b, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1096,7 +1096,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Company_drop",
+                                SelectlistType = "CompanyList_DDL",
                                 selectlist = new SelectList(c, "Id", "Name", "")
                             };
                             return selectlistjson;
@@ -1108,7 +1108,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Division_drop",
+                                    SelectlistType = "DivisionList_DDL",
                                     selectlist = new SelectList(d, "Id", "Name", "")
                                 };
                                 return selectlistjson;
@@ -1120,7 +1120,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                 {
                                     var selectlistjson = new
                                     {
-                                        SelectlistType = "Location_drop",
+                                        SelectlistType = "LocationList_DDL",
                                         selectlist = new SelectList(e, "Id", "FullDetails", "")
                                     };
                                     return selectlistjson;
@@ -1132,7 +1132,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                     {
                                         var selectlistjson = new
                                         {
-                                            SelectlistType = "Department_drop",
+                                            SelectlistType = "DepartmentList_DDL",
                                             selectlist = new SelectList(f, "Id", "FullDetails", "")
                                         };
                                         return selectlistjson;
@@ -1144,7 +1144,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                         {
                                             var selectlistjson = new
                                             {
-                                                SelectlistType = "Group_drop",
+                                                SelectlistType = "GroupList_DDL",
                                                 selectlist = new SelectList(g, "Id", "Name", "")
                                             };
                                             return selectlistjson;
@@ -1156,7 +1156,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                             {
                                                 var selectlistjson = new
                                                 {
-                                                    SelectlistType = "Unit_drop",
+                                                    SelectlistType = "UnitList_DDL",
                                                     selectlist = new SelectList(h, "Id", "Name", "")
                                                 };
                                                 return selectlistjson;
@@ -1178,7 +1178,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Company_drop",
+                            SelectlistType = "CompanyList_DDL",
                             selectlist = new SelectList(i, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1190,7 +1190,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Division_drop",
+                                SelectlistType = "DivisionList_DDL",
                                 selectlist = new SelectList(j, "Id", "Name", "")
                             };
                             return selectlistjson;
@@ -1202,7 +1202,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Location_drop",
+                                    SelectlistType = "LocationList_DDL",
                                     selectlist = new SelectList(k, "Id", "FullDetails", "")
                                 };
                                 return selectlistjson;
@@ -1214,7 +1214,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                 {
                                     var selectlistjson = new
                                     {
-                                        SelectlistType = "Department_drop",
+                                        SelectlistType = "DepartmentList_DDL",
                                         selectlist = new SelectList(l, "Id", "FullDetails", "")
                                     };
                                     return selectlistjson;
@@ -1226,7 +1226,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                     {
                                         var selectlistjson = new
                                         {
-                                            SelectlistType = "Group_drop",
+                                            SelectlistType = "GroupList_DDL",
                                             selectlist = new SelectList(m, "Id", "Name", "")
                                         };
                                         return selectlistjson;
@@ -1238,7 +1238,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                         {
                                             var selectlistjson = new
                                             {
-                                                SelectlistType = "Unit_drop",
+                                                SelectlistType = "UnitList_DDL",
                                                 selectlist = new SelectList(n, "Id", "Name", "")
                                             };
                                             return selectlistjson;
@@ -1259,7 +1259,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Division_drop",
+                            SelectlistType = "DivisionList_DDL",
                             selectlist = new SelectList(o, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1271,7 +1271,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Location_drop",
+                                SelectlistType = "LocationList_DDL",
                                 selectlist = new SelectList(p, "Id", "FullDetails", "")
                             };
                             return selectlistjson;
@@ -1283,7 +1283,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Department_drop",
+                                    SelectlistType = "DepartmentList_DDL",
                                     selectlist = new SelectList(q, "Id", "FullDetails", "")
                                 };
                                 return selectlistjson;
@@ -1295,7 +1295,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                 {
                                     var selectlistjson = new
                                     {
-                                        SelectlistType = "Group_drop",
+                                        SelectlistType = "GroupList_DDL",
                                         selectlist = new SelectList(r, "Id", "Name", "")
                                     };
                                     return selectlistjson;
@@ -1307,7 +1307,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                     {
                                         var selectlistjson = new
                                         {
-                                            SelectlistType = "Unit_drop",
+                                            SelectlistType = "UnitList_DDL",
                                             selectlist = new SelectList(s, "Id", "Name", "")
                                         };
                                         return selectlistjson;
@@ -1327,7 +1327,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Location_drop",
+                            SelectlistType = "LocationList_DDL",
                             selectlist = new SelectList(t, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1339,7 +1339,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Department_drop",
+                                SelectlistType = "DepartmentList_DDL",
                                 selectlist = new SelectList(x, "Id", "FullDetails", "")
                             };
                             return selectlistjson;
@@ -1351,7 +1351,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Group_drop",
+                                    SelectlistType = "GroupList_DDL",
                                     selectlist = new SelectList(y, "Id", "Name", "")
                                 };
                                 return selectlistjson;
@@ -1363,7 +1363,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                                 {
                                     var selectlistjson = new
                                     {
-                                        SelectlistType = "Unit_drop",
+                                        SelectlistType = "UnitList_DDL",
                                         selectlist = new SelectList(z, "Id", "Name", "")
                                     };
                                     return selectlistjson;
@@ -1382,7 +1382,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Department_drop",
+                            SelectlistType = "DepartmentList_DDL",
                             selectlist = new SelectList(x1, "Id", "FullDetails", "")
                         };
                         return selectlistjson;
@@ -1394,7 +1394,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Group_drop",
+                                SelectlistType = "GroupList_DDL",
                                 selectlist = new SelectList(y1, "Id", "Name", "")
                             };
                             return selectlistjson;
@@ -1406,7 +1406,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                             {
                                 var selectlistjson = new
                                 {
-                                    SelectlistType = "Unit_drop",
+                                    SelectlistType = "UnitList_DDL",
                                     selectlist = new SelectList(z1, "Id", "Name", "")
                                 };
                                 return selectlistjson;
@@ -1424,7 +1424,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Group_drop",
+                            SelectlistType = "GroupList_DDL",
                             selectlist = new SelectList(y11, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1436,7 +1436,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                         {
                             var selectlistjson = new
                             {
-                                SelectlistType = "Unit_drop",
+                                SelectlistType = "UnitList_DDL",
                                 selectlist = new SelectList(z11, "Id", "Name", "")
                             };
                             return selectlistjson;
@@ -1453,7 +1453,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Unit_drop",
+                            SelectlistType = "UnitList_DDL",
                             selectlist = new SelectList(z111, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1546,7 +1546,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "Job_drop",
+                            SelectlistType = "JobList_DDL",
                             selectlist = new SelectList(a, "Id", "Name", "")
                         };
                         return selectlistjson;
@@ -1566,7 +1566,7 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                     {
                         var selectlistjson = new
                         {
-                            SelectlistType = "JobPosition_drop",
+                            SelectlistType = "JobPositionList_DDL",
                             selectlist = new SelectList(b, "Id", "JobPositionDesc", "")
                         };
                         return selectlistjson;
@@ -1662,19 +1662,19 @@ namespace P2BUltimate.Controllers.recruitment.MainController
         //        string PermContactDetails = form["PermContactDetailslist"] == "0" ? "" : form["PermContactDetailslist"];
         //        string CorrsAddrs = form["CorrsAddrslist"] == "0" ? "" : form["CorrsAddrslist"];
         //        string CorrsContactDetails = form["CorrsContactDetailslist"] == "0" ? "" : form["CorrsContactDetailslist"];
-        //        string Corporate = form["Corporate_drop"] == "0" ? "" : form["Corporate_drop"];
-        //        string Region = form["Region_drop"] == "0" ? "" : form["Region_drop"];
-        //        string Company = form["Company_drop"] == "0" ? "" : form["Company_drop"];
-        //        string Division = form["Division_drop"] == "0" ? "" : form["Division_drop"];
-        //        string Location = form["Location_drop"] == "0" ? "" : form["Location_drop"];
-        //        string Department = form["Department_drop"] == "0" ? "" : form["Department_drop"];
-        //        string Group = form["Group_drop"] == "0" ? "" : form["Group_drop"];
-        //        string Unit = form["Unit_drop"] == "0" ? "" : form["Unit_drop"];
+        //        string Corporate = form["CorporateList_DDL"] == "0" ? "" : form["CorporateList_DDL"];
+        //        string Region = form["RegionList_DDL"] == "0" ? "" : form["RegionList_DDL"];
+        //        string Company = form["CompanyList_DDL"] == "0" ? "" : form["CompanyList_DDL"];
+        //        string Division = form["DivisionList_DDL"] == "0" ? "" : form["DivisionList_DDL"];
+        //        string Location = form["LocationList_DDL"] == "0" ? "" : form["LocationList_DDL"];
+        //        string Department = form["DepartmentList_DDL"] == "0" ? "" : form["DepartmentList_DDL"];
+        //        string Group = form["GroupList_DDL"] == "0" ? "" : form["GroupList_DDL"];
+        //        string Unit = form["UnitList_DDL"] == "0" ? "" : form["UnitList_DDL"];
         //        string Grade = form["Grade_drop"] == "0" ? "" : form["Grade_drop"];
         //        string Level = form["Level_drop"] == "0" ? "" : form["Level_drop"];
         //        string JobStatus = form["JobStatus_drop"] == "0" ? "" : form["JobStatus_drop"];
         //        string EmpActingStatus = form["EmpActingStatus_drop"] == "0" ? "" : form["EmpActingStatus_drop"];
-        //        string Job = form["Job_drop"] == "0" ? "" : form["Job_drop"];
+        //        string Job = form["JobList_DDL"] == "0" ? "" : form["JobList_DDL"];
         //        string Position = form["Position_drop"] == "0" ? "" : form["Position_drop"];
         //        string TimingCode = form["TimingCode_drop"] == "0" ? "" : form["TimingCode_drop"];
 
@@ -2125,8 +2125,8 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 string AwardDetails = form["AwardsList"] == "0" ? "" : form["AwardsList"];
 
                 string BloodGroupDetails = form["BloodGroup_drop"] == "0" ? "" : form["BloodGroup_drop"];
-                string AllergyDetails = form["Alergylist"] == "0" ? "" : form["Alergylist"];
-                string DiseaseDetails = form["Diseaselist"] == "0" ? "" : form["Diseaselist"];
+                string AllergyDetails = form["AlergyList"] == "0" ? "" : form["AlergyList"];
+                string DiseaseDetails = form["DiseaseList"] == "0" ? "" : form["DiseaseList"];
 
                 string PreCompExpDetails = form["PreCompExplist"] == "0" ? "" : form["PreCompExplist"];
 
@@ -2844,8 +2844,8 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 string AwardDetails = form["AwardsList"] == "0" ? "" : form["AwardsList"];
 
                 string BloodGroupDetails = form["BloodGroup_drop"] == "0" ? "" : form["BloodGroup_drop"];
-                string AllergyDetails = form["Alergylist"] == "0" ? "" : form["Alergylist"];
-                string DiseaseDetails = form["Diseaselist"] == "0" ? "" : form["Diseaselist"];
+                string AllergyDetails = form["AlergyList"] == "0" ? "" : form["AlergyList"];
+                string DiseaseDetails = form["DiseaseList"] == "0" ? "" : form["DiseaseList"];
 
                 string PreCompExpDetails = form["PreCompExplist"] == "0" ? "" : form["PreCompExplist"];
 

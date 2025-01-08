@@ -243,7 +243,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string Category = form["Diseasetypelist"] == "0" ? "" : form["Diseasetypelist"];
-                    string Values = form["Medicinelist1"];
+                    string Values = form["MedicineList1"];
 
                     if (Category != null)
                     {
@@ -666,7 +666,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["DiseaseTypelist"] == "0" ? "" : form["DiseaseTypelist"];
+                    string Corp = form["DiseaseTypeList_DDL"] == "0" ? "" : form["DiseaseTypeList_DDL"];
                     if (Corp != null)
                     {
                         if (Corp != "")
@@ -829,7 +829,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //        try
         //        {
         //            bool Auth = form["Autho_Allow"] == "true" ? true : false;
-        //            string Corp = form["DiseaseTypelist"] == "0" ? "" : form["DiseaseTypelist"];
+        //            string Corp = form["DiseaseTypeList_DDL"] == "0" ? "" : form["DiseaseTypeList_DDL"];
         //            if (Corp != null)
         //            {
         //                if (Corp != "")
@@ -991,7 +991,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
 
-                    string Corp = form["DiseaseTypelist"] == "0" ? "" : form["DiseaseTypelist"];
+                    string Corp = form["DiseaseTypeList_DDL"] == "0" ? "" : form["DiseaseTypeList_DDL"];
                     string Lang = form["MedicineList"] == "0" ? "" : form["MedicineList1"];
 
                     Disease corporates =db.Disease.Include(e => e.DiseaseMedicine).Include(e => e.DiseaseType).Where(e => e.Id == data).SingleOrDefault();

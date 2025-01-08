@@ -265,7 +265,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 using (DataBaseContext db = new DataBaseContext())
                 {
                     //string VisaTypelst = form["VisaTypelist"] == "0" ? "" : form["VisaTypelist"];
-                    //string Countrylst = form["CountryList"] == "0" ? "" : form["CountryList"];                
+                    //string Countrylst = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];                
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
                     var db_data1 = db.BasicLinkedDA.Where(e => e.Id == data).SingleOrDefault();
 

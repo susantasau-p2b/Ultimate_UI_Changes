@@ -2343,7 +2343,7 @@ namespace P2BUltimate.Process
 
                 int EmployeePFTrust_Id = 0;
                 int IntPostBal_Id = 0;
-                int MonthlyCredit_Id = 0;
+                int MonthlyCrEdit_Id = 0;
                 int IntApply_Id = 0;
                 int LoanApply_Id = 0;
                 int LoanPostBal_Id = 0;
@@ -2369,7 +2369,7 @@ namespace P2BUltimate.Process
                 {
 
                     //IntPostBal_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Interest Posting Balance".ToUpper()).Select(e => e.Id).SingleOrDefault();
-                    //MonthlyCredit_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Monthly Credit".ToUpper()).Select(e => e.Id).SingleOrDefault();
+                    //MonthlyCrEdit_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Monthly Credit".ToUpper()).Select(e => e.Id).SingleOrDefault();
                     //IntApply_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Interest Apply".ToUpper()).Select(e => e.Id).SingleOrDefault();
                     //LoanApply_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Loan Apply".ToUpper()).Select(e => e.Id).SingleOrDefault();
                     //LoanPostBal_Id = db.LookupValue.Where(e => e.IsActive != false && e.LookupVal.ToUpper() == "Loan Posting Balance".ToUpper()).Select(e => e.Id).SingleOrDefault();

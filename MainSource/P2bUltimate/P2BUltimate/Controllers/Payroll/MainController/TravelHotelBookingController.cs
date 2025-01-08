@@ -63,9 +63,9 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 {
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
                     //  string Emp = form["Employee-Table"] == "0" ? "" : form["Employee-Table"];
-                    string Country = form["CountryList"] == "0" ? "" : form["CountryList"];
-                    string State = form["StateList"] == "0" ? "" : form["StateList"];
-                    string City = form["CityList"] == "0" ? "" : form["CityList"];
+                    string Country = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
+                    string State = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
+                    string City = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
                     // string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     // string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     //     string benifit = form["BenefitTypelist"] == "0" ? "" : form["BenefitTypelist"];
@@ -426,9 +426,9 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 {
                     //Calendar c = db.Calendar.Find(data);
                     string HotelEligibilitypolicy = form["HotelEligibilityPolicyList"] == "0" ? "" : form["HotelEligibilityPolicyList"];
-                    string Countrylist = form["CountryList"] == "0" ? "" : form["CountryList"];
-                    string statelist = form["StateList"] == "0" ? "" : form["StateList"];
-                    string citylist = form["CityList"] == "0" ? "" : form["CityList"];
+                    string Countrylist = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
+                    string statelist = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
+                    string citylist = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
                     //var Name = form["Name_drop"] == "0" ? 0 : Convert.ToInt32(form["Name_drop"]);
 
                     //if (Name != 0)

@@ -560,7 +560,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
 
         //            var db_data = db.SalaryHead.Include(e => e.PayScaleArea.Select(r => r.LocationObj)).Include(e => e.PayScaleType).Where(e => e.Id == data).SingleOrDefault();
         //            List<Location> LocationDetails = new List<Location>();
-        //            string Values = form["PayScaleArealist"];
+        //            string Values = form["PayScaleAreaList"];
 
         //            if (Values != null)
         //            {

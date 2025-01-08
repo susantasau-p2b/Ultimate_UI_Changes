@@ -52,7 +52,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     string Borrower = form["Borrowerlist"] == "0" ? "" : form["Borrowerlist"];
@@ -674,7 +674,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Corp = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     string Borrower = form["Borrowerlist"] == "0" ? "" : form["Borrowerlist"];

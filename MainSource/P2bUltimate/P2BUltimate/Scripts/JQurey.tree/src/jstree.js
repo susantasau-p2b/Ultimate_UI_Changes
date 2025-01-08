@@ -354,7 +354,7 @@
 		 *	$('#tree').jstree({
 		 *		'core' : {
 		 *			'check_callback' : function (operation, node, node_parent, node_position, more) {
-		 *				// operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'
+		 *				// operation can be 'Create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'
 		 *				// in case of 'rename_node' node_position is filled with the new node name
 		 *				return operation === 'rename_node' ? true : false;
 		 *			}
@@ -3187,7 +3187,7 @@
 			dom = this.get_node(obj, true);
 			if(obj.state.selected) {
 				obj.state.selected = false;
-				this._data.core.selected = $.vakata.array_remove_item(this._data.core.selected, obj.id);
+				this._data.core.selected = $.vakata.array_Remove_item(this._data.core.selected, obj.id);
 				if(dom.length) {
 					dom.attr('aria-selected', false).children('.jstree-anchor').removeClass('jstree-clicked');
 				}
@@ -3675,22 +3675,22 @@
 		},
 		/**
 		 * create a new node (do not confuse with load_node)
-		 * @name create_node([par, node, pos, callback, is_loaded])
+		 * @name Create_node([par, node, pos, callback, is_loaded])
 		 * @param  {mixed}   par       the parent node (to create a root node use either "#" (string) or `null`)
 		 * @param  {mixed}   node      the data for the new node (a valid JSON object, or a simple string with the name)
 		 * @param  {mixed}   pos       the index at which to insert the node, "first" and "last" are also supported, default is "last"
 		 * @param  {Function} callback a function to be called once the node is created
 		 * @param  {Boolean} is_loaded internal argument indicating if the parent node was succesfully loaded
 		 * @return {String}            the ID of the newly create node
-		 * @trigger model.jstree, create_node.jstree
+		 * @trigger model.jstree, Create_node.jstree
 		 */
-		create_node : function (par, node, pos, callback, is_loaded) {
+		Create_node : function (par, node, pos, callback, is_loaded) {
 			if(par === null) { par = $.jstree.root; }
 			par = this.get_node(par);
 			if(!par) { return false; }
 			pos = pos === undefined ? "last" : pos;
 			if(!pos.toString().match(/^(before|after)$/) && !is_loaded && !this.is_loaded(par)) {
-				return this.load_node(par, function () { this.create_node(par, node, pos, callback, true); });
+				return this.load_node(par, function () { this.Create_node(par, node, pos, callback, true); });
 			}
 			if(!node) { node = { "text" : this.get_string('New node') }; }
 			if(typeof node === "string") { node = { "text" : node }; }
@@ -3725,7 +3725,7 @@
 			}
 			if(pos > par.children.length) { pos = par.children.length; }
 			if(!node.id) { node.id = true; }
-			if(!this.check("create_node", node, par, pos)) {
+			if(!this.check("Create_node", node, par, pos)) {
 				this.settings.core.error.call(this, this._data.core.last_error);
 				return false;
 			}
@@ -3755,12 +3755,12 @@
 			/**
 			 * triggered when a node is created
 			 * @event
-			 * @name create_node.jstree
+			 * @name Create_node.jstree
 			 * @param {Object} node
 			 * @param {String} parent the parent's ID
 			 * @param {Number} position the position of the new node among the parent's children
 			 */
-			this.trigger('create_node', { "node" : this.get_node(node), "parent" : par.id, "position" : pos });
+			this.trigger('Create_node', { "node" : this.get_node(node), "parent" : par.id, "position" : pos });
 			return node.id;
 		},
 		/**
@@ -3825,7 +3825,7 @@
 				return false;
 			}
 			if(pos !== -1) {
-				par.children = $.vakata.array_remove(par.children, pos);
+				par.children = $.vakata.array_Remove(par.children, pos);
 			}
 			tmp = obj.children_d.concat([]);
 			tmp.push(obj.id);
@@ -3881,7 +3881,7 @@
 		 * check if an operation is premitted on the tree. Used internally.
 		 * @private
 		 * @name check(chk, obj, par, pos)
-		 * @param  {String} chk the operation to check, can be "create_node", "rename_node", "delete_node", "copy_node" or "move_node"
+		 * @param  {String} chk the operation to check, can be "Create_node", "rename_node", "delete_node", "copy_node" or "move_node"
 		 * @param  {mixed} obj the node
 		 * @param  {mixed} par the parent
 		 * @param  {mixed} pos the position to insert at, or if "rename_node" - the new name
@@ -3891,7 +3891,7 @@
 		check : function (chk, obj, par, pos, more) {
 			obj = obj && obj.id ? obj : this.get_node(obj);
 			par = par && par.id ? par : this.get_node(par);
-			var tmp = chk.match(/^move_node|copy_node|create_node$/i) ? par : obj,
+			var tmp = chk.match(/^move_node|copy_node|Create_node$/i) ? par : obj,
 				chc = this.settings.core.check_callback;
 			if(chk === "move_node" || chk === "copy_node") {
 				if((!more || !more.is_multi) && (obj.id === par.id || (chk === "move_node" && $.inArray(obj.id, par.children) === pos) || $.inArray(par.id, obj.children_d) !== -1)) {
@@ -4010,7 +4010,7 @@
 				dpc = new_par.children.concat();
 				tmp = $.inArray(obj.id, dpc);
 				if(tmp !== -1) {
-					dpc = $.vakata.array_remove(dpc, tmp);
+					dpc = $.vakata.array_Remove(dpc, tmp);
 					if(pos > tmp) { pos--; }
 				}
 				tmp = [];
@@ -4036,7 +4036,7 @@
 					}
 					old_ins._model.data[obj.parents[i]].children_d = dpc;
 				}
-				old_ins._model.data[old_par].children = $.vakata.array_remove_item(old_ins._model.data[old_par].children, obj.id);
+				old_ins._model.data[old_par].children = $.vakata.array_Remove_item(old_ins._model.data[old_par].children, obj.id);
 
 				// insert into new parent and up
 				for(i = 0, j = new_par.parents.length; i < j; i++) {
@@ -4680,7 +4680,7 @@
 		return a;
 	};
 	// remove item from array
-	$.vakata.array_remove = function(array, from) {
+	$.vakata.array_Remove = function(array, from) {
 		array.splice(from, 1);
 		return array;
 		//var rest = array.slice((to || from) + 1 || array.length);
@@ -4689,9 +4689,9 @@
 		//return array;
 	};
 	// remove item from array
-	$.vakata.array_remove_item = function(array, item) {
+	$.vakata.array_Remove_item = function(array, item) {
 		var tmp = $.inArray(item, array);
-		return tmp !== -1 ? $.vakata.array_remove(array, tmp) : array;
+		return tmp !== -1 ? $.vakata.array_Remove(array, tmp) : array;
 	};
 	$.vakata.array_filter = function(c,a,b,d,e) {
 		if (c.filter) {

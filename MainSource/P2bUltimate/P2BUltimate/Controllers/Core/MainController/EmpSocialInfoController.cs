@@ -69,7 +69,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Caste = form["Castelist"] == "0" ? "" : form["Castelist"];
                     string Religion = form["Religionlist"] == "0" ? "" : form["Religionlist"];
                     string SubCaste = form["SubCastelist"] == "0" ? "" : form["SubCastelist"];
@@ -413,7 +413,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
 
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     if (Category != null)
                     {
                         if (Category != "")
@@ -654,7 +654,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //                }
         //            }
         //            var socialact = db_data.EmpSocialInfo.SocialActivities;
-        //            string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+        //            string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
         //            if (Category != null)
         //            {
         //                if (Category != "")
@@ -1158,7 +1158,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     {
                        
                         string Religion = form["Religionlist"] == "0" ? "" : form["Religionlist"];
-                        string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                        string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                         string Caste = form["Castelist"] == "0" ? "" : form["Castelist"];
                         string SubCaste = form["SubCastelist"] == "0" ? "" : form["SubCastelist"];
                         string Values = form["SocialActivitieslist"];

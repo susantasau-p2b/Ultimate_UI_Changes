@@ -247,7 +247,7 @@
 	};
 	
 	
-	var _removeEmpty = function ( a )
+	var _RemoveEmpty = function ( a )
 	{
 		var out = [];
 	
@@ -4058,7 +4058,7 @@
 	
 	
 	
-	var __re_html_remove = /<.*?>/g;
+	var __re_html_Remove = /<.*?>/g;
 	
 	
 	/**
@@ -4349,7 +4349,7 @@
 	
 		for ( var i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
 			s = _fnGetCellData( settings, i, colIdx, 'display' )+'';
-			s = s.replace( __re_html_remove, '' );
+			s = s.replace( __re_html_Remove, '' );
 	
 			if ( s.length > max ) {
 				max = s.length;
@@ -7663,7 +7663,7 @@
 			}
 	
 			// Get nodes in the order from the `rows` array with null values removed
-			var nodes = _removeEmpty(
+			var nodes = _RemoveEmpty(
 				_pluck_order( settings.aoData, rows, 'nTr' )
 			);
 	
@@ -7907,7 +7907,7 @@
 	};
 	
 	
-	var __details_remove = function ( api, idx )
+	var __details_Remove = function ( api, idx )
 	{
 		var ctx = api.context;
 	
@@ -8001,7 +8001,7 @@
 	
 				for ( var i=0, ien=data.length ; i<ien ; i++ ) {
 					if ( data[i]._details ) {
-						__details_remove( api, i );
+						__details_Remove( api, i );
 					}
 				}
 			} );
@@ -8032,7 +8032,7 @@
 		}
 		else if ( data === false ) {
 			// remove
-			__details_remove( this );
+			__details_Remove( this );
 		}
 		else if ( ctx.length && this.length ) {
 			// set
@@ -8065,7 +8065,7 @@
 		_child_obj+'.remove()',
 		_child_mth+'.remove()' // only when `child()` was called with parameters (without
 	], function () {           // it returns an object and this method is not executed)
-		__details_remove( this );
+		__details_Remove( this );
 		return this;
 	} );
 	
@@ -8391,7 +8391,7 @@
 	{
 		var data = settings.aoData;
 		var rows = _selector_row_indexes( settings, opts );
-		var cells = _removeEmpty( _pluck_order( data, rows, 'anCells' ) );
+		var cells = _RemoveEmpty( _pluck_order( data, rows, 'anCells' ) );
 		var allCells = $( [].concat.apply([], cells) );
 		var row;
 		var columns = settings.aoColumns.length;

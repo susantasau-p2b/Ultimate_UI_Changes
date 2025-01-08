@@ -195,7 +195,7 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmVisa", name = "frmVisa" }))
         {
 
-            <div class="section_Method" id="section_emp">
+            <div class="section_Method" id="Section_Emp">
                 <div class="heading" style="width:1065px">Employee List</div>
 
                 <div class="employeeselectiondiv">
@@ -220,7 +220,7 @@
                     </div>
                     <div class="row1 content_margine">
                         @Html.LabelFor(m => m.Country, "Country :", new { @class = "popup-content-label" })
-                        <select class="drop" style="width:120px;" name="CountryList" id="CountryList"><option value="0">-Select-</option></select>
+                        <select class="drop" style="width:120px;" name="CountryList_DDL" id="CountryList_DDL"><option value="0">-Select-</option></select>
                     </div>
                     <div class="row1 content_margine">
                         @Html.LabelFor(m => m.IssueDate, "Issue Date :", new { @class = "popup-content-label" })@Html.TextBoxFor(m => m.IssueDate, new { @class = "popup-content-textbox" })
@@ -282,7 +282,7 @@
         //Create Function
         $('#Create').on("click", function (event) {
             $('#frmVisa').trigger("reset");
-            $('#section_emp').fadeIn();
+            $('#Section_Emp').fadeIn();
             $.LoadEmpByDefault(true);
             $('#Advance-Filter-Symbol').on('click', function () {
                 $("<div></div>").FilterDialog({
@@ -304,21 +304,21 @@
             });
             $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Visa Details', 'open', '@Url.Action("Create")', '#frmVisa', 'Message :', 'Request Falied :', '#JqGrid', 490, 956, '', btndisablenames, function (data) { });
             $('#VisaTypelist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 316, "");
-            $('#CountryList').empty();
-            $('#CountryList').off("selectmenuopen").on("selectmenuopen", function () {
-                $('#CountryList').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
+            $('#CountryList_DDL').empty();
+            $('#CountryList_DDL').off("selectmenuopen").on("selectmenuopen", function () {
+                $('#CountryList_DDL').empty().append("<option value=0 >-Select-</option>").selectmenu().selectmenu("refresh");
                 $.post("@Url.Action("PopulateDropDownList","country")", {
                     data: "",
                     data2: ""
                 }, function (data) {
                     $.each(data, function (i, k) {
-                        $('#CountryList').append($("<option>", {
+                        $('#CountryList_DDL').append($("<option>", {
                             value: k.Value,
                             text: k.Text,
                             selcted: k.Selected
                         }));
                     });
-                    jQuery('#CountryList').selectmenu('refresh').selectmenu("menuWidget").css({ "height": "120px" });
+                    jQuery('#CountryList_DDL').selectmenu('refresh').selectmenu("menuWidget").css({ "height": "120px" });
                 });
             });
             event.preventDefault();
@@ -328,8 +328,8 @@
         // Main page edit
         $('#Edit').on('click', function () {
             AssignData();
-            $('#section_emp').fadeOut();
-            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.ID, '@Url.Action("EditSave")', "Edit Visa Details->" + JSON.stringify(dt) + "", '#frmVisa', dt.ID, 'Message : ', 'Request Falied :', '#JqGrid', 490, 956, '#CountryList', btndisablenames, function (data) {
+            $('#Section_Emp').fadeOut();
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.ID, '@Url.Action("EditSave")', "Edit Visa Details->" + JSON.stringify(dt) + "", '#frmVisa', dt.ID, 'Message : ', 'Request Falied :', '#JqGrid', 490, 956, '#CountryList_DDL', btndisablenames, function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
                     $('#IssueAt').val(k.IssueAt);
@@ -338,7 +338,7 @@
                     if (k.IssueDate != null) { $('#IssueDate').val(DateConvert(k.IssueDate)); }
                     //$('#ValidDate').val(k.ValidDate);
                     if (k.ValidDate != null) { $('#ValidDate').val(DateConvert(k.ValidDate)); }
-                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id);
+                    $('#CountryList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id);
                     $('#VisaTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 316, k.VisaType_Id);
                 });
 
@@ -352,7 +352,7 @@
         //View main page
         $('#View').button().click(function (event) {
             AssignData();
-            $('#section_emp').fadeOut();  @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
+            $('#Section_Emp').fadeOut();  @*$('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View', '#BasicScaleDetailslist', '', 356, 512, '#Autho', '@Url.Action("delete")', '', '', '', '','','', function (data) {*@
             $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.ID, "View Visa Details->" + JSON.stringify(dt) + "", '', '#Lookup-Address-Corporate,#Create-Address-Corporate,#Edit-Address-Corporate,#Remove-Address-Corporate,#Lookup-ContactDetails-Corporate,#Create-ContactDetails-Corporate,#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 490, 956, '#Autho', '@Url.Action("AuthSave")', dt.ID, '', '', '', '', '#JqGrid', function (data) {
                 $.each(data[0], function (i, k) {
                     $('#Autho_Action').val(k.Action);
@@ -362,7 +362,7 @@
                     if (k.ValidDate != null) { $('#ValidDate').val(DateConvert(k.ValidDate)); }
 
                     $('#VisaTypelist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 316, k.VisaType_Id);
-                    $('#CountryList').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id); 
+                    $('#CountryList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id); 
                 });
 
 
@@ -371,7 +371,7 @@
                 if ($("#Autho").hasClass('auto_active')) {
                     $('#Name').oldVal(data[2].Name);
                     $('#VisaTypelist').oldDropval(data[2].VisaType_Val);
-                    $('#CountryList').oldDropval(data[2].Country_Val);
+                    $('#CountryList_DDL').oldDropval(data[2].Country_Val);
                     if (data[2].IssueDate != null) { $('#IssueDate').StickNote(DateConvert(data[2].IssueDate)); }
                     if (data[2].ValidDate != null) { $('#ValidDate').StickNote(DateConvert(data[2].ValidDate)); }
                 }

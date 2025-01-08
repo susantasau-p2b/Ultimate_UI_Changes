@@ -78,7 +78,7 @@ namespace P2BUltimate.Controllers
                     string EffectiveDate = form["EffectiveDate"] == "0" ? "" : form["EffectiveDate"];
                     //string EndDate = form["EndDate"] == "0" ? "" : form["EndDate"];
                     //string LWFWagesRangelist = form["LWFWagesRangelist"] == "0" ? "" : form["LWFWagesRangelist"];
-                    string StateList = form["StateList"] == "0" ? "" : form["StateList"];
+                    string StateList_DDL = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
                     string StatutoryEffectiveMonthsList = form["StatutoryEffectiveMonthsList"] == "0" ? "" : form["StatutoryEffectiveMonthsList"];
                     string WagesMasterList = form["WagesMasterList"] == "0" ? "" : form["WagesMasterList"];
                     var id = int.Parse(Session["CompId"].ToString());
@@ -104,12 +104,12 @@ namespace P2BUltimate.Controllers
                     //    }
                     //}              
 
-                    if (StateList != null)
+                    if (StateList_DDL != null)
                     {
-                        if (StateList != "")
+                        if (StateList_DDL != "")
                         {
 
-                            var val = db.State.Find(int.Parse(StateList));
+                            var val = db.State.Find(int.Parse(StateList_DDL));
                             LWF.LWFStates = val;
                         }
                     }
@@ -330,12 +330,12 @@ namespace P2BUltimate.Controllers
                      string EffectiveDate = form["EffectiveDate"] == "0" ? "" : form["EffectiveDate"];
                      //string EndDate = form["EndDate"] == "0" ? "" : form["EndDate"];
                      string LWFWagesRangelist = form["LWFWagesRangelist"] == "0" ? "" : form["LWFWagesRangelist"];
-                     string StateList = form["StateList"] == "0" ? "" : form["StateList"];
+                     string StateList_DDL = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
                      string StatutoryEffectiveMonthsList = form["StatutoryEffectiveMonthsList"] == "0" ? "" : form["StatutoryEffectiveMonthsList"];
                      string WagesMasterList = form["WagesMasterList"] == "0" ? "" : form["WagesMasterList"];
                      //  bool Auth = form["Autho_Action"] == "" ? false : true;
                      bool Auth = form["Autho_Allow"] == "true" ? true : false;
-                     if (StateList == null)
+                     if (StateList_DDL == null)
                      {
                          Msg.Add("LWFStates is required.");
                          return Json(new Utility.JsonReturnClass { success = false, responseText = Msg }, JsonRequestBehavior.AllowGet);
@@ -354,7 +354,7 @@ namespace P2BUltimate.Controllers
                          return Json(new Utility.JsonReturnClass { success = false, responseText = Msg }, JsonRequestBehavior.AllowGet);
                      }
 
-                     LWF.LWFStates_Id = StateList != "0" && StateList != "" && StateList != null ? int.Parse(StateList) : 0;
+                     LWF.LWFStates_Id = StateList_DDL != "0" && StateList_DDL != "" && StateList_DDL != null ? int.Parse(StateList_DDL) : 0;
                      LWF.WagesMaster_Id = WagesMasterList != null && WagesMasterList != "" ? int.Parse(WagesMasterList) : 0;
                       
                     

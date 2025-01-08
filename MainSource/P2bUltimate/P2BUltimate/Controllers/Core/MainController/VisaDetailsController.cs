@@ -45,7 +45,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string VisaType = form["VisaTypelist"] == "0" ? "" : form["VisaTypelist"];
-                    string Country = form["CountryList"] == "0" ? "" : form["CountryList"];
+                    string Country = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
 
 
@@ -336,7 +336,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string VisaTypelst = form["VisaTypelist"] == "0" ? "" : form["VisaTypelist"];
-                    string Countrylst = form["CountryList"] == "0" ? "" : form["CountryList"];
+                    string Countrylst = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
 
                     var Passport = db.Employee.Include(e => e.VisaDetails).Include(e => e.VisaDetails.Select(q => q.Country))
            .Include(e => e.VisaDetails.Select(q => q.VisaType))
@@ -574,7 +574,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string VisaTypelst = form["VisaTypelist"] == "0" ? "" : form["VisaTypelist"];
-                    string Countrylst = form["CountryList"] == "0" ? "" : form["CountryList"];
+                    string Countrylst = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
 
                     var Passport = db.Employee.Include(e => e.VisaDetails).Include(e => e.VisaDetails.Select(q => q.Country))
            .Include(e => e.VisaDetails.Select(q => q.VisaType))

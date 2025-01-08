@@ -377,7 +377,7 @@
 								else {
 									if(p.state[ t ? 'selected' : 'checked' ]) {
 										p.state[ t ? 'selected' : 'checked' ] = false;
-										this._data[ t ? 'core' : 'checkbox' ].selected = $.vakata.array_remove_item(this._data[ t ? 'core' : 'checkbox' ].selected, p.id);
+										this._data[ t ? 'core' : 'checkbox' ].selected = $.vakata.array_Remove_item(this._data[ t ? 'core' : 'checkbox' ].selected, p.id);
 										tmp = this.get_node(p, true);
 										if(tmp && tmp.length) {
 											tmp.attr('aria-selected', false).children('.jstree-anchor').removeClass(t ? 'jstree-clicked' : 'jstree-checked');
@@ -683,7 +683,7 @@
 			dom = this.get_node(obj, true);
 			if(obj.state.checked) {
 				obj.state.checked = false;
-				this._data.checkbox.selected = $.vakata.array_remove_item(this._data.checkbox.selected, obj.id);
+				this._data.checkbox.selected = $.vakata.array_Remove_item(this._data.checkbox.selected, obj.id);
 				if(dom.length) {
 					dom.children('.jstree-anchor').removeClass('jstree-checked');
 				}
@@ -829,7 +829,7 @@
 					for(k = 0, l = tmp.children_d.length; k < l; k++) {
 						if(this._model.data[tmp.children_d[k]].state.checked) {
 							c = true;
-							this._data.checkbox.selected = $.vakata.array_remove_item(this._data.checkbox.selected, tmp.children_d[k]);
+							this._data.checkbox.selected = $.vakata.array_Remove_item(this._data.checkbox.selected, tmp.children_d[k]);
 						}
 					}
 				}

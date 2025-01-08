@@ -213,16 +213,16 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
-                    string Category = form["BloodGrouplist"] == "0" ? "" : form["BloodGrouplist"];
+                    string Category = form["BloodGroupList_DDL"] == "0" ? "" : form["BloodGroupList_DDL"];
                     string Addrs = form["HospitalAddressList"] == "0" ? "" : form["HospitalAddressList"];
-                    string HospitalContactDetails = form["HospitalContactDetailslist"] == "0" ? "" : form["HospitalContactDetailslist"];
-                    //string Allergy = form["Alergylist"] == "0" ? "" : form["Alergylist"];
-                    //string Disease = form["Diseaselist"] == "0" ? "" : form["Diseaselist"];
-                    //string EmergencyContact = form["EmergencyContactlist"] == "0" ? "" : form["EmergencyContactlist"];
-                    //string Doctor = form["Doctorlist"] == "0" ? "" : form["Doctorlist"];
+                    string HospitalContactDetails = form["HospitalContactDetailsList"] == "0" ? "" : form["HospitalContactDetailsList"];
+                    //string Allergy = form["AlergyList"] == "0" ? "" : form["AlergyList"];
+                    //string Disease = form["DiseaseList"] == "0" ? "" : form["DiseaseList"];
+                    //string EmergencyContact = form["EmergencyContactList"] == "0" ? "" : form["EmergencyContactList"];
+                    //string Doctor = form["DoctorList"] == "0" ? "" : form["DoctorList"];
 
                     List<Allergy> Allergyval = new List<Allergy>();
-                    string Allergy = form["Alergylist"];
+                    string Allergy = form["AlergyList"];
                     c.Allergy = null;
                     if (Allergy != null)
                     {
@@ -238,7 +238,7 @@ namespace P2BUltimate.Controllers.Core.MainController
 
 
                     List<Disease> DiseaseVal = new List<Disease>();
-                    string Disease = form["Diseaselist"];
+                    string Disease = form["DiseaseList"];
                     c.Disease = null;
                     if (Disease != null)
                     {
@@ -253,7 +253,7 @@ namespace P2BUltimate.Controllers.Core.MainController
 
 
                     List<EmergencyContact> EmergencyContactval = new List<EmergencyContact>();
-                    string EmergencyContact = form["EmergencyContactlist"];
+                    string EmergencyContact = form["EmergencyContactList"];
                     c.EmergencyContact = null;
                     if (EmergencyContact != null)
                     {
@@ -267,7 +267,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     }
 
                     List<Doctor> Doctorval = new List<Doctor>();
-                    string Doctor = form["Doctorlist"];
+                    string Doctor = form["DoctorList"];
                     c.Doctor = null;
                     if (Doctor != null)
                     {
@@ -808,9 +808,9 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["BloodGrouplist"] == "0" ? "" : form["BloodGrouplist"];
+                    string Corp = form["BloodGroupList_DDL"] == "0" ? "" : form["BloodGroupList_DDL"];
                     string Addrs = form["HospitalAddressList"] == "0" ? "" : form["HospitalAddressList"];
-                    string HospitalContactDetails = form["HospitalContactDetailslist"] == "0" ? "" : form["HospitalContactDetailslist"];
+                    string HospitalContactDetails = form["HospitalContactDetailsList"] == "0" ? "" : form["HospitalContactDetailsList"];
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
@@ -839,7 +839,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     db_Data.EmpmedicalInfo.EmergencyContact = null;
 
                     List<Allergy> AllergyVal = new List<Allergy>();
-                    string AllergyV = form["Alergylist"];
+                    string AllergyV = form["AlergyList"];
                     if (AllergyV != null)
                     {
                         var ids = Utility.StringIdsToListIds(AllergyV);
@@ -851,7 +851,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<Disease> DiseaseVal = new List<Disease>();
-                    string DiseaseV = form["Diseaselist"];
+                    string DiseaseV = form["DiseaseList"];
                     if (DiseaseV != null)
                     {
                         var ids = Utility.StringIdsToListIds(DiseaseV);
@@ -863,7 +863,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<EmergencyContact> EmergencyContactVal = new List<EmergencyContact>();
-                    string EmergencyContactV = form["EmergencyContactlist"];
+                    string EmergencyContactV = form["EmergencyContactList"];
                     if (EmergencyContactV != null && EmergencyContactV != "0")
                     {
                         var ids = Utility.StringIdsToListIds(EmergencyContactV);
@@ -875,7 +875,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<Doctor> DoctorVal = new List<Doctor>();
-                    string DoctorV = form["Doctorlist"];
+                    string DoctorV = form["DoctorList"];
                     if (DoctorV != null && DoctorV != "0")
                     {
                         var ids = Utility.StringIdsToListIds(DoctorV);
@@ -1240,9 +1240,9 @@ namespace P2BUltimate.Controllers.Core.MainController
                     //              .Include(e => e.QualificationDetails)
                     //            .Include(e => e.Skill)
                     //            .Include(e => e.Scolarship).Where(e => e.Id == data).SingleOrDefault();
-                    string Corp = form["BloodGrouplist"] == "0" ? "" : form["BloodGrouplist"];
+                    string Corp = form["BloodGroupList_DDL"] == "0" ? "" : form["BloodGroupList_DDL"];
                     string Addrs = form["HospitalAddressList"] == "0" ? "" : form["HospitalAddressList"];
-                    string HospitalContactDetails = form["HospitalContactDetailslist"] == "0" ? "" : form["HospitalContactDetailslist"];
+                    string HospitalContactDetails = form["HospitalContactDetailsList"] == "0" ? "" : form["HospitalContactDetailsList"];
 
                     var db_Data = db.Employee.Include(e => e.EmpmedicalInfo)
                       .Include(e => e.EmpmedicalInfo.HospitalContactDetails)
@@ -1268,7 +1268,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     db_Data.EmpmedicalInfo.HospitalContactDetails = null;
                     db_Data.EmpmedicalInfo.HospitalAddress = null;
                     List<Allergy> AllergyVal = new List<Allergy>();
-                    string AllergyV = form["Alergylist"];
+                    string AllergyV = form["AlergyList"];
                     if (AllergyV != null)
                     {
                         var ids = Utility.StringIdsToListIds(AllergyV);
@@ -1280,7 +1280,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<Disease> DiseaseVal = new List<Disease>();
-                    string DiseaseV = form["Diseaselist"];
+                    string DiseaseV = form["DiseaseList"];
                     if (DiseaseV != null)
                     {
                         var ids = Utility.StringIdsToListIds(DiseaseV);
@@ -1292,7 +1292,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<EmergencyContact> EmergencyContactVal = new List<EmergencyContact>();
-                    string EmergencyContactV = form["EmergencyContactlist"];
+                    string EmergencyContactV = form["EmergencyContactList"];
                     if (EmergencyContactV != null && EmergencyContactV != "0")
                     {
                         var ids = Utility.StringIdsToListIds(EmergencyContactV);
@@ -1304,7 +1304,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
                     List<Doctor> DoctorVal = new List<Doctor>();
-                    string DoctorV = form["Doctorlist"];
+                    string DoctorV = form["DoctorList"];
                     if (DoctorV != null && DoctorV != "0")
                     {
                         var ids = Utility.StringIdsToListIds(DoctorV);

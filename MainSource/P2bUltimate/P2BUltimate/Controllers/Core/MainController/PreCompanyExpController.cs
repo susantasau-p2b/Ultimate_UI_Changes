@@ -140,7 +140,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
-                    string ExpDet = form["ExperienceDetailslist"] == "0" ? "" : form["ExperienceDetailslist"];
+                    string ExpDet = form["ExperienceDetailsList_DDL"] == "0" ? "" : form["ExperienceDetailsList_DDL"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
 
@@ -691,7 +691,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 try
                 {
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
-                    string ExpDet = form["ExperienceDetailslist"] == "0" ? "" : form["ExperienceDetailslist"];
+                    string ExpDet = form["ExperienceDetailsList_DDL"] == "0" ? "" : form["ExperienceDetailsList_DDL"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
                     var prevcomp = db.Employee.Include(e => e.PreCompExp).Include(e => e.PreCompExp.Select(q => q.CompAddress))

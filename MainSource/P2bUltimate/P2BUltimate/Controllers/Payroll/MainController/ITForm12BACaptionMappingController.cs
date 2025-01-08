@@ -35,7 +35,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
         {
             using (DataBaseContext db = new DataBaseContext())
             {
-                var perqname = form["Categorylist"] == null ? "" : form["Categorylist"];
+                var perqname = form["CategoryList_DDL"] == null ? "" : form["CategoryList_DDL"];
                 string salhd = form["AddressList"];
                 try
                 {
@@ -211,7 +211,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
 
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
-                    var perqname = form["Categorylist"] == null ? "" : form["Categorylist"];
+                    var perqname = form["CategoryList_DDL"] == null ? "" : form["CategoryList_DDL"];
                     string salhd = form["AddressList"];
 
 

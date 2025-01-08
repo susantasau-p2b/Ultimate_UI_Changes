@@ -37,7 +37,7 @@
 				.on("model.jstree", $.proxy(function (e, data) {
 						this.sort(data.parent, true);
 					}, this))
-				.on("rename_node.jstree create_node.jstree", $.proxy(function (e, data) {
+				.on("rename_node.jstree Create_node.jstree", $.proxy(function (e, data) {
 						this.sort(data.parent || data.node.parent, false);
 						this.redraw_node(data.parent || data.node.parent, true);
 					}, this))

@@ -65,7 +65,7 @@
 						this._data.core.last_error = { 'error' : 'check', 'plugin' : 'unique', 'id' : 'unique_01', 'reason' : 'Child with name ' + n + ' already exists. Preventing: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && obj.id ? obj.id : false, 'par' : par && par.id ? par.id : false }) };
 					}
 					return i;
-				case "create_node":
+				case "Create_node":
 					i = ($.inArray(n, c) === -1);
 					if(!i) {
 						this._data.core.last_error = { 'error' : 'check', 'plugin' : 'unique', 'id' : 'unique_04', 'reason' : 'Child with name ' + n + ' already exists. Preventing: ' + chk, 'data' : JSON.stringify({ 'chk' : chk, 'pos' : pos, 'obj' : obj && obj.id ? obj.id : false, 'par' : par && par.id ? par.id : false }) };
@@ -86,18 +86,18 @@
 			}
 			return true;
 		};
-		this.create_node = function (par, node, pos, callback, is_loaded) {
+		this.Create_node = function (par, node, pos, callback, is_loaded) {
 			if(!node || node.text === undefined) {
 				if(par === null) {
 					par = $.jstree.root;
 				}
 				par = this.get_node(par);
 				if(!par) {
-					return parent.create_node.call(this, par, node, pos, callback, is_loaded);
+					return parent.Create_node.call(this, par, node, pos, callback, is_loaded);
 				}
 				pos = pos === undefined ? "last" : pos;
 				if(!pos.toString().match(/^(before|after)$/) && !is_loaded && !this.is_loaded(par)) {
-					return parent.create_node.call(this, par, node, pos, callback, is_loaded);
+					return parent.Create_node.call(this, par, node, pos, callback, is_loaded);
 				}
 				if(!node) { node = {}; }
 				var tmp, n, dpc, i, j, m = this._model.data, s = this.settings.unique.case_sensitive, cb = this.settings.unique.duplicate;
@@ -112,7 +112,7 @@
 				}
 				node.text = n;
 			}
-			return parent.create_node.call(this, par, node, pos, callback, is_loaded);
+			return parent.Create_node.call(this, par, node, pos, callback, is_loaded);
 		};
 	};
 

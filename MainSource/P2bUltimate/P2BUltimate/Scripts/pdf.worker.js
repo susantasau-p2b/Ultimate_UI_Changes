@@ -11321,7 +11321,7 @@ var RefSet = function RefSetClosure() {
     put: function RefSet_put(ref) {
       this.dict[ref.toString()] = true;
     },
-    remove: function RefSet_remove(ref) {
+    remove: function RefSet_Remove(ref) {
       delete this.dict[ref.toString()];
     }
   };
@@ -39621,7 +39621,7 @@ var CFFDict = function CFFDictClosure() {
 
       return this.values[key];
     },
-    removeByName: function CFFDict_removeByName(name) {
+    removeByName: function CFFDict_RemoveByName(name) {
       delete this.values[this.nameToKeyMap[name]];
     }
   };

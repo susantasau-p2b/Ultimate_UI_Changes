@@ -44,7 +44,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
 
@@ -273,7 +273,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Corp = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;

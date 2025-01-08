@@ -280,16 +280,16 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                     string CreditDebitFlag = form["ArrCreditDebitFlag"] != null ? form["ArrCreditDebitFlag"] : "";
                     jv.ArrCreditDebitFlag = CreditDebitFlag;
                     string salaryheadslist = form["salaryheadslist"] != null ? form["salaryheadslist"] : "";
-                    string Group_drop = form["Group_drop"] != null ? form["Group_drop"] : "";
+                    string GroupList_DDL = form["GroupList_DDL"] != null ? form["GroupList_DDL"] : "";
                     string Branch_drop = form["Branch_drop"] != null ? form["Branch_drop"] : "";
                     if (Branch_drop != "-Select-")
                     {
                         jv.ArrCreditDebitBranchName = Branch_drop;
 
                     }
-                    if (Group_drop != null && Group_drop != "-Select-")
+                    if (GroupList_DDL != null && GroupList_DDL != "-Select-")
                     {
-                        var value = db.LookupValue.Find(int.Parse(Group_drop));
+                        var value = db.LookupValue.Find(int.Parse(GroupList_DDL));
                         jv.JVGroup = value;
 
                     }
@@ -699,7 +699,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 {
                     string CreditDebitFlag = form["CreditDebitFlag"] != null ? form["CreditDebitFlag"] : "";
                     string salaryheadslist = form["salaryheadslist"] != null ? form["salaryheadslist"] : "";
-                    string Group_drop = form["Group_drop"] != null ? form["Group_drop"] : "";
+                    string GroupList_DDL = form["GroupList_DDL"] != null ? form["GroupList_DDL"] : "";
                     string Branch_drop = form["Branch_drop"] != null ? form["Branch_drop"] : "";
 
                     string LocationIn_table = form["LocationIn-table"] != null ? form["LocationIn-table"] : null;
@@ -806,11 +806,11 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                             ModifiedBy = SessionManager.UserName,
                             ModifiedOn = DateTime.Now
                         };
-                        if (Group_drop != null)
+                        if (GroupList_DDL != null)
                         {
-                            if (Group_drop != "" && Group_drop != "0" && Group_drop != "-Select-")
+                            if (GroupList_DDL != "" && GroupList_DDL != "0" && GroupList_DDL != "-Select-")
                             {
-                                var val = db.LookupValue.Find(int.Parse(Group_drop));
+                                var val = db.LookupValue.Find(int.Parse(GroupList_DDL));
                                 jv.JVGroup = val;
 
                                 var type = db.ArrJVParameter.Include(e => e.JVGroup).Where(e => e.Id == data).SingleOrDefault();
@@ -869,7 +869,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         company_Id = Convert.ToInt32(Session["CompId"]);
                         var companypayroll = new CompanyPayroll();
                         companypayroll = db.CompanyPayroll.Include(a => a.ArrJVParameter).Where(e => e.Company.Id == company_Id).SingleOrDefault();
-                        if (Group_drop == "535")
+                        if (GroupList_DDL == "535")
                         {
                             var CurCorp = db.ArrJVParameter.Find(data);
                             TempData["CurrRowVersion"] = CurCorp.RowVersion;

@@ -43,11 +43,11 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Category = form["DoctorCategorylist"] == "0" ? "" : form["DoctorCategorylist"];
-                    string Rltnlist = form["Relationlist"] == "0" ? "" : form["Relationlist"];
+                    string Category = form["DoctorCategoryList_DDL"] == "0" ? "" : form["DoctorCategoryList_DDL"];
+                    string Rltnlist = form["RelationList_DDL"] == "0" ? "" : form["RelationList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
-                    string Namel = form["Namelist"] == "0" ? "" : form["Namelist"]; ;
+                    string Namel = form["NameList"] == "0" ? "" : form["NameList"]; ;
 
                     if (Rltnlist != null)
                     {
@@ -354,11 +354,11 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["Relationlist"] == "0" ? "" : form["Relationlist"];
-                    string Dcategory = form["DoctorCategorylist"] == "0" ? "" : form["DoctorCategorylist"];
+                    string Corp = form["RelationList_DDL"] == "0" ? "" : form["RelationList_DDL"];
+                    string Dcategory = form["DoctorCategoryList_DDL"] == "0" ? "" : form["DoctorCategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
-                    string Namelist = form["Namelist"] == "0" ? "" : form["Namelist"];
+                    string NameList = form["NameList"] == "0" ? "" : form["NameList"];
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
@@ -401,11 +401,11 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
 
-                    if (Namelist != null)
+                    if (NameList != null)
                     {
-                        if (Namelist != "")
+                        if (NameList != "")
                         {
-                            int NameId = Convert.ToInt32(Namelist);
+                            int NameId = Convert.ToInt32(NameList);
                             var val = db.NameSingle.Include(e => e.EmpTitle)
                                                 .Where(e => e.Id == NameId).SingleOrDefault();
                             c.Name = val;
@@ -443,7 +443,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                                     ModifiedOn = DateTime.Now
                                 };
 
-                                int a = EditS(Corp, Dcategory, Addrs, ContactDetails, Namelist, data, c, c.DBTrack);
+                                int a = EditS(Corp, Dcategory, Addrs, ContactDetails, NameList, data, c, c.DBTrack);
 
                                 await db.SaveChangesAsync();
 
@@ -738,7 +738,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     Address add = corporates.Address;
                     ContactDetails conDet = corporates.ContactDetails;
                     LookupValue val = corporates.Relation;
-                    NameSingle Namelist = corporates.Name;
+                    NameSingle NameList = corporates.Name;
                     //EmergencyContact corporates = db.EmergencyContact.Where(e => e.Id == data).SingleOrDefault();
                     if (corporates.DBTrack.IsModified == true)
                     {

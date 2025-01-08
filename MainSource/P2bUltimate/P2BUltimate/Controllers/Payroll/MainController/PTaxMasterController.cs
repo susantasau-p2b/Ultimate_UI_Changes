@@ -389,7 +389,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
         {
             public int Id { get; set; }
 
-            public string StateList { get; set; }
+            public string StateList_DDL { get; set; }
             public string PTWagesMaster { get; set; }
         }
 
@@ -432,7 +432,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                                 view = new P2BGridData()
                                 {
                                     Id = E.Id,
-                                    StateList = E.States != null ? Convert.ToString(E.States.FullDetails) : "",
+                                    StateList_DDL = E.States != null ? Convert.ToString(E.States.FullDetails) : "",
                                     PTWagesMaster = E.PTWagesMaster != null ? Convert.ToString(E.PTWagesMaster.FullDetails) : ""
 
                                 };
@@ -451,16 +451,16 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         IE = PTAXMASTERList;
                         if (gp.searchOper.Equals("eq"))
                         {
-                            jsonData = IE.Where(e => (e.StateList.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
+                            jsonData = IE.Where(e => (e.StateList_DDL.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                             || (e.PTWagesMaster.ToUpper().ToString().Contains(gp.searchString.ToUpper()))
                             || (e.Id.ToString().Contains(gp.searchString))
-                            ).Select(a => new Object[] { a.StateList, a.PTWagesMaster, a.Id }).ToList();
+                            ).Select(a => new Object[] { a.StateList_DDL, a.PTWagesMaster, a.Id }).ToList();
                             //jsonData = IE.Select(a => new Object[] { a.Id, Convert.ToString(a.Code), Convert.ToString(a.Name), Convert.ToString(a.BusinessType) != null ? Convert.ToString(a.BusinessType.Id) : "" }).Where(a => a.Contains(Convert.ToInt32(gp.searchString))).ToList();
                         }
                         if (pageIndex > 1)
                         {
                             int h = pageIndex * pageSize;
-                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.StateList, a.PTWagesMaster, a.Id }).ToList();
+                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.StateList_DDL, a.PTWagesMaster, a.Id }).ToList();
                         }
                         totalRecords = IE.Count();
                     }
@@ -474,7 +474,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         }
                         else
                         {
-                            orderfuc = (c =>    gp.sidx == "StateList" ? c.StateList.ToString() :
+                            orderfuc = (c =>    gp.sidx == "StateList_DDL" ? c.StateList_DDL.ToString() :
                                                 gp.sidx == "PTWagesMaster" ? c.PTWagesMaster.ToString() : ""
 
                                             );
@@ -482,17 +482,17 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                         if (gp.sord == "asc")
                         {
                             IE = IE.OrderBy(orderfuc);
-                            jsonData = IE.Select(a => new Object[] { a.StateList, a.PTWagesMaster, a.Id }).ToList();
+                            jsonData = IE.Select(a => new Object[] { a.StateList_DDL, a.PTWagesMaster, a.Id }).ToList();
                         }
                         else if (gp.sord == "desc")
                         {
                             IE = IE.OrderByDescending(orderfuc);
-                            jsonData = IE.Select(a => new Object[] { a.StateList, a.PTWagesMaster, a.Id }).ToList();
+                            jsonData = IE.Select(a => new Object[] { a.StateList_DDL, a.PTWagesMaster, a.Id }).ToList();
                         }
                         if (pageIndex > 1)
                         {
                             int h = pageIndex * pageSize;
-                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.StateList, a.PTWagesMaster, a.Id }).ToList();
+                            jsonData = IE.Skip(pageIndex).Take(pageSize).Select(a => new Object[] { a.StateList_DDL, a.PTWagesMaster, a.Id }).ToList();
                         }
                         totalRecords = PTAXMASTERList.Count();
                     }

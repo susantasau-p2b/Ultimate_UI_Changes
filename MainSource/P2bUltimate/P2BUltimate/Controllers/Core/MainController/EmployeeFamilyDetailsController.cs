@@ -251,7 +251,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                 {
                     int Emp = form["Employee-Table"] == "0" ? 0 : Convert.ToInt32(form["Employee-Table"]);
                     //  string Emp = form["Employee-Table"] == "0" ? "" : form["Employee-Table"];
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     //     string benifit = form["BenefitTypelist"] == "0" ? "" : form["BenefitTypelist"];
@@ -987,9 +987,9 @@ namespace P2BUltimate.Controllers.Core.MainController
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string benefit = form["BenefitTypelist"] == "0" ? "" : form["BenefitTypelist"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
-                    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
 
-                    //  string FacultyType = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+                    //  string FacultyType = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
                     // string TrainingInstitute = form["TrainingInstitutelist"] == "0" ? "" : form["TrainingInstitutelist"];
                     // string ContactDetails = form["FacultySpecializationlist"] == "0" ? "" : form["FacultySpecializationlist"];
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;
@@ -1609,7 +1609,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
         //    string benefit = form["BenefitTypelist"] == "0" ? "" : form["BenefitTypelist"];
         //    string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
-        //    string Category = form["Categorylist"] == "0" ? "" : form["Categorylist"];
+        //    string Category = form["CategoryList_DDL"] == "0" ? "" : form["CategoryList_DDL"];
         //    //  bool Auth = form["Autho_Action"] == "" ? false : true;
         //    bool Auth = form["Autho_Allow"] == "true" ? true : false;
 

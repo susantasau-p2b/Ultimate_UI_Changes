@@ -18326,8 +18326,8 @@ function () {
       this._progressiveDone = true;
     }
   }, {
-    key: "_removeRangeReader",
-    value: function _removeRangeReader(reader) {
+    key: "_RemoveRangeReader",
+    value: function _RemoveRangeReader(reader) {
       var i = this._rangeReaders.indexOf(reader);
 
       if (i >= 0) {
@@ -18588,7 +18588,7 @@ function () {
 
       this._done = true;
 
-      this._stream._removeRangeReader(this);
+      this._stream._RemoveRangeReader(this);
     }
   }, {
     key: "read",
@@ -18649,7 +18649,7 @@ function () {
 
       this._requests = [];
 
-      this._stream._removeRangeReader(this);
+      this._stream._RemoveRangeReader(this);
     }
   }, {
     key: "isStreamingSupported",

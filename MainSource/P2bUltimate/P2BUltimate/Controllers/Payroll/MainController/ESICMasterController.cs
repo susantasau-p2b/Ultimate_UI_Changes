@@ -152,7 +152,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                     string StatutoryEffectiveMonthsList = form["StatutoryEffectiveMonthsList"] == "0" ? "" : form["StatutoryEffectiveMonthsList"];
                     string WageMasterPayList = form["WageMasterPayList"] == "0" ? "" : form["WageMasterPayList"];
                     string WageMasterQualifyList = form["WageMasterQualifyList"] == "0" ? "" : form["WageMasterQualifyList"];
-                    string Location_drop = form["Locationlist"] == "0" ? "" : form["Locationlist"];
+                    string LocationList_DDL = form["Locationlist"] == "0" ? "" : form["Locationlist"];
                     var id = int.Parse(Session["CompId"].ToString());
                     var companypayroll = db.CompanyPayroll.Where(e => e.Company.Id == id).SingleOrDefault();
 
@@ -163,9 +163,9 @@ namespace P2BUltimate.Controllers.Payroll.MainController
 
                     }
                     List<Location> location = new List<Location>();
-                    if (!string.IsNullOrEmpty(Location_drop))
+                    if (!string.IsNullOrEmpty(LocationList_DDL))
                     {
-                        var ids = Utility.StringIdsToListIds(Location_drop);
+                        var ids = Utility.StringIdsToListIds(LocationList_DDL);
                         foreach (var ca in ids)
                         {
                             var val = db.Location.Find(ca);
@@ -384,7 +384,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                     string StatutoryEffectiveMonthsList = form["StatutoryEffectiveMonthsList"] == "0" ? "" : form["StatutoryEffectiveMonthsList"];
                     string WageMasterPayList = form["WageMasterPayList"] == "0" ? "" : form["WageMasterPayList"];
                     string WageMasterQualifyList = form["WageMasterQualifyList"] == "0" ? "" : form["WageMasterQualifyList"];
-                    string Location_drop = form["Locationlist"] == "0" ? "" : form["Locationlist"];
+                    string LocationList_DDL = form["Locationlist"] == "0" ? "" : form["Locationlist"];
 
                     if (!string.IsNullOrEmpty(EffectiveDate))
                     {
@@ -423,9 +423,9 @@ namespace P2BUltimate.Controllers.Payroll.MainController
 
                     List<Location> dbLocationlist = new List<Location>();
                    
-                    if (!string.IsNullOrEmpty(Location_drop))
+                    if (!string.IsNullOrEmpty(LocationList_DDL))
                     {
-                        var ids = Utility.StringIdsToListIds(Location_drop);
+                        var ids = Utility.StringIdsToListIds(LocationList_DDL);
                         foreach (var ca in ids)
                         {
                             var val = db.Location.Find(ca);

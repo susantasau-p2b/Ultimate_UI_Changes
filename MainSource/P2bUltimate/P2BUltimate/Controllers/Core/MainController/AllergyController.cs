@@ -256,7 +256,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Values = form["Medicinelist"];
+                    string Values = form["MedicineList"];
 
 
                     if (Values != null)

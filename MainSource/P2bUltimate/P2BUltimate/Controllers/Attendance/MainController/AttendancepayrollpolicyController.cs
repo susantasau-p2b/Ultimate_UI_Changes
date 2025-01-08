@@ -66,7 +66,7 @@ namespace P2BUltimate.Controllers.Attendance.MainController
                 try
                 {
                     string PayScaleType = form["PayProcessGroupList"] == "0" ? "" : form["PayProcessGroupList"];
-                    // string RoundingList = form["RoundingList"] == "0" ? "" : form["RoundingList"];
+                    // string RoundingList_DDL = form["RoundingList_DDL"] == "0" ? "" : form["RoundingList_DDL"];
                     var LWPAdjustCurSal = form["LWPAdjustCurSal"];
                     NOBJ.LWPAdjustCurSal = Convert.ToBoolean(LWPAdjustCurSal);
                     int company_Id = 0;
@@ -95,10 +95,10 @@ namespace P2BUltimate.Controllers.Attendance.MainController
                         // return this.Json(new Object[] { "", "", "Select PayScaleType", JsonRequestBehavior.AllowGet });
                     }
 
-                    //string Values = form["PayScaleArealist"];
+                    //string Values = form["PayScaleAreaList"];
 
                     List<Location> OBJ = new List<Location>();
-                    string Values = form["PayScaleArealist"];
+                    string Values = form["PayScaleAreaList"];
 
 
 
@@ -509,7 +509,7 @@ namespace P2BUltimate.Controllers.Attendance.MainController
         }
 
 
-        public int EditS(string TypeLS, string RoundingList, string Areal, int data, PayScale NOBJ, DBTrack dbT)
+        public int EditS(string TypeLS, string RoundingList_DDL, string Areal, int data, PayScale NOBJ, DBTrack dbT)
         {
 
             // db.Configuration.AutoDetectChangesEnabled = false;
@@ -562,11 +562,11 @@ namespace P2BUltimate.Controllers.Attendance.MainController
                         //db.Entry(type).State = System.Data.Entity.EntityState.Detached;
                     }
                 }
-                if (RoundingList != null)
+                if (RoundingList_DDL != null)
                 {
-                    if (RoundingList != "")
+                    if (RoundingList_DDL != "")
                     {
-                        var val = db.LookupValue.Find(int.Parse(RoundingList));
+                        var val = db.LookupValue.Find(int.Parse(RoundingList_DDL));
                         NOBJ.Rounding = val;
 
                         var type = db.PayScale.Include(e => e.Rounding).Where(e => e.Id == data).SingleOrDefault();

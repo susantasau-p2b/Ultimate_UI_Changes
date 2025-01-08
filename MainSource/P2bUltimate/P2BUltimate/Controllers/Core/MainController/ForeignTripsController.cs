@@ -40,7 +40,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                             Addrs.TripType = val;
                         }
                     }
-                    string count = form["CountryList"] == "0" ? "" : form["CountryList"];
+                    string count = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
 
                     if (count != null)
                     {
@@ -51,7 +51,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
 
-                    count = form["StateList"] == "0" ? "" : form["StateList"];
+                    count = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
                     if (count != null)
                     {
                         if (count != "")
@@ -62,7 +62,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     }
 
 
-                    var citycount = form["CityList"] == "0" ? "" : form["CityList"];
+                    var citycount = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
                     if (citycount != null)
                     {
                         if (citycount != "")
@@ -565,9 +565,9 @@ namespace P2BUltimate.Controllers.Core.MainController
 
 
                     string TripType = form["Category"] == "0" ? "" : form["Category"];
-                    string Country = form["CountryList"] == "0" ? "" : form["CountryList"];
-                    string State = form["StateList"] == "0" ? "" : form["StateList"];
-                    string City = form["CityList"] == "0" ? "" : form["CityList"];
+                    string Country = form["CountryList_DDL"] == "0" ? "" : form["CountryList_DDL"];
+                    string State = form["StateList_DDL"] == "0" ? "" : form["StateList_DDL"];
+                    string City = form["CityList_DDL"] == "0" ? "" : form["CityList_DDL"];
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
 

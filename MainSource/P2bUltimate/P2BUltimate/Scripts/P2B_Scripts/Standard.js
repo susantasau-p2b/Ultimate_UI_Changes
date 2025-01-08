@@ -1,6 +1,7 @@
 ﻿//Developed By Chaitanya Potdar
 // V 1.0.0
 //05:32 PM 06/01/2017
+
 (function (factory) {
     if (typeof define === "function" && define.amd) {
         define(["jquery"], factory);
@@ -146,8 +147,13 @@
             //    return $(e.target).is("input:checkbox");
             //}
         });
-
         this.jqGrid('navGrid', pager, { edit: false, add: false, del: false });
+        this.jqGrid('setGridParam', {
+            url: url,
+            page: 1,
+            search: false,
+            postData: { filters: '' }
+        },true).trigger('reloadGrid');
         this.trigger('reyGrid', [{ _search: false, searchField: null, searchOper: '', searchString: '' }]);
 
         if (extraparam.selectall == true && extraparam.multiple == true) {
@@ -471,6 +477,7 @@
     };
     $.fn.P2BCreateDialog = function (creaturl, creadata, url, forwarddata, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returnfunctiondata, fn) {
         jQuery(this).trigger('reset');
+        //$('select').removeAttr('style');
         var init = jQuery(this);
         var ajaxdata, createajaxdata;
         nameidclassofbuttontodisable = '.popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-view';
@@ -1130,6 +1137,7 @@
     };
     $.fn.P2BEditModalDialog = function (openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returndatafunction, fn) {
         var editajaxdata, editajaxopenloaddata, init;
+        //$('select').removeAttr('style');
         var OldIds = [];
         var NewIds = [];
         var olddata = [];
@@ -1462,6 +1470,7 @@
     };
     $.fn.P2BViewModalDialog = function (openurl, opendataforward, maindialogtitle, nameofthelookuptable, nameidclassofbuttontodisable, height, width, idorclassofautobtn, authoriseurl, autho_id, autho_action, autho_data, editmessage, editerrormessage, gridreloadname, returndatafunction) {
         var viewajaxopenloaddata;
+        //$('select').removeAttr('style');
         var old_data_class = ['.olddiv', '.oldlookup', '.olddrop', '.oldradio'];
         nameidclassofbuttontodisable = ".popup-content-icon-create,.popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-lookup,.popup-content-icon-view";
         var init = jQuery(this);
@@ -2993,7 +3002,6 @@
         jQuery(init).empty().append(htm).selectmenu().selectmenu().selectmenu("refresh");
         $.post(url, { data: forwardata, data2: forwardata2 }, function (data) {
             $.each(data, function (i, k) {
-
                 jQuery(init).append($('<option>', {
                     value: k.Value,
                     text: k.Text,
@@ -3390,6 +3398,7 @@
                             if (!parent.hasClass('table-div-hide')) {
                                 parent.removeClass('selectedtr');
                                 ele.removeAttr('checked');
+                                ele.prop('checked', false);
                             }
 
                         });
@@ -3770,11 +3779,12 @@
             autoOpen: false,
             height: obj.height,
             width: obj.width,
-            modal: true,
+            modal: false,
             closeOnEscape: false,
             title: obj.title,
             beforeClose: function () {
-                obj.gridname != null ? $(obj.gridname).trigger("reloadGrid") : true;
+                obj.gridname != null ? $(obj.gridname).jqGrid('clearGridData') : true;
+                //obj.gridname != null ? $(obj.gridname).trigger("reloadGrid") : true;
                 obj.returnToGrid != null ? $(obj.returnToGrid).trigger("reloadGrid") : true;
                 // $.FormReset(obj.form)
                 RemoveErrTag();
@@ -3783,6 +3793,7 @@
             },
             open: function (event, ui) {
                 $.CheckSessionExitance();
+                $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
                 if (obj.submiturl == null) {
                     $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable');
                 }

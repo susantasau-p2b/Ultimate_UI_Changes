@@ -1,4 +1,4 @@
-﻿@{
+﻿    @{
     ViewBag.Title = "JVParameter";
 }
 @model Payroll.JVParameter
@@ -15,8 +15,8 @@
         var ColNames = [];
         var ColModel = [];
         var SortName, Caption, url, width, height;
-        ColModel = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'Credit_Debit', 'BranchCode', 'AccountNo', 'Id'];
-        ColNames = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'Credit_Debit', 'BranchCode', 'AccountNo', 'Id'];
+        ColModel = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'CrEdit_Debit', 'BranchCode', 'AccountNo', 'Id'];
+        ColNames = ['Code', 'Name', 'PaymentBank', 'JVGroup', 'CrEdit_Debit', 'BranchCode', 'AccountNo', 'Id'];
         SortName = 'Id';
         Caption = 'JVParameter';
         url = '@Url.Action("P2BGrid")';
@@ -26,13 +26,13 @@
         $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
         $('#hidebrank').hide();
         $('#hidepaybank').hide();
-        $("#Group_drop").on("selectmenuchange", function () {
+        $("#GroupList_DDL").on("selectmenuchange", function () {
             // alert($(this).val());
-            if ($("#Group_drop :selected").text() == "COMPANY") {
+            if ($("#GroupList_DDL :selected").text() == "COMPANY") {
                 $('#hidebrank').fadeIn();
                 $('#hidepaybank').fadeOut();
             }
-            else if ($("#Group_drop :selected").text() == "PAYMENTBANK") {
+            else if ($("#GroupList_DDL :selected").text() == "PAYMENTBANK") {
                 $('#hidebrank').fadeIn();
                 $('#hidepaybank').fadeIn();
             }
@@ -40,7 +40,7 @@
                 $('#hidebrank').fadeOut();
                 $('#hidepaybank').fadeOut();
             }
-            if ($("#Group_drop :selected").text() == "LOCATION") {
+            if ($("#GroupList_DDL :selected").text() == "LOCATION") {
                 $('#dvGroup').show();
             }
             else {
@@ -58,7 +58,7 @@
             $('#multiple-shwdivG').hide();
             $.SelectionRefresh();
             $('#Create_Dialog').P2BCreateDialog('', 0, '', '', 'Create JVParameter Dialog', 'open', '@Url.Action("Create")', '#frmJVParameter', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#salaryheadslist', '#Remove-salaryhead-Lookup1', function () { });
-            $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, "");// To bind dropdown on page load
+            $('#GroupList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, "");// To bind dropdown on page load
             $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", ""); // To bind dropdown on page load
             $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", ""); // To bind dropdown on page load
             $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, "");// To bind dropdown on page load
@@ -77,7 +77,8 @@
         $.MarkChecked = function (fn, val) {
             var ele = $("input[name='" + fn + "'][value='" + val + "']");
             console.log(val);
-            ele.attr('checked', 'checked');
+            ele.prop('checked', true);
+            //ele.attr('checked', 'checked');
             ele.parents('tr').addClass("selectedtr");
         };
         function SingleSelection1() {
@@ -96,18 +97,20 @@
         var jobposiid = 0;
 
         $('#Edit').on('click', function (event) {
-
             AssignData();
             $('#frmJVParameter').trigger('reset');
-            $('#Createpartial').attr('disabled', true);
+            $('#Createpartial').removeAttr('disabled');
             $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit JVParameter Dialog", '#frmJVParameter', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#salaryheadslist', '#Remove-salaryhead-Lookup1', function (data) {
-
+                $('#frmJVParameter').trigger('reset');
+                $('#Createpartial').prop('disabled', true);
+                $('#Createpartial').addClass('ui-button-disabled ui-state-disabled');
                 //  $.each(data[0], function (i, k) {
                 var k = data[0];
                 $('#JVProductCode').val(k.JVCode);
                 //$('#JVProductCode').attr('readonly', 'readonly');
                 $('#JVName').val(k.JVName);
                 $('[name="CreditDebitFlag"]').val([k.CreditDebitFlag]).button().button("refresh");
+                //$('input[type="radio"][name="CreditDebitFlag"][value="' + k.CreditDebitFlag + '"]:radio').prop('checked', true).addClass('ui-state-active');
                 $('#CreditDebitBranchCode').val(k.CreditDebitBranchCode);
                 $('#AccountNo').val(k.AccountNo);
                 $('#SubAccountNo').val(k.SubAccountNo);
@@ -115,7 +118,7 @@
                 $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", k.CreditDebitBranchName); // To bind dropdown on page load
                 $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", k.PaymentBank_Id); // To bind dropdown on page load
                 $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, k.SourceType_Id);
-                $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
+                $('#GroupList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
                 if (k.Irregular == true) {
                     $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
                     $('#multiple-shwdiv').show();
@@ -195,10 +198,19 @@
                 });
 
                 $('#Autho_Allow').val(data[3]);
+
+                //debugger;
+                //$("input[type='radio'][name='CreditDebitFlag']:checked").each(
+                //    function () {
+                //        $("input[type='radio'][name='CreditDebitFlag'][value='" + k.CreditDebitFlag + "']").prop('checked', true);
+                //        var id1 = $("input[type='radio'][name='CreditDebitFlag'][value='" + k.CreditDebitFlag + "'] label[for='CreditDebitFlag_radio1']").prop('id');
+                //    }
+                //);
             });
             checking = 1;
 
             event.preventDefault();
+
         });
 
         //$.when(P2BEditModalDialog()).done(function () {
@@ -226,7 +238,7 @@
                 $('#Branch_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListLocation", "JVParameter")', "", k.CreditDebitBranchName); // To bind dropdown on page load
                 $('#PaymentBank_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownListPaymentbank", "JVParameter")', "", k.PaymentBank_Id); // To bind dropdown on page load
                 $('#SourceType_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 1084, k.SourceType_Id);
-                $('#Group_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
+                $('#GroupList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 502, k.Group_Id);
                 if (k.Irregular == true) {
                     $('[name="Irregular"]').val([k.Irregular]).button().button("refresh");
                     $('#multiple-shwdiv').show()
@@ -256,7 +268,7 @@
                 if ($("#Autho").hasClass('auto_active')) {
                     if (data[2] != null) {
                         $('#Name').oldVal(data[2].Name);
-                        $('#Categorylist').oldDropval(data[2].BusinessType_Val);
+                        $('#CategoryList_DDL').oldDropval(data[2].BusinessType_Val);
                         $('#salaryheadslist_old').oldLookupVal(data[2].Address_Val);
                         $('#ContactDetailsList_Old').oldLookupVal(data[2].Contact_Val);
                     }
@@ -311,10 +323,10 @@
         //    var a = [], b;
         //    a = $('#AddressList').P2BGetTableDataonSelectedRow('#AddressList', 0);
         //    b = a[0];
-        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#frmCorporate', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
+        //    $('<div></div>').P2BPartialDeleteModalDialog('', b, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AddressList', $('#AddressList').val(), 200, 200, '#FormCorporate', '#AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate');
         //    event.preventDefault();
         //});
-        $('.popup_radio_button').controlgroup();
+        //$('.popup_radio_button').controlgroup();
         $('.drop').selectmenu().selectmenu('menuWidget');
         $('#LocationIn-table').P2BTransactionTableAnimation();
         $('#LocationOut-table').P2BTransactionTableAnimation();
@@ -375,17 +387,17 @@
     });
 </script>
 <style>
-    .icon-row {
+/*    .icon-row {
         position: relative;
         left: 53px;
         top: -150px;
-    }
+    }*/
 
-    #BusinessType-button {
+/*    #BusinessType-button {
         font-size: 9px;
         padding-top: 1px;
         font-weight: bold;
-    }
+    }*/
 
     .popup-content-label {
         display: block;
@@ -404,24 +416,25 @@
 
     .row3 {
         width: 551px;
-        display: inline-flex;
+/*        display: inline-flex;*/
+        position:relative;
     }
 
-    .row4 {
+/*    .row4 {
         position: absolute;
         top: 294px;
         width: 400px;
-    }
+    }*/
 
-    .popup-content-textbox-long {
+/*    .popup-content-textbox-long {
         margin-bottom: 1px;
         width: 290px;
-    }
+    }*/
 
 
-    .row2 {
-        width: 434px;
-    }
+/*    .row2 {
+        
+    }*/
 
     .icon-row {
         left: 94px;
@@ -437,25 +450,26 @@
     }
 
     .row2 {
+        width: 434px;
         float: left;
     }
 
-    .filter_row {
+/*    .filter_row {
         padding-top: 60px;
-    }
+    }*/
 
-    .popup-content-icon-create {
+/*    .popup-content-icon-create {
         display: block;
-    }
+    }*/
 
     .transcation_btn {
         width: 21px;
         height: 21px;
     }
 
-    .StrctSelectionClass {
+/*    .StrctSelectionClass {
         float: left;
-    }
+    }*/
 
     .grid_colllpase_height {
         height: 43px;
@@ -499,7 +513,7 @@
             @*<input id="JVLocIdForNonStd" type="hidden" name="JVLocIdForNonStd" />*@
             <div class="content_margine row3">
                 @Html.LabelFor(m => m.JVGroup, "JVGroup:", new { @class = "popup-content-label must" })
-                <select class="drop must" name="Group_drop" id="Group_drop" style="width:180px">
+                <select class="drop must" name="GroupList_DDL" id="GroupList_DDL" style="width:180px">
                     <option value="0">-Select-</option>
 
                 </select>
@@ -515,8 +529,8 @@
                 <div class="row3 content_margine">
                     <label class="popup-content-label">Select Mode :</label>
                     <div class="popup_radio_button">
-                        <label class="popup-content-label" for="rd1">Non Standard</label><input type="radio" id="rd1" name="Irregular" value="true" />
-                        <label class="popup-content-label" for="rd2">Standard</label><input type="radio" id="rd2" name="Irregular" value="false" />
+                        <input type="radio" id="rd1" name="Irregular" value="true" /><label class="popup-content-label" for="rd1">Non Standard</label>
+                        <input type="radio" id="rd2" name="Irregular" value="false" /><label class="popup-content-label" for="rd2">Standard</label>
                     </div>
                 </div>
                 <div class="row3" style="display:none" id="multiple-shwdiv">
@@ -640,8 +654,8 @@
                 <div class="row3 content_margine">
                     @Html.LabelFor(m => m.CreditDebitFlag, "Credit/Debit:", new { @class = "popup-content-label " })
                     <div class="popup_radio_button">
-                        <input type="radio" id="CreditDebitFlag_radio1" name="CreditDebitFlag" value="C" /><label for="CreditDebitFlag_radio1">Credit</label>
-                        <input type="radio" id="CreditDebitFlag_radio2" name="CreditDebitFlag" value="D" /><label for="CreditDebitFlag_radio2">Debit</label>
+                        <input type="radio" id="rrr1" name="CreditDebitFlag" value="C" /><label class="ui-state-active" for="rrr1">Credit</label>
+                        <input type="radio" id="rrr12" name="CreditDebitFlag" value="D"/><label for="rrr12">Debit</label>
                     </div>
                 </div>
                 <div id="hidepaybank">

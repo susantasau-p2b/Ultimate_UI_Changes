@@ -43,12 +43,12 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Category = form["DoctorCategorylist"] == "0" ? "" : form["DoctorCategorylist"];
-                    string Splzlist = form["Specializationlist"] == "0" ? "" : form["Specializationlist"];
+                    string Category = form["DoctorCategoryList_DDL"] == "0" ? "" : form["DoctorCategoryList_DDL"];
+                    string Splzlist = form["SpecializationList_DDL"] == "0" ? "" : form["SpecializationList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     //string Namel = "6";
-                    string Name1 = form["Namelist"] == "0" ? "" : form["Namelist"];
+                    string Name1 = form["NameList"] == "0" ? "" : form["NameList"];
 
                     if (Splzlist != null && Splzlist != "")
                     {
@@ -372,11 +372,11 @@ namespace P2BUltimate.Controllers.Core.MainController
             {
                 try
                 {
-                    string Corp = form["Specializationlist"] == "0" ? "" : form["Specializationlist"];
-                    string Dcategory = form["DoctorCategorylist"] == "0" ? "" : form["DoctorCategorylist"];
+                    string Corp = form["SpecializationList_DDL"] == "0" ? "" : form["SpecializationList_DDL"];
+                    string Dcategory = form["DoctorCategoryList_DDL"] == "0" ? "" : form["DoctorCategoryList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
-                    string Namelist = form["Namelist"] == "0" ? "" : form["Namelist"];
+                    string NameList = form["NameList"] == "0" ? "" : form["NameList"];
                     //  bool Auth = form["Autho_Action"] == "" ? false : true;
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
@@ -426,11 +426,11 @@ namespace P2BUltimate.Controllers.Core.MainController
                         }
                     }
 
-                    if (Namelist != null)
+                    if (NameList != null)
                     {
-                        if (Namelist != "")
+                        if (NameList != "")
                         {
-                            int NameId = Convert.ToInt32(Namelist);
+                            int NameId = Convert.ToInt32(NameList);
                             var val = db.NameSingle.Include(e => e.EmpTitle)
                                                 .Where(e => e.Id == NameId).SingleOrDefault();
                             c.Name = val;
@@ -469,7 +469,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                                     ModifiedOn = DateTime.Now
                                 };
 
-                               // int a = EditS(Corp, Dcategory, Addrs, ContactDetails, Namelist, data, c, c.DBTrack);
+                               // int a = EditS(Corp, Dcategory, Addrs, ContactDetails, NameList, data, c, c.DBTrack);
                                 if (Corp != null)
                                 {
                                     if (Corp != "")
@@ -625,11 +625,11 @@ namespace P2BUltimate.Controllers.Core.MainController
                                     }
                                 }
 
-                                if (Namelist != null)
+                                if (NameList != null)
                                 {
-                                    if (Namelist != "")
+                                    if (NameList != "")
                                     {
-                                        var val = db.NameSingle.Find(int.Parse(Namelist));
+                                        var val = db.NameSingle.Find(int.Parse(NameList));
                                         c.Name = val;
 
                                         var add = db.Doctor.Include(e => e.Name).Where(e => e.Id == data).SingleOrDefault();
@@ -959,7 +959,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     Address add = corporates.Address;
                     ContactDetails conDet = corporates.ContactDetails;
                     LookupValue val = corporates.Specialization;
-                    NameSingle Namelist = corporates.Name;
+                    NameSingle NameList = corporates.Name;
                     //Doctor corporates = db.Doctor.Where(e => e.Id == data).SingleOrDefault();
                     if (corporates.DBTrack.IsModified == true)
                     {
