@@ -188,7 +188,7 @@
                                     JqGridCheck.Set(a);
                                 }
                             },
-                            data: { rows: 0, page: 0, sord: "asc", filter: $('#txtPayMonth').val() }
+                            data: { rows: 0, page: 0, sord: "asc", filter: $('#TextPayMonth').val() }
                         });
                     } else {
                         $('#cb_' + $(init).attr('id') + '').trigger('click');
@@ -308,7 +308,7 @@
                                     JqGridCheck.Set(a);
                                 }
                             },
-                            data: { rows: 0, page: 0, sord: "asc", filter: $('#txtPayMonth').val() }
+                            data: { rows: 0, page: 0, sord: "asc", filter: $('#TextPayMonth').val() }
                         });
                     } else {
                         $('#cb_' + $(init).attr('id') + '').trigger('click');
@@ -497,7 +497,8 @@
                 jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                 jQuery(init).find('input').empty();
                 jQuery(init).find('textarea').empty();
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                 jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove(); RemoveErrTag();
             },
             open: function (event, ui) {
@@ -514,7 +515,8 @@
                 createajaxdata.done(function (value) {
                     returnfunctiondata(value);
                 });
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                 OnpageAlter();
                 MakeRadioBtnChecked();
                 $.removeDisble(submitnameformforserilize);
@@ -642,7 +644,8 @@
                                         jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                                         jQuery(init).find('input').empty();
                                         jQuery(init).find('textarea').empty();
-                                        jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                         jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
                                         newDiv.dialog("close");
                                         jQuery(maindailog).dialog("close");
@@ -741,7 +744,8 @@
                 jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                 jQuery(init).find('input').empty();
                 jQuery(init).find('textarea').empty();
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                 jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove(); RemoveErrTag();
             },
             open: function (event, ui) {
@@ -758,7 +762,8 @@
                 createajaxdata.done(function (value) {
                     returnfunctiondata(value);
                 });
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                 OnpageAlter();
                 MakeRadioBtnChecked();
                 $.removeDisble(submitnameformforserilize);
@@ -910,7 +915,8 @@
                                         jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                                         jQuery(init).find('input').empty();
                                         jQuery(init).find('textarea').empty();
-                                        jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                         jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
                                         newDiv.dialog("close");
                                         jQuery(maindailog).dialog("close");
@@ -1248,7 +1254,8 @@
                 });
                 OnpageAlter();
 
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
             },
             buttons: {
                 Submit: function (e) {
@@ -1389,7 +1396,8 @@
                                                     jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu().selectmenu("refresh");
                                                     jQuery(init).find('input').empty();
                                                     jQuery(init).find('textarea').empty();
-                                                    jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                                    //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                                    jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                                     jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
                                                     newDiv.dialog("close");
                                                     jQuery(maindialog).dialog("close");
@@ -1488,7 +1496,8 @@
                 jQuery(init).find('textarea').prop('disabled', false).removeAttr('style').removeAttr('readonly');
                 jQuery(init).find('' + nameofthelookuptable + ' tr td').attr('disabled', 'disabled');
                 jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
-                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                 $.each(old_data_class, function (i, k) { $(init).find(k).remove(); });
             },
             closeOnEscape: false,
@@ -1526,7 +1535,8 @@
                 jQuery(this).find('input').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
                 jQuery(this).find('textarea').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
                 jQuery(this).find('' + nameofthelookuptable + ' tr td').attr('disabled', 'disabled');
-                jQuery(this).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(this).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(this).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
             },
             buttons: {
                 Submit: function () {
@@ -1566,7 +1576,8 @@
                                     jQuery(init).find('textarea').prop('disabled', false).removeAttr('style').removeAttr('readonly');
                                     jQuery(init).find('' + nameofthelookuptable + ' tr td').attr('disabled', 'disabled');
                                     jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
-                                    jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                     $.each(old_data_class, function (i, k) { $(init).find(k).remove(); });
                                     newDiv.dialog("close");
                                     newDiv.remove();
@@ -2081,7 +2092,8 @@
                             var data = [0, 0];
                             returnfunctiondata(data);
                         }
-                        $(submitnameformforserilize).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        //$(submitnameformforserilize).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        $(submitnameformforserilize).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover');
                     },
                     error: function (xhr, status, error) {
                         showajaxeroor(xhr, init);
@@ -2291,7 +2303,8 @@
             modal: true,
             closeOnEscape: false,
             beforeClose: function () {
-                jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)").button().button("refresh");
+                //jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)").button().button("refresh");
+                jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').button().button("refresh");
                 jQuery(init).remove(); RemoveErrTag();
             },
             title: maindialogtitle,
@@ -2325,7 +2338,8 @@
                         AlterBtnType();
                         //console.log(forwarddata);
                         //console.log(nameclassidofinlinelookup);
-                        $(forwardserializedata).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        //$(forwardserializedata).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        $(forwardserializedata).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover');
                     },
                     error: function (xhr, status, error) {
                         showajaxeroor(xhr, init);
@@ -2464,7 +2478,8 @@
                                         }
                                         newDiv.dialog("close");
                                         newDiv.remove();
-                                        jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        //jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                        jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                         jQuery(maindialog).dialog("close");
                                         jQuery(init).remove();
                                     }
@@ -2513,7 +2528,8 @@
                                         // jQuery(gridreloadname).trigger('reloadGrid');
                                     }
                                     newDiv.dialog("close");
-                                    jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    //jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    jQuery(forwardserializedata).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                 }
                             }
                         });
@@ -2603,11 +2619,11 @@
         $('.ui-dialog-buttonpane').find('button:contains("Confirm")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-trash"></span>');
         $('.ui-dialog-buttonpane').find('button:contains("Cancel")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-closethick"></span>');
     };
-    $.fn.P2BLookUpModal = function (lookupurl, lookupdata, lookupdiv, lookuptitle, tablename, nameoftable, dataontable, nameofthelist, classoridoftheonwhichpopupderived, multipleallowedornot, nameidclassofbuttontodisable, setnameofthelookupbyppage, pagename) {
+    $.fn.P2BLookUpModal = function (lookupurl, lookupdata, LookupDiv, lookuptitle, tablename, nameoftable, dataontable, nameofthelist, classoridoftheonwhichpopupderived, multipleallowedornot, nameidclassofbuttontodisable, setnameofthelookupbyppage, pagename) {
         //----------HTML-------------Example---------------
         // <div class="dialog">
         // <div title="LookUp Data">
-        // <div class="lookupdiv"></div>
+        // <div class="LookupDiv"></div>
         // </div>
         // <div id="pageNavPosition">
 
@@ -2716,7 +2732,8 @@
                             // console.log(classoridoftheonwhichpopupderived);
                             // console.log(nameidclassofbuttontodisable);
                             jQuery(tablename).append('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').insertAfter($(this).closest('tr')).TableOnRowsClick(nameoftable);
-                            jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                            //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                            jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                             jQuery(tablename + ' tr td').addClass("selectedtr");
                             setTimeout(function () {
                                 jQuery(tablename + ' tr td ').removeClass("selectedtr")
@@ -2729,7 +2746,8 @@
                             //console.log(classoridoftheonwhichpopupderived);
                             //console.log(nameidclassofbuttontodisable);
                             if (jQuery(tablename + ' tr').closest('tr').length == 1) {
-                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                             }
                         }
                     }
@@ -2738,12 +2756,14 @@
                             if (target.className == "selectedtr") {
                                 target.className = "";
                                 jQuery(tablename + ' tr td:contains(' + data[0] + ')').closest('tr').remove();
-                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                             }
                             else if (target.className != "selectedtr" && inline == data[0]) {
                                 target.className = "";
                                 jQuery(tablename + ' tr td:contains(' + data[0] + ')').closest('tr').remove();
-                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                             }
                             else {
                                 var newDivma = $(document.createElement('div'));
@@ -2770,7 +2790,8 @@
                                 //console.log("dsad");
                                 //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
                                 jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
-                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                 jQuery(tablename + ' tr td').addClass("selectedtr");
                                 setTimeout(function () {
                                     jQuery(tablename + ' tr td ').removeClass("selectedtr")
@@ -2780,7 +2801,8 @@
                                 target.className = "";
                                 jQuery(tablename + ' tr td:contains(' + data[0] + ')').closest('tr').remove();
                                 if (count == 1) {
-                                    jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                    jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
                                 }
                             }
                         }
@@ -2826,7 +2848,8 @@
                         }
                         jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
                         data = [];
-                        jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                        jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                     }
                 }
                 e.preventDefault();
@@ -2846,7 +2869,7 @@
                 jQuery('#' + pagename + '').empty();
             },
             open: function (event, ui) {
-            jQuery('.' + lookupdiv + '').empty();
+            jQuery('.' + LookupDiv + '').empty();
             jQuery('#' + pagename + '').empty();
                 $.CheckSessionExitance();
                 var ids = CountTableIds(tablename);
@@ -2873,7 +2896,7 @@
                         '</tr>'
                     });
                     htmltag += '</table>';
-                    jQuery('.' + lookupdiv + '').html(htmltag);
+                    jQuery('.' + LookupDiv + '').html(htmltag);
                     clickon();
                     pageon();
                     searchon();
@@ -3156,7 +3179,7 @@
             }
         });
     };
-    $.fn.AddDataToTranscation = function (tablename, lookupurl, NoOfRecordToShow, setnameofthelookupbyppage, lookupdiv, lookuppagename, pagename) {
+    $.fn.AddDataToTranscation = function (tablename, lookupurl, NoOfRecordToShow, setnameofthelookupbyppage, LookupDiv, lookuppagename, pagename) {
         function pageon() {
             //--------------------------------initial---------------------
             var dataontable = NoOfRecordToShow || 5;
@@ -3318,7 +3341,7 @@
                         '</tr>'
                     });
                     htmltag += '</table>';
-                    jQuery('.' + lookupdiv + '').html(htmltag);
+                    jQuery('.' + LookupDiv + '').html(htmltag);
                     clickon();
                     pageon();
                     searchon();
@@ -3482,7 +3505,7 @@
         return $(table).find('input:checkbox:gt(0):checked').length;
     };
     $.ApplyFilter = function (url, inputname, formname, callback) {
-        formname = formname || "#frmtrasctionform";
+        formname = formname || "#FormTransactionForm";
         $.ajax({
             method: "POST",
             url: url,
@@ -4553,7 +4576,7 @@
             lookupurl: null,
             NoOfRecordToShow: null,
             setnameofthelookupbyppage: null,
-            lookupdiv: null,
+            LookupDiv: null,
             lookuppagename: null,
             pagename: null,
             readonly: null,
@@ -4594,9 +4617,11 @@
 
                 this.init = function () {
                     var rows = document.getElementById(tableName).rows;
-                    var records = (rows.length - 1);
-                    this.pages = Math.ceil(records / itemsPerPage);
-                    this.inited = true;
+                    if (rows) {
+                        var records = (rows.length - 1);
+                        this.pages = Math.ceil(records / itemsPerPage);
+                        this.inited = true;
+                    }
                 }
 
                 this.showPageNav = function (pagerName, positionId) {
@@ -4737,7 +4762,7 @@
                         '</tr>'
                     });
                     htmltag += '</table>';
-                    jQuery('.' + obj.lookupdiv + '').html(htmltag);
+                    jQuery('.' + obj.LookupDiv + '').html(htmltag);
                     clickon();
                     pageon();
                     searchon();
@@ -4760,7 +4785,7 @@
             lookupurl: null,
             NoOfRecordToShow: null,
             setnameofthelookupbyppage: null,
-            lookupdiv: null,
+            LookupDiv: null,
             lookuppagename: null,
             pagename: null,
             readonly: null,
@@ -4946,7 +4971,7 @@
                         '</tr>'
                     });
                     htmltag += '</table>';
-                    jQuery('.' + obj.lookupdiv + '').html(htmltag);
+                    jQuery('.' + obj.LookupDiv + '').html(htmltag);
                     clickon();
                     pageon();
                     searchon();
@@ -5125,7 +5150,8 @@
                 jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                 jQuery(init).find('input').empty();
                 jQuery(init).find('textarea').empty();
-                jQuery(init).find(obj.btndisableid).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(obj.btndisableid).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(obj.btndisableid).button().button('enable').removeClass('ButtonHover');
                 jQuery(init).find(obj.lookuptableid).find('tr td').parent().remove(); RemoveErrTag();
             },
             open: function (event, ui) {
@@ -5142,7 +5168,8 @@
 
                 // returnfunctiondata(value);
                 //});
-                jQuery(init).find(obj.btndisableid).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                //jQuery(init).find(obj.btndisableid).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                jQuery(init).find(obj.btndisableid).button().button('disable').addClass('ButtonHover');
                 OnpageAlter();
             },
             buttons: {

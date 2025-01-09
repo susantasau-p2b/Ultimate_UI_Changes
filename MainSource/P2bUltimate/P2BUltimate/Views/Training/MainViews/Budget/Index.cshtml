@@ -173,16 +173,16 @@
         });
 
         $('#Load').on('click', function (e) {
-            $('#JqGrid').PostGridData({ url: url, filter: $('#Financial_id').val() });
+            $('#JqGrid').PostGridData({ url: url, filter: $('#Financial_Id').val() });
         });
 
-        $('#txtPayMonth').MonthYearPicker();
+        $('#TextPayMonth').MonthYearPicker();
         $('#Create_PayableDays').val(0).ForceAmount().MaxLength(8);
-        if ($("#txtPayMonth").val() == "") {
+        if ($("#TextPayMonth").val() == "") {
             var dt = new Date();
             var month = dt.getMonth() + 1;
             month = month < 10 ? '0' + month : '' + month;
-            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+            $("#TextPayMonth").val(month + "/" + dt.getFullYear());
         }
 
 
@@ -213,14 +213,14 @@
         };
 
         $('#Create').button().on("click", function (event) {
-            if (!$("#Financial_id").val()) {
+            if (!$("#Financial_Id").val()) {
 
                 alert("Please Select Training Year.")
                 return false;
             }
 
-            $('#frmEmpList').trigger('reset');
-
+            $('#FormEmpList').trigger('reset');
+            $('#FormEmpList').focus();
             var Id = "";
             $.ajax({
                 method: "POST",
@@ -259,8 +259,8 @@
 
             $('#list-employee').P2BGridDialog({
                 maindialogtitle: "Create Budget entry ",
-                submiturl: "@Url.Action("create")?TrainingYear=" + $('#Financial_id').val(),
-                form: "#frmEmpList",
+                submiturl: "@Url.Action("create")?TrainingYear=" + $('#Financial_Id').val(),
+                form: "#FormEmpList",
                 height: 475,
                 width: 850,
                 state: "open",
@@ -281,13 +281,13 @@
         $('#Edit').makeDisable1('#Load,#Create,#Delete');
         //  $.LocalStorageHelper("EditClickSalAttendance", "0");
         $('#Edit').on('click', function (e) {
-            $("#PayMonthEdit").val($('#txtPayMonth').val());
+            $("#PayMonthEdit").val($('#TextPayMonth').val());
             var aa = $('#JqGrid').jqGrid('getGridParam', 'selrow');
             dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'ID');
             if (aa != null) {
                 $('#Edit').ProcessConfirmation1({
                     confirmurl: "@Url.Action("ChkProcess")",
-                    month: "#txtPayMonth",
+                    month: "#TextPayMonth",
                     EmpCode: dt.Id,
                     msg: "Are you sure, you want to edit??",
                     status: function (data) {
@@ -301,7 +301,7 @@
                             //else {
                             //    alert('Please Select Row..!');
                             //}
-                            $('#PayMonth').val($('#txtPayMonth').val());
+                            $('#PayMonth').val($('#TextPayMonth').val());
                         }
                         else {
                             $('#cancle,#Save').fadeOut();
@@ -359,7 +359,7 @@
             $('#Edit_model_dialog').P2BGridDialog({
                 maindialogtitle: "Edit attendance entry ",
                 submiturl: "@Url.Action("process")",
-                form: "#frmeditinlinegrid",
+                form: "#FormEditInlineGrid",
                 height: 400,
                 width: 900,
                 gridname: "#JqGrid",
@@ -372,13 +372,13 @@
         });
 
         $('.drop').selectmenu().selectmenu("menuWidget");
-        if ($("#txtPayMonth").val() == "") {
+        if ($("#TextPayMonth").val() == "") {
             var dt = new Date();
 
             var month = dt.getMonth() + 1;
 
             month = month < 10 ? '0' + month : '' + month;
-            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+            $("#TextPayMonth").val(month + "/" + dt.getFullYear());
 
         }
 
@@ -401,7 +401,7 @@
         $('#Lookup_FinancialYear_Calendar').on('click', function () {
             $('.dialog').AddDataToTextbox({
                 appendTo: "#txtPayMonth1",
-                appendToId: "#Financial_id",
+                appendToId: "#Financial_Id",
                 lookupurl: "@Url.Action("GetCalendarDetails", "Budget")",
                 NoOfRecordToShow: "10",
                 setnameofthelookupbyppage: "txtPayMonth1",
@@ -421,7 +421,7 @@
                 NoOfRecordToShow: "10",
                 setnameofthelookupbyppage: "HusbandName_FName-lookup",
                 LookupDiv: "LookupDiv",
-                lookuppagename: "lookup",
+                lookuppagename: "Lookup",
                 pagename: "PageNavPosition",
                 readonly: true,
             });
@@ -429,7 +429,7 @@
         $('#Edit_model_dialog').P2BGridDialog();
 
         $('#Lookup_FinancialYear').on('click', function (event) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "Budget")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#frmeditinlinegrid', 'N', '#Remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCalendarDetails", "Budget")', '', 'LookupDiv', ' Look Up Data', '#FinancialYearList', 'FinancialYearList', 5, 'FinancialYearList', '#FormEditInlineGrid', 'N', '#Remove_FinancialYear', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
@@ -608,7 +608,7 @@
             <div style="float:left;width:293px">
                 <label id="lblPayMonth" class="popup-content-label must">Training Year:</label>
                 <input name="txtPayMonth1" type="text" id="txtPayMonth1" class="date-picker" />
-                <input type="text" id="Financial_id" name="Financial_id" class="filter_structure_id" />
+                <input type="text" id="Financial_Id" name="Financial_Id" class="filter_structure_id" />
 
                 <button data-p2btooltip="Lookup FinancialYear Details" class="button popup-content-icon-lookup" id="Lookup_FinancialYear_Calendar"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
             </div>
@@ -637,7 +637,7 @@
 
 <div class="dialog">
     <div title="LookUp Data">
-        <div class="LookupDiv" id="Lookup"></div>
+        <div class="LookupDiv" id="lookup"></div>
     </div>
     <div id="PageNavPosition">
 
@@ -646,7 +646,7 @@
 <div id="list-employee">
 
 
-    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmEmpList", name = "frmEmpList" }))
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "FormEmpList", name = "FormEmpList" }))
     {
         <div class="row4 content_margine " id="IsAdvFilterAppl">
 
@@ -725,7 +725,7 @@
     }
 </div>
 <div id="Edit_model_dialog">
-    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmeditinlinegrid", name = "frmeditinlinegrid" }))
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "FormEditInlineGrid", name = "FormEditInlineGrid" }))
     {
         <input name="PayMonthEdit" type="text" id="PayMonthEdit" class="date-picker" />
         <div class="emplist_row">

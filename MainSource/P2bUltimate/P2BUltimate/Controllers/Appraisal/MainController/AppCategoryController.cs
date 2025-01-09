@@ -403,7 +403,7 @@ namespace P2BUltimate.Controllers.Appraisal.MainController
             using (DataBaseContext db = new DataBaseContext())
                 try
                 {
-                    string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+                    string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
 
                    // string Type = form["AppModelist"] == "0" ? "" : form["AppModelist"];
                     var IsDescriptive = form["IsDescriptive"] == "0" ? "" : form["IsDescriptive"];
@@ -596,7 +596,7 @@ namespace P2BUltimate.Controllers.Appraisal.MainController
         //    List<String> Msg = new List<String>();
         //    try
         //    {
-        //        string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+        //        string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
 
         //        // string Type = form["AppModelist"] == "0" ? "" : form["AppModelist"];
         //        var IsDescriptive = form["IsDescriptive"] == "0" ? "" : form["IsDescriptive"];

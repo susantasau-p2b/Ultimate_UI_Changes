@@ -44,7 +44,7 @@ namespace P2BUltimate.Controllers.Training.MainController
                 string Emp = form["employee-table1"] == "0" ? "" : form["employee-table1"];
                 string TrainingScheduleD = form["Training_Schedule"] == null ? "" : form["Training_Schedule"];
                 string TrainingSessionDet = form["SessionListSch"] == null ? "" : form["SessionListSch"];
-                string TrainingSrc = form["Training_Source"] == null ? "" : form["Training_Source"];
+                string TrainingSrc = form["Training_Source_DDL"] == null ? "" : form["Training_Source_DDL"];
                 int CompId = 0;
                 if (!String.IsNullOrEmpty(Session["CompId"].ToString()))
                 {

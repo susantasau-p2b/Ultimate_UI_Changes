@@ -30,15 +30,15 @@
         $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height, '#pager2', { multiple: true, rowNum: 30, selectall: true });
 
         $('#Load').on('click', function (e) {
-            $('#JqGrid').PostGridData({ url: url, filter: $('#txtPayMonth').val() });
+            $('#JqGrid').PostGridData({ url: url, filter: $('#TextPayMonth').val() });
         });
-        $('#PayMonth,#txtPayMonth').MonthYearPicker();
+        $('#PayMonth,#TextPayMonth').MonthYearPicker();
 
-        if ($("#txtPayMonth").val() == "") {
+        if ($("#TextPayMonth").val() == "") {
             var dt = new Date();
             var month = dt.getMonth() + 1;
             month = month < 10 ? '0' + month : '' + month;
-            $("#txtPayMonth").val(month + "/" + dt.getFullYear());
+            $("#TextPayMonth").val(month + "/" + dt.getFullYear());
         }
 
         function AssignData() {
@@ -65,15 +65,15 @@
 
         //Create Function
         $('#process').on("click", function (event) {
-            $('#frmPaySlipR').trigger("reset");
+            $('#FormPaySlipR').trigger("reset");
 
             $('#process').ProcessConfirmation({
                 confirmurl: "@Url.Action("ChkProcess")",
-                month: "#txtPayMonth",
+                month: "#TextPayMonth",
                 status: function (data) {
                     if (data == true) {
-                        $.LoadEmpByDefaultWOGeoId(false, $('#txtPayMonth').val());
-                        $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PaySlipR', 'open', '@Url.Action("Create")', '#frmPaySlipR', 'Message :', 'Request Falied :', '#JqGrid', 500, 900, '#AddressList,#ContactDetailsList', '', function (data) { });
+                        $.LoadEmpByDefaultWOGeoId(false, $('#TextPayMonth').val());
+                        $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create PaySlipR', 'open', '@Url.Action("Create")', '#FormPaySlipR', 'Message :', 'Request Falied :', '#JqGrid', 500, 900, '#AddressList,#ContactDetailsList', '', function (data) { });
                         $('#PayProcessGroupList').P2BSelectMenuAppend('@Url.Action("Polulate_PayProcessGroup", "SalaryT")', "", ""); // To bind dropdown on page load
                         if ($("#PayMonth").val() == "") {
                             var dt = new Date();
@@ -101,7 +101,7 @@
                 a = a.toString();
             }
            // a = a != null ? a.toString() : null;
-            @*$.post("@Url.Action("ReleaseProcess")", { forwardata: a, PayMonth: $("#txtPayMonth").val() }, function (data) {
+            @*$.post("@Url.Action("ReleaseProcess")", { forwardata: a, PayMonth: $("#TextPayMonth").val() }, function (data) {
                 console.log(data);
             }).success(function (data) {
                 $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
@@ -115,7 +115,7 @@
             $.ajax({
                 method: "POST",
                 url: "@Url.Action("ReleaseProcess")",
-                data: { forwardata: a, PayMonth: $("#txtPayMonth").val() },
+                data: { forwardata: a, PayMonth: $("#TextPayMonth").val() },
             beforeSend: function () {
                 ajaxloaderv2('body');
             },
@@ -142,7 +142,7 @@
 
         $('#EmailSend').on('click', function (e) {
        
-            $.post("@Url.Action("EmailSend")", { PayMonth: $("#txtPayMonth").val() }, function (data) {
+            $.post("@Url.Action("EmailSend")", { PayMonth: $("#TextPayMonth").val() }, function (data) {
                 console.log(data);
             }).success(function (data) {
                 $('<div></div>').P2BMessageModalDialog('ui-icon-info', data.responseText);
@@ -323,7 +323,7 @@
                     @*@Html.LabelFor(m => m.PayMonth, "PayMonth:", new { @class = "popup-content-label must" })
                         @Html.TextBoxFor(m => m.PayMonth, new { @class = "popup-content-textbox must" })*@
                     <label id="lblPayMonth" class="popup-content-label must">PayMonth:</label>
-                    <input name="txtPayMonth" type="text" id="txtPayMonth" class="date-picker" />
+                    <input name="TextPayMonth" type="text" id="TextPayMonth" class="date-picker" />
                 </div>
                 <button class="button" id="Load">Load</button>
                 <button class="button" data-typeofbtn="process" id="process">Process</button>
@@ -351,7 +351,7 @@
 
     <div id="Create_Dialog" title="Create Corpoarte">
 
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "frmPaySlipR", name = "frmPaySlipR" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { Id = "FormPaySlipR", name = "FormPaySlipR" }))
         {
             <input id="Autho_Action" type="hidden" name="Autho_Action" />
             <input id="Autho_Allow" type="hidden" name="Autho_Allow" />

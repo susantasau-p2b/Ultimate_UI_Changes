@@ -1648,8 +1648,8 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 string ReportingLevel3 = form["ReportingLevel3_drop"] == "0" ? "" : form["ReportingLevel3_drop"];
                 string ReportingStructRights = form["ReportingStructRightslist"] == null ? null : form["ReportingStructRightslist"];
 
-                string MaritalStatus = form["MaritalStatus_drop"] == "0" ? "" : form["MaritalStatus_drop"];
-                string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+                string MaritalStatus = form["MaritalStatusList_DDL"] == "0" ? "" : form["MaritalStatusList_DDL"];
+                string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
                 string Category = form["Category_drop"] == "0" ? "" : form["Category_drop"];
                 string Caste = form["Caste_drop"] == "0" ? "" : form["Caste_drop"];
                 string Religion = form["Religion_drop"] == "0" ? "" : form["Religion_drop"];
@@ -2235,8 +2235,8 @@ namespace P2BUltimate.Controllers.recruitment.MainController
                 string ReportingLevel3 = form["ReportingLevel3_drop"] == "0" ? "" : form["ReportingLevel3_drop"];
                 string ReportingStructRights = form["ReportingStructRightslist"] == null ? null : form["ReportingStructRightslist"];
 
-                string MaritalStatus = form["MaritalStatus_drop"] == "0" ? "" : form["MaritalStatus_drop"];
-                string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+                string MaritalStatus = form["MaritalStatusList_DDL"] == "0" ? "" : form["MaritalStatusList_DDL"];
+                string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
                 string Category = form["Category_drop"] == "0" ? "" : form["Category_drop"];
                 string Caste = form["Caste_drop"] == "0" ? "" : form["Caste_drop"];
                 string Religion = form["Religion_drop"] == "0" ? "" : form["Religion_drop"];

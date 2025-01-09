@@ -140,7 +140,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 {
                     string StatutoryWageRangelist = form["StatutoryWageRangelist"] == "0" ? "" : form["StatutoryWageRangelist"];
                     string EffectiveMonth = form["EffectiveMonthList"] == "0" ? "" : form["EffectiveMonthList"];
-                    string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+                    string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
 
                     List<Range> Range = new List<Range>();
 
@@ -311,7 +311,7 @@ namespace P2BUltimate.Controllers.Payroll.MainController
                 try
                 {
                     string EffectiveMonth = form["EffectiveMonthList"] == "0" ? "" : form["EffectiveMonthList"];
-                    string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
+                    string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
                     string StatutoryWageRangelist = form["StatutoryWageRangelist"] == "0" ? "" : form["StatutoryWageRangelist"];
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 

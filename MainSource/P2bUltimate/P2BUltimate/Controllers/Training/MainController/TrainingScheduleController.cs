@@ -295,7 +295,7 @@ namespace P2BUltimate.Controllers.Training.MainController
                     string state = form["StateList_DDL"];
                     string TrainingMaterial = form["TrainingMaterialList"];
                     //string EmpAssignSource = form["TrainingEmployeeSourceList"];
-                    string FinancialYearList = form["Financial_id"] == "0" ? "" : form["Financial_id"];
+                    string FinancialYearList = form["Financial_Id"] == "0" ? "" : form["Financial_Id"];
                     string EmpAssignSource = form["TrainingEmployeeSourceList"] == "0" ? "" : form["TrainingEmployeeSourceList"];
                     string IsBatchClose = form["IsBatchClose"] == "0" ? "" : form["IsBatchClose"];
 

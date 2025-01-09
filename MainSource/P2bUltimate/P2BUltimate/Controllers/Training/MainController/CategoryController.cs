@@ -154,7 +154,7 @@ namespace P2BUltimate.Controllers.Training.MainController
                 {
                     //p.FuncStruct.JobPosition = null;
                     //List<FuncStruct> job = new List<FuncStruct>();
-                    //string val2 = form["JobPositionMlist"];
+                    //string val2 = form["JobPositionMList"];
 
                     //if (val2 != null && val2 != "")
                     //{

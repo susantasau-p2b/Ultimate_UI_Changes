@@ -37,7 +37,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
             {
                 try
                 {
-                    string Category = form["CategoryPostListP"] == "0" ? "" : form["CategoryPostListP"];
+                    string Category = form["CategoryPostListP_DDL"] == "0" ? "" : form["CategoryPostListP_DDL"];
 
                     if (Category != null)
                     {
@@ -216,7 +216,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
             {
                 try
                 {
-                    string Category = form["CategoryPostListP"] == "0" ? "" : form["CategoryPostListP"];
+                    string Category = form["CategoryPostListP_DDL"] == "0" ? "" : form["CategoryPostListP_DDL"];
                     if (Category != null && Category != "")
                     {
                         var val = db.LookupValue.Find(int.Parse(Category));
@@ -414,7 +414,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
 
                     bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
-                    string Category = form["CategoryPostListP"] == "0" ? "" : form["CategoryPostListP"];
+                    string Category = form["CategoryPostListP_DDL"] == "0" ? "" : form["CategoryPostListP_DDL"];
                     if (Category != null && Category != "")
                     {
                         var val = db.LookupValue.Find(int.Parse(Category));

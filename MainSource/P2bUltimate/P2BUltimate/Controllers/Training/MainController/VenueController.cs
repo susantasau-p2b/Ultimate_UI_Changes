@@ -50,7 +50,7 @@ namespace P2BUltimate.Controllers.Training.MainController
         {
             using (DataBaseContext db = new DataBaseContext())
             {
-                string Category = form["VenuTypelist"] == "0" ? "" : form["VenuTypelist"];
+                string Category = form["VenuTypeList_DDL"] == "0" ? "" : form["VenuTypeList_DDL"];
                 string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                 string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
 
@@ -183,7 +183,7 @@ namespace P2BUltimate.Controllers.Training.MainController
         {
             using (DataBaseContext db = new DataBaseContext())
             {
-                string Category = form["VenuTypelist"] == "0" ? "" : form["VenuTypelist"];
+                string Category = form["VenuTypeList_DDL"] == "0" ? "" : form["VenuTypeList_DDL"];
                 string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                 string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
 
@@ -418,7 +418,7 @@ namespace P2BUltimate.Controllers.Training.MainController
         //    using (DataBaseContext db = new DataBaseContext())
         //        try
         //        {
-        //            string Corp = form["VenuTypelist"] == "0" ? "" : form["VenuTypelist"];
+        //            string Corp = form["VenuTypeList_DDL"] == "0" ? "" : form["VenuTypeList_DDL"];
         //            string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
         //            string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
         //            var blog1 = db.Venue.Where(e => e.Id == data).Include(e => e.Address).Include(e => e.ContactDetails).Include(e => e.VenuType).SingleOrDefault();
@@ -672,7 +672,7 @@ namespace P2BUltimate.Controllers.Training.MainController
                 List<string> Msg = new List<string>();
                 try
                 {
-                    string VenueType = form["VenuTypelist"] == "0" ? "" : form["VenuTypelist"];
+                    string VenueType = form["VenuTypeList_DDL"] == "0" ? "" : form["VenuTypeList_DDL"];
                     string Addrs = form["AddressList"] == "0" ? "" : form["AddressList"];
                     string ContactDetails = form["ContactDetailsList"] == "0" ? "" : form["ContactDetailsList"];
                     //string OpeningDate = form["OpeningDate"] == "0" ? "" : form["OpeningDate"];

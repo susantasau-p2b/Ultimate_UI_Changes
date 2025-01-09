@@ -230,14 +230,14 @@
     </div>
     <div class="dialog">
         <div title="LookUp Data">
-            <div class="LookupDiv" id="Lookup"></div>
+            <div class="LookupDiv" id="lookup"></div>
         </div>
         <div id="PageNavPosition">
 
         </div>
     </div>
     <div id="Create_Dialog">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmCandidate", name = "frmCandidate" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "FormCandidate", name = "FormCandidate" }))
         {
             <input id="Autho_Action" type="hidden" name="Autho_Action" />
             <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
@@ -306,13 +306,13 @@
 
                     <div class="content_margine row1">
                         @Html.LabelFor(m => m.Candidate.Gender, "Gender:", new { @class = "popup-content-label must" })
-                        <select class="selectmenu must" style="width:215px" id="Gender_drop" name="Gender_drop"><option value="0">-Select-</option></select>
+                        <select class="selectmenu must" style="width:215px" id="GenderList_DDL" name="GenderList_DDL"><option value="0">-Select-</option></select>
                     </div>
 
                     <div class="content_margine row1">
                         @Html.LabelFor(m => m.Candidate.MaritalStatus, "Marital Status:", new { @class = "popup-content-label" })
 
-                        <select class="selectmenu" style="width:215px; left:-17px" id="MaritalStatus_drop" name="MaritalStatus_drop"><option value="0">-Select-</option></select>
+                        <select class="selectmenu" style="width:215px; left:-17px" id="MaritalStatusList_DDL" name="MaritalStatusList_DDL"><option value="0">-Select-</option></select>
                     </div>
 
                     <div id="Husband_disp" class="content_margine row1">
@@ -715,7 +715,7 @@
             $('<div></div>').PartialCreateDialog({
                 height: '500',
                 width: '700',
-                form: '#frmlookup',
+                form: '#FormLookup',
                 title: 'Upload',
                 htmlurl: '@Url.Action("PARTIAL","JSONUPLOAD")',
                 state: "open",
@@ -748,10 +748,10 @@
             $('#ServiceBookDates_JoiningDate').val('');
         });
 
-        $("#Gender_drop,#MaritalStatus_drop").on("selectmenuchange", function () {
+        $("#GenderList_DDL,#MaritalStatusList_DDL").on("selectmenuchange", function () {
 
-            if ($("#Gender_drop :selected").text() == "FEMALE") {
-                if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+            if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                     $("#BeforeM_disp,#Husband_disp").fadeIn();
                 } else {
                     $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -811,8 +811,8 @@
         $('#tabs').tabs();
         $('#Create_Dialog').P2BCreateDialog();
         $('#Create').on("click", function () {
-            $('#frmCandidate').trigger('reset');
-            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Candidate Resume', 'open', '@Url.Action("create")', '#frmCandidate', 'Message :', 'Request Falied :', '#JqGrid', 720, 1130, tablelist, '', function (data) { });
+            $('#FormCandidate').trigger('reset');
+            $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Candidate Resume', 'open', '@Url.Action("create")', '#FormCandidate', 'Message :', 'Request Falied :', '#JqGrid', 720, 1130, tablelist, '', function (data) { });
 
             $('#Religion_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 103, "");
             $('#Caste_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 105, "");
@@ -821,8 +821,8 @@
 
             $('#BloodGroup_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 108, "");
 
-            $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, '');
-            $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, '');
+            $('#MaritalStatusList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, '');
+            $('#GenderList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, '');
             $('#ReportingHR_drop').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "ReportingStruct")", "", '');
 
             $('#ReportingLevel1_drop').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "ReportingStruct")', "", "");
@@ -843,10 +843,10 @@
         }
 
         $('#Edit').on('click', function () {
-            $('#frmCandidate').trigger('reset');
+            $('#FormCandidate').trigger('reset');
             AssignData();
             $('.date').off('focusout');
-            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Candidate Data ->" + JSON.stringify(dt) + "", '#frmCandidate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 552, 1188, tablelist, btndisablenames, function (data) {
+            $('#Create_Dialog').P2BEditModalDialog('@Url.Action("Edit")', dt.Id, '@Url.Action("EditSave")', "Edit Candidate Data ->" + JSON.stringify(dt) + "", '#FormCandidate', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 552, 1188, tablelist, btndisablenames, function (data) {
                 $.each(data[0], function (i, k) {
                     console.log(k.Code);
                     $('#Candidate_CanCode').val(k.Code);
@@ -856,8 +856,8 @@
 
 
 
-                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
-                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
+                    $('#MaritalStatusList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
+                    $('#GenderList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
 
 
                     ////debugger;
@@ -880,8 +880,8 @@
                     $('#CorrsAddrslist').P2BLookUpEncapsulate('#CorrsAddrslist', 'CorrsAddrslist', k.CorrsAddrs_Id, k.CorrsAddrs_FullDetails, 'CorrsAddrslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'N');
                     $('#CorrsContactDetailslist').P2BLookUpEncapsulate('#CorrsContactDetailslist', 'CorrsContactDetailslist', k.CorrsContactDetails_Id, k.CorrsContactDetails_FullDetails, 'CorrsContactDetailslist', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee', 'N');
 
-                    if ($("#Gender_drop :selected").text() == "FEMALE") {
-                        if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+                    if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                        if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                             $("#BeforeM_disp,#Husband_disp").fadeIn();
                         } else {
                             $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -891,10 +891,10 @@
                         $("#BeforeM_disp,#Husband_disp").fadeOut();
                     }
 
-                    $("#Gender_drop,#MaritalStatus_drop").on("selectmenuchange", function () {
+                    $("#GenderList_DDL,#MaritalStatusList_DDL").on("selectmenuchange", function () {
 
-                        if ($("#Gender_drop :selected").text() == "FEMALE") {
-                            if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+                        if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                            if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                                 $("#BeforeM_disp,#Husband_disp").fadeIn();
                             } else {
                                 $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -987,7 +987,7 @@
 
         //create Emp offf
         $('#createEmpoff').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("_EmpOfficial", "Candidate")', 'Create Emp Official', 'open', '@Url.Action("CreateEmpoff", "Candidate")', '#frmPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 700, 700, '', '', '', '#frmPayProcessGroup', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("_EmpOfficial", "Candidate")', 'Create Emp Official', 'open', '@Url.Action("CreateEmpoff", "Candidate")', '#FormPayProcessGroup', 'Message :', 'Request Falied :', '#JqGrid', 700, 700, '', '', '', '#FormPayProcessGroup', '#Edit-PayProcessGroup-PayrollPeriod,#Remove-PayProcessGroup-PayrollPeriod', function (data) {
                 // to show data which is created in partial page
                 $('#PayProcessGrouplist').P2BLookUpEncapsulate('#PayProcessGrouplist', 'PayProcessGrouplist', data[0], data[1], 'PayProcessGrouplist', btndisablenames, 'N');
             });
@@ -996,7 +996,7 @@
 
         $('#View').button().click(function (event) {
             AssignData();
-            $('#frmCandidate').trigger('reset');
+            $('#FormCandidate').trigger('reset');
             var btnDisnames = '#Lookup-ResAddrs-Employee,#Create-ResAddrs-Employee,#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee,#Lookup-ResContactDetails-Employee,#Create-ResContactDetails-Employee,#Edit-ResContactDetails-Employee,#Remove-ResContactDetails-Employee,#Lookup-PermAddrs-Employee,#Create-PermAddrs-Employee,#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee,#Lookup-PermContactDetails-Employee,#Create-PermContactDetails-Employee,#Lookup-PermContactDetails-Employee,#Create-PermContactDetails-Employee,#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee,#Lookup-CorrsAddrs-Employee,#Create-CorrsAddrs-Employee,#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee,#Lookup-CorrsContactDetails-Employee,#Create-CorrsContactDetails-Employee,#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee,#Lookup-EmpName-FName,#Create-EmpName-FName,#Edit-EmpName-FName,#Lookup-FatherName-FName,#Create-FatherName-FName,#Edit-FatherName-FName,#Lookup-MotherName-FName,#Create-MotherName-FName,#Edit-MotherName-FName,#Lookup-HusbandName-FName,#Create-HusbandName-FName,#Edit-HusbandName-FName,#Lookup-BeforeMarriageName-FName,#Create-BeforeMarriageName-FName,#Edit-BeforeMarriageName-FName';
 
             $('#Create_Dialog').P2BViewModalDialog('@Url.Action("Edit")', dt.Id, 'View Candidate Data', tablelist, btnDisnames, 552, 1188, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
@@ -1009,8 +1009,8 @@
 
 
 
-                    $('#MaritalStatus_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
-                    $('#Gender_drop').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
+                    $('#MaritalStatusList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 128, k.MaritalStatus_Id);
+                    $('#GenderList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 129, k.Gender_Id);
 
 
                     ////debugger;
@@ -1033,8 +1033,8 @@
                     $('#CorrsAddrslist').P2BLookUpEncapsulate('#CorrsAddrslist', 'CorrsAddrslist', k.CorrsAddrs_Id, k.CorrsAddrs_FullDetails, 'CorrsAddrslist', 'view', 'N');
                     $('#CorrsContactDetailslist').P2BLookUpEncapsulate('#CorrsContactDetailslist', 'CorrsContactDetailslist', k.CorrsContactDetails_Id, k.CorrsContactDetails_FullDetails, 'CorrsContactDetailslist', 'view', 'N');
 
-                    if ($("#Gender_drop :selected").text() == "FEMALE") {
-                        if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+                    if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                        if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                             $("#BeforeM_disp,#Husband_disp").fadeIn();
                         } else {
                             $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -1044,10 +1044,10 @@
                         $("#BeforeM_disp,#Husband_disp").fadeOut();
                     }
 
-                    $("#Gender_drop,#MaritalStatus_drop").on("selectmenuchange", function () {
+                    $("#GenderList_DDL,#MaritalStatusList_DDL").on("selectmenuchange", function () {
 
-                        if ($("#Gender_drop :selected").text() == "FEMALE") {
-                            if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+                        if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                            if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                                 $("#BeforeM_disp,#Husband_disp").fadeIn();
                             } else {
                                 $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -1121,10 +1121,10 @@
 
                 });
 
-                $("#Gender_drop,#MaritalStatus_drop").on("selectmenuchange", function () {
+                $("#GenderList_DDL,#MaritalStatusList_DDL").on("selectmenuchange", function () {
 
-                    if ($("#Gender_drop :selected").text() == "FEMALE") {
-                        if ($("#MaritalStatus_drop :selected").text() == "MARRIED") {
+                    if ($("#GenderList_DDL :selected").text() == "FEMALE") {
+                        if ($("#MaritalStatusList_DDL :selected").text() == "MARRIED") {
                             $("#BeforeM_disp,#Husband_disp").fadeIn();
                         } else {
                             $("#BeforeM_disp,#Husband_disp").fadeOut();
@@ -1146,13 +1146,13 @@
 
         /* Residential address*/
         $('#Lookup-ResAddrs-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Candidate")', '', 'LookupDiv', 'Address Look Up Data', '#ResAddrslist', 'ResAddrslist', 5, 'ResAddrslist', '#frmCandidate', 'N', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee', 'ResAddrslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Candidate")', '', 'LookupDiv', 'Address Look Up Data', '#ResAddrslist', 'ResAddrslist', 5, 'ResAddrslist', '#FormCandidate', 'N', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee', 'ResAddrslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-ResAddrs-Employee').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 // to show data which is created in partial page
                 $('#ResAddrslist').P2BLookUpEncapsulate('#ResAddrslist', 'ResAddrslist', data[0], data[1], 'ResAddrslist', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee', 'N');
             });
@@ -1163,7 +1163,7 @@
             var a = [], b;
             a = $('#ResAddrslist').P2BGetTableDataonSelectedRow('#ResAddrslist', 0);
             b = a[0];
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee', '#ResAddrslist', 'ResAddrslist', 'ResAddrslist', 'N', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee', '#ResAddrslist', 'ResAddrslist', 'ResAddrslist', 'N', function (data) {
                 $.each(data[0], function (i, k) {
                     $('#FormAddress').trigger("reset");
                     $('#Address1').val(k.Address1);
@@ -1191,19 +1191,19 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#ResAddrslist').P2BGetTableDataonSelectedRow('#ResAddrslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ResAddrslist', $('#ResAddrslist').val(), 200, 200, '#frmEmployee', '#ResAddrslist', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ResAddrslist', $('#ResAddrslist').val(), 200, 200, '#FormEmployee', '#ResAddrslist', '#Edit-ResAddrs-Employee,#Remove-ResAddrs-Employee');
             event.preventDefault();
         });
 
         /* Correspondance address*/
         $('#Lookup-CorrsAddrs-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Employee")', '', 'LookupDiv', 'Address Look Up Data', '#CorrsAddrslist', 'CorrsAddrslist', 5, 'CorrsAddrslist', '#frmEmployee', 'N', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Employee")', '', 'LookupDiv', 'Address Look Up Data', '#CorrsAddrslist', 'CorrsAddrslist', 5, 'CorrsAddrslist', '#FormEmployee', 'N', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-CorrsAddrs-Employee').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmEmployee', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormEmployee', '', function (data) {
                 // to show data which is created in partial page
                 $('#CorrsAddrslist').P2BLookUpEncapsulate('#CorrsAddrslist', 'CorrsAddrslist', data[0], data[1], 'CorrsAddrslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'N');
             });
@@ -1214,7 +1214,7 @@
             var a = [], b;
             a = $('#CorrsAddrslist').P2BGetTableDataonSelectedRow('#CorrsAddrslist', 0);
             b = a[0];
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#CorrsAddrslist', 'CorrsAddrslist', 'CorrsAddrslist', 'N', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#CorrsAddrslist', 'CorrsAddrslist', 'CorrsAddrslist', 'N', function (data) {
                 $.each(data[0], function (i, k) {
                     $('#FormAddress').trigger("reset");
                     $('#Address1').val(k.Address1);
@@ -1239,19 +1239,19 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#CorrsAddrslist').P2BGetTableDataonSelectedRow('#CorrsAddrslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CorrsAddrslist', $('#CorrsAddrslist').val(), 200, 200, '#frmCandidate', '#CorrsAddrslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CorrsAddrslist', $('#CorrsAddrslist').val(), 200, 200, '#FormCandidate', '#CorrsAddrslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
             event.preventDefault();
         });
 
         /* Permanent address*/
         $('#Lookup-PermAddrs-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Employee")', '', 'LookupDiv', 'Address Look Up Data', '#PermAddrslist', 'PermAddrslist', 5, 'PermAddrslist', '#frmCandidate', 'N', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee', 'PermAddrslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Employee")', '', 'LookupDiv', 'Address Look Up Data', '#PermAddrslist', 'PermAddrslist', 5, 'PermAddrslist', '#FormCandidate', 'N', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee', 'PermAddrslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-PermAddrs-Employee').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 // to show data which is created in partial page
                 $('#PermAddrslist').P2BLookUpEncapsulate('#PermAddrslist', 'PermAddrslist', data[0], data[1], 'PermAddrslist', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee', 'N');
             });
@@ -1262,7 +1262,7 @@
             var a = [], b;
             a = $('#PermAddrslist').P2BGetTableDataonSelectedRow('#PermAddrslist', 0);
             b = a[0];
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmEmployee', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee', '#PermAddrslist', 'PermAddrslist', 'PermAddrslist', 'N', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormEmployee', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee', '#PermAddrslist', 'PermAddrslist', 'PermAddrslist', 'N', function (data) {
                 $.each(data[0], function (i, k) {
                     $('#FormAddress').trigger("reset");
                     $('#Address1').val(k.Address1);
@@ -1287,13 +1287,13 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#PermAddrslist').P2BGetTableDataonSelectedRow('#PermAddrslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PermAddrslist', $('#PermAddrslist').val(), 200, 200, '#frmCandidate', '#PermAddrslist', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PermAddrslist', $('#PermAddrslist').val(), 200, 200, '#FormCandidate', '#PermAddrslist', '#Edit-PermAddrs-Employee,#Remove-PermAddrs-Employee');
             event.preventDefault();
         });
 
         /* Residential Contact Details*/
         $('#Lookup-ResContactDetails-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Candidate")', '', 'LookupDiv', 'Contact Details Look Up Data', '#ResContactDetailslist', 'ResContactDetailslist', 5, 'ResContactDetailslist', '#frmCandidate', 'N', '#Edit-ResContactDetails-Employee,#Remove-ResContactDetails-Employee', 'ResContactDetailslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Candidate")', '', 'LookupDiv', 'Contact Details Look Up Data', '#ResContactDetailslist', 'ResContactDetailslist', 5, 'ResContactDetailslist', '#FormCandidate', 'N', '#Edit-ResContactDetails-Employee,#Remove-ResContactDetails-Employee', 'ResContactDetailslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
@@ -1334,13 +1334,13 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#ResContactDetailslist').P2BGetTableDataonSelectedRow('#ResContactDetailslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ResContactDetailslist', $('#ResContactDetailslist').val(), 200, 200, '#frmCandidate', '#ResContactDetailslist', '#Edit-ResContactDetails-Employee,#Remove-ResContactDetails-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ResContactDetailslist', $('#ResContactDetailslist').val(), 200, 200, '#FormCandidate', '#ResContactDetailslist', '#Edit-ResContactDetails-Employee,#Remove-ResContactDetails-Employee');
             event.preventDefault();
         });
 
         /* Correspondance Contact Details*/
         $('#Lookup-CorrsContactDetails-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Employee")', '', 'LookupDiv', 'Contact Details Look Up Data', '#CorrsContactDetailslist', 'CorrsContactDetailslist', 5, 'CorrsContactDetailslist', '#frmCandidate', 'N', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee', 'CorrsContactDetailslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Employee")', '', 'LookupDiv', 'Contact Details Look Up Data', '#CorrsContactDetailslist', 'CorrsContactDetailslist', 5, 'CorrsContactDetailslist', '#FormCandidate', 'N', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee', 'CorrsContactDetailslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
@@ -1357,7 +1357,7 @@
             a = $('#CorrsContactDetailslist').P2BGetTableDataonSelectedRow('#CorrsContactDetailslist', 0);
             b = a[0];
             console.log(b);
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee', '#CorrsContactDetailslist', 'CorrsContactDetailslist', 'CorrsContactDetailslist', 'N', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee', '#CorrsContactDetailslist', 'CorrsContactDetailslist', 'CorrsContactDetailslist', 'N', function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
                     $('#FormContactDetails').trigger('reset');
@@ -1380,11 +1380,11 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#CorrsContactDetailslist').P2BGetTableDataonSelectedRow('#CorrsContactDetailslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CorrsContactDetailslist', $('#CorrsContactDetailslist').val(), 200, 200, '#frmCandidate', '#CorrsContactDetailslist', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CorrsContactDetailslist', $('#CorrsContactDetailslist').val(), 200, 200, '#FormCandidate', '#CorrsContactDetailslist', '#Edit-CorrsContactDetails-Employee,#Remove-CorrsContactDetails-Employee');
             event.preventDefault();
         });
         $('#Lookup-PermContactDetails-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Employee")', '', 'LookupDiv', 'Contact Details Look Up Data', '#PermContactDetailslist', 'PermContactDetailslist', 5, 'PermContactDetailslist', '#frmCandidate', 'N', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee', 'PermContactDetailslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Employee")', '', 'LookupDiv', 'Contact Details Look Up Data', '#PermContactDetailslist', 'PermContactDetailslist', 5, 'PermContactDetailslist', '#FormCandidate', 'N', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee', 'PermContactDetailslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
@@ -1401,7 +1401,7 @@
             a = $('#PermContactDetailslist').P2BGetTableDataonSelectedRow('#PermContactDetailslist', 0);
             b = a[0];
             console.log(b);
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee', '#PermContactDetailslist', 'PermContactDetailslist', 'PermContactDetailslist', 'N', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', '@Url.Action("Editcontactdetails_partial", "Corporate")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee', '#PermContactDetailslist', 'PermContactDetailslist', 'PermContactDetailslist', 'N', function (data) {
                 $.each(data[0], function (i, k) {
                     $('#FormContactDetails').trigger('reset');
                     $('#EmailId').val(k.EmailId);
@@ -1422,7 +1422,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#PermContactDetailslist').P2BGetTableDataonSelectedRow('#PermContactDetailslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PermContactDetailslist', $('#PermContactDetailslist').val(), 200, 200, '#frmCandidate', '#PermContactDetailslist', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails","Corporate")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PermContactDetailslist', $('#PermContactDetailslist').val(), 200, 200, '#FormCandidate', '#PermContactDetailslist', '#Edit-PermContactDetails-Employee,#Remove-PermContactDetails-Employee');
             event.preventDefault();
         });
 
@@ -1669,12 +1669,12 @@
         });
         $('#EmpName_FullNameFML,#FatherName_FullNameFML,#BeforeMarriageName_FullNameFML,#MotherName_FullNameFML,#MotherName_FullNameFML,#HusbandName_FullNameFML').attr('readonly', true);
         $('#Lookup-ReportingStructRights-Employee').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "ReportingStructRights")', '', 'LookupDiv', 'ReportingStructRights Look Up Data', '#ReportingStructRightslist', 'ReportingStructRightslist', 5, 'ReportingStructRightslist', '#frmCandidate', 'A', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetLookup", "ReportingStructRights")', '', 'LookupDiv', 'ReportingStructRights Look Up Data', '#ReportingStructRightslist', 'ReportingStructRightslist', 5, 'ReportingStructRightslist', '#FormCandidate', 'A', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', 'CorrsAddrslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
         $('#Create-ReportingStructRights-Employee').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ReportingStructRights")', 'Create ReportingStructRights', 'open', '@Url.Action("Create","ReportingStructRights")', '#frmReportingStructRights', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "ReportingStructRights")', 'Create ReportingStructRights', 'open', '@Url.Action("Create","ReportingStructRights")', '#FormReportingStructRights', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 $('#ReportingStructRightslist').P2BLookUpEncapsulate('#ReportingStructRightslist', 'ReportingStructRightslist', data[0], data[1], 'ReportingStructRightslist', '#Edit-ReportingStructRights-Employee,#Remove-ReportingStructRights-Employee', 'A');
             });
             event.preventDefault();
@@ -1684,7 +1684,7 @@
             var a = [], b;
             a = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
             b = a[0];
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "ReportingStructRights")', '@Url.Action("edit", "ReportingStructRights")', b, '@Url.Action("Editsave","ReportingStructRights")', 'Edit ReportingStructRights', '#frmReportingStructRights', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#ReportingStructRightslist', 'ReportingStructRightslist', 'ReportingStructRightslist', 'A', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "ReportingStructRights")', '@Url.Action("edit", "ReportingStructRights")', b, '@Url.Action("Editsave","ReportingStructRights")', 'Edit ReportingStructRights', '#FormReportingStructRights', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee', '#ReportingStructRightslist', 'ReportingStructRightslist', 'ReportingStructRightslist', 'A', function (data) {
                 $.each(data[0], function (i, k) {
                     @*$('#ReportingLevellist').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 600, k.ReportingLevel_Id, '');*@
                     $('#FuncModuleslist').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 601, k.FuncModules_Id, '');
@@ -1705,7 +1705,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ReportingStructRightslist', $('#ReportingStructRightslist').val(), 200, 200, '#frmCandidate', '#ReportingStructRightslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ReportingStructRightslist', $('#ReportingStructRightslist').val(), 200, 200, '#FormCandidate', '#ReportingStructRightslist', '#Edit-CorrsAddrs-Employee,#Remove-CorrsAddrs-Employee');
             event.preventDefault();
         });
 
@@ -1716,14 +1716,14 @@
         //To get data in Lookup
         $('#LookUp_QualDetails_empAcademicDtl').button().on('click', function (event) {
             // alert('Show QualDetails')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetQualificationDetailLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#QualificationDetailsList', 'QualificationDetailsList', 10, 'QualificationDetailsList', '#frmCandidate', 'A', '#Remove_QualDetails_empAcademicDtl,#Edit_QualDetails_empAcademicDtl', 'QualificationDetailsList_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetQualificationDetailLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#QualificationDetailsList', 'QualificationDetailsList', 10, 'QualificationDetailsList', '#FormCandidate', 'A', '#Remove_QualDetails_empAcademicDtl,#Edit_QualDetails_empAcademicDtl', 'QualificationDetailsList_table', 'PageNavPosition');
             event.preventDefault();
         });
 
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_QualDetails_empAcademicDtl').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "QualificationDetails")', 'Create Qualification Details', 'open', '@Url.Action("Create", "QualificationDetails")', '#frmQualificationDetails1', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "QualificationDetails")', 'Create Qualification Details', 'open', '@Url.Action("Create", "QualificationDetails")', '#frmQualificationDetails1', 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '', '', '', '#FormCandidate', '', function (data) {
                 // to show data which is created in partial page
                 //   alert(data);
                 $('#QualificationDetailsList').P2BLookUpEncapsulate('#QualificationDetailsList', 'QualificationDetailsList', data[0], data[1], 'QualificationDetailsList', '#Edit_QualDetails_empAcademicDtl,#Remove_QualDetails_empAcademicDtl', 'A');
@@ -1737,7 +1737,7 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "QualificationDetails")', '@Url.Action("Edit", "QualificationDetails")', b, '@Url.Action("EditSave", "QualificationDetails")', 'Edit QualificationDetails', '#frmQualificationDetails1', b, 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#frmCandidate', '#QualificationDetailsList', 'QualificationDetailsList', 'QualificationDetailsList', 'A', '#Edit-Qualification-QualDetails,#Remove-Qualification-QualDetails', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "QualificationDetails")', '@Url.Action("Edit", "QualificationDetails")', b, '@Url.Action("EditSave", "QualificationDetails")', 'Edit QualificationDetails', '#frmQualificationDetails1', b, 'Message :', 'Request Falied :', '#JqGrid', 500, 600, '#FormCandidate', '#QualificationDetailsList', 'QualificationDetailsList', 'QualificationDetailsList', 'A', '#Edit-Qualification-QualDetails,#Remove-Qualification-QualDetails', function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
 
@@ -1776,7 +1776,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#ReportingStructRightslist').P2BGetTableDataonSelectedRow('#ReportingStructRightslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#QualificationDetailsList', $('#QualificationDetailsList').val(), 200, 200, '#frmCandidate', '#QualificationDetailsList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#QualificationDetailsList', $('#QualificationDetailsList').val(), 200, 200, '#FormCandidate', '#QualificationDetailsList');
             event.preventDefault();
         });
 
@@ -1786,7 +1786,7 @@
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Skill_empAcademicDtl').on("click", function (event) {
             //  alert('create Hobby');
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Skill")', 'Create Skill', 'open', '@Url.Action("Create", "Skill")', '#frmSkill', 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Skill")', 'Create Skill', 'open', '@Url.Action("Create", "Skill")', '#FormSkill', 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '', '', '', '#FormCandidate', '', function (data) {
                 //alert(data[0]);
                 $('#SkillList').P2BLookUpEncapsulate('#SkillList', 'SkillList', data[0], data[1], 'SkillList', '#Remove_Skill_empAcademicDtl,#Edit_Skill_empAcademicDtl', 'A');
             });
@@ -1797,7 +1797,7 @@
 
         $('#LookUp_Skill_empAcademicDtl').on('click', function (event) {
             //alert ('Show Hobby')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetSkillLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#SkillList', 'SkillList', 5, 'SkillList', '#frmCandidate', 'A', '#Remove_Skill_empAcademicDtl,#Edit_Skill_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetSkillLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#SkillList', 'SkillList', 5, 'SkillList', '#FormCandidate', 'A', '#Remove_Skill_empAcademicDtl,#Edit_Skill_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
@@ -1809,10 +1809,10 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Skill")', '@Url.Action("edit", "Skill")', b, '@Url.Action("EditSave", "Skill")', 'Edit Skill ', '#frmSkill', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '#frmCandidate', '#SkillList', 'SkillList', 'SkillList', 'A', '#Edit_Skill_empAcademicDtl,#Remove_Skill_empAcademicDtl', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Skill")', '@Url.Action("edit", "Skill")', b, '@Url.Action("EditSave", "Skill")', 'Edit Skill ', '#FormSkill', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '#FormCandidate', '#SkillList', 'SkillList', 'SkillList', 'A', '#Edit_Skill_empAcademicDtl,#Remove_Skill_empAcademicDtl', function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
-                    $('#frmSkill').trigger("reset");
+                    $('#FormSkill').trigger("reset");
                     $('#Name').val(k.Name);
                 });
 
@@ -1830,7 +1830,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#SkillList').P2BGetTableDataonSelectedRow('#SkillList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SkillList', $('#SkillList').val(), 200, 200, '#frmCandidate', '#SkillList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#SkillList', $('#SkillList').val(), 200, 200, '#FormCandidate', '#SkillList');
             event.preventDefault();
         });
 
@@ -1842,7 +1842,7 @@
 
         $('#LookUp_Scolarship_empAcademicDtl').on('click', function (event) {
             //alert ('Show Hobby')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetScolarshipLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Scholarship data', '#ScolarshipList', 'ScolarshipList', 5, 'ScolarshipList', '#frmCandidate', 'A', '#Edit_Scolarship_empAcademicDtl,#Remove_Scolarship_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetScolarshipLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Scholarship data', '#ScolarshipList', 'ScolarshipList', 5, 'ScolarshipList', '#FormCandidate', 'A', '#Edit_Scolarship_empAcademicDtl,#Remove_Scolarship_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
@@ -1850,7 +1850,7 @@
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Scolarship_empAcademicDtl').on("click", function (event) {
             //  alert('create Hobby');
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Scolarship")', 'Create Scholarship', 'open', '@Url.Action("Create", "Scolarship")', '#frmScolarship', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Scolarship")', 'Create Scholarship', 'open', '@Url.Action("Create", "Scolarship")', '#frmScolarship', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 //alert(data[0]);
                 $('#ScolarshipList').P2BLookUpEncapsulate('#ScolarshipList', 'ScolarshipList', data[0], data[1], 'ScolarshipList', '#LookUp_Scolarship_empAcademicDtl,#Create_Scolarship_empAcademicDtl', 'A');
             });
@@ -1864,7 +1864,7 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Scolarship")', '@Url.Action("edit", "Scolarship")', b, '@Url.Action("EditSave", "Scolarship")', 'Edit Scholarship ', '#frmScolarship', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#ScolarshipList', 'ScolarshipList', 'ScolarshipList', 'A', '#Edit_Scolarship_empAcademicDtl,#Remove_Scolarship_empAcademicDtl', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Scolarship")', '@Url.Action("edit", "Scolarship")', b, '@Url.Action("EditSave", "Scolarship")', 'Edit Scholarship ', '#frmScolarship', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#ScolarshipList', 'ScolarshipList', 'ScolarshipList', 'A', '#Edit_Scolarship_empAcademicDtl,#Remove_Scolarship_empAcademicDtl', function (data) {
 
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
@@ -1889,7 +1889,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#ScolarshipList').P2BGetTableDataonSelectedRow('#ScolarshipList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ScolarshipList', $('#ScolarshipList').val(), 200, 200, '#frmCandidate', '#ScolarshipList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#ScolarshipList', $('#ScolarshipList').val(), 200, 200, '#FormCandidate', '#ScolarshipList');
             event.preventDefault();
         });
 
@@ -1900,14 +1900,14 @@
         //To get data in Lookup
         $('#LookUp_Hobby_empAcademicDtl').on('click', function (event) {
             //alert ('Show Hobby')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetHobbyLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#HobbyList', 'HobbyList', 5, 'HobbyList', '#frmCandidate', 'A', '#Edit_Hobby_empAcademicDtl,#Remove_Hobby_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetHobbyLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#HobbyList', 'HobbyList', 5, 'HobbyList', '#FormCandidate', 'A', '#Edit_Hobby_empAcademicDtl,#Remove_Hobby_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Hobby_empAcademicDtl').on("click", function (event) {
 
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Hobby")', 'Create Hobby', 'open', '@Url.Action("Create", "Hobby")', '#frmHobby', 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Hobby")', 'Create Hobby', 'open', '@Url.Action("Create", "Hobby")', '#frmHobby', 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '', '', '', '#FormCandidate', '', function (data) {
                 //alert(data[0]);
                 $('#HobbyList').P2BLookUpEncapsulate('#HobbyList', 'HobbyList', data[0], data[1], 'HobbyList', '#Remove_Hobby_empAcademicDtl,#Edit_Hobby_empAcademicDtl', 'A');
             });
@@ -1922,7 +1922,7 @@
             b = a[0];
             //  console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Hobby")', '@Url.Action("edit", "Hobby")', b, '@Url.Action("EditSave", "Hobby")', 'Edit Hobby ', '#frmHobby', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '#frmCandidate', '#HobbyList', 'HobbyList', 'HobbyList', 'A', '#Edit_Hobby_empAcademicDtl,#Remove_Hobby_empAcademicDtl', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Hobby")', '@Url.Action("edit", "Hobby")', b, '@Url.Action("EditSave", "Hobby")', 'Edit Hobby ', '#frmHobby', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 366, '#FormCandidate', '#HobbyList', 'HobbyList', 'HobbyList', 'A', '#Edit_Hobby_empAcademicDtl,#Remove_Hobby_empAcademicDtl', function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
                     $('#frmHobby').trigger("reset");
@@ -1943,7 +1943,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#HobbyList').P2BGetTableDataonSelectedRow('#HobbyList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HobbyList', $('#HobbyList').val(), 200, 200, '#frmCandidate', '#HobbyList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#HobbyList', $('#HobbyList').val(), 200, 200, '#FormCandidate', '#HobbyList');
             event.preventDefault();
         });
 
@@ -1956,14 +1956,14 @@
 
         $('#LookUp_Awards_empAcademicDtl').on('click', function (event) {
             //alert ('Show Hobby')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAwardsLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#AwardsList', 'AwardsList', 5, 'AwardsList', '#frmCandidate', 'A', '#Edit_Awards_empAcademicDtl,#Remove_Awards_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAwardsLKDetails", "EmpAcademicInfo")', '', 'LookupDiv', 'Look Up Data', '#AwardsList', 'AwardsList', 5, 'AwardsList', '#FormCandidate', 'A', '#Edit_Awards_empAcademicDtl,#Remove_Awards_empAcademicDtl', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Awards_empAcademicDtl').on("click", function (event) {
             //  alert('create Hobby');
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Awards")', 'Create Awards', 'open', '@Url.Action("Create", "Awards")', '#frmAwards', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "Awards")', 'Create Awards', 'open', '@Url.Action("Create", "Awards")', '#FormAwards', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 //alert(data[0]);
                 $('#AwardsList').P2BLookUpEncapsulate('#AwardsList', 'AwardsList', data[0], data[1], 'AwardsList', '#Edit_Awards_empAcademicDtl,#Remove_Awards_empAcademicDtl', 'A');
             });
@@ -1977,11 +1977,11 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Awards")', '@Url.Action("edit", "Awards")', b, '@Url.Action("EditSave", "Awards")', 'Edit Awards ', '#frmAwards', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#AwardsList', 'AwardsList', 'AwardsList', 'A', '#Edit_Awards_empAcademicDtl,#Remove_Awards_empAcademicDtl', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "Awards")', '@Url.Action("edit", "Awards")', b, '@Url.Action("EditSave", "Awards")', 'Edit Awards ', '#FormAwards', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#AwardsList', 'AwardsList', 'AwardsList', 'A', '#Edit_Awards_empAcademicDtl,#Remove_Awards_empAcademicDtl', function (data) {
 
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
-                    $('#frmAwards').trigger("reset");
+                    $('#FormAwards').trigger("reset");
                     $('#Name').val(k.Name);
                     $('#Details').val(k.Details);
                     if (k.IssueDate != null)
@@ -2001,7 +2001,7 @@
             //b = a[0];
             var selctedRows = [];
             selctedRows = $('#AwardsList').P2BGetTableDataonSelectedRow('#AwardsList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selctedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AwardsList', $('#AwardsList').val(), 200, 200, '#frmCandidate', '#AwardsList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selctedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AwardsList', $('#AwardsList').val(), 200, 200, '#FormCandidate', '#AwardsList');
             event.preventDefault();
         });
 
@@ -2011,13 +2011,13 @@
 
         $('#Lookup_Alergy_EmpMedicalInfo').on('click', function (event) {
             //alert ('Show Hobby')
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAllergyDetails", "EmpMedicalInfo")', '', 'LookupDiv', 'Look Up Data', '#AlergyList', 'AlergyList', 5, 'AlergyList', '#frmCandidate', 'A', '#Edit_Alergy_EmpMedicalInfo,#Remove_Alergy_EmpMedicalInfo', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetAllergyDetails", "EmpMedicalInfo")', '', 'LookupDiv', 'Look Up Data', '#AlergyList', 'AlergyList', 5, 'AlergyList', '#FormCandidate', 'A', '#Edit_Alergy_EmpMedicalInfo,#Remove_Alergy_EmpMedicalInfo', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
         $('#Create_Alergy_EmpMedicalInfo').on('click', function (e) {
             @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Corporate")', 'Create Dialog', 'open', '@Url.Action("CreateSave","ContactDetails")', '#FormContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCorporate', '#ContactNo_Edit', function (data) {*@
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', 'Create Allergy Details', 'open', '@Url.Action("Create", "Allergy")', '#FormAllergy', 'Message :', 'Request Falied :', '#JqGrid', 370, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', 'Create Allergy Details', 'open', '@Url.Action("Create", "Allergy")', '#FormAllergy', 'Message :', 'Request Falied :', '#JqGrid', 370, 500, '', '', '', '#FormCandidate', '', function (data) {
                 $('#AlergyList').P2BLookUpEncapsulate('#AlergyList', 'AlergyList', data[0], data[1], 'AlergyList', btndisable_Alergy, 'A');
 
             });
@@ -2030,7 +2030,7 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Allergy")', b, '@Url.Action("EditSave", "Allergy")', 'Edit Allergy ', '#FormAllergy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#AlergyList', 'AlergyList', 'AlergyList', 'N', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Allergy_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Allergy")', b, '@Url.Action("EditSave", "Allergy")', 'Edit Allergy ', '#FormAllergy', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#AlergyList', 'AlergyList', 'AlergyList', 'N', '#Edit-Medicine-Allergy,#Remove-Medicine-Allergy', function (data) {
                 // setTimeout(function () {
                 $.each(data[0], function (i, k) {
                     $('#FormAllergy').trigger('reset');
@@ -2054,7 +2054,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#AlergyList').P2BGetTableDataonSelectedRow('#AlergyList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AlergyList', $('#AlergyList').val(), 200, 200, '#frmCandidate', '#AlergyList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#AlergyList', $('#AlergyList').val(), 200, 200, '#FormCandidate', '#AlergyList');
             event.preventDefault();
         });
 
@@ -2064,12 +2064,12 @@
 
         $('#Lookup-Disease-EmpMedicalInfo').on('click', function (event) {
 
-            $('.dialog').P2BLookUpModal('@Url.Action("GetDiseaseDetails", "EmpMedicalInfo")', '', 'LookupDiv', 'Look Up Data', '#DiseaseList', 'DiseaseList', 5, 'DiseaseList', '#frmCandidate', 'A', '#Edit-Disease-EmpMedicalInfo,#Remove-Disease-EmpMedicalInfo', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetDiseaseDetails", "EmpMedicalInfo")', '', 'LookupDiv', 'Look Up Data', '#DiseaseList', 'DiseaseList', 5, 'DiseaseList', '#FormCandidate', 'A', '#Edit-Disease-EmpMedicalInfo,#Remove-Disease-EmpMedicalInfo', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
         $('#Create-Disease-EmpMedicalInfo').on('click', function (e) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', 'Create Disease Details', 'open', '@Url.Action("Create", "Disease")', '#frmDisease', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', 'Create Disease Details', 'open', '@Url.Action("Create", "Disease")', '#FormDisease', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 $('#DiseaseList').P2BLookUpEncapsulate('#DiseaseList', 'DiseaseList', data[0], data[1], 'DiseaseList', '#Edit-Disease-EmpMedicalInfo,#Remove-Disease-EmpMedicalInfo', 'A');
             });
             e.preventDefault();
@@ -2079,9 +2079,9 @@
             var a = [], b;
             a = $('#DiseaseList').P2BGetTableDataonSelectedRow('#DiseaseList', 0);
             b = a[0];
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Disease")', b, '@Url.Action("EditSave", "Disease")', 'Edit Disease Details', '#frmDisease', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#DiseaseList', 'DiseaseList', 'DiseaseList', 'A', '#Edit-Medicine-Disease,#Remove-Medicine-Disease', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Disease_partial", "EmpMedicalInfo")', '@Url.Action("Edit", "Disease")', b, '@Url.Action("EditSave", "Disease")', 'Edit Disease Details', '#FormDisease', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#DiseaseList', 'DiseaseList', 'DiseaseList', 'A', '#Edit-Medicine-Disease,#Remove-Medicine-Disease', function (data) {
                 $.each(data[0], function (i, k) {
-                    $('#frmDisease').trigger('reset');
+                    $('#FormDisease').trigger('reset');
                     $('#Name').val(k.Name);
                     $('#DiseaseTypeList_DDL').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 300, k.DiseaseType_Id);
                 });
@@ -2100,7 +2100,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#DiseaseList').P2BGetTableDataonSelectedRow('#DiseaseList', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DiseaseList', $('#DiseaseList').val(), 200, 200, '#frmCandidate', '#DiseaseList');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#DiseaseList', $('#DiseaseList').val(), 200, 200, '#FormCandidate', '#DiseaseList');
             event.preventDefault();
         });
         //----------disease Details-end----
@@ -2110,14 +2110,14 @@
 
         $('#Lookup-PreCompExp-Candidate').on('click', function (event) {
 
-            $('.dialog').P2BLookUpModal('@Url.Action("GetPrevCompanyExp", "PreviousCompanyExp")', '', 'LookupDiv', 'Look Up Data', '#PreCompExplist', 'PreCompExplist', 5, 'PreCompExplist', '#frmCandidate', 'A', '#Edit-PreCompExp-Candidate,#Remove-PreCompExp-Candidate', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetPrevCompanyExp", "PreviousCompanyExp")', '', 'LookupDiv', 'Look Up Data', '#PreCompExplist', 'PreCompExplist', 5, 'PreCompExplist', '#FormCandidate', 'A', '#Edit-PreCompExp-Candidate,#Remove-PreCompExp-Candidate', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-PreCompExp-Candidate').button().on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "PreviousCompanyExp")', 'Create PreviousCompanyExp', 'open', '@Url.Action("Create", "PreviousCompanyExp")', '#FormPrevCompExp', 'Message :', 'Request Falied :', '#JqGrid', 550, 1100, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "PreviousCompanyExp")', 'Create PreviousCompanyExp', 'open', '@Url.Action("Create", "PreviousCompanyExp")', '#FormPrevCompExp', 'Message :', 'Request Falied :', '#JqGrid', 550, 1100, '', '', '', '#FormCandidate', '', function (data) {
                 @*$.LoadEmpByDefault(true);
                 $('#Advance-Filter-Symbol').on('click', function () {
                     $("<div></div>").FilterDialog({
@@ -2151,7 +2151,7 @@
             a = $('#PreCompExplist').P2BGetTableDataonSelectedRow('#PreCompExplist', 0);
             b = a[0];
 
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "PreviousCompanyExp")', '@Url.Action("Edit", "PreviousCompanyExp")', b, '@Url.Action("EditSave", "PreviousCompanyExp")', 'Edit PreviousCompanyExp Details', '#FormPrevCompExp', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 1100, '#frmCandidate', '#PreCompExplist', 'PreCompExplist', 'PreCompExplist', 'A', '#Edit-PreCompExp-Candidate,#Remove-PreCompExp-Candidate', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "PreviousCompanyExp")', '@Url.Action("Edit", "PreviousCompanyExp")', b, '@Url.Action("EditSave", "PreviousCompanyExp")', 'Edit PreviousCompanyExp Details', '#FormPrevCompExp', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 1100, '#FormCandidate', '#PreCompExplist', 'PreCompExplist', 'PreCompExplist', 'A', '#Edit-PreCompExp-Candidate,#Remove-PreCompExp-Candidate', function (data) {
 
                 $('#Section_Emp').fadeOut();
                 $.each(data[0], function (i, k) {
@@ -2193,7 +2193,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#PreCompExplist').P2BGetTableDataonSelectedRow('#PreCompExplist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PreCompExplist', $('#PreCompExplist').val(), 200, 200, '#frmCandidate', '#PreCompExplist');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PreCompExplist', $('#PreCompExplist').val(), 200, 200, '#FormCandidate', '#PreCompExplist');
             event.preventDefault();
         });
         //----------Prev Comp Details-end----
@@ -2202,14 +2202,14 @@
 
         $('#Lookup-Reference-Candidate').on('click', function (event) {
 
-            $('.dialog').P2BLookUpModal('@Url.Action("GetFamilyDetails", "FamilyDetails")', '', 'LookupDiv', 'Look Up Data', '#Referencelist', 'Referencelist', 5, 'Referencelist', '#frmCandidate', 'A', '#Edit-Reference-Candidate,#Remove-Reference-Candidate', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetFamilyDetails", "FamilyDetails")', '', 'LookupDiv', 'Look Up Data', '#Referencelist', 'Referencelist', 5, 'Referencelist', '#FormCandidate', 'A', '#Edit-Reference-Candidate,#Remove-Reference-Candidate', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-Reference-Candidate').button().on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "FamilyDetails")', 'Create FamilyDetails', 'open', '@Url.Action("Create", "FamilyDetails")', '#frmBenefitNominees', 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '', '', '', '#frmCandidate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "FamilyDetails")', 'Create FamilyDetails', 'open', '@Url.Action("Create", "FamilyDetails")', '#FormBenefitNominees', 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '', '', '', '#FormCandidate', '', function (data) {
                 $('#Referencelist').P2BLookUpEncapsulate('#Referencelist', 'Referencelist', data[0], data[1], 'Referencelist', '#Edit-Reference-Candidate,#Remove-Reference-Candidate', 'A');
                 $('#CategoryList_DDL').P2BSelectMenuAppend('@Url.Action("GetLookupValue", "lookup")', 107, "");
 
@@ -2223,7 +2223,7 @@
             a = $('#Referencelist').P2BGetTableDataonSelectedRow('#Referencelist', 0);
             b = a[0];
 
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "FamilyDetails")', '@Url.Action("Edit", "FamilyDetails")', b, '@Url.Action("EditSave", "FamilyDetails")', 'Edit FamilyDetails Details', '#frmBenefitNominees', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '#frmCandidate', '#Referencelist', 'Referencelist', 'Referencelist', 'A', '#Edit-Reference-Candidate,#Remove-Reference-Candidate', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "FamilyDetails")', '@Url.Action("Edit", "FamilyDetails")', b, '@Url.Action("EditSave", "FamilyDetails")', 'Edit FamilyDetails Details', '#FormBenefitNominees', b, 'Message :', 'Request Falied :', '#JqGrid', 550, 580, '#FormCandidate', '#Referencelist', 'Referencelist', 'Referencelist', 'A', '#Edit-Reference-Candidate,#Remove-Reference-Candidate', function (data) {
 
 
                 $.each(data[0], function (i, k) {
@@ -2255,7 +2255,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#Referencelist').P2BGetTableDataonSelectedRow('#Referencelist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Referencelist', $('#Referencelist').val(), 200, 200, '#frmCandidate', '#Referencelist');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Referencelist', $('#Referencelist').val(), 200, 200, '#FormCandidate', '#Referencelist');
             event.preventDefault();
         });
         //----------Family Details-end----
@@ -2263,13 +2263,13 @@
         //----------Candidate Document Details-end----
 
         $('#Lookup-CandidateDocuments-Candidate').button().on('click', function (e) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetCandDocsLKDetails", "ResumeCollection")', '', 'LookupDiv', 'Candidate Look Up Data', '#CandidateDocumentslist', 'CandidateDocumentslist', 5, 'CandidateDocumentslist', '#frmCandidate', 'A', '#Remove-CandidateDocuments-Candidate', 'CandidateDocumentslist_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('@Url.Action("GetCandDocsLKDetails", "ResumeCollection")', '', 'LookupDiv', 'Candidate Look Up Data', '#CandidateDocumentslist', 'CandidateDocumentslist', 5, 'CandidateDocumentslist', '#FormCandidate', 'A', '#Remove-CandidateDocuments-Candidate', 'CandidateDocumentslist_table', 'PageNavPosition');
             e.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-CandidateDocuments-Candidate').on("click", function (event) {
-            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "CandidateDocuments")', 'Create Candidate Documents', 'open', '@Url.Action("Create","CandidateDocuments")', '#frmCandidateDocs', 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '', '', '', '#frmCandidate', '', function (data) {
+            @*$('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "CandidateDocuments")', 'Create Candidate Documents', 'open', '@Url.Action("Create","CandidateDocuments")', '#FormCandidateDocs', 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '', '', '', '#FormCandidate', '', function (data) {
                 $('#CandidateDocumentslist').P2BLookUpEncapsulate('#CandidateDocumentslist', 'CandidateDocumentslist', data[0], data[1], 'CandidateDocumentslist', '', 'N');
             });
             event.preventDefault();*@
@@ -2279,7 +2279,7 @@
             $('<div></div>').P2BConfidentialModelDialog({
                 htmlurl: "@Url.Action("partial", "CandidateDocuments")",
                 submiturl: "@Url.Action("Create", "CandidateDocuments")?EmpCode=" + a,
-                form: '#frmCandidateDocs',
+                form: '#FormCandidateDocs',
                 height: "400",
                 type: "FILE",
                 width: "500",
@@ -2302,11 +2302,11 @@
             a = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
             b = a[0];
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
-            @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CandidateDocuments")', '@Url.Action("edit", "CandidateDocuments")', b, '@Url.Action("Editsave", "CandidateDocuments")', 'Edit Candidate Documents', '#frmCandidateDocuments', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#frmCandidate', '#CandidateDocumentslist', 'CandidateDocumentslist', 'CandidateDocumentslist', 'N', '#Edit-CandidateDocuments-Candidate,#Remove-CandidateDocuments-Candidate', function (data) {
+            @*$('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "CandidateDocuments")', '@Url.Action("edit", "CandidateDocuments")', b, '@Url.Action("Editsave", "CandidateDocuments")', 'Edit Candidate Documents', '#FormCandidateDocuments', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCandidate', '#CandidateDocumentslist', 'CandidateDocumentslist', 'CandidateDocumentslist', 'N', '#Edit-CandidateDocuments-Candidate,#Remove-CandidateDocuments-Candidate', function (data) {
                 // setTimeout(function () {
                 //to bind data according to selected id
                 $.each(data[0], function (i, k) {
-                    $('#frmCandidateDocuments').trigger("reset");
+                    $('#FormCandidateDocuments').trigger("reset");
                     $('#DocTypeList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1070, k.DocTypeList);
                     $('#SubDocList').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 1071, k.SubDocList);
                     if (k.txtUploadDate != null) {
@@ -2369,7 +2369,7 @@
             //b = a[0];
             var selectedRows = [];
             selectedRows = $('#CandidateDocumentslist').P2BGetTableDataonSelectedRow('#CandidateDocumentslist', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#frmCandidate', '#CandidateDocumentslist', '#Remove-CandidateDocuments-Candidate');
+            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#CandidateDocumentslist', $('#CandidateDocumentslist').val(), 200, 200, '#FormCandidate', '#CandidateDocumentslist', '#Remove-CandidateDocuments-Candidate');
             event.preventDefault();
         });
 

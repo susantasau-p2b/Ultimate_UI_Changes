@@ -37,16 +37,16 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
         {
             using (DataBaseContext db = new DataBaseContext())
             {
-                string JobPosition = form["JobPositionMlist"] == "0" ? "" : form["JobPositionMlist"];
-                string Qualification = form["QualificationlistM"] == "0" ? "" : form["QualificationlistM"];
+                string JobPosition = form["JobPositionMList"] == "0" ? "" : form["JobPositionMList"];
+                string Qualification = form["QualificationListM"] == "0" ? "" : form["QualificationListM"];
                 string Skill = form["SkillList"] == "0" ? "" : form["SkillList"];
-                string CategoryPost = form["CategoryPostlist"] == "0" ? "" : form["CategoryPostlist"];
-                string CategorySplPost = form["CategorySplPostlist"] == "0" ? "" : form["CategorySplPostlist"];
-                string ExpFilter_Id = form["ExpFilterlist"] == "0" ? "" : form["ExpFilterlist"];
-                string RangeFilter_Id = form["RangeFilterlist"] == "0" ? "" : form["RangeFilterlist"];
-                string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
-                string MStatus = form["MaritalStatus_drop"] == "0" ? "" : form["MaritalStatus_drop"];
-                string PostSourceTypelist = form["PostSourceTypelist"] == "0" ? "" : form["PostSourceTypelist"];
+                string CategoryPost = form["CategoryPostList"] == "0" ? "" : form["CategoryPostList"];
+                string CategorySplPost = form["CategorySplPostList"] == "0" ? "" : form["CategorySplPostList"];
+                string ExpFilter_Id = form["ExpFilterList_DDL"] == "0" ? "" : form["ExpFilterList_DDL"];
+                string RangeFilter_Id = form["RangeFilterList_DDL"] == "0" ? "" : form["RangeFilterList_DDL"];
+                string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
+                string MStatus = form["MaritalStatusList_DDL"] == "0" ? "" : form["MaritalStatusList_DDL"];
+                string PostSourceTypeList_DDL = form["PostSourceTypeList_DDL"] == "0" ? "" : form["PostSourceTypeList_DDL"];
 
                 Calendar recruitcalendar = db.Calendar.Include(e => e.Name).Where(e => e.Default == true && e.Name.LookupVal.ToString().ToUpper() == "RECRUITMENTCALENDAR").SingleOrDefault();
 
@@ -62,7 +62,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                 {
                     //p.FuncStruct.JobPosition = null;
                     //List<FuncStruct> job = new List<FuncStruct>();
-                    //string val2 = form["JobPositionMlist"];
+                    //string val2 = form["JobPositionMList"];
 
                     //if (val2 != null && val2 != "")
                     //{
@@ -89,7 +89,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
 
                     p.Qualification = null;
                     List<Qualification> OBJ = new List<Qualification>();
-                    string Values = form["QualificationlistM"];
+                    string Values = form["QualificationListM"];
 
                     if (Values != null && Values != "")
                     {
@@ -119,7 +119,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
 
                     p.CategoryPost = null;
                     List<CategoryPost> cp = new List<CategoryPost>();
-                    string val3 = form["CategoryPostlist"];
+                    string val3 = form["CategoryPostList"];
 
                     if (val3 != null && val3 != "")
                     {
@@ -134,7 +134,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
 
                     p.CategorySplPost = null;
                     List<CategorySplPost> csp = new List<CategorySplPost>();
-                    string val4 = form["CategorySplPostlist"];
+                    string val4 = form["CategorySplPostList"];
 
                     if (val4 != null && val4 != "")
                     {
@@ -171,9 +171,9 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                         p.Gender = val;
                     }
 
-                    if (PostSourceTypelist != null && PostSourceTypelist != "")
+                    if (PostSourceTypeList_DDL != null && PostSourceTypeList_DDL != "")
                     {
-                        var val = db.LookupValue.Find(int.Parse(PostSourceTypelist));
+                        var val = db.LookupValue.Find(int.Parse(PostSourceTypeList_DDL));
                         p.PostSourceType = val;
                     }
 
@@ -467,15 +467,15 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
         //    try
         //    {
 
-        //        string JobP = form["JobPositionMlist"] == "0" ? "" : form["JobPositionMlist"];   
-        //        string Qual = form["QualificationlistM"] == "0" ? "" : form["QualificationlistM"];
+        //        string JobP = form["JobPositionMList"] == "0" ? "" : form["JobPositionMList"];   
+        //        string Qual = form["QualificationListM"] == "0" ? "" : form["QualificationListM"];
         //        string SkillL = form["SkillList"] == "0" ? "" : form["SkillList"];
-        //        string CatPost = form["CategoryPostlist"] == "0" ? "" : form["CategoryPostlist"];
-        //        string CatSplPost = form["CategoryPostlist"] == "0" ? "" : form["CategoryPostlist"];
-        //        string ExpCriteria = form["ExpFilterlist"] == "0" ? "" : form["ExpFilterlist"];
-        //        string AgeCriteria = form["RangeFilterlist"] == "0" ? "" : form["RangeFilterlist"];
-        //        string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
-        //        string MStatus = form["MaritalStatus_drop"] == "0" ? "" : form["MaritalStatus_drop"];
+        //        string CatPost = form["CategoryPostList"] == "0" ? "" : form["CategoryPostList"];
+        //        string CatSplPost = form["CategoryPostList"] == "0" ? "" : form["CategoryPostList"];
+        //        string ExpCriteria = form["ExpFilterList_DDL"] == "0" ? "" : form["ExpFilterList_DDL"];
+        //        string AgeCriteria = form["RangeFilterList_DDL"] == "0" ? "" : form["RangeFilterList_DDL"];
+        //        string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
+        //        string MStatus = form["MaritalStatusList_DDL"] == "0" ? "" : form["MaritalStatusList_DDL"];
         //        //  bool Auth = form["Autho_Action"] == "" ? false : true;
         //        bool Auth = form["Autho_Allow"] == "true" ? true : false;
 
@@ -1945,12 +1945,12 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
             using (DataBaseContext db = new DataBaseContext())
                 try
                 {
-                    string JobPosition = form["JobPositionMlist"] == "0" ? "" : form["JobPositionMlist"];
-                    string ExpFilter_Id = form["ExpFilterlist"] == "0" ? "" : form["ExpFilterlist"];
-                    string RangeFilter_Id = form["RangeFilterlist"] == "0" ? "" : form["RangeFilterlist"];
-                    string Gender = form["Gender_drop"] == "0" ? "" : form["Gender_drop"];
-                    string MStatus = form["MaritalStatus_drop"] == "0" ? "" : form["MaritalStatus_drop"];
-                    string PostSourceType = form["PostSourceTypelist"] == "0" ? "" : form["PostSourceTypelist"];
+                    string JobPosition = form["JobPositionMList"] == "0" ? "" : form["JobPositionMList"];
+                    string ExpFilter_Id = form["ExpFilterList_DDL"] == "0" ? "" : form["ExpFilterList_DDL"];
+                    string RangeFilter_Id = form["RangeFilterList_DDL"] == "0" ? "" : form["RangeFilterList_DDL"];
+                    string Gender = form["GenderList_DDL"] == "0" ? "" : form["GenderList_DDL"];
+                    string MStatus = form["MaritalStatusList_DDL"] == "0" ? "" : form["MaritalStatusList_DDL"];
+                    string PostSourceType = form["PostSourceTypeList_DDL"] == "0" ? "" : form["PostSourceTypeList_DDL"];
                     var blog1 = db.ManpowerRequestPost.Where(e => e.Id == data).Include(e => e.FuncStruct)
                                                     .Include(e => e.FuncStruct.JobPosition)
                                                     .Include(e => e.FuncStruct.Job)
@@ -2021,7 +2021,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                     List<Qualification> ObjQualification = new List<Qualification>();
                     ManpowerRequestPost pd1 = null;
                     pd1 = db.ManpowerRequestPost.Include(e => e.Qualification).Where(e => e.Id == data).SingleOrDefault();
-                    string quali = form["QualificationlistM"];
+                    string quali = form["QualificationListM"];
                     if (quali != null && quali != "")
                     {
                         var ids = Utility.StringIdsToListIds(quali);
@@ -2051,7 +2051,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                     //    }
                     //}
                     //List<Qualification> qual = new List<Qualification>();
-                    //string quali = form["QualificationlistM"];
+                    //string quali = form["QualificationListM"];
                     //if (quali != null)
                     //{
                     //    var ids = Utility.StringIdsToListIds(quali);
@@ -2064,7 +2064,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                     //}
 
                     List<CategoryPost> cat = new List<CategoryPost>();
-                    string catr = form["CategoryPostlist"];
+                    string catr = form["CategoryPostList"];
                     if (catr != null)
                     {
                         var ids = Utility.StringIdsToListIds(catr);
@@ -2077,7 +2077,7 @@ namespace P2BUltimate.Controllers.Recruitement.MainController
                     }
 
                     List<CategorySplPost> cat1 = new List<CategorySplPost>();
-                    string catr1 = form["CategorySplPostlist"];
+                    string catr1 = form["CategorySplPostList"];
                     if (catr1 != null)
                     {
                         var ids = Utility.StringIdsToListIds(catr1);
