@@ -11,6 +11,26 @@
 }
 (function ($) {
     "use strict";
+    $.fn.P2BApiCall = function () {
+        url = 'http://192.168.1.11/P2BUltimate2.0Api/CORE/GetCompanyEditRequest/';
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: url,
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "Id": 1,
+                "UserGroup": "Checker"
+            }),
+            success: function (response) {
+                console.log('Success:', response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        })
+    }
+
     $.fn.P2BDatePicker = function () {
         /*
        Dependancy datetimepickerjs
@@ -167,7 +187,6 @@
                             url: url,
                             method: "POST",
                             success: function (data) {
-                                 //console.log(data);
                                 var a = [];
                                 var EmpCode = [];
                                 // var empcodeindex = ColModel.indexOf("EmpCode");
@@ -182,7 +201,6 @@
                                     $('#cb_' + $(init).attr('id') + '').trigger('click');
                                     JqGridCheck.select_all = true;
                                     $('#emp_Id').val(EmpCode);
-                                    //console.log($('#emp_Id').val());
 
                                     localStorage.setItem("LEAVECREDITTRAILBALANCE", a);
                                     JqGridCheck.Set(a);
@@ -288,7 +306,6 @@
                             url: url,
                             method: "POST",
                             success: function (data) {
-                                // console.log(data);
                                 var a = [];
                                 var EmpCode = [];
                                 //var empcodeindex = ColModel.indexOf("EmpCode");
@@ -302,7 +319,6 @@
                                     $('#cb_' + $(init).attr('id') + '').trigger('click');
                                     JqGridCheck.select_all = true;
                                     $('#emp_Id').val(EmpCode);
-                                    //console.log($('#emp_Id').val());
 
                                     localStorage.setItem("LEAVECREDITTRAILBALANCE", a);
                                     JqGridCheck.Set(a);
@@ -461,7 +477,6 @@
     };
     function RemoveLookupTableElement(form) {
         var formname = $(form);
-        // console.log(formname);
         formname.find('table.lookuptableselected').find('tr td').parent().remove();
     }
     $.CheckSessionExitance = function () {
@@ -525,6 +540,7 @@
                 Submit: function () {
                     var x = PerformValidations(submitnameformforserilize);
                     var y = true;
+                    debugger;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
                             var chkajx = $.ajax({
@@ -620,7 +636,6 @@
                         var htmltag = "";
                         if (msg.success == true) {
                             var newDiv = $(document.createElement('div'));
-                            // console.log(msg.responseText.length);
                             for (var i = 0; i < msg.responseText.length; i++) {
                                 htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
                             }
@@ -891,7 +906,6 @@
                         var htmltag = "";
                         if (msg.success == true) {
                             var newDiv = $(document.createElement('div'));
-                            // console.log(msg.responseText.length);
                             for (var i = 0; i < msg.responseText.length; i++) {
                                 htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
                             }
@@ -1028,7 +1042,6 @@
                         var htmltag = "";
                         if (msg.success == true) {
                             var newDiv2 = $(document.createElement('div'));
-                            // console.log(msg.responseText.length);
                             // msg.responseText = msg.responseText.trim();
                             for (var i = 0; i < msg.responseText.length; i++) {
                                 htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i].trim() + '</span></span>';
@@ -1170,8 +1183,6 @@
                 // NewIds = CountTableIdsVal(nameofthelookuptable);
                 //}
                 //var olddata = get1DArray(OldIds);
-                ////console.log(NewIds);
-                ////console.log(olddata);
                 ////bypass checking remaining
                 //NewIds = [];
                 //olddata = [];
@@ -1244,7 +1255,6 @@
                     // });
                     // }
                     //}
-                    // console.log(value);
                     if (typeof returndatafunction === 'function') {
 
                         returndatafunction(value);
@@ -1527,7 +1537,6 @@
                         $('.ui-dialog-buttonpane button:contains("Submit")').button().button("enable");
                     }
                     $.each(value, function (i, k) {
-                        // console.log(k);
                     });
                     returndatafunction(value);
                 });
@@ -1647,7 +1656,6 @@
     function helpfun(whitchtype, cameform) {
         var xDoc = responseXmlData("/xml/readxml", function (xmldata) {
             var xmldoc = $.parseXML(xmldata);
-            //console.log($(xmldoc));
         });
     }
     function responseXmlDataManipulation(xml) {
@@ -1656,7 +1664,6 @@
     $.fn.onClickGrid = function (gridname, url1, url2) {
         $(this).on("click", function () {
             if ($(this).hasClass('auto_active')) {
-                // console.log("click");
                 $(gridname).P2BGrid.onclickChangeUrl(gridname, url2, true);
             } else {
                 $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
@@ -1715,7 +1722,6 @@
     };
     $.fn.StickNote = function (old_val) {
         var objtype = $(this).attr('type') || $(this)[0].nodeName.toLowerCase();
-        // console.log(objtype);
         if (objtype == 'text') {
             $(this).oldVal(old_val);
         }
@@ -1769,7 +1775,6 @@
         $('button').attr('type', 'button');
     };
     var maxlength = function (control, len) {
-        //console.log(len);
         if ($(control).val().length == 0 || $(control).val().length <= len) {
             return 'no-error';
         } else {
@@ -1891,7 +1896,6 @@
         }
     };
     var ShowErrorMsg = function (comingfrom, msg) {
-        // console.log(msg);
         var pos = $(comingfrom).offset();
         var h = $(comingfrom).height();
         var w = $(comingfrom).width();
@@ -1983,7 +1987,6 @@
         });
 
         $('#pass_form').submit(function (e) {
-            //console.log(e);
             var OnSuccess = function (data) {
                 if (data == "1") {
                     //error
@@ -2033,7 +2036,6 @@
     function CountTranscationTableIds(lookuptable) {
         var abcd = [];
         var x;
-        //console.log($('#' + lookuptable + ' tr td'));
         $('#' + lookuptable + ' tr td input').each(function () {
             x = $(this).val();
             if (x != "" && x != undefined) {
@@ -2201,10 +2203,8 @@
                         //$('.ajax_loder').parents('div').remove();
                         ajaxLoderRemove();
                         var htmltag = '';
-                        // console.log(msg);
                         if (msg.success == true) {
                             var newDiv = $(document.createElement('div'));
-                            //console.log(msg.responseText.length);
                             for (var i = 0; i < msg.responseText.length; i++) {
                                 htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
                             }
@@ -2336,8 +2336,6 @@
                         assigndata();
                         OnEnterFocusNext();
                         AlterBtnType();
-                        //console.log(forwarddata);
-                        //console.log(nameclassidofinlinelookup);
                         //$(forwardserializedata).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                         $(forwardserializedata).find(nameidclassofbuttontodisable).button().button('disable').button().button("refresh").addClass('ButtonHover');
                     },
@@ -2468,8 +2466,7 @@
                                             alert("Parameter is Not Passed Properly");
                                         }
                                         if (nameclassidofinlinelookup != '' || nameclassidofinlinelookup == null && classoridoftheonwhichpopupderived != '' || classoridoftheonwhichpopupderived == null) {
-                                            //console.log(classoridoftheonwhichpopupderived);
-                                            //console.log(classoridoftheonwhichpopupderived);
+                                            
                                             jQuery(classoridoftheonwhichpopupderived).find('' + nameclassidofinlinelookup + ' tr td:contains(' + data[0] + ')').parent('tr.selectedtr').remove();
                                             $(nameclassidofinlinelookup).P2BLookUpEncapsulate(nameclassidofinlinelookup, nameofthelist_inlinelookuptable, data[0], data[1], nameoftable_inlinelookuptable, nameidclassofbuttontodisable, multiple_allowed_or_not);
                                         }
@@ -2600,7 +2597,7 @@
                                 }
                                 var nameidclassofbuttontodisable = ".popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-view";
                                 var a = $(nameclassidofinlinelookup).parents('div').next('.icon-row').find(nameidclassofbuttontodisable);
-                                //console.log(a);
+                                
                                 btndisable = a;
                                 lookuptablevaluecount(nameclassidofinlinelookup, btndisable);
                             }
@@ -2724,13 +2721,11 @@
                     }
                     var count = $('' + tablename + ' tbody')[0].childElementCount;
                     // var count = jQuery(tablename + ' tr').closest('tr').length;
-                    //console.log(count);
+                  
                     var inline = jQuery(tablename).find('td').eq(0).text();
                     if (multipleallowedornot == 'A') {
                         if (target.className != "selectedtr") {
                             target.className = "selectedtr";
-                            // console.log(classoridoftheonwhichpopupderived);
-                            // console.log(nameidclassofbuttontodisable);
                             jQuery(tablename).append('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').insertAfter($(this).closest('tr')).TableOnRowsClick(nameoftable);
                             //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                             jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
@@ -2742,9 +2737,6 @@
                         else {
                             target.className = "";
                             jQuery(tablename + ' tr td:contains(' + data[0] + ')').closest('tr').remove();
-                            //console.log(count);
-                            //console.log(classoridoftheonwhichpopupderived);
-                            //console.log(nameidclassofbuttontodisable);
                             if (jQuery(tablename + ' tr').closest('tr').length == 1) {
                                 //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                                 jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
@@ -2787,7 +2779,7 @@
                         else {
                             if (target.className != "selectedtr") {
                                 target.className = "selectedtr";
-                                //console.log("dsad");
+                                
                                 //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
                                 jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
                                 //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
@@ -2873,7 +2865,6 @@
             jQuery('#' + pagename + '').empty();
                 $.CheckSessionExitance();
                 var ids = CountTableIds(tablename);
-                //console.log(ids);
                 lookupajaxdata = $.ajax({
                     url: lookupurl,
                     type: 'POST',
@@ -2919,7 +2910,6 @@
         tbody.onclick = function (e) {
             e = e || window.event;
             var target = e.srcElement || e.target;
-            // console.log(target);
             while (target && target.nodeName !== "TR") {
                 target = target.parentNode;
             }
@@ -2938,14 +2928,12 @@
 
     };
     $.fn.TableOnRowsClick = function (tabledvalues) {
-        //console.log(tabledvalues);
         var table = document.getElementById(tabledvalues);
         var tbody = table.getElementsByTagName("tbody")[0];
         var all_child = $(tbody)[0].children;
         tbody.onclick = function (e) {
             e = e || window.event;
             var target = e.srcElement || e.target;
-            //console.log(target);
             while (target && target.nodeName !== "TR") {
                 target = target.parentNode;
             }
@@ -3074,7 +3062,6 @@
                     });
                 });
             } else {
-                //console.log($(filter_drop).empty());
                 jQuery(filter_drop).empty()
                 .append("<option value=0 selected=true>-Select-</option>")
                 .css({ "height": "auto" });
@@ -3124,15 +3111,11 @@
         var ExpandAnimation = function (init) {
             var transcation_div = $(init).parent('.transactiondiv');
 
-            //console.log(transcation_div);
-            //console.log(init);
-
             $(transcation_div).find('button').hide();
             $(transcation_div).find('div').hide();
             $(init).hide();
 
             var heading = $(init).find('tr th:eq(1)').text();
-            //console.log(heading);
 
             $(transcation_div).append('<span class="filter_title">' + heading + ' Filter</span>');
 
@@ -3173,7 +3156,7 @@
         var init = $(this);
         $.each(data, function (i, k) {
             var x = $(init).find("tr td input[type=checkbox][value=" + k + "]");
-            //console.log(x);
+            
             if (x != undefined) {
                 $(x).checked(true);
             }
@@ -3322,7 +3305,7 @@
                     jQuery(init).dialog('destroy').hide();
                 });
                 var ids = CountTranscationTableIds(tablename);
-                // console.log(ids);
+                
                 lookupajaxdata = $.ajax({
                     url: lookupurl,
                     type: 'POST',
@@ -3433,14 +3416,12 @@
             //
             $(document).on('click', '#' + init.attr('id') + ' .case', function (e) {
                 single = single || false;
-                //var tr = console.log('#' + init.attr('id') + ' ');
                 if (single == false) {
                     if (this.checked) {
                         var value_checked = jQuery('#' + init.attr('id') + ' ' + '.case:checked').parent('td').parent('tr');
                         value_checked.addClass('selectedtr');
                     }
                     else {
-                        // console.log('a');
                         var value_unchecked = jQuery(this).parent('td').parent('tr');
                         value_unchecked.removeClass('selectedtr');
                     }
@@ -3477,12 +3458,12 @@
                     if (l != null && l.data != null) {
                         $('#' + l.tablename + '').parent('div.transactiondiv').parents('div').show();
                         $('#' + l.tablename + '>tbody>tr:gt(0)').remove();
-                        //console.log(l.tablename);
+                       
                         $.each(l.data, function (i, k) {
                             jQuery('#' + l.tablename + ' tr:last').after('<tr tabindex="1"><td><input type="checkbox" class="case" name=' + l.tablename + ' value=' + k.code + ' /></td><td style="display:none;">' + k.code + '</td><td>' + k.value + '</td></tr>');
                         });
                     } else {
-                        //console.log(l);
+                       
                         //if (l.responseText != null) {
                         //    alert(l.responseText);
                         //}
@@ -3554,7 +3535,7 @@
         jQuery(init).on("selectmenuchange", function () {
             var value = jQuery("#" + $(this).attr('id') + "").val();
             var SelectType = $(this).attr('id').substr(0, $(this).attr('id').indexOf("_"));
-            // console.log(value);
+          
             if (value != 0) {
 
                 //  if (SelectType != "Company") {
@@ -3575,9 +3556,9 @@
                 // }
                 //else {
                 //    $.post(Url, { data: value, data2: SelectType }, function (data) {
-                //        console.log(data);
+                //       
                 //        $.each(data, function (i, j) {
-                //            console.log(j);
+                //            
                 //            if (j.SelectlistType != null) {
                 //                $('#' + j.SelectlistType + '').parent().show();
                 //                jQuery("#" + j.SelectlistType + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
@@ -3594,7 +3575,6 @@
                 //    });
                 //}
             } else {
-                //console.log($(filter_drop).empty());
                 jQuery('#' + data.SelectlistType + '').empty()
                 .append("<option value=0 selected=true>-Select-</option>")
                 .selectmenu().selectmenu("refresh")
@@ -3694,7 +3674,6 @@
 
             //},
             beforeSelectRow: function (rowid, e) {
-                //console.log($.LocalStorageHelper(obj.LocalStorageId));
                 var temp = "true";
                 if (obj.onEditClick == true) {
                     temp = $.LocalStorageHelper(obj.LocalStorageId);
@@ -3702,9 +3681,6 @@
                 var $td = $(e.target).closest("td"), iCol = $.jgrid.getCellIndex($td[0]);
                 var a = $(table).getRowData(rowid);
                 $td.addClass('not-editable-cell');
-                //console.log(obj.ColModel.indexOf(obj.EditableCol[0]) + 1);
-                //console.log(iCol);
-                //console.log(a[obj.CheckCol]);
                 for (var i = 0; i < obj.EditableCol.length; i++) {
                     if (a[obj.CheckCol] == "true" && obj.ColModel.indexOf(obj.EditableCol[i]) + 1 == iCol && temp == "true") {
                         $td.removeClass('not-editable-cell');
@@ -3728,28 +3704,24 @@
                 //});
                 //$.each(a, function (i, k) {
                 // if (k[obj.CheckCol] == "true") {
-                // console.log(k);
                 // //for (var j = 0; j < obj.EditableCol.length; j++) {
                 // // var b = $("#inline_jqgrid").jqGrid('getColProp', obj.EditableCol[i]);
-                // // console.log(b);
+               
                 // //}
                 // }
                 //});
-                //console.log(a[i]);
+               
                 //var a = $(this).jqGrid('getColProp', obj.EditableCol[i]);
                 //if (obj.CheckCol != null) {
                 // //jQuery(tablename).jqGrid('getRowData', id, value);
                 // //var x=$(this).jqGrid()
-                // console.log($(this).getGridParam("records"));
                 //}
                 //a.editable = true;
                 //}
-                //console.log(a[i]);
                 //var a = $(this).jqGrid('getColProp', obj.EditableCol[i]);
                 //if (obj.CheckCol != null) {
                 // //jQuery(tablename).jqGrid('getRowData', id, value);
                 // //var x=$(this).jqGrid()
-                // console.log($(this).getGridParam("records"));
                 //}
                 //a.editable = true;
                 //}
@@ -3759,10 +3731,8 @@
         this.trigger('reloadGrid');
     };
     $.GetGridSelctedvalue = function (Gridname, col) {
-        //console.log(Gridname);
         //alert("sdasd");
         var a = jQuery(Gridname).jqGrid('getGridParam', 'selarrrow');
-        // console.log(a);
         if (a.length != 0) {
             var selected_ids = [];
             for (var i = 0; i < a.length; i++) {
@@ -3851,11 +3821,8 @@
                             var Activityid = $.GetGridSelctedvalue(obj.gridname, "ActivityId");
                             $('#Activity_Id').val(Activityid);
                             $('#Activity_Idh').val(Activityid);
-                            //console.log("Activity  trans id");
-                            //console.log($('#Activity_Id').val(Activityid));
                             //var Lvencashid=j
                         }
-                        //console.log(JqGridCheck.select_all);
                        
                         if (JqGridCheck.select_all == true) {
                             obj.forwarddata = JqGridCheck.Get();
@@ -3868,7 +3835,6 @@
                             obj.forwarddata = JSON.stringify(a);
                         }
                     }
-                    //console.log(obj.forwarddata);
                     var ajaxdata = $.ajax({
                         url: obj.submiturl,
                         method: "POST",
@@ -4120,7 +4086,6 @@
                 },
                 error: function (data) {
                     $('.ajax_loder').parents('div').remove();
-                    //console.log(data);
                 }
             });
         }
@@ -4207,7 +4172,6 @@
                 },
                 error: function (data) {
                     $('.ajax_loder').parents('div').remove();
-                    //console.log(data);
                 }
             });
         }
@@ -4322,7 +4286,6 @@
                 }
             });
             ajx.fail(function (data) {
-                //console.log(data);
             });
         };
         if ($(obj.renderat)[0].childElementCount == 0) {
@@ -4458,7 +4421,6 @@
                                     newDiv.dialog('open');
                                     $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
                                 } else {
-                                    //console.log(msg);
                                 }
 
                             });
@@ -4527,7 +4489,6 @@
                                     newDiv.dialog('open');
                                     $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
                                 } else {
-                                    //console.log(msg);
                                 }
 
                             });
@@ -4684,8 +4645,6 @@
                     if (target.className != "selectedtr") {
                         target.className = "selectedtr";
                         if (obj.appendTo != null) {
-                            //console.log($(obj.appendToId));
-                            //console.log(data[1]);
                             $(obj.appendToId).val(data[0]);
                             $(obj.appendTo).val(data[1]);
 
@@ -4891,8 +4850,6 @@
                     if (target.className != "selectedtr") {
                         target.className = "selectedtr";
                         if (obj.appendTo != null) {
-                            //console.log($(obj.appendToId));
-                            //console.log(data[1]);
 
 
                             $(obj.appendToId).val($(obj.appendToId).val() + " " + data[0]);
@@ -4990,7 +4947,6 @@
             method: "Get",
             url: "Transcation/ByDefaultLoadEmp",
             success: function (data) {
-                //console.log(data);
                 if (data.GeoStruct != null) {
                     $('#geo_id').val(data.GeoStruct);
                 }
@@ -5015,7 +4971,6 @@
             method: "Get",
             url: "Transcation/ByDefaultLoadEmp",
             success: function (data) {
-                // console.log(data);
                 if (data.GeoStruct != null) {
                     $('#geo_id').val(data.GeoStruct);
                 }
@@ -5216,7 +5171,6 @@
                                     }
                                 });
                             } else {
-                                //console.log(msg);
                             }
 
                             $(newDiv).dialog('open');
@@ -5283,7 +5237,6 @@
         var edit = "EDIT";
         var view = "VIEW";
         if (obj.mode != del) {
-            // console.log(this);
             var maindailog = jQuery(this).dialog({
                 autoOpen: false,
                 height: obj.height,
@@ -5353,7 +5306,6 @@
                             if (typeof obj.submiturl === "function") {
                                 obj.submiturl(function (data) {
 
-                                    // console.log(data);
                                     var newDiv = $(document.createElement('div'));
                                     var htmltag = '<p><span class="ui-icon ui-icon-check" style="float:left;margin-right:10px"></span> ' + data.responseText + '';
                                     htmltag += '</p>';
@@ -5376,7 +5328,6 @@
                                                 } else {
                                                     newDiv.dialog("close");
                                                     newDiv.remove();
-                                                    //console.log(data);
                                                     return false;
                                                 }
                                             }
@@ -5510,7 +5461,6 @@
                 buttons: {
                     Confirm: function () {
                         if (typeof obj.submitfun === "function") {
-                            //console.log(obj.forwarddata);
                             if (obj.editdata != null) {
 
                                 var ajx = $.ajax({
@@ -6067,7 +6017,6 @@
             //$.LocalStorageHelper("LoanAdvRequest_LoadEmp");
             //
             var tr = $(this).parents('tr');
-            //console.log(tr);
             var row = dt.row(tr);
             var idx = "";
             if (obj.childurlColumnNo != null) {
@@ -6080,7 +6029,6 @@
                 row.child.hide();
             }
             else {
-                ///  console.log(PayMonthObj.GetMonth());
                 tr.addClass('details');
                 $.ajax({
                     url: obj.childurl,
@@ -6090,7 +6038,6 @@
                     success: function (res) {
                         var coldata;
                         var td = "";
-                        //console.log(res);
                         var value = '<table class="table" id="table"><tr><th>DD</th>'
                         $.each(obj.childheader, function (i, k) {
                             value += '<th>' + k + '</th>'
@@ -6157,7 +6104,6 @@
             });
             $(htm).appendTo('body');
             $('#snackbar').trigger('click');
-            // console.log(obj.setTimeout);
             if (obj.setTimeout == true)
                 setTimeout(function () { $('#snackbar').removeClass('show'); }, 3000);
         }
@@ -6171,7 +6117,6 @@
 
             }
         });
-        //console.log(all_element);
     };
     $.fn.P2BConfidentialModelDialog = function (fn) {
         var obj = $.extend({
@@ -6245,7 +6190,6 @@
                 Submit: function (e) {
                     var x = PerformValidations(obj.form);
                     var a = $(obj.form).doval();
-                    //console.log(a);
                     if (x == true && a == true) {
                         if (obj.type == null) {
                             ajaxdata = $.ajax({
@@ -6368,8 +6312,6 @@
                                                 newDiv.dialog("close");
                                                 newDiv.remove();
                                                 obj.returnfun(msg);
-                                                //console.log("Emp data");
-                                                //console.log(msg);
                                                 // jQuery(dia).dialog("close");
                                                 obj.onsubmitreturnfunction(msg);
                                             }
@@ -6526,7 +6468,6 @@
             url: obj.url,
             success: function (data) {
                 var horizontalBarChartData = JSON.parse(data);
-                //console.log(horizontalBarChartData);
                 var chart = $(init);
                 Chart.defaults.global.defaultFontFamily = 'Verdana';
                 var myHorizontalBar = new Chart(chart, {

@@ -309,11 +309,11 @@
                     x = false;
                     $('#' + value + '').val('');
                     $('#' + value + '').prop('must', true);
-                    ShowErrorMessage($('#' + value + ''), 'Required Field!');
+                    ShowErrorMessage($('#' + value + ''), 'Required Field!', parentdiv);
                 }
                 if ($('#' + value + '').is(':checkbox')) {
                     if (!$('#' + value + '').prop('checked')) {
-                        ShowErrorMessage($('#' + value + ''), 'Please Select Required Field!');
+                        ShowErrorMessage($('#' + value + ''), 'Please Select Required Field!', parentdiv);
                     }
 
                 }
@@ -374,7 +374,7 @@
                     $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)); // If any issue then add '.css({ display: "inline-block" })' in the end or in the middle.
                 }
                 else {
-                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control));
+                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left });
                 }
             }
 //        $(control).off('click change selectmenuchange').on('click change selectmenuchange', function (e) {
