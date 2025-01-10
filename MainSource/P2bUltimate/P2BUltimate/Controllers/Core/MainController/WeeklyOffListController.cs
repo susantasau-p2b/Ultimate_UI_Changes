@@ -240,7 +240,7 @@ namespace P2BUltimate.Controllers.Core.MainController
             }
         }
 
-        //public async Task<ActionResult> EditSave(WeeklyOffList frmWeeklyOffList, FormCollection form, int data)
+        //public async Task<ActionResult> EditSave(WeeklyOffList FormWeeklyOffList, FormCollection form, int data)
         //{
 
         //    string WeekDaysdrop = form["WeekDaysdrop"] == "0" ? null : form["WeekDaysdrop"];
@@ -248,14 +248,14 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    if (WeekDaysdrop != null)
         //    {
         //        var val = db.LookupValue.Find(int.Parse(WeekDaysdrop));
-        //        frmWeeklyOffList.WeekDays = val;
+        //        FormWeeklyOffList.WeekDays = val;
         //    }
         //    string WeeklyOffStatusdrop = form["WeeklyOffStatusdrop"] == "0" ? null : form["WeeklyOffStatusdrop"];
 
         //    if (WeeklyOffStatusdrop != null)
         //    {
         //        var val = db.LookupValue.Find(int.Parse(WeeklyOffStatusdrop));
-        //        frmWeeklyOffList.WeeklyOffStatus = val;
+        //        FormWeeklyOffList.WeeklyOffStatus = val;
         //    }
         //    if (ModelState.IsValid)
         //    {
@@ -263,8 +263,8 @@ namespace P2BUltimate.Controllers.Core.MainController
         //            .Include(e => e.WeekDays)
         //            .Include(e => e.WeeklyOffStatus)
         //            .Where(e => e.Id == data).SingleOrDefault();
-        //        db_data.WeekDays = frmWeeklyOffList.WeekDays;
-        //        db_data.WeeklyOffStatus = frmWeeklyOffList.WeeklyOffStatus;
+        //        db_data.WeekDays = FormWeeklyOffList.WeekDays;
+        //        db_data.WeeklyOffStatus = FormWeeklyOffList.WeeklyOffStatus;
         //        using (TransactionScope ts = new TransactionScope())
         //        {
         //            db.WeeklyOffList.Attach(db_data);

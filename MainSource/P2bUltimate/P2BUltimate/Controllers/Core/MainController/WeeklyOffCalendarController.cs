@@ -50,7 +50,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //}
 
         [HttpPost]
-        public ActionResult Create(WeeklyOffCalendar frmWeeklyOffCalendar, FormCollection form) //Create submit
+        public ActionResult Create(WeeklyOffCalendar FormWeeklyOffCalendar, FormCollection form) //Create submit
         {
             List<string> Msg = new List<string>();
             using (DataBaseContext db = new DataBaseContext())
@@ -60,7 +60,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     int WOCalendar_DDL = form["WOCalendar_DDL"] == "0" ? 0 : Convert.ToInt32(form["WOCalendar_DDL"]);
                     string WeeklyOffListList = form["WeeklyOffListList"] == null ? null : form["WeeklyOffListList"];
 
-                    if (db.WeeklyOffCalendar.Include(q => q.WOCalendar).Any(e => e.WOCalendar.Id == WOCalendar_DDL && e.Name == frmWeeklyOffCalendar.Name))
+                    if (db.WeeklyOffCalendar.Include(q => q.WOCalendar).Any(e => e.WOCalendar.Id == WOCalendar_DDL && e.Name == FormWeeklyOffCalendar.Name))
                     {
                         Msg.Add(" Data with this Calendar Year Already Exist. ");
                         return Json(new Utility.JsonReturnClass { success = false, responseText = Msg }, JsonRequestBehavior.AllowGet);
@@ -73,7 +73,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                     if (WOCalendar_DDL != null)
                     {
                         var val = db.Calendar.Include(e=>e.Name).Where(e=>e.Id==WOCalendar_DDL).SingleOrDefault();
-                        frmWeeklyOffCalendar.WOCalendar = val;
+                        FormWeeklyOffCalendar.WOCalendar = val;
                     }
 
                     //if (WeeklyOffListList != null)
@@ -89,7 +89,7 @@ namespace P2BUltimate.Controllers.Core.MainController
 
 
                     //    }
-                    //    frmWeeklyOffCalendar.WeeklyOffList = WeeklyOffList;
+                    //    FormWeeklyOffCalendar.WeeklyOffList = WeeklyOffList;
                     //}
 
 
@@ -107,7 +107,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                                 Weeklylist.Add(val);
                             }
                         }
-                        frmWeeklyOffCalendar.WeeklyOffList = Weeklylist;
+                        FormWeeklyOffCalendar.WeeklyOffList = Weeklylist;
                     }
 
 
@@ -115,13 +115,13 @@ namespace P2BUltimate.Controllers.Core.MainController
                     {
                         using (TransactionScope ts = new TransactionScope())
                         {
-                            frmWeeklyOffCalendar.DBTrack = new DBTrack { Action = "C", CreatedBy = SessionManager.UserName, IsModified = false };
+                            FormWeeklyOffCalendar.DBTrack = new DBTrack { Action = "C", CreatedBy = SessionManager.UserName, IsModified = false };
                             WeeklyOffCalendar WeeklyOffCalendar = new WeeklyOffCalendar()
                             {
-                                WOCalendar = frmWeeklyOffCalendar.WOCalendar,
-                                WeeklyOffList = frmWeeklyOffCalendar.WeeklyOffList,
-                                DBTrack = frmWeeklyOffCalendar.DBTrack,
-                                Name = frmWeeklyOffCalendar.Name 
+                                WOCalendar = FormWeeklyOffCalendar.WOCalendar,
+                                WeeklyOffList = FormWeeklyOffCalendar.WeeklyOffList,
+                                DBTrack = FormWeeklyOffCalendar.DBTrack,
+                                Name = FormWeeklyOffCalendar.Name 
                             };
                             try
                             {
@@ -145,7 +145,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                                 }
                                 ts.Complete();
                                 Msg.Add("  Data Saved successfully  ");
-                                return Json(new Utility.JsonReturnClass { Id = frmWeeklyOffCalendar.Id, Val = frmWeeklyOffCalendar.FullDetails, success = true, responseText = Msg }, JsonRequestBehavior.AllowGet);
+                                return Json(new Utility.JsonReturnClass { Id = FormWeeklyOffCalendar.Id, Val = FormWeeklyOffCalendar.FullDetails, success = true, responseText = Msg }, JsonRequestBehavior.AllowGet);
                                 //return this.Json(new Object[] { , , "Data Saved Successfully.", JsonRequestBehavior.AllowGet });
                             }
                             catch (DbUpdateConcurrencyException)
@@ -270,7 +270,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         }
 
         //[HttpPost]
-        //public async Task<ActionResult> EditSave(WeeklyOffCalendar frmWeeklyOffCalendar, int data, FormCollection form) // Edit submit
+        //public async Task<ActionResult> EditSave(WeeklyOffCalendar FormWeeklyOffCalendar, int data, FormCollection form) // Edit submit
         //{
         //    string WOCalendar_DDL = form["WOCalendar_DDL"] == "0" ? null : form["WOCalendar_DDL"];
         //    string WeeklyOffListList = form["WeeklyOffListList"] == null ? null : form["WeeklyOffListList"];
@@ -278,7 +278,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //    if (WOCalendar_DDL != null)
         //    {
         //        var val = db.Calendar.Find(int.Parse(WOCalendar_DDL));
-        //        frmWeeklyOffCalendar.WOCalendar = val;
+        //        FormWeeklyOffCalendar.WOCalendar = val;
         //    }
 
         //    if (WeeklyOffListList != null)
@@ -295,7 +295,7 @@ namespace P2BUltimate.Controllers.Core.MainController
         //                WeeklyOffList.Add(val);
         //            }
         //        }
-        //        frmWeeklyOffCalendar.WeeklyOffList = WeeklyOffList;
+        //        FormWeeklyOffCalendar.WeeklyOffList = WeeklyOffList;
         //    }
 
         //    if (ModelState.IsValid)
@@ -303,8 +303,8 @@ namespace P2BUltimate.Controllers.Core.MainController
         //        var db_data = db.WeeklyOffCalendar
         //            .Include(e => e.WeeklyOffList)
         //            .Include(e => e.WOCalendar).Where(e => e.Id == data).SingleOrDefault();
-        //        db_data.WOCalendar = frmWeeklyOffCalendar.WOCalendar;
-        //        db_data.WeeklyOffList = frmWeeklyOffCalendar.WeeklyOffList;
+        //        db_data.WOCalendar = FormWeeklyOffCalendar.WOCalendar;
+        //        db_data.WeeklyOffList = FormWeeklyOffCalendar.WeeklyOffList;
         //        using (TransactionScope ts = new TransactionScope())
         //        {
 
