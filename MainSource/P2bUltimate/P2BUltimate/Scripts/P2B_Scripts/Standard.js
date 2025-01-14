@@ -2,6 +2,7 @@
 // V 1.0.0
 //05:32 PM 06/01/2017
 
+//const absoluteUrlPath = http://192.168.1.11/P2BUltimate2.0Api;
 (function (factory) {
     if (typeof define === "function" && define.amd) {
         define(["jquery"], factory);
@@ -11,24 +12,48 @@
 }
 (function ($) {
     "use strict";
-    $.fn.P2BApiCall = function () {
-        url = 'http://192.168.1.11/P2BUltimate2.0Api/CORE/GetCompanyEditRequest/';
-        $.ajax({
-            type: 'POST',
-            dataType: 'json',
-            url: url,
-            contentType: 'application/json',
-            data: JSON.stringify({
-                "Id": 1,
-                "UserGroup": "Checker"
-            }),
-            success: function (response) {
-                console.log('Success:', response);
-            },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
+
+    function P2bCreateObjectFormattedData(classObj) {
+        const array = classObj.getData();
+        function formDataToObject(formData) {
+            const obj = {};
+            formData.forEach((value, key) => {
+                obj[key] = value;
+            });
+            return obj;
+        }
+        
+        const serializableArray = array.map(item => {
+            if (item instanceof FormData) {
+                return formDataToObject(item);
             }
-        })
+            return item;
+        });
+        const mergedObject = serializableArray.reduce((acc, obj) => {
+            return { ...acc, ...obj };
+        }, {});
+        return mergedObject;
+    }
+
+    function P2bBindAllDataForCreate (formId) {
+        const allFormDataForCreate = new P2bFormDataHandlingClass();
+        const $formData = $(formId);
+        let allData = new FormData($formData[0]);
+        allFormDataForCreate.addData(allData);
+
+        return P2bCreateObjectFormattedData(allFormDataForCreate);
+    }
+    function P2bBindAllDataForEdit(...args) {
+        const allDataForEdit = new P2bFormDataHandlingClass();
+        allDataForEdit.addData(...args);
+        return P2bCreateObjectFormattedData(allDataForEdit);
+    }
+    function P2bBindAllDataForEditSave(formId,idForEdit) {
+        const allDataForEditSave = new P2bFormDataHandlingClass();
+        const $formData = $(formId);
+        let allData = new FormData($formData[0]);
+        allDataForEditSave.addData(allData, idForEdit);
+        return P2bCreateObjectFormattedData(allDataForEditSave);
     }
 
     $.fn.P2BDatePicker = function () {
@@ -150,6 +175,7 @@
         this.jqGrid({
             url: url,
             datatype: "json",
+            mtype: "POST",
             colNames: ColNamesData,
             colModel: ColModelData,
             rowNum: extraparam.rowNum,
@@ -493,6 +519,7 @@
     $.fn.P2BCreateDialog = function (creaturl, creadata, url, forwarddata, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returnfunctiondata, fn) {
         jQuery(this).trigger('reset');
         //$('select').removeAttr('style');
+        //var createSubmitUrl = absoluteUrlPath + submiturl;
         var init = jQuery(this);
         var ajaxdata, createajaxdata;
         nameidclassofbuttontodisable = '.popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-view';
@@ -540,14 +567,13 @@
                 Submit: function () {
                     var x = PerformValidations(submitnameformforserilize);
                     var y = true;
-                    debugger;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
                             var chkajx = $.ajax({
                                 url: fn.validurl,
                                 method: "POST",
                                 async: false,
-                                data: $(submitnameformforserilize).serialize(),
+                                data: P2bBindAllDataForCreate(submitnameformforserilize),
                                 beforeSend: function () {
                                     $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                     ajaxloaderv2('body');
@@ -557,11 +583,11 @@
                                 $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('enable').removeClass('submitbtndisable');
                                 //$('.ajax_loder').parents('div').remove();
                                 ajaxLoderRemove();
-                                if (msg.success == true) {
+                                if (msg.MessageCode == 200) {
                                     //success event
-                                    y = msg.success;
+                                    y = true;
                                 } else {
-                                    y = msg.success;
+                                    y = false;
                                     var newDiv = $(document.createElement('div'));
                                     var htmltag = "";
                                     for (var i = 0; i < msg.responseText.length; i++) {
@@ -620,10 +646,12 @@
                     if (x == false || y == false) {
                         return false;
                     }
+                    var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize));
                     ajaxdata = $.ajax({
                         url: submiturl,
                         method: "POST",
-                        data: $(submitnameformforserilize).serialize(),
+                        data: allDataForAPI,
+                        //data: $(submitnameformforserilize).serialize(),
                         beforeSend: function () {
                             $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                             ajaxloaderv2('body');
@@ -634,11 +662,11 @@
                         // $('.ajax_loder').parents('div').remove();
                         ajaxLoderRemove();
                         var htmltag = "";
-                        if (msg.success == true) {
+                        if (msg.MessageCode == 200) {
                             var newDiv = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            //for (var i = 0; i < msg.Message.length; i++) {
+                                htmltag = '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                            //}
                             newDiv.html(htmltag);
                             newDiv.dialog({
                                 autoOpen: false,
@@ -1024,10 +1052,11 @@
             modal: true,
             buttons: {
                 Confirm: function () {
+                    var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: deletedata }));
                     deleteajaxdata = $.ajax({
                         url: deleteurl,
                         method: 'POST',
-                        data: { data: deletedata },
+                        data: allDataForAPI,
                         beforeSend: function () {
                             // alert('hiihihihihi');
                             $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('disable').addClass('submitbtndisable');
@@ -1040,12 +1069,10 @@
                         // $('.ajax_loder').parents('div').remove();
                         ajaxLoderRemove();
                         var htmltag = "";
-                        if (msg.success == true) {
+                        if (msg.MessageCode == 200) {
                             var newDiv2 = $(document.createElement('div'));
-                            // msg.responseText = msg.responseText.trim();
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i].trim() + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                          
                             newDiv2.html(htmltag);
                             newDiv2.dialog({
                                 autoOpen: false,
@@ -1074,9 +1101,8 @@
                             $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
                         } else {
                             var newDiv2 = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                           
                             newDiv2.html(htmltag);
                             newDiv2.dialog({
                                 autoOpen: false,
@@ -1233,10 +1259,12 @@
                 NewIds = [];
                 olddata = [];
                 OldIds = [];
+                var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
                 editajaxopenloaddata = $.ajax({
                     url: openurl,
                     method: 'POST',
-                    data: { data: opendataforward },
+                    data: allDataForAPI,
+                    //data: { data: opendataforward },
                     beforeSend: function () {
                         ajaxloaderv2('body');
                     },
@@ -1360,11 +1388,13 @@
                         },
                         modal: true,
                         buttons: {
-                            Confirm: function () {
+                            Confirm: function () {                                
+                                var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, {Id : forwarddata}));
                                 editajaxdata = $.ajax({
                                     url: editurl,
                                     method: 'POST',
-                                    data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
+                                    data: allDataForAPI,
+                                    //data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
                                     beforeSend: function () {
                                         // alert('hiihihihihi');
                                         $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('disable').addClass('submitbtndisable');
@@ -1377,11 +1407,10 @@
                                     $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('enable').removeClass('submitbtndisable');
                                     // $('.ajax_loder').parents('div').remove();
                                     ajaxLoderRemove();
-                                    if (msg.success == true) {
+                                    if (msg.MessageCode == 200) {
                                         var newDiv = $(document.createElement('div'));
-                                        for (var i = 0; i < msg.responseText.length; i++) {
-                                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                                        }
+                                        htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                                       
                                         newDiv.html(htmltag);
                                         newDiv.dialog({
                                             autoOpen: false,
@@ -1419,9 +1448,8 @@
                                         newDiv.dialog('open');
                                     } else {
                                         var newDiv = $(document.createElement('div'));
-                                        for (var i = 0; i < msg.responseText.length; i++) {
-                                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                                        }
+                                        htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                                       
                                         newDiv.html(htmltag);
                                         newDiv.dialog({
                                             autoOpen: false,
@@ -1515,10 +1543,11 @@
             open: function (event, ui) {
                 $.CheckSessionExitance();
                 $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
+                var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
                 viewajaxopenloaddata = $.ajax({
                     url: openurl,
                     method: 'POST',
-                    data: { data: opendataforward },
+                    data: allDataForAPI,
                     beforeSend: function () {
                         ajaxloaderv2('body');
                     },
@@ -6494,3 +6523,16 @@
         });
     };
 }));
+
+class P2bFormDataHandlingClass {
+    constructor() {
+        this.data = [{ UserGroup : 'Checker'}];
+    }
+
+    addData(...args) {
+        this.data = [...this.data, ...args];
+    }
+    getData() {
+        return this.data;
+    }
+}

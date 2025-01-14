@@ -131,7 +131,6 @@ namespace P2BUltimate.Controllers.Core.MainController
             }
         }
 
-
         public MultiSelectList getState()
         {
             using (DataBaseContext db = new DataBaseContext())

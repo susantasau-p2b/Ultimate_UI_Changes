@@ -357,11 +357,11 @@
     //    }
 
     function ShowErrorMessage(control, message, parentdiv) {
-            var pos = $(control).offset();
-            var parentdivpos = $(parentdiv).offset();
-            var h = $(control).height();
-            var w = $(control).width();
-            var id = $(control).attr('id') + "_error";
+            let pos = $(control).offset();
+            let parentdivpos = $(parentdiv).offset();
+            let h = $(control).height();
+            let w = $(control).width();
+            let id = $(control).attr('id') + "_error";
             if ($(control)[0].nodeName === "SELECT") {
                 pos = $(control).next().offset();
                 parentdivpos = $(parentdiv).offset();
@@ -374,7 +374,7 @@
                     $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)); // If any issue then add '.css({ display: "inline-block" })' in the end or in the middle.
                 }
                 else {
-                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left });
+                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control));
                 }
             }
 //        $(control).off('click change selectmenuchange').on('click change selectmenuchange', function (e) {

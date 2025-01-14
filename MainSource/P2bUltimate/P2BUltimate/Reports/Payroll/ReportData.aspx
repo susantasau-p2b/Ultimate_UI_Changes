@@ -9,7 +9,6 @@
     <script src="../../Scripts/jquery-2.2.1.js"></script>
     <script>
         $(function () {
-            debugger;
             var menulink = window.location.pathname.toLowerCase().substr(1).split('/')[window.location.pathname.toLowerCase().substr(1).split('/').length - 1];
             var urlparm = new URLSearchParams(window.location.search);
 
