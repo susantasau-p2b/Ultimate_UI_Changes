@@ -37,8 +37,8 @@
 
     function P2bBindAllDataForCreate (formId) {
         const allFormDataForCreate = new P2bFormDataHandlingClass();
-        const $formData = $(formId);
-        let allData = new FormData($formData[0]);
+        const formData = $(formId);
+        let allData = new FormData(formData[0]);
         allFormDataForCreate.addData(allData);
 
         return P2bCreateObjectFormattedData(allFormDataForCreate);
@@ -569,11 +569,12 @@
                     var y = true;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
+                            var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize));
                             var chkajx = $.ajax({
                                 url: fn.validurl,
                                 method: "POST",
                                 async: false,
-                                data: P2bBindAllDataForCreate(submitnameformforserilize),
+                                data: allDataForAPI,
                                 beforeSend: function () {
                                     $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                     ajaxloaderv2('body');
@@ -1301,11 +1302,12 @@
                     var y = true;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
+                            var allDataForAPI = $.param(P2bBindAllDataForCreate(forwardserializedata));
                             var chkajx = $.ajax({
                                 url: fn.validurl,
                                 method: "POST",
                                 async: false,
-                                data: $(forwardserializedata).serialize(),
+                                data: allDataForAPI,
                                 beforeSend: function () {
                                     $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                     ajaxloaderv2('body');
@@ -1391,7 +1393,7 @@
                             Confirm: function () {                                
                                 var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, {Id : forwarddata}));
                                 editajaxdata = $.ajax({
-                                    url: editurl,
+                                    url: editurl + '?listOfIds=' + JSON.stringify({'name':'Susanta', 'roll':19}),
                                     method: 'POST',
                                     data: allDataForAPI,
                                     //data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
@@ -2217,6 +2219,7 @@
                     if (x == false || y == false) {
                         return false;
                     }
+                    var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize));
                     ajaxdata = $.ajax({
                         url: submiturl,
                         method: "POST",
@@ -2224,7 +2227,8 @@
                             $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                             ajaxloaderv2('body');
                         },
-                        data: $(submitnameformforserilize).serialize() + '&data=' + forwarddata + '',
+                        data: allDataForAPI,
+                        //data: $(submitnameformforserilize).serialize() + '&data=' + forwarddata + '',
                     });
                     //ajaxdata.success(function (msg) {
                     ajaxdata.done(function (msg) {
@@ -2232,11 +2236,10 @@
                         //$('.ajax_loder').parents('div').remove();
                         ajaxLoderRemove();
                         var htmltag = '';
-                        if (msg.success == true) {
+                        if (msg.MessageCode == 200) {
                             var newDiv = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                            
                             newDiv.html(htmltag);
                             newDiv.dialog({
                                 autoOpen: false,
@@ -2246,8 +2249,7 @@
                                 buttons: {
                                     Ok: function () {
                                         var data = [];
-                                        data.push(msg.Id);
-                                        data.push(msg.Val);
+                                        data.push(msg.Data);
                                         returnfunctiondata(data);
                                         if (gridreloadname != '' || gridreloadname != null) {
                                             //jQuery(gridreloadname).trigger('reloadGrid');
@@ -2265,9 +2267,8 @@
                             newDiv.dialog('open');
                         } else {
                             var newDiv = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                           
                             newDiv.html(htmltag);
                             newDiv.dialog({
                                 autoOpen: false,
@@ -2340,10 +2341,11 @@
             open: function (event, ui) {
                 $.CheckSessionExitance();
                 function assigndata() {
+                    var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
                     editajaxopenloaddata = $.ajax({
                         url: openurl,
                         method: 'POST',
-                        data: { data: opendataforward },
+                        data: allDataForAPI,
                     });
                     editajaxopenloaddata.done(function (value) {
                         returndatafunction(value);
@@ -2385,11 +2387,13 @@
                     var y = true;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
+                            var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }));
                             var chkajx = $.ajax({
                                 url: fn.validurl,
                                 method: "POST",
                                 async: false,
-                                data: $(forwardserializedata).serialize(),
+                                data: allDataForAPI,
+                                //data: $(forwardserializedata).serialize(),
                                 beforeSend: function () {
                                     $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                     ajaxloaderv2('body');
@@ -2458,6 +2462,7 @@
                     if (x == false || y == false) {
                         return false;
                     }
+                    var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }));
                     editajaxdata = $.ajax({
                         url: editurl,
                         method: "POST",
@@ -2465,18 +2470,18 @@
                             $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                             ajaxloaderv2('body');
                         },
-                        data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
+                        data: allDataForAPI,
+                        //data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
                     });
                     editajaxdata.done(function (msg) {
                         $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('enable').removeClass('submitbtndisable');
                         //$('.ajax_loder').parents('div').remove();
                         ajaxLoderRemove();
                         var htmltag = "";
-                        if (msg.success == true) {
+                        if (msg.MessageCode == 200) {
                             var newDiv = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                            
                             newDiv.html(htmltag);
                             var data = [];
                             data.push(msg.Id);
@@ -2514,9 +2519,8 @@
                             newDiv.dialog('open');
                         } else {
                             var newDiv = $(document.createElement('div'));
-                            for (var i = 0; i < msg.responseText.length; i++) {
-                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.responseText[i] + '</span></span>';
-                            }
+                            htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+                            
                             newDiv.html(htmltag);
                             newDiv.dialog({
                                 autoOpen: false,
@@ -2909,10 +2913,13 @@
                 });
                 lookupajaxdata.done(function (successdata) {
                     var htmltag = '<div style="margin: 0px auto;width:100%;padding: 1px 0px 5px;float:left"><input type="text" style="width:97%"; placeholder="Search" id="lookup-search" /></div><table class="lookuptable" id="' + setnameofthelookupbyppage + '"><tr><th>Sr.No</th><th><a id="selectall_lookuptable" style="float:left;padding: 1px 0px;" title="Select All">SelectAll</a>Description</th></tr>'
-                    jQuery.each(successdata, function (i, k) {
+                     
+                    jQuery.each(successdata.Data, function (i, k) {
                         htmltag += '<tr tabindex="-1">' +
-                        '<td>' + k.srno + '</td>' +
-                        '<td>' + k.lookupvalue + '</td>' +
+                            //'<td>' + k.srno + '</td>' +
+                            '<td>' + k.Id + '</td>' +
+                            '<td>' + P2bGetFullDetails(k) + '</td>' +
+                        //'<td>' + k.lookupvalue + '</td>' +
                         '</tr>'
                     });
                     htmltag += '</table>';
@@ -3048,7 +3055,7 @@
                     selected: k.Selected
                 }));
             });
-            jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+            jQuery(init).selectmenu().selectmenu("refresh").selectmenu("menuWidget").css("height", "100px");
         });
         // $("<span class='DropdownCode'>" + forwardata + "</span>").insertAfter(init);
         jQuery(drop2).empty().append(htm).selectmenu().selectmenu("refresh");
@@ -3068,7 +3075,7 @@
                     selected: k.Selected
                 }));
             });
-            jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+            jQuery(init).selectmenu().selectmenu("refresh").selectmenu("menuWidget").css("height", "100px");
         });
         // $("<span class='DropdownCode'>" + forwardata + "</span>").insertAfter(init);
         jQuery(drop2).empty().append(htm).selectmenu().selectmenu("refresh");
@@ -3077,7 +3084,7 @@
     $.fn.P2BSelectMenuOnChange = function (onchangeevent, url, filter_drop, data2) {
         var init = jQuery(this);
         jQuery(init).off(onchangeevent).on(onchangeevent, function () {
-            jQuery(filter_drop).empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+            jQuery(filter_drop).empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
             var value = jQuery(init).val();
             if (value != 0) {
                 $.post(url, { data: value, data2: data2 }, function (data) {
@@ -3543,7 +3550,7 @@
     };
     $.fn.DynamicSelectMenuAppend = function (Url, SelectType) {
         var init = jQuery(this);
-        jQuery("#" + $(this).attr('id') + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+        jQuery("#" + $(this).attr('id') + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
         var value = jQuery(init).val();
         $.post(Url, { data: value, data2: SelectType }, function (data) {
             if (data.SelectlistType != null) {
@@ -3571,7 +3578,7 @@
                 $.post(Url, { data: value, data2: SelectType }, function (data) {
                     if (data.SelectlistType != null) {
                         $('#' + data.SelectlistType + '').parent().show();
-                        jQuery("#" + data.SelectlistType + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                        jQuery("#" + data.SelectlistType + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                         $.each(data.selectlist, function (i, k) {
                             jQuery('#' + data.SelectlistType + '').append($('<option>', {
                                 value: k.Value,
@@ -3590,7 +3597,7 @@
                 //            
                 //            if (j.SelectlistType != null) {
                 //                $('#' + j.SelectlistType + '').parent().show();
-                //                jQuery("#" + j.SelectlistType + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+                //                jQuery("#" + j.SelectlistType + "").empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
                 //                $.each(j.selectlist, function (i, k) {
                 //                    jQuery('#' + j.SelectlistType + '').append($('<option>', {
                 //                        value: k.Value,
@@ -5569,7 +5576,7 @@
         $(this).on('change', 'input:checkbox:gt(0)', function (e) {
             var formname = $(FormName);
             formname.trigger('reset');
-            formname.find('select').empty().append('<option></option>').selectmenu('refresh');
+            formname.find('select').empty().append('<option></option>').selectmenu().selectmenu("refresh");
             formname.find('table').find('tr td').parent().remove();
             $(emp).val($(this).val());
             if (typeof fun === 'function') {
@@ -5580,7 +5587,7 @@
     $.FormReset = function (form) {
         var formname = $(form);
         formname.trigger('reset');
-        formname.find('select').empty().append('<option></option>').selectmenu('refresh');
+        formname.find('select').empty().append('<option></option>').selectmenu().selectmenu("refresh");
         formname.find('table').find('tr td').parent().remove();
     }
     $.fn.TodayDate = function () {
@@ -5695,7 +5702,7 @@
     $.fn.SelectMenuOnChange = function (url, filter_drop, data2, data3, callbck) {
         var init = jQuery(this);
         jQuery(init).off("selectmenuchange").on("selectmenuchange", function () {
-            jQuery(filter_drop).empty().append("<option value=0 selected=true>-Select-</option>").selectmenu('refresh');
+            jQuery(filter_drop).empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu("refresh");
             var value = jQuery(init).val();
             if (value != 0) {
                 $.post(url, { data: value, data2: data2, data3: data3 }, function (data) {
@@ -5737,7 +5744,7 @@
                     selected: k.Selected
                 }));
             });
-            jQuery(init).selectmenu('refresh').selectmenu("menuWidget").css("height", "100px");
+            jQuery(init).selectmenu().selectmenu("refresh").selectmenu("menuWidget").css("height", "100px");
         });
         jQuery(drop2).empty().append(htm).selectmenu().selectmenu("refresh");
     };
@@ -6526,7 +6533,8 @@
 
 class P2bFormDataHandlingClass {
     constructor() {
-        this.data = [{ UserGroup : 'Checker'}];
+        this.data = [{ UserGroup: 'Checker' }];
+        this.listOfIds = {};
     }
 
     addData(...args) {
@@ -6535,4 +6543,24 @@ class P2bFormDataHandlingClass {
     getData() {
         return this.data;
     }
+}
+
+function P2bGetFullDetails(obj) {
+    var getFullDetailsAsString = '';
+    if (obj && typeof obj === 'object') {
+        const allValuesFromObject = Object.values(obj);
+        if (typeof allValuesFromObject === 'object') {
+            const filterValues = allValuesFromObject.filter((item) => {
+                if (item !== null || item !== "" || item !== undefined || typeof item !== "boolean") {
+                    return item;
+                }
+            });
+
+            filterValues.map((item) => {
+                getFullDetailsAsString += item + ", ";
+            })
+        }
+
+    }
+    return getFullDetailsAsString;
 }

@@ -78,8 +78,6 @@
 
 
     <div id="Create_Dialog">
-        @*@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "FormCompany", name = "frmCompanyEdit" }))
-        {*@
         <form id = "FormCompany" name = "frmCompanyEdit" method="post">
             <input id="Autho_Action" type="hidden" name="Autho_Action" />
             <input id="Autho_Allow" type="hidden" name="Autho_Allow" />
@@ -294,9 +292,8 @@
                     $('#CINNo').val(k.CINNo);
                     $('#ServiceTaxNo').val(k.ServiceTaxNo);
                     $('#EstablishmentNo').val(k.EstablishmentNo);
-
-                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', k.Add_Id, k.Address_FullAddress, 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
-                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', k.Cont_Id, k.FullContactDetails, 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
+                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', k.Address_Id, P2bGetFullDetails(k.Address), 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
+                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', k.ContactDetails_Id, P2bGetFullDetails(k.ContactDetails), 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
 
 
                     $('#PayscaleList').P2BLookUpEncapsulate('#PayscaleList', 'PayscaleList', k.Payscale_Id, k.Payscale_Details, 'PayscaleList', '#Remove_Payscale_Company', 'A');
@@ -333,8 +330,8 @@
                     $('#ServiceTaxNo').val(k.ServiceTaxNo);
                     $('#EstablishmentNo').val(k.EstablishmentNo);
 
-                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', k.Add_Id, k.Address_FullAddress, 'Address_Id', 'view', 'N');
-                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', k.Cont_Id, k.FullContactDetails, 'ContactDetails_Id', 'view', 'N');
+                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', k.Address_Id, P2bGetFullDetails(k.Address), 'Address_Id', 'view', 'N');
+                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', k.ContactDetails_Id, P2bGetFullDetails(k.ContactDetails), 'ContactDetails_Id', 'view', 'N');
 
 
                     $('#PayscaleList').P2BLookUpEncapsulate('#PayscaleList', 'PayscaleList', k.Payscale_Id, k.Payscale_Details, 'PayscaleList', 'view', 'N');
@@ -363,16 +360,16 @@
 
         //To get data in Lookup
         $('#Lookup-Address-Company').on('click', function (event) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Company")', '', 'LookupDiv', 'Address Look Up Data', '#Address_Id', 'Address_Id', 5, 'Address_Id', '#FormCompany', 'N', '#Edit-Address-Company,#Remove-Address-Company', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('http://localhost/P2BUltimate2.0Api/CORE/GetAddressEditRequest', '', 'LookupDiv', 'Address Look Up Data', '#Address_Id', 'Address_Id', 5, 'Address_Id', '#FormCompany', 'N', '#Edit-Address-Company,#Remove-Address-Company', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
         // PArtial page create
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-Address-Company').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', '@Url.Action("Create","Address")', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCorporate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', 'http://localhost/P2BUltimate2.0Api/CORE/GetAddressCreateRequest', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCorporate', '', function (data) {
                 // to show data which is created in partial page
-                $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', data[0], data[1], 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
+                $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', data[0] && data[0].Id, P2bGetFullDetails(data[0]), 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
             });
             event.preventDefault();
         });
@@ -383,10 +380,8 @@
             a = $('#Address_Id').P2BGetTableDataonSelectedRow('#Address_Id', 0);
             b = a[0];
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', '@Url.Action("edit", "address")', b, '@Url.Action("Editsave","Address")', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#Address_Id', 'Address_Id', 'Address_Id', 'N', '#Edit-Address-Company,#Remove-Address-Company', function (data) {
-                // setTimeout(function () {
-                //to bind data according to selected id
-                $.each(data[0], function (i, k) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', 'http://localhost/P2BUltimate2.0Api/CORE/GetAddressEditRequest', b, 'http://localhost/P2BUltimate2.0Api/CORE/GetAddressEditSaveRequest', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#Address_Id', 'Address_Id', 'Address_Id', 'N', '#Edit-Address-Company,#Remove-Address-Company', function (data) {
+                var k = data.Data;
                     $('#FormAddress').trigger("reset");
                     $('#Address1').val(k.Address1);
                     $('#Address2').val(k.Address2);
@@ -399,8 +394,6 @@
                     $('#TalukaList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
                     $('#CityList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
                     $('#AreaList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
-                });
-                //}, 3000);
 
 
             });
@@ -423,7 +416,7 @@
 
         $('#Lookup-ContactDetails-Company').button().on('click', function (event) {
             @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#Address_Id', 'Address_Id', 5, 'Address_Id', '#FormCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
-            $('.dialog').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Company")', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetails_Id', 'ContactDetails_Id', 5, 'ContactDetails_Id', '#FormCompany', 'N', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('http://localhost/P2BUltimate2.0Api/CORE/GetContactDetailsEditRequest', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetails_Id', 'ContactDetails_Id', 5, 'ContactDetails_Id', '#FormCompany', 'N', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'Lookup_table', 'PageNavPosition');
             // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetails_Id', 'ContactDetails_Id', 10, 'ContactDetails_Id', '#FormCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
             event.preventDefault();
         });
@@ -431,7 +424,7 @@
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-ContactDetails-Company').button().on("click", function (event) {
             //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', 'Create ContactDetails', 'open', '@Url.Action("CreateSave","ContactDetails")', '#FormContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', 'Create ContactDetails', 'open', 'http://localhost/P2BUltimate2.0Api/CORE/GetContactDetailsCreateRequest', '#FormContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
                 $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', data[0], data[1], 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
             });
             event.preventDefault();
@@ -443,19 +436,16 @@
             b = a[0];
             console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', '@Url.Action("Editcontactdetails_partial", "Company")', b, '@Url.Action("EditSave", "ContactDetails")', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#ContactDetails_Id', 'ContactDetails_Id', 'ContactDetails_Id', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', 'http://localhost/P2BUltimate2.0Api/CORE/GetContactDetailsEditRequest', b, 'http://localhost/P2BUltimate2.0Api/CORE/GetContactDetailsEditSaveRequest', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#ContactDetails_Id', 'ContactDetails_Id', 'ContactDetails_Id', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
                 // setTimeout(function () {
-                $.each(data[0], function (i, k) {
+                var k = data.Data;
+                //$.each(data[0], function (i, k) {
                     $('#FormContactDetails').trigger('reset');
                     $('#EmailId').val(k.EmailId);
                     $('#Website').val(k.Website);
                     $('#FaxNo').val(k.FaxNo);
-                });
+                $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.ContactDetails_Id, P2bGetFullDetails(k.ContactNumbers), 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
 
-                $.each(data[1], function (i, k) {
-                    $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.Id, k.FullContactNumbers, 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
-                });
-                // }, 3000);
             });
             event.preventDefault();
         });
@@ -472,7 +462,7 @@
         });
 
         $('#Lookup_Payscale_Company').on('click', function (event) {
-            $('.dialog').P2BLookUpModal('@Url.Action("GetLookupDetailsPayscale", "Company")', '', 'LookupDiv', 'Look Up Data', '#PayscaleList', 'PayscaleList', 5, 'PayscaleList', '#FormCompany', 'A', '#Remove_Payscale_Company', 'Lookup_table', 'PageNavPosition');
+            $('.dialog').P2BLookUpModal('http://localhost/P2BUltimate2.0Api/CORE/GetPayScaleEditRequest', '', 'LookupDiv', 'Look Up Data', '#PayscaleList', 'PayscaleList', 5, 'PayscaleList', '#FormCompany', 'A', '#Remove_Payscale_Company', 'Lookup_table', 'PageNavPosition');
             event.preventDefault();
         });
 
@@ -480,7 +470,7 @@
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Payscale_Company').button().on("click", function (event) {
             //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payscale_Partial", "Company")', 'Create payscale', 'open', '@Url.Action("Create", "PayScale")', '#FormPayScaleP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCompany', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payscale_Partial", "Company")', 'Create payscale', 'open', 'http://localhost/P2BUltimate2.0Api/CORE/GetPayScaleCreateRequest', '#FormPayScaleP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCompany', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
                 $('#PayscaleList').P2BLookUpEncapsulate('#PayscaleList', 'PayscaleList', data[0], data[1], 'PayscaleList', '#Remove_Payscale_Company', 'A');
             });
             event.preventDefault();
