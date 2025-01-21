@@ -2,7 +2,6 @@
 // V 1.0.0
 //05:32 PM 06/01/2017
 
-//const absoluteUrlPath = http://192.168.1.11/P2BUltimate2.0Api;
 (function (factory) {
     if (typeof define === "function" && define.amd) {
         define(["jquery"], factory);
@@ -12,48 +11,54 @@
 }
 (function ($) {
     "use strict";
-
-    function P2bCreateObjectFormattedData(classObj) {
-        const array = classObj.getData();
-        function formDataToObject(formData) {
-            const obj = {};
+    function formDataToObject(formData) {
+        const obj = {};
+        if (formData instanceof FormData) {
             formData.forEach((value, key) => {
-                obj[key] = value;
+                if (obj[key]) {
+                    if (Array.isArray(obj[key])) {
+                        obj[key].push(value);
+                    } else {
+                        obj[key] = [obj[key], value];
+                    }
+                } else {
+                    obj[key] = value;
+                }
             });
             return obj;
+        } else {
+            return formData;
         }
-        
-        const serializableArray = array.map(item => {
-            if (item instanceof FormData) {
-                return formDataToObject(item);
-            }
-            return item;
-        });
+    }
+    function P2bObjectFormattedData(classObj) {
+        const serializableArray = classObj.getData();
         const mergedObject = serializableArray.reduce((acc, obj) => {
             return { ...acc, ...obj };
         }, {});
         return mergedObject;
     }
 
-    function P2bBindAllDataForCreate (formId) {
+    function P2bBindAllDataForCreate(formId, allTableIds) {
         const allFormDataForCreate = new P2bFormDataHandlingClass();
         const formData = $(formId);
         let allData = new FormData(formData[0]);
+        allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
         allFormDataForCreate.addData(allData);
 
-        return P2bCreateObjectFormattedData(allFormDataForCreate);
+        return P2bObjectFormattedData(allFormDataForCreate);
     }
-    function P2bBindAllDataForEdit(...args) {
+    function P2bBindAllDataForEdit(id) {
         const allDataForEdit = new P2bFormDataHandlingClass();
-        allDataForEdit.addData(...args);
-        return P2bCreateObjectFormattedData(allDataForEdit);
+        allDataForEdit.addData(id);
+        return P2bObjectFormattedData(allDataForEdit);
     }
-    function P2bBindAllDataForEditSave(formId,idForEdit) {
+    function P2bBindAllDataForEditSave(formId,idForEdit,allTableIds) {
         const allDataForEditSave = new P2bFormDataHandlingClass();
-        const $formData = $(formId);
-        let allData = new FormData($formData[0]);
+        const formData = $(formId);
+        let allData = new FormData(formData[0]);
+        allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
         allDataForEditSave.addData(allData, idForEdit);
-        return P2bCreateObjectFormattedData(allDataForEditSave);
+        return P2bObjectFormattedData(allDataForEditSave);
     }
 
     $.fn.P2BDatePicker = function () {
@@ -647,7 +652,7 @@
                     if (x == false || y == false) {
                         return false;
                     }
-                    var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize));
+                    var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize, nameofthelookuptable));
                     ajaxdata = $.ajax({
                         url: submiturl,
                         method: "POST",
@@ -1302,7 +1307,7 @@
                     var y = true;
                     if (fn != undefined) {
                         if (fn.validurl != null && x == true) {
-                            var allDataForAPI = $.param(P2bBindAllDataForCreate(forwardserializedata));
+                            var allDataForAPI = $.param(P2bBindAllDataForCreate(forwardserializedata, nameofthelookuptable));
                             var chkajx = $.ajax({
                                 url: fn.validurl,
                                 method: "POST",
@@ -1391,9 +1396,9 @@
                         modal: true,
                         buttons: {
                             Confirm: function () {                                
-                                var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, {Id : forwarddata}));
+                                var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }, nameofthelookuptable));
                                 editajaxdata = $.ajax({
-                                    url: editurl + '?listOfIds=' + JSON.stringify({'name':'Susanta', 'roll':19}),
+                                    url: editurl,
                                     method: 'POST',
                                     data: allDataForAPI,
                                     //data: $(forwardserializedata).serialize() + '&data=' + forwarddata + '',
@@ -2725,11 +2730,15 @@
                     }
 
                     var oldPageAnchor = document.getElementById('pg' + this.currentPage);
-                    oldPageAnchor.className = 'pg-normal';
+                    if(oldPageAnchor) {
+                        oldPageAnchor.className = 'pg-normal';
+                    }
 
                     this.currentPage = pageNumber;
                     var newPageAnchor = document.getElementById('pg' + this.currentPage);
-                    newPageAnchor.className = 'pg-selected';
+                    if (newPageAnchor){
+                        newPageAnchor.className = 'pg-selected';
+                    }
 
                     var from = (pageNumber - 1) * itemsPerPage + 1;
                     var to = from + itemsPerPage - 1;
@@ -6546,9 +6555,9 @@ class P2bFormDataHandlingClass {
 }
 
 function P2bGetFullDetails(obj) {
-    var getFullDetailsAsString = '';
-    if (obj && typeof obj === 'object') {
-        const allValuesFromObject = Object.values(obj);
+    function P2bCreateFullDetails(singleObject) {
+        var getFullDetailsAsString = '';
+        const allValuesFromObject = Object.values(singleObject);
         if (typeof allValuesFromObject === 'object') {
             const filterValues = allValuesFromObject.filter((item) => {
                 if (item !== null || item !== "" || item !== undefined || typeof item !== "boolean") {
@@ -6560,7 +6569,56 @@ function P2bGetFullDetails(obj) {
                 getFullDetailsAsString += item + ", ";
             })
         }
+        return getFullDetailsAsString;
+    }
+    if (obj && typeof obj === 'object') {
+        if (Array.isArray(obj)) {
+            let fullDetailsArray = [];
+            obj.map(obj => {
+                var fullDetailsString = P2bCreateFullDetails(obj);
+                fullDetailsArray.push(fullDetailsString);
+            });
+            return fullDetailsArray;
+        } else {
+            var fullDetailsString = P2bCreateFullDetails(obj);
+            return fullDetailsString;
+        }
 
     }
-    return getFullDetailsAsString;
 }
+
+
+function P2bCreateListOfTableData(formData, allTableIds) {
+    const arrayOfTableName = [];
+    if (allTableIds && typeof allTableIds === 'string') {
+        const arrayOfTableIds = allTableIds.split(',');
+        arrayOfTableIds.map(id => {            
+            const tableName = id.replace(/#/g, '');
+            arrayOfTableName.push(tableName);
+        })
+
+        if (arrayOfTableName.length > 0) {
+            arrayOfTableName.map(name => {
+                if (Array.isArray(formData[name])) {
+                    formData[name] = formData[name].map(value => (
+                        { Id: value }
+                    ))
+                } else if (!name.includes("_Id")) {
+                    formData[name] = [{ Id: formData[name] }]
+                }
+            })
+        }
+    }
+    return formData;
+}
+
+function DateConvert(dateString) {
+    var date = dateString.substr(0, 10);
+    const splitDateArray = date.split('-');
+    date = splitDateArray[0] + "-" + splitDateArray[2] + "-" + splitDateArray[1];
+    date = new Date(date);
+        var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+        return displayDate;
+}
+const APIURL = "http://192.168.1.11/P2BUltimate2.0Api";
+//const APIURL = "http://192.168.1.15/P2B.Api_2.0";
