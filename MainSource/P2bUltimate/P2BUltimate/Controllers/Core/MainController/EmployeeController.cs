@@ -4198,18 +4198,20 @@ namespace P2BUltimate.Controllers
         {
             using (DataBaseContext db = new DataBaseContext())
             {
-                var lall = db.NameSingle.Select(e => e.Id.ToString()).Distinct().ToList();
-                var rall = db.Employee.Include(e => e.EmpName).Where(e => e.EmpName != null).Select(e => e.EmpName.Id.ToString()).Distinct().ToList();
+                var lall = db.NameSingle.Select(e => e.Id).Distinct().ToList();
+                var rall = db.Employee.Include(e => e.EmpName).Where(e => e.EmpName != null).Select(e => e.EmpName.Id).Distinct().ToList();
                 var all = lall.Except(rall);
-                var EmpList = new List<NameSingle>();
-                foreach (var item in all)
-                {
-                    EmpList.Add(db.NameSingle.Find(Convert.ToInt32(item)));
-                }
+                //var EmpList = new List<NameSingle>();
+                var EmpList = db.NameSingle.Where(e => all.Contains(e.Id)).ToList();
+                //foreach (var item in all)
+                //{
+                //    EmpList.Add(db.NameSingle.Find(Convert.ToInt32(item)));
+                //}
                 var r = (from ca in EmpList select new { srno = ca.Id, lookupvalue = ca.FullNameFML }).Distinct();
                 return Json(r, JsonRequestBehavior.AllowGet);
             }
         }
+
         public JsonResult GetRetirementDay(string data)
         {
             List<string> Msg = new List<string>();

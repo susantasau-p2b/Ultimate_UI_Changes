@@ -128,13 +128,55 @@
                 dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
             }
 
-            //function DateConvert(JsonDate) {
-                //    var date = new Date(parseInt(JsonDate.substr(6)));
-                //    var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
-                //    return displayDate;
-            //};
+            function DateConvert(JsonDate) {
+                    var date = new Date(parseInt(JsonDate.substr(6)));
+                    var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+                    return displayDate;
+            };
 
             //-------------------------Release Grid----------------------------------------//
+            function initializeGrid() {
+                var ColNames_release = [];
+                var ColModel_release = [];
+                var SortName_release, Caption_release, url_release, width_release, height_release;
+
+                ColNames_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
+                ColModel_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
+                SortName_release = 'Id';
+                Caption_release = 'Yearly Payment T';
+                url_release = '@Url.Action("P2BGridRelease")';
+                width_release = 1000;
+                height_release = 150;
+
+                $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+                $('#JqGrid_release').on('click', function () {
+                    var dt_release = $('#JqGrid_release').P2BGrid.P2BEdDelV('#JqGrid_release', 'Id');
+                    $('#emp_Id').val(dt_release.Id);
+
+                    $.get("@Url.Action("Edit")", { data: dt_release.Id }, function (data) {
+                        $.each(data[0], function (i, k) {
+                            if (k.FromPeriod != null) { $('#txtFromPeriod').val(DateConvert(k.FromPeriod)); }
+                            if (k.ToPeriod != null) { $('#txtToPeriod').val(DateConvert(k.ToPeriod)); }
+                            $('#txtAmountPaidRelease').val(k.AmountPaid);
+                            $('#txtProcessmonth').val(k.ProcessMonth);
+                            $('#PayMonth').val(k.PayMonth);
+                            $('#txtTDSAmountRelease').val(k.TDSAmount);
+                            $('#txtOtherDeductionRelease').val(k.OtherDeduction);
+                            $('#txtNarrationRelease').val(k.Narration);
+                            $('#SalaryHeadReleaselist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", k.Salaryhead_Id);
+                            if (k.Salaryhead_Id == "1") {
+
+                                $('#HideDiv').fadeIn();
+                            }
+                            else {
+                                $('#HideDiv').fadeOut();
+                            }
+                        });
+                    });
+
+                });
+            }
+
 
             @*var ColNames_release = [];
             var ColModel_release = [];
@@ -146,13 +188,12 @@
             Caption_release = 'Yearly Payment T';
             url_release = '@Url.Action("P2BGridRelease")';
             width_release = 1000;
-            height_release = 150;*@
+            height_release = 150;
 
-            //  a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
-            //$('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
+              //a.Id, a.SalaryHead.Name, a.FromPeriod, a.ToPeriod, a.AmountPaid, a.OtherDeduction, a.ProcessMonth, a.TDSAmount, a.Narration
+            $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });*@
 
-            $('#JqGrid_release').on('click', function () {
-                $('#JqGrid').GridUnload();
+            @*$('#JqGrid_release').on('click', function () {
                 var dt_release = $('#JqGrid_release').P2BGrid.P2BEdDelV('#JqGrid_release', 'Id');
 
                 // alert(dt_release.Id);
@@ -186,7 +227,7 @@
                     console.log(data);
                 });
 
-            });
+            });*@
             //$('#txtProcessmonth').on('change', function () {
 
             //    var from = $("#txtProcessmonth").val().split("/");
@@ -305,6 +346,7 @@
                         //console.log("dasd");
                         $.get("@Url.Action("getCalendar", "YearlyPaymentT")", function (data) {
                             // $('#dispcalender').val(data.Lvcalendardesc);
+                            debugger;
                             $('#FromPeriod').val(data.Fromperiod);
                             $('#ToPeriod').val(data.Toperiod);
                         });
@@ -384,25 +426,11 @@
             $('#SalaryHeadReleaselist').prop("disabled", true);
 
             $('#release').on("click", function (event) {
-                ;
-                var ColNames_release = [];
-var ColModel_release = [];
-var SortName_release, Caption_release, url_release, width_release, height_release;
-
-ColNames_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
-ColModel_release = ['EmpCode', 'EmpName', 'SalaryHead', 'FromPeriod', 'ToPeriod', 'AmountPaid', 'OtherDeduction', 'ProcessMonth', 'TDSAmount', 'Narration', 'EncashLvhead', 'Id'];
-SortName_release = 'Id';
-Caption_release = 'Yearly Payment T';
-url_release = '@Url.Action("P2BGridRelease")';
-width_release = 1000;
-height_release = 150;
-                $('#JqGrid_release').P2BGrid(ColNames_release, ColModel_release, SortName_release, Caption_release, url_release, width_release, height_release, '#pager2_release', { multiple: true, rowNum: 30, selectall: true });
-                //$('#JqGrid_release').trigger('reloadGrid');
                 $('#SalaryHeadReleaselist').P2BSelectMenuAppend('@Url.Action("PopulateDropDownList", "YearlyPaymentT")', "", "");
-
                 // $('#CreateRelease_dialog').P2BCreateDialog('', '', '', '', 'Create Release Yearly Payment', 'open', '@@Url.Action("Create")', '#frmYearlyPaymentT', 'Message :', 'Request Falied :', '#JqGrid', 600, 850, '#AddressList,#ContactDetailsList', btndisablenames, function (data) { });
 
                 $('#frmYearlyPaymentTRelease').trigger('reset');
+                initializeGrid();
 
                 $('#CreateRelease_dialog').P2BGridDialog({
                     maindialogtitle: "Create Release Yearly Payment",
@@ -417,6 +445,7 @@ height_release = 150;
                 // To bind dropdown on page load
                 $('#ProcTypeList').P2BSelectMenuAppend1('@Url.Action("Polulate_ProcTypeChk", "YearlyPaymentT")', "", ""); // To bind dropdown on page load
 
+                $('#JqGrid_release').trigger('reloadGrid');
             });
 
             $('#Lookup-LvEncashReq-YearlyPaymentT').on('click', function (event) {
@@ -443,7 +472,6 @@ height_release = 150;
                         $('#Name').val(k.Name);
                         $('#CategoryList_DDL').P2BSelectMenuAppend("@Url.Action("GetLookupValue", "lookup")", 402, k.BusinessType_Id); // Dropdown bind
                     });
-
                     //partial page bind
                     $.each(data[1], function (i, k) {
                         $('#AddressList').P2BLookUpEncapsulate('#AddressList', 'AddressList', k.Add_Id, k.Address_FullAddress, 'AddressList', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'N');
@@ -640,7 +668,7 @@ height_release = 150;
         .section2_Leave {
             display: block;
             border: 1px solid #ddd;
-/*            height: 300px;*/
+            /*            height: 300px;*/
             width: 736px;
             margin: 5px 4px;
             position: absolute;
