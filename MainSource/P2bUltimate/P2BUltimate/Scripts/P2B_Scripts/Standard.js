@@ -16,13 +16,15 @@
             if (formData instanceof FormData) {
                 formData.forEach((value, key) => {
                     if (obj[key]) {
-                        if (Array.isArray(obj[key])) {
+                        if (Array.isArray(obj[key]) && value !== "null") {
                             obj[key].push(value);
                         } else if (value !== "null") {
                             obj[key] = [obj[key], value];
                         }
-                    } else {
+                    } else if (value !== "null") {
                         obj[key] = value;
+                    } else {
+                        obj[key] = null;
                     }
                 });
                 return obj;
@@ -39,29 +41,32 @@
         }
 
         function P2bBindAllDataForCreate(formId, allTableIds) {
-            var arrayOfObjects = [];
+            var arrayOfObjects = {};
             const allFormDataForCreate = new P2bFormDataHandlingClass();
             const formData = $(formId);
             let allData = new FormData(formData[0]);
             allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
             allFormDataForCreate.addData(allData);
             var getAllObjectData = P2bObjectFormattedData(allFormDataForCreate);
-            arrayOfObjects.push(getAllObjectData);
+            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
+            arrayOfObjects["EntityData"] = getAllObjectData;
             return arrayOfObjects;
 
             //return P2bObjectFormattedData(allFormDataForCreate);
         }
         function P2bBindAllDataForEdit(id) {
-            var arrayOfObjects = [];
+            var arrayOfObjects = {};
             const allDataForEdit = new P2bFormDataHandlingClass();
             allDataForEdit.addData(id);
             var getAllObjectData = P2bObjectFormattedData(allDataForEdit);
-            arrayOfObjects.push(getAllObjectData);
+            //arrayOfObjects.push(getAllObjectData);
+            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
+            arrayOfObjects["EntityData"] = getAllObjectData;
             return arrayOfObjects;
             //return P2bObjectFormattedData(allDataForEdit);
         }
         function P2bBindAllDataForEditSave(formId, idForEdit, allTableIds, originalDataObject) {
-            var arrayOfObjects = [];
+            var arrayOfObjects = {};
             const allDataForEditSave = new P2bFormDataHandlingClass();
             const formData = $(formId);
             let allData = new FormData(formData[0]);
@@ -73,12 +78,115 @@
             allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
             allDataForEditSave.addData(allData, idForEdit);
             var getAllObjectData = P2bObjectFormattedData(allDataForEditSave);
-            arrayOfObjects.push(getAllObjectData);
-            arrayOfObjects.push(originalDataObject);
+            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
+            arrayOfObjects["EntityData"] = getAllObjectData;
+            //arrayOfObjects.push(getAllObjectData);
+            //arrayOfObjects.push(originalDataObject);
             return arrayOfObjects;
             //allDataForEditSave.addData(originalDataObject, allData);
             //allDataForEditSave.addData(allData, idForEdit, originalDataObject);
             //return P2bObjectFormattedData(allDataForEditSave);
+        }
+        function P2bGetAllFilteredNames(obj) {
+            var arrayOfUncommonKeys = [];
+            if (obj && obj.FieldNames.length > 0 && obj.OriginalData && obj.ModifiedData) {
+                obj.FieldNames.forEach((item) => {
+                    if (obj.OriginalData[item] !== obj.ModifiedData[item]) {
+                        arrayOfUncommonKeys.push(item);
+                    }
+                });
+                
+            }
+            return arrayOfUncommonKeys;
+        }
+        function P2bCreateAuthorizationDialog(obj) {
+            var tableWithAllNewData = '';
+            var tableWithAllOldData = '';
+            var authDialogDiv = $("#Autho-Dialog");
+            if (authDialogDiv.length === 0) {
+                authDialogDiv = $(document.createElement('div')).attr('id', 'Autho-Dialog');
+            }
+            //var originalDataDiv = $("#Original-Data");
+            //if (originalDataDiv.length === 0) {
+            //    originalDataDiv = $(document.createElement('div')).attr('id', 'Original-Data');
+            //}
+            //var newDataDiv = $("#New-Data");
+            //if (newDataDiv.length === 0) {
+            //    newDataDiv = $(document.createElement('div')).attr('id', 'New-Data');
+            //}
+            //$(authDialogDiv).append(originalDataDiv).append(newDataDiv);
+
+            var newDataTable = $('#New-Data-Table');
+            if (newDataTable.length === 0) {
+                newDataTable = $(document.createElement('table')).attr({ 'id':'New-Data-Table','class': 'fiter-data-table'});
+                $(newDataTable).append('<caption>New Data</caption>');
+            }
+            var oldDataTable = $('#Old-Data-Table');
+            if (oldDataTable.length === 0) {
+                oldDataTable = $(document.createElement('table')).attr({ 'id': 'Old-Data-Table', 'class': 'fiter-data-table' });
+                $(oldDataTable).append('<caption>Old Data</caption>');
+            }
+
+            var labelAndFieldNameObject = {};
+            if (obj && obj.FormName) {
+                $(`${obj.FormName} label`).each(function () {
+                    var fieldId = $(this).attr('for');
+                    var labelText = $(this).text().trim();
+                    var field = $('#' + fieldId);
+                    if (field.length > 0) {
+                        labelAndFieldNameObject[labelText] = field.attr('name');
+                    }
+                });
+            }
+            var arrayOfFieldNames = labelAndFieldNameObject ? Object.values(labelAndFieldNameObject) : [];
+            var uncommonKeys = P2bGetAllFilteredNames({ FieldNames: arrayOfFieldNames, OriginalData: obj.OriginalData, ModifiedData: obj.ModifiedData })
+            if (uncommonKeys.length > 0) {
+                let newObj = {};
+                $.each(labelAndFieldNameObject, function (key, value) {
+                    if (uncommonKeys.includes(value)) {
+                        newObj[key] = value;
+                    }
+                });
+                function addDataIntoTable(variableName, labelAndFieldName, Data) {
+                    $.each(labelAndFieldName, (name, label) => {
+                        variableName += `<tr><td class='td-label'>${label}</td><td class='td-data'>${Data[name]}</td></tr>`;
+                    });
+                }
+
+                addDataIntoTable(tableWithAllNewData, newObj, obj.ModifiedData);
+                addDataIntoTable(tableWithAllOldData, newObj, obj.OriginalData);
+            }
+
+
+            $(newDataTable).append(tableWithAllNewData);
+            $(oldDataTable).append(tableWithAllOldData);
+            $(authDialogDiv).append(newDataTable).append(oldDataTable);
+            $(authDialogDiv).dialog({
+                width: 700,
+                height: 400,
+                modal: false,
+                closeOnEscape: false,
+                position: { my: "right center", at: "right center", of: window },
+                title: 'Company Authorization',
+                open: function () {
+                    jQuery(this).find("select").selectmenu('disable').addClass("ui-selectmenu-text");
+                    jQuery(this).find('input').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
+                    jQuery(this).find('textarea').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
+                    //jQuery(this).contains('Reject').css("background-color", "rgba(241, 0, 0, 0.66)");
+                },
+
+                buttons: {
+                    Approve: function () {
+                        alert("Hi this is Approve button");
+                    },
+                    Reject: function () {
+                        alert("Hi this is Reject button");
+                    },
+                    Cancel: function () {
+                        $(this).dialog('close');
+                    }
+                }                
+            });
         }
 
         function P2bCreateHelpDialog(obj) {
@@ -799,6 +907,7 @@
                         if (x == false || y == false) {
                             return false;
                         }
+                        Action = 'C';
                         var allDataForAPI = JSON.stringify(P2bBindAllDataForCreate(submitnameformforserilize, nameofthelookuptable));
                         //var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize, nameofthelookuptable));
                         ajaxdata = $.ajax({
@@ -1337,6 +1446,7 @@
         };
         $.fn.P2BEditModalDialog = function (openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returndatafunction, fn) {
             var originalObjectData;
+            var modifiedObjectData;
             var editajaxdata, editajaxopenloaddata, init;
             //$('select').removeAttr('style');
             var OldIds = [];
@@ -1350,13 +1460,26 @@
                 height: height,
                 width: width,
                 modal: true,
-                iconButtons: [{
-                    text: "Help",
-                    icon: "ui-icon-help",
-                    click: function (e) {
-                        helpfun("edit", "" + submitnameformforserilize.slice("4") + "");
-                    }
-                }],
+                //iconButtons: [{
+                //    text: "Help",
+                //    icon: "ui-icon-help",
+                //    click: function (e) {
+                //        helpfun("edit", "" + submitnameformforserilize.slice("4") + "");
+                //    }
+                //}, {
+                //    text: "Authorization",
+                //    icon:"ui-icon-taskcomplete"
+                //}],
+                //create: function () {
+                //    var helpButton = $('<button>', {
+                //        text: 'Help',
+                //        //class: 'titlebar-btn',
+                //        click: function () {
+                //            alert('Help button clicked!');
+                //        }
+                //    });
+                //    $(this).closest('.ui-dialog').find('.ui-dialog-titlebar').append(helpButton);
+                //},
                 closeOnEscape: false,
                 title: maindialogtitle,
                 beforeClose: function (e) {
@@ -1412,10 +1535,21 @@
                 open: function (event, ui) {
                     $.CheckSessionExitance();
                     $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
+                    var helpButton = $('<button>', {
+                        title:'Authorization',
+                        html: '<span class="ui-icon ui-icon-person"></span>',
+                        //html: '<span class="ui-icon ui-icon-document"></span>',
+                        class: 'ui-button ui-corner-all ui-widget ui-dialog-titlebar-close ui-dialog-titlebar-person',
+                        click: function () {
+                            P2bCreateAuthorizationDialog({ FormName: forwardserializedata, OriginalData: originalObjectData, ModifiedData: modifiedObjectData });
+                        }
+                    });
+                    $(this).closest('.ui-dialog').find('.ui-dialog-titlebar').append(helpButton);
                     NewIds = [];
                     olddata = [];
                     OldIds = [];
-                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit({ Id: opendataforward }));
+                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit(opendataforward));
+                    //var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit({ Id: opendataforward }));
                     //var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
                     editajaxopenloaddata = $.ajax({
                         url: openurl,
@@ -1443,8 +1577,12 @@
                         //}
                         if (typeof returndatafunction === 'function') {
                             if (value && value.Data) {
-                                originalObjectData = value.Data.Company;
-                            }
+                                if (UserGroup.toUpperCase() === "CHECKER") {
+                                    originalObjectData = value.Data.DT_Company;
+                                } else {
+                                    originalObjectData = value.Data.OriginalData;
+                                }
+                            } 
                             returndatafunction(value);
                         } else {
                             console.log('returnfun is not define');
@@ -1857,7 +1995,6 @@
         };
         $.fn.onClickGrid = function (gridname, url1, url2) {
             $(this).on("click", function () {
-                $(this).toggleClass('auto_active');
                 if ($(this).hasClass('auto_active')) {
                     $(gridname).P2BGrid.onclickChangeUrl(gridname, url2, true);
                 } else {
@@ -1867,17 +2004,20 @@
         };
         $.fn.makeDisable = function (buttonsmakedisble) {
             var note_html = '<span class="parent_span" style="display:inline-block;position:relative"><span style="color:red">*</span><span>Note:The Text Which Are In<span class="child_span_color"></span>&nbsp;&nbsp;&nbsp;&nbsp; Color Is Old Data </span></span>';
-            //if (!$(this).hasClass('auto_active')) {
-            //    $(buttonsmakedisble).button("enable");
-            //}
+            if ($(this).hasClass('auto_active')) {
+                $('authorization-fields').css('display', 'block');
+            } else {
+                $('authorization-fields').css('display', 'none');
+            }
             $(this).on("click", function (e) {
                 $(this).toggleClass('auto_active');
                 if ($(this).hasClass('auto_active')) {
                     $('<div class="old_data_div">' + note_html + '</div>').appendTo('.ui-dialog-content');
+                    $(buttonsmakedisble).button("enable");
                 } else {
                     $('.ui-dialog-content').find('.old_data_div').remove();
-                }
-                $(buttonsmakedisble).button("enable").css("display", "block");
+                    $(buttonsmakedisble).button("disable");
+                }                
             });
         };
         //$.fn.makeDisable = function (buttonsmakedisble) {
@@ -3089,7 +3229,7 @@
                         cache: false,
                         contentType: 'application/json',
                         datatype: 'json',
-                        data: JSON.stringify([{ Id: ids.length ? ids : 0 }]),
+                        data: JSON.stringify([null, null, ids]),
                         //data: JSON.stringify([{ Id: ids }]),
                         //beforeSend: function () {
                         //    ajaxloader(init);
@@ -3102,10 +3242,11 @@
                         if (successdata.Data) {
                             var allListData = successdata.Data.FullDetailsList;
                             if (allListData) {
+                                const FullDetailsKey = Object.keys(allListData).find(item => item.includes('_FullDetails'));
                                 for (let i = 0; i < allListData.Id.length; i++) {
                                     htmltag += '<tr tabindex="-1">' +
                                         '<td>' + allListData.Id[i] + '</td>' +
-                                        '<td>' + allListData.FullDetails[i] + '</td>' +
+                                        '<td>' + allListData[FullDetailsKey][i] + '</td>' +
                                         '</tr>'
                                 }
                             }
@@ -6729,7 +6870,7 @@
 
 class P2bFormDataHandlingClass {
     constructor() {
-        this.data = [{ UserGroup: 'Maker' }];
+        this.data = [{ UserGroup: UserGroup }];
         this.listOfIds = {};
     }
 
@@ -6792,7 +6933,6 @@ function P2bCreateListOfTableData(formData, allTableIds) {
                     ))
                 } else if (!name.includes("_Id")) {
                     formData[name] = [{ Id: formData[name] }];
-
                 }
             })
         }
@@ -6812,3 +6952,10 @@ function DateConvert(dateString) {
 //const APIURL = "http://192.168.1.218/P2B.Api_2.0";
 //const APIURL = "http://192.168.1.36/P2B.API_2.0";
 const APIURL = "http://192.168.1.12/P2B.API_2.0";
+const UserGroup = "ADMIN";
+//const UserGroup = "MAKER";
+//const UserGroup = "CHECKER";
+let Action;
+let NavListAction;
+let IsAuthorized;
+let UserName;
