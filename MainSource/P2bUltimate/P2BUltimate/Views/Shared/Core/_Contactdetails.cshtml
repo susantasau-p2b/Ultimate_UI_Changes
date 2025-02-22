@@ -11,18 +11,18 @@
         display: block;
         margin: 1px;
         float: left;
-        width: 95px;
+        min-width: 95px;
     }
 
     .contact_row {
         width: 397px;
     }
 
-    .con_icon-row {
+/*    .con_icon-row {
         position: absolute;
         left: 64px;
         top: 83px;
-    }
+    }*/
 </style>
 <div class="ContactNosLKDiv">
     <div title="LookUp Data">
@@ -47,18 +47,18 @@
                 <label class="contact_popup-content-label">Fax NO :</label>
                 <input type="text" id="FaxNo" name="FaxNo" class="contact_popup-content-textbox" maxlength="15" />
             </div>
-            <div class="contact_row content_margine">
+            <div class="row3 content_margine">
                 <label class="contact_popup-content-label">Contact No :</label>
                 <div class="popup-content-table">
-                    <table class="lookuptableselected" id="ContactNos_List">
+                    <table class="lookuptableselected" id="ContactNumbers">
                         <tr><th>ID</th><th>LookUp Selected Description</th></tr>
                     </table>
                 </div>
                 <div class="con_icon-row icon-row">
-                    <button data-p2btooltip="Lookup Contact Numbers" class="popup-content-icon-lookup" id="Lookup-ContactNo-ContDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
-                    <button data-p2btooltip="Create Contact Numbers" class="popup-content-icon-create" id="Create-ContactNo-ContDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
-                    <button data-p2btooltip="Edit Contact Numbers" class="popup-content-icon-edit" id="Edit-ContactNo-ContDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
-                    <button data-p2btooltip="Delete Contact Numbers" class="popup-content-icon-remove" id="Remove-ContactNo-ContDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Lookup Contact Numbers" class="popup-content-icon-lookup" id="Lookup-ContactNumbers-ContDetails"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Create Contact Numbers" class="popup-content-icon-create" id="Create-ContactNumbers-ContDetails"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Edit Contact Numbers" class="popup-content-icon-edit" id="Edit-ContactNumbers-ContDetails"><span class="ui-icon ui-icon-pencil popup-content-iconmark"></span></button>
+                    <button data-p2btooltip="Delete Contact Numbers" class="popup-content-icon-remove" id="Remove-ContactNumbers-ContDetails"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
                 </div>
             </div>
         </form>
@@ -81,50 +81,59 @@
     $(document).ready(function () {
         $('button').button();
         $('<div></div>').P2BPartialCreateModalDialog();
-        $('#Create-ContactNo-ContDetails').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', APIURL + '/CORE/GetContactNumbersCreateRequest', '#FormContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 350, '', '', '', '#FormContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
-              
-                $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', data[0].Id, P2bGetFullDetails(data[0]), 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
+        $('#Create-ContactNumbers-ContDetails').on("click", function (event) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Partial", "ContactNumbers")', 'Create Dialog', 'open', APIURL + '/GetContactNumbersCreateRequest', '#FormContactNo', 'Message :', 'Request Falied :', '#JqGrid', 200, 350, '', '', '', '#FormContactDetails', '#Edit-ContactNumbers-ContDetails,#Remove-ContactNumbers-ContDetails', function (data) {
+                
+                if (data[0] && data[0].ContactNumbers) {
+                    $('#ContactNumbers').P2BLookUpEncapsulate('#ContactNumbers', 'ContactNumbers', data[0].ContactNumbers.Id, data[0].ContactNumbers.ContactNumbers_FullDetails, 'ContactNumbers', 'Create', 'A','C');
+                }
             });
             event.preventDefault();
         });
 
-        $('#Lookup-ContactNo-ContDetails').button().on('click', function (event) {
-            $('.ContactNosLKDiv').P2BLookUpModal(APIURL + '/CORE/GetContactNumbersEditRequest', '', 'lookupdiv_ContactNos', 'ContactDetails Look Up Data', '#ContactNos_List', 'ContactNos_List', 5, 'ContactNos_List', '#FormContactDetails', 'A', '', 'lookupdiv_ContactNos', 'PageNavPosition_ContactNos');
+        $('#Lookup-ContactNumbers-ContDetails').button().on('click', function (event) {
+            $('.ContactNosLKDiv').P2BLookUpModal(APIURL + '/GetContactNumbersEditRequest', '', 'lookupdiv_ContactNos', 'ContactDetails Look Up Data', '#ContactNumbers', 'ContactNumbers', 5, 'ContactNumbers', '#FormContactDetails', 'A', '', 'lookupdiv_ContactNos', 'PageNavPosition_ContactNos');
             event.preventDefault();
         });
 
-        $('#Edit-ContactNo-ContDetails').button().on("click", function (event) {
+        $('#Edit-ContactNumbers-ContDetails').button().on("click", function (event) {
             var a = [], b;
-            a = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            a = $('#ContactNumbers').P2BGetTableDataonSelectedRow('#ContactNumbers', 0);
             b = a[0];
             console.log(b);
             event.preventDefault();
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', APIURL + '/CORE/GetContactNumbersEditRequest', b, APIURL + '/CORE/GetContactNumbersEditSaveRequest', 'Edit Contact Numbers', '#FormContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#FormContactDetails', '#ContactNos_List', 'ContactNos_List', 'ContactNos_List', 'A', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
-                var k = data.Data;
-                    $('#FormContactNo').trigger('reset');
-                    $('#MobileNo').val(k.MobileNo);
-                    $('#LandlineNo').val(k.LandlineNo);
-                    $('#STDCode').val(k.STD);
-
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Partial", "ContactNumbers")', APIURL + '/GetContactNumbersEditRequest', b, APIURL + '/GetContactNumbersEditSaveRequest', 'Edit Contact Numbers', '#FormContactNo', b, 'Message :', 'Request Falied :', '#JqGrid', 200, 300, '#FormContactDetails', '#ContactNumbers', 'ContactNumbers', 'ContactNumbers', 'A', '#Edit-ContactNumbers-ContDetails,#Remove-ContactNumbers-ContDetails', function (data) {
+                var k;
+                var apiData;
+                if (data) {
+                    k = data.Data;
+                    if (k && k.OriginalData && k.OriginalData.Id) {
+                        apiData = k.OriginalData;
+                    } else {
+                        apiData = k.DTData;
+                    }
+                }
+                $('#FormContactNo').trigger("reset");
+                $('#MobileNo').val(apiData && apiData.MobileNo || '');
+                $('#LandlineNo').val((apiData && apiData.LandlineNo) || '');                
             });
 
         });
 
 
-        $('#Remove-ContactNo-ContDetails').button().on('click', function (event) {
+        $('#Remove-ContactNumbers-ContDetails').button().on('click', function (event) {
 
             var a = [], b;
             a = $('#Contact_List').P2BGetTableDataonSelectedRow('#Contact_List', 0);
             b = a[0];
             var selectedRows = [];
-            selectedRows = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            selectedRows = $('#ContactNumbers').P2BGetTableDataonSelectedRow('#ContactNumbers', 0);
             //var selectedRows = $('#Contact_List').P2BGetTableDataonSelectedRow('#Contact_List', 0);
             //var c = [], d;
-            //c = $('#ContactNos_List').P2BGetTableDataonSelectedRow('#ContactNos_List', 0);
+            //c = $('#ContactNumbers').P2BGetTableDataonSelectedRow('#ContactNumbers', 0);
             //d = c[0];
             // deleteurl, deletedata, forwarddata, deletemessage, deletesuccessmessage, deleteerrormessage, selectfield, optionvalue, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, btndisable) {
-            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "ContactNumbers")', selectedRows, b, 'Are you sure you want to remove record???', 'Message : ', 'Request failed', '#ContactNos_List', $('#ContactNos_List').val(), 200, 200, '#FormContactDetails', '#ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails');
+            $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("Delete", "ContactNumbers")', selectedRows, b, 'Are you sure you want to remove record???', 'Message : ', 'Request failed', '#ContactNumbers', $('#ContactNumbers').val(), 200, 200, '#FormContactDetails', '#ContactNumbers', '#Edit-ContactNumbers-ContDetails,#Remove-ContactNumbers-ContDetails');
             event.preventDefault();
 
         });

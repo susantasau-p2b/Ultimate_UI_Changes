@@ -317,8 +317,14 @@
                     }
 
                 }
+            } else if ($('#' + value + '')[0].nodeName == "TEXTAREA") {
+                if (!$('#' + value + '').val()) {
+                    x = false;
+                    $('#' + value + '').val('');
+                    $('#' + value + '').prop('must', true);
+                    ShowErrorMessage($('#' + value + ''), 'Required Field!', parentdiv);
+                }
             }
-
         });
         return x;
     };
@@ -357,16 +363,16 @@
     //    }
 
     function ShowErrorMessage(control, message, parentdiv) {
-            let pos = $(control).offset();
+            let controlPos = $(control).offset();
             let parentdivpos = $(parentdiv).offset();
             let h = $(control).height();
             let w = $(control).width();
             let id = $(control).attr('id') + "_error";
             if ($(control)[0].nodeName === "SELECT") {
-                pos = $(control).next().offset();
-                parentdivpos = $(parentdiv).offset();
+                let Pos = $(control).next().offset();
+                let parentdivPosSelect = $(parentdiv).offset();
                 w = $(control).width();
-                console.log(control, pos.left, parentdivpos.left, w);
+                //console.log(control, pos.left, parentdivpos.left, w);
                 $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control));
                 //$("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: pos.left - parentdivpos.left + w + 100 });
             } else {
@@ -374,7 +380,7 @@
                     $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)); // If any issue then add '.css({ display: "inline-block" })' in the end or in the middle.
                 }
                 else {
-                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control));
+                    $("<span class='error' id=" + id + ">" + message + "</span>").insertAfter($(control)).css({ left: controlPos && controlPos.left - parentdivpos && parentdivpos.left + w});
                 }
             }
 //        $(control).off('click change selectmenuchange').on('click change selectmenuchange', function (e) {

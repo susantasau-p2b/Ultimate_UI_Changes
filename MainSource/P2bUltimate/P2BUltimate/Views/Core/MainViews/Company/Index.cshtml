@@ -3,14 +3,14 @@
 
     <style>
         .icon-row {
-            position: relative;
+/*            position: relative;
             left: 84px;
-            top: -149px;
+            top: -149px;*/
         }
 
         .row1 {
             width: 399px;
-            display: inline-block;
+/*            display: inline-block;*/
         }
 
         .row2 {
@@ -21,16 +21,21 @@
             display: block;
             margin: 1px;
             float: left;
-            width: 125px;
+            min-width: 125px;
             text-transform: capitalize;
+        }
+        .popup-content-textbox-rowfirst{
+            width:146px;
         }
 
         .row3 {
-            width: 449px;
+            /*            width: 449px;*/
+            display: flex;
         }
 
         #file {
-            width: 15em;
+            width: 161px;
+            margin-left: 2px;
         }
 
         .popup-content-textbox {
@@ -73,15 +78,6 @@
         </div>
     </div>
 
-    @*<div id="Autho-Dialog">
-        <div id="Original-Data">
-            <label class="autho-dialog-label">Updated Data</label>
-        </div>
-        <div id="New-Data">
-            <label class="autho-dialog-label">Previous Data</label>
-        </div>
-    </div>*@
-
     <div id="Create_Dialog">
         <form id="FormCompany" name="frmCompanyEdit" method="post">
             <input id="Autho_Action" type="hidden" name="Autho_Action" />
@@ -102,7 +98,7 @@
                 <div id="AddressList_Old"></div>
                 <label for="Address_Id" class="popup-content-label">Address :</label>
                 <div class="popup-content-table">
-                    <table class="lookuptableselected" id="Address_Id" name="Address_Id">
+                    <table class="lookuptableselected" id="Address_Id">
                         <tr><th>ID</th><th>LookUp Selected Description</th></tr>
                     </table>
                 </div>
@@ -117,7 +113,7 @@
                 <div id="ContactDetailsList_Old"></div>
                 <label for="ContactDetails_Id" class="popup-content-label">Contact Details :</label>
                 <div class="popup-content-table">
-                    <table class="lookuptableselected" id="ContactDetails_Id" name="ContactDetails_Id">
+                    <table class="lookuptableselected" id="ContactDetails_Id">
                         <tr><th>ID</th><th>LookUp Selected Description</th></tr>
                     </table>
                 </div>
@@ -134,7 +130,8 @@
             </div>
             <div class="row1 content_margine">
                 <label for="RegistrationDate" class="popup-content-label">Register Date :</label>
-                <input type="date" id="RegistrationDate" name="RegistrationDate" class="popup-content-textbox-rowfirst" placeholder="dd/mm/yyyy" />
+                @*<input type="text" id="RegistrationDate" name="RegistrationDate" class="popup-content-textbox-rowfirst" placeholder="dd/mm/yyyy" />*@
+                <input type="date" id="RegistrationDate" name="RegistrationDate" class="popup-content-textbox-rowfirst" />
             </div>
             <div class="row1 content_margine">
                 <label for="PTECNO" class="popup-content-label">Ptec No :</label>
@@ -185,7 +182,7 @@
                 <div id="PayscaleList_Old"></div>
                 <label for="PayScale" class="popup-content-label">PayScale :</label>
                 <div class="popup-content-table">
-                    <table class="lookuptableselected" id="PayScale" name="PayScale">
+                    <table class="lookuptableselected" id="PayScale">
                         <tr><th>ID</th><th>LookUp Selected Description</th></tr>
                     </table>
                 </div>
@@ -193,24 +190,7 @@
                     <button data-p2btooltip="Select PayScale" class="button popup-content-icon-lookup" id="Lookup_Payscale_Company"><span class="ui-icon ui-icon-folder-open popup-content-iconmark"></span></button>
                     <button data-p2btooltip="Create PayScale" class="button popup-content-icon-create" id="Create_Payscale_Company"><span class="ui-icon ui-icon-newwin popup-content-iconmark"></span></button>
                     <button data-p2btooltip="Remove PayScale" class="button popup-content-icon-remove" id="Remove_Payscale_Company"><span class="ui-icon ui-icon-trash popup-content-iconmark"></span></button>
-                </div>
-            </div>
-            <div class="authorization-fields" style="display:none">
-                <div class="row3 content_margine">
-                    <label for="IsAuthorized" class="popup-content-label">IsAuthorized :</label>
-                    <div class="popup_radio_button">
-                        <span>
-                            <input type="radio" id="radio1" name="IsAuthorized" value="1" /> <label class="ui-corner-left" for="radio1">Yes&nbsp;</label>
-                        </span>
-                        <span>
-                            <input type="radio" id="radio2" name="IsAuthorized" value="2" checked="checked" /> <label class="ui-corner-right" for="radio2">No&nbsp;</label>
-                        </span>
-                    </div>
-                </div>
-                <div class="row3 content_margine">
-                    <label for="AuthorizedComment" class="popup-content-label">Comment :</label>
-                    <textarea id="AuthorizedComment" name="AuthorizedComment" rows="3"></textarea>
-                </div>
+                </div>                
             </div>
         </form>
     </div>
@@ -218,43 +198,12 @@
 </html>
 <script>
     $(document).ready(function (e) {
-        var EditDataForAutho;
         var hasAuthoClassName;
         let allOrinalData;
-        UserName = '00000228';
-        var user = [
-            { EmpCode: '00001886', UserGroup: 'CHECKER' },
-            { EmpCode: '00000357', UserGroup: 'MAKER' },
-            { EmpCode: '00000228', UserGroup: 'ADMIN' }
-        ];
+        var activeButtonsArray = singleData.Action;
+        var allDisableIds = CreateDisableButtonsString(activeButtonsArray);
 
-        var singleData = user.find((e) => e.EmpCode === UserName);
-
-        //function createDiv(objectData, fieldName) {
-        //    var newDiv = $(document.createElement('div')).attr('id','display-original-data');
-        //    $(newDiv).css({'position':'absolute', 'background-color': 'yellow', 'width': '200px', 'height': '100px','z-index':'101',left:'300px' });
-        //    $(`[name=${fieldName}]`).after(newDiv);
-        //}
-        //$('input').hover(
-        //    function (event) {
-        //        var fieldNameValue = $(this).attr('name');
-        //        createDiv(allOrinalData, fieldNameValue);
-        //        event.preventDefault();
-        //    },
-        //    function (event) {
-        //        $('#display-original-data').css('display', 'none');
-        //        $('#display-original-data').remove();
-        //                event.preventDefault();
-        //    }
-        //);
-
-        //$('input').blur(
-        //function (event) {
-        //    $('#display-original-data').css('display', 'none');
-        //        $('#display-original-data').remove();
-        //        event.preventDefault();
-        //    }
-        //)
+        $(allDisableIds).button().button('disable');
 
 
         $('#Code').MaxLength(10);
@@ -289,7 +238,6 @@
         var ColNames = [];
         var ColModel = [];
         var SortName, Caption, url, width, height;
-        //a.Id, Convert.ToString(a.RegName), Convert.ToString(a.Code), Convert.ToString(a.Name)
         var btndisablenames = "#Edit-Address-Company,#Remove-Address-Company,#Edit-ContactDetails-Company,#Remove-ContactDetails-Company,#Remove_Payscale_Company";
         ColModel = ['Code', 'Name', 'Id'];
         ColNames = [ 'Code', 'Name','Id',];
@@ -300,9 +248,15 @@
         width = 1000;
         height = 150;
         $('#JqGrid').P2BGrid(ColNames, ColModel, SortName, Caption, url, width, height);
-        //$('#RegistrationDate').P2BDatePicker();
+
+        $('#RegistrationDate').on('click', function () {
+            this.showPicker();
+        });
+        //document.getElementById('RegistrationDate').addEventListener('click', function () {
+        //    this.showPicker();
+        //});
         //$('#RegistrationDate');
-        $("#RegistrationDate").keypress(function (event) { event.preventDefault(); });
+        //$("#RegistrationDate").keypress(function (event) { event.preventDefault(); });
         //function DateConvert(JsonDate) {
         //    var date = new Date(parseInt(JsonDate.substr(6)));
         //    var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
@@ -317,147 +271,95 @@
         function AssignData() {
             dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
         }
+        function FieldsDataFromAPI(data, clickededBtnName) {
+            $('#FormCompany').trigger("reset");
+            if (data.MessageCode === 200) {
+                var companyData = data.Data;
+                var k;
+                if (companyData) {
+                    allOrinalData = companyData.DTData;
+                    if (AuthorizeStatus) {
+                        k = companyData.DTData;
+                    } else {
+                        k = companyData.OriginalData;
+                    }
+                    var addressObj = companyData.Address;
+                    var contactObj = companyData.ContactDetails;
+                    var payscaleObj = companyData.PayScale;
+                    if (k) {
+                        $('#Code').val(k.Code);
+                        $('#Code').attr('readonly', 'readonly');
+                        $('#Name').val(k.Name);
+                        $('#RegistrationNo').val(k.RegistrationNo);
+                        if (k.RegistrationDate != null) {
+                            $('#RegistrationDate').val(DateConvert(k.RegistrationDate));
+                        } else {
+                            $('#RegistrationDate').val("");
+                        }
+                        $('#PTECNO').val(k.PTECNO);
+                        $('#PTRCNO').val(k.PTRCNO);
+                        $('#VATNo').val(k.VATNo);
+                        $('#LBTNO').val(k.LBTNO);
+                        $('#ESICNo').val(k.ESICNo);
+                        $('#PANNo').val(k.PANNo);
+                        $('#TANNo').val(k.TANNo);
+                        $('#CSTNo').val(k.CSTNo);
+                        $('#CINNo').val(k.CINNo);
+                        $('#ServiceTaxNo').val(k.ServiceTaxNo);
+                        $('#EstablishmentNo').val(k.EstablishmentNo);
+                    }
+                    if (addressObj) {
+                        $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', addressObj.Address_Id, addressObj.Address_FullDetails, 'Address_Id', clickededBtnName , 'A','O');
+                    }
+                    if (contactObj) {
+                        $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', contactObj.ContactDetails_Id, contactObj.ContactDetails_FullDetails, 'ContactDetails_Id', clickededBtnName, 'A','O');
+                    }
+                    if (payscaleObj) {
+                        $('#PayScale').P2BLookUpEncapsulate('#PayScale', 'PayScale', payscaleObj[0], payscaleObj[1], 'PayScale', clickededBtnName, 'A','O');
+
+                    }
+                }
+            }
+        }
         $('#Create_Dialog').P2BCreateDialog();
 
         $('#Create').on("click", function (event) {
-            if (UserGroup === user.UserGroup && UserName === user.UserName) {
-                IsAuthorized = 1;
-            } else {
-                IsAuthorized = 0;
-            }
             $('#FormCompany').trigger("reset");
             $('#Create_Dialog').P2BCreateDialog('', '', '', '', 'Create Company', 'open', APIURL + '/GetCompanyCreateRequest', '#FormCompany', 'Message :', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) { });
-            //$('#Autho-Dialog').dialog('open');
+            
             event.preventDefault();
         });
 
         // Main page edit
         $('#Edit').on('click', function () {
             AssignData();
-            hasAuthoClassName = $('#Autho').hasClass('auto_active');
-            if (hasAuthoClassName && dt){
-                EditDataForAutho = { Id: dt.Id, IsAuthorized: 1 };
-                $('.authorization-fields').css('display', 'block');
-            } else if (!hasAuthoClassName && dt){
-                EditDataForAutho = { Id: dt.Id, IsAuthorized: 0 };
-                $('.authorization-fields').css('display', 'none');
+            if (AuthorizeStatus) {
+                $('#Create_Dialog').P2BAuthorizeModalDialog(APIURL + '/GetCompanyEditRequest', dt.Id, APIURL + '/GetCompanyEditSaveRequest', "Authorize Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) {
+                    FieldsDataFromAPI(data, 'View');
+                });
+            } else {
+                //$('#Create_Dialog').P2BEditModalDialog(APIURL + '/GetCompanyEditRequest', dt.Id, APIURL + '/GetCompanyEditSaveRequest', "Edit Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) {
+                $('#Create_Dialog').P2BEditModalDialog(APIURL + '/GetCompanyEditRequest', dt.Id, APIURL + '/GetCompanyEditSaveRequest', "Edit Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) {
+                    FieldsDataFromAPI(data, 'Edit');
+                    $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
+                });
             }
-            //$('#Create_Dialog').P2BEditModalDialog(APIURL + '/GetCompanyEditRequest', dt.Id, APIURL + '/GetCompanyEditSaveRequest', "Edit Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) {
-            $('#Create_Dialog').P2BEditModalDialog(APIURL + '/GetCompanyEditRequest', EditDataForAutho, APIURL + '/GetCompanyEditSaveRequest', "Edit Company Data", '#FormCompany', dt.Id, 'Message : ', 'Request Falied :', '#JqGrid', 500, 620, '#Address_Id,#ContactDetails_Id,#PayScale', btndisablenames, function (data) {
-                if (data.MessageCode === 200) {
-                    var companyData = data.Data;
-                    var k;
-                    if (companyData) {
-                        allOrinalData = companyData.DT_Company;
-                        if (hasAuthoClassName) {
-                            k = companyData.DT_Company;
-                        } else {
-                            k = companyData.OriginalData;
-                        }
-                        var addressObj = companyData.Address;
-                        var contactObj = companyData.ContactDetails;
-                        var payscaleObj = companyData.PayScale;
-                                if (k) {
-                                    $('#Code').val(k.Code);
-                                    $('#Code').attr('readonly', 'readonly');
-                                    $('#Name').val(k.Name);
-                                    $('#RegistrationNo').val(k.RegistrationNo);
-                                    if (k.RegistrationDate != null) {
-                                        $('#RegistrationDate').val(DateConvert(k.RegistrationDate));
-                                    } else
-                                        $('#RegistrationDate').val();
-                                    $('#PTECNO').val(k.PTECNO);
-                                    $('#PTRCNO').val(k.PTRCNO);
-                                    $('#VATNo').val(k.VATNo);
-                                    $('#LBTNO').val(k.LBTNO);
-                                    $('#ESICNo').val(k.ESICNo);
-                                    $('#PANNo').val(k.PANNo);
-                                    $('#TANNo').val(k.TANNo);
-                                    $('#CSTNo').val(k.CSTNo);
-                                    $('#CINNo').val(k.CINNo);
-                                    $('#ServiceTaxNo').val(k.ServiceTaxNo);
-                                    $('#EstablishmentNo').val(k.EstablishmentNo);
-                                }
-                                    if (addressObj) {
-                                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', addressObj.Address_Id, addressObj.Address_FullDetails, 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
-                        }
-                        if (contactObj) {
-                                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', contactObj.ContactDetails_Id, contactObj.ContactDetails_FullDetails, 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
-                        }
-                            if (payscaleObj) {
-                                    $('#PayScale').P2BLookUpEncapsulate('#PayScale', 'PayScale', payscaleObj[0], payscaleObj[1], 'PayScale', '#Remove_Payscale_Company', 'A');
-
-                                }
-                    }
-                }
-                $('#Autho_Allow').val(data[3]); //Compulsory for authorisation
-            });
         });
 
 
         $('#View').button().click(function (event) {
             AssignData();
-            hasAuthoClassName = $('#Autho').hasClass('auto_active');
-            if (hasAuthoClassName && dt) {
-                EditDataForAutho = { Id: dt.Id, IsAuthorized: 0 };
-                $('.authorization-fields').css('display', 'block');
-            } else if (!hasAuthoClassName && dt) {
-                EditDataForAutho = { Id: dt.Id, IsAuthorized: 1 };
-                $('.authorization-fields').css('display', 'none');
-            }
-            $('#Create_Dialog').P2BViewModalDialog(APIURL + '/GetCompanyEditRequest', EditDataForAutho, 'View Company Data', '#Address_Id,#ContactDetails_Id', '#Lookup_Payscale_Company,#Remove_Payscale_Company,#Create_Payscale_Company,#Lookup-ContactDetails-Company,#Create-ContactDetails-Company,#Edit-ContactDetails-Company,#Remove-ContactDetails-Company,#Lookup-Address-Company,#Create-Address-Company,#Edit-Address-Company,#Remove-Address-Company', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
-                if (data.MessageCode === 200) {
-                    var companyData = data.Data;
-                    var k;
-                    if (companyData) {
-                        allOrinalData = companyData.DT_Company;
-                        if (hasAuthoClassName) {
-                            k = companyData.DT_Company;
-                        } else {
-                            k = companyData.OriginalData;
-                        };
-                        var addressObj = companyData.Address;
-                        var contactObj = companyData.ContactDetails;
-                        var payscaleObj = companyData.PayScale;
-                                if (k) {
-                                    $('#Code').val(k.Code);
-                                    $('#Code').attr('readonly', 'readonly');
-                                    $('#Name').val(k.Name);
-                                    $('#RegistrationNo').val(k.RegistrationNo);
-                                    if (k.RegistrationDate != null) {
-                                        $('#RegistrationDate').val(DateConvert(k.RegistrationDate));
-                                    } else
-                                        $('#RegistrationDate').val();
-                                    $('#PTECNO').val(k.PTECNO);
-                                    $('#PTRCNO').val(k.PTRCNO);
-                                    $('#VATNo').val(k.VATNo);
-                                    $('#LBTNO').val(k.LBTNO);
-                                    $('#ESICNo').val(k.ESICNo);
-                                    $('#PANNo').val(k.PANNo);
-                                    $('#TANNo').val(k.TANNo);
-                                    $('#CSTNo').val(k.CSTNo);
-                                    $('#CINNo').val(k.CINNo);
-                                    $('#ServiceTaxNo').val(k.ServiceTaxNo);
-                                    $('#EstablishmentNo').val(k.EstablishmentNo);
-                                } else if (addressObj) {
-                                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', addressObj.Address_Id, addressObj.Address_FullDetails, 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
-                                } else if (contactObj) {
-                                    $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', contactObj.ContactDetails_Id, contactObj.ContactDetails_FullDetails, 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
-                                } else if (payscaleObj) {
-                                    $('#PayScale').P2BLookUpEncapsulate('#PayScale', 'PayScale', payscaleObj[0], payscaleObj[1], 'PayScale', '#Remove_Payscale_Company', 'A');
+            $('#Create_Dialog').P2BViewModalDialog(APIURL + '/GetCompanyEditRequest', dt.Id, 'View Company Data', '#Address_Id,#ContactDetails_Id', '#Lookup_Payscale_Company,#Remove_Payscale_Company,#Create_Payscale_Company,#Lookup-ContactDetails-Company,#Create-ContactDetails-Company,#Edit-ContactDetails-Company,#Remove-ContactDetails-Company,#Lookup-Address-Company,#Create-Address-Company,#Edit-Address-Company,#Remove-Address-Company', 500, 620, '#Autho', '@Url.Action("AuthSave")', dt.Id, '', '', '', '', '#JqGrid', function (data) {
+                FieldsDataFromAPI(data,'View');
 
-                                }
-                    }
-                }
-
-                if ($("#Autho").hasClass('auto_active')) {
-                    if (data[3] != null) {
-                        $('#Name').oldVal(data[2].Name);
-                        $('#AddressList_Old').oldLookupVal(data[3].Address_Val);
-                        $('#ContactDetailsList_Old').oldLookupVal(data[3].Contact_Val);
-                        $('#PayScaleList_Old').oldLookupVal(data[3].PayScale_Val);
-                    }
-                }
+                //if ($("#Autho").hasClass('auto_active')) {
+                //    if (data[3] != null) {
+                //        $('#Name').oldVal(data[2].Name);
+                //        $('#AddressList_Old').oldLookupVal(data[3].Address_Val);
+                //        $('#ContactDetailsList_Old').oldLookupVal(data[3].Contact_Val);
+                //        $('#PayScaleList_Old').oldLookupVal(data[3].PayScale_Val);
+                //    }
+                //}
 
             });
         });
@@ -480,11 +382,11 @@
         // PArtial page create
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-Address-Company').on("click", function (event) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', APIURL + '/GetAddressCreateRequest', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCorporate', '', function (data) {
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("partial", "address")', 'Create Address', 'open', APIURL + '/GetAddressCreateRequest', '#FormAddress', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#Country_Id,#State_Id,#StateRegion_Id,#District_Id,#Taluka_Id,#City_Id,#Area_Id', '', '', '#FormCorporate', '', function (data) {
                 // to show data which is created in partial page
-                debugger;
                 if (data[0] && data[0].Address) {
-                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', data[0].Address.Id, data[0].Address.Address_FullDetails, 'Address_Id', '#Edit-Address-Company,#Remove-Address-Company', 'N');
+                    $('#Address_Id').P2BLookUpEncapsulate('#Address_Id', 'Address_Id', data[0].Address.Id, data[0].Address.Address_FullDetails, 'Address_Id', 'Create', 'A', 'C');
+                    //$('#Lookup-Address-Company,#Create-Address-Company,#Edit-Address-Company').button().button('disable');
                 }
             });
             event.preventDefault();
@@ -496,53 +398,59 @@
             a = $('#Address_Id').P2BGetTableDataonSelectedRow('#Address_Id', 0);
             b = a[0];
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, classoridoftheonwhichpopupderived, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not,nameidclassofbuttontodisable,returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', APIURL + '/GetAddressEditRequest', b, APIURL + '/GetAddressEditSaveRequest', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#Address_Id', 'Address_Id', 'Address_Id', 'N', '#Edit-Address-Company,#Remove-Address-Company', function (data) {
-                var k = data.Data;
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("partial", "address")', APIURL + '/GetAddressEditRequest', b, APIURL + '/GetAddressEditSaveRequest', 'Edit Address', '#FormAddress', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#Country_Id,#State_Id,#StateRegion_Id,#District_Id,#Taluka_Id,#City_Id,#Area_Id', '#Address_Id', 'Address_Id', 'Address_Id', 'N', '#Edit-Address-Company,#Remove-Address-Company', function (data) {
+                var k;
+                var apiData;
+                if (data) {
+                    k = data.Data;
+                    if (k && k.OriginalData && k.OriginalData.Id) {
+                        apiData = k.OriginalData;
+                    } else {
+                        apiData = k.DTData;
+                    }
+                }
                     $('#FormAddress').trigger("reset");
-                    $('#Address1').val(k.Address1);
-                    $('#Address2').val(k.Address2);
-                    $('#Address3').val(k.Address3);
-                    $('#Landmark').val(k.Landmark);
-                    $('#CountryList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "country")", "", k.Country_Id, '');
-                    $('#StateList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "state")", "", k.State_Id, '');
-                    $('#StateRegionList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "StateRegion")", "", k.StateRegion_Id, '');
-                    $('#DistrictList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "District")", "", k.District_Id, '');
-                    $('#TalukaList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "Taluka")", "", k.Taluka_Id, '');
-                    $('#CityList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "City")", "", k.City_Id, '');
-                    $('#AreaList_DDL').P2BSelectMenuAppend("@Url.Action("PopulateDropDownList", "area")", "", k.Area_Id, '');
-
-
+                    $('#Address1').val((apiData && apiData.Address1) || '');
+                    $('#Address2').val((apiData && apiData.Address2) || '');
+                    $('#Address3').val((apiData && apiData.Address3) || '');
+                    $('#Landmark').val((apiData && apiData.Landmark) || '');
+                    $('#Country_Id').P2BLookUpEncapsulate('#Country_Id', 'Country_Id', k.Country && k.Country.Id, k.Country && k.Country.Country_FullDetails, 'Country_Id', 'Edit', 'A', 'E');
+                    $('#State_Id').P2BLookUpEncapsulate('#State_Id', 'State_Id', k.State && k.State.Id, k.State && k.State.State_FullDetails, 'State_Id', 'Edit', 'A', 'E');
+                    $('#StateRegion_Id').P2BLookUpEncapsulate('#StateRegion_Id', 'StateRegion_Id', k.StateRegion && k.StateRegion.Id, k.StateRegion && k.StateRegion.StateRegion_FullDetails, 'StateRegion_Id', 'Edit', 'A', 'E');
+                    $('#District_Id').P2BLookUpEncapsulate('#District_Id', 'District_Id', k.District && k.District.Id, k.District && k.District.District_FullDetails, 'District_Id', 'Edit', 'A', 'E');
+                    $('#Taluka_Id').P2BLookUpEncapsulate('#Taluka_Id', 'Taluka_Id', k.Taluka && k.Taluka.Id, k.Taluka && k.Taluka.Taluka_FullDetails, 'Taluka_Id', 'Edit', 'A', 'E');
+                    $('#City_Id').P2BLookUpEncapsulate('#City_Id', 'City_Id', k.City && k.City.Id, k.City && k.City.City_FullDetails, 'City_Id', 'Edit', 'A', 'E');
+                    $('#Area_Id').P2BLookUpEncapsulate('#Area_Id', 'Area_Id', k.Area && k.Area.Id, k.Area && k.Area.Area_FullDetails, 'Area_Id', 'Edit', 'A', 'E');
+                
             });
             event.preventDefault();
         });
 
         //partial page delete
         $('#Remove-Address-Company').button().on('click', function (event) {
-            //dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
-            //var a = [], b;
-            //a = $('#Address_Id').P2BGetTableDataonSelectedRow('#Address_Id', 0);
-            //b = a[0];
             var selectedRows = [];
             selectedRows = $('#Address_Id').P2BGetTableDataonSelectedRow('#Address_Id', 0);
-            $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Address_Id', $('#Address_Id').val(), 200, 200, '#FormCompany', '#Address_Id', '#Edit-Address-Company,#Remove-Address-Company');
+            var objData = $('.Address_Id');
+            if (objData[0].innerText === 'C') {
+                $('<div></div>').P2BPartialDeleteModalDialog(APIURL + '/GetAddressDeleteRequest', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Address_Id', $('#Address_Id').val(), 200, 200, '#FormCompany', '#Address_Id', '#Edit-Address-Company,#Remove-Address-Company');
+            } else {
+                $('<div></div>').P2BPartialDeleteModalDialog('', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#Address_Id', $('#Address_Id').val(), 200, 200, '#FormCompany', '#Address_Id', '#Edit-Address-Company,#Remove-Address-Company');
+            }
+            $('#Lookup-Address-Company,#Create-Address-Company').button().button('enable');
             event.preventDefault();
         });
 
         /* ContactDetails button click*/
 
         $('#Lookup-ContactDetails-Company').button().on('click', function (event) {
-            @*$('.dialog').P2BLookUpModal('@Url.Action("GetAddressLKDetails", "Corporate")', '', 'LookupDiv', 'Address Look Up Data', '#Address_Id', 'Address_Id', 5, 'Address_Id', '#FormCorporate', 'N', '#Edit-Address-Corporate,#Remove-Address-Corporate', 'Lookup_table', 'PageNavPosition');*@
             $('.dialog').P2BLookUpModal(APIURL + '/GetContactDetailsEditRequest', '', 'LookupDiv', 'ContactDetails Look Up Data', '#ContactDetails_Id', 'ContactDetails_Id', 5, 'ContactDetails_Id', '#FormCompany', 'N', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'Lookup_table', 'PageNavPosition');
-            // $('.ContactDetLKDiv').P2BLookUpModal('@Url.Action("GetContactDetLKDetails", "Corporate")', '', 'ContactDetLKDiv', 'Look Up Data', '#ContactDetails_Id', 'ContactDetails_Id', 10, 'ContactDetails_Id', '#FormCorporate', 'N', '#Edit-ContactDetails-Corporate,#Remove-ContactDetails-Corporate', 'lookupdiv_ContactDet', 'pageNavPosition_ContactDet');
             event.preventDefault();
         });
 
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create-ContactDetails-Company').button().on("click", function (event) {
-            //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', 'Create ContactDetails', 'open', APIURL + '/GetContactDetailsCreateRequest', '#FormContactDetails', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormContactDetails', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
-                debugger;
-                $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', data[0] && data[0].Id, P2bGetFullDetails(data[0]), 'ContactDetails_Id', '#Edit-ContactDetails-Company,#Remove-ContactDetails-Company', 'N');
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', 'Create ContactDetails', 'open', APIURL + '/GetContactDetailsCreateRequest', '#FormContactDetails', 'Message :', 'Request Failed :', '#JqGrid', 400, 500, '#ContactNumbers', '', '', '#FormContactDetails', '#Edit-ContactNumbers-ContDetails,#Remove-ContactNumbers-ContDetails', function (data) {
+                $('#ContactDetails_Id').P2BLookUpEncapsulate('#ContactDetails_Id', 'ContactDetails_Id', data[0] && data[0].ContactDetails.Id, data[0] && data[0].ContactDetails && data[0].ContactDetails.ContactDetails_FullDetails, 'ContactDetails_Id', 'Create', 'A','C');
             });
             event.preventDefault();
         });
@@ -551,18 +459,24 @@
             var a = [], b;
             a = $('#ContactDetails_Id').P2BGetTableDataonSelectedRow('#ContactDetails_Id', 0);
             b = a[0];
-            console.log(b);
             //url, openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname,                                                                                                                    height, width, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, nameclassidofinlinelookup, nameofthelist_inlinelookuptable, nameoftable_inlinelookuptable,multiple_allowed_or_not, returndatafunction) {
-            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', APIURL + '/GetContactDetailsEditRequest', b, APIURL + '/GetContactDetailsEditSaveRequest', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#ContactDetails_Id', 'ContactDetails_Id', 'ContactDetails_Id', 'N', '#Remove-ContactNo-ContDetails,#Edit-ContactNo-ContDetails', function (data) {
-                // setTimeout(function () {
-                var k = data.Data;
-                //$.each(data[0], function (i, k) {
-                    $('#FormContactDetails').trigger('reset');
-                    $('#EmailId').val(k.EmailId);
-                    $('#Website').val(k.Website);
-                    $('#FaxNo').val(k.FaxNo);
-                $('#ContactNos_List').P2BLookUpEncapsulate('#ContactNos_List', 'ContactNos_List', k.ContactDetails_Id, P2bGetFullDetails(k.ContactNumbers), 'ContactNos_List', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', 'A');
-
+            $('<div></div>').P2BPatialEditModalDialog('@Url.Action("Createcontactdetails_partial", "Company")', APIURL + '/GetContactDetailsEditRequest', b, APIURL + '/GetContactDetailsEditSaveRequest', 'Edit Contact Details', '#FormContactDetails', b, 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '#FormCompany', '#ContactDetails_Id', 'ContactDetails_Id', 'ContactDetails_Id', 'N', '#Remove-ContactNumbers-ContDetails,#Edit-ContactNumbers-ContDetails', function (data) {
+                var k;
+                var apiData;
+                if (data) {
+                    k = data.Data;
+                    if (k && k.OriginalData && k.OriginalData.Id) {
+                        apiData = k.OriginalData;
+                    } else {
+                        apiData = k.DTData;
+                    }
+                }
+                    $('#FormContactDetails').trigger("reset");
+                    $('#EmailId').val((apiData && apiData.EmailId) || '');
+                    $('#Website').val((apiData && apiData.Website) || '');
+                    $('#FaxNo').val((apiData && apiData.FaxNo) || '');
+                    $('#ContactNumbers').P2BLookUpEncapsulate('#ContactNumbers', 'ContactNumbers', k.ContactNumbers && k.ContactNumbers.Id, k.ContactNumbers && k.ContactNumbers.ContactNumbers_FullDetails, 'ContactNumbers', 'Edit', 'A', 'E');
+                
             });
             event.preventDefault();
         });
@@ -587,20 +501,16 @@
         $('<div></div>').P2BPartialCreateModalDialog();
         $('#Create_Payscale_Company').button().on("click", function (event) {
             //function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata) {
-            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payscale_Partial", "Company")', 'Create payscale', 'open', APIURL + '/GetPayScaleCreateRequest', '#FormPayScaleP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCompany', '#Edit-ContactNo-ContDetails,#Remove-ContactNo-ContDetails', function (data) {
-                debugger;
+            $('<div></div>').P2BPartialCreateModalDialog('@Url.Action("Payscale_Partial", "Company")', 'Create payscale', 'open', APIURL + '/GetPayScaleCreateRequest', '#FormPayScaleP', 'Message :', 'Request Falied :', '#JqGrid', 400, 500, '', '', '', '#FormCompany', '#Edit-ContactNumbers-ContDetails,#Remove-ContactNumbers-ContDetails', function (data) {
+               
                 if (data[0] && data[0].PayScale) {
-                    $('#PayScale').P2BLookUpEncapsulate('#PayScale', 'PayScale', data[0].PayScale.Id, data[0].PayScale.PayScale_FullDetails, 'PayScale', '#Remove_Payscale_Company', 'A');
+                    $('#PayScale').P2BLookUpEncapsulate('#PayScale', 'PayScale', data[0].PayScale.Id, data[0].PayScale.PayScale_FullDetails, 'PayScale', 'Create', 'A','C');
                 }
             });
             event.preventDefault();
         });
 
         $('#Remove_Payscale_Company').button().on('click', function (event) {
-            //// dt = $('#JqGrid').P2BGrid.P2BEdDelV('#JqGrid', 'Id');
-            //var a = [], b;
-            //a = $('#PayScale').P2BGetTableDataonSelectedRow('#PayScale', 0);
-            //b = a[0];
             var selectedRows = [];
             selectedRows = $('#PayScale').P2BGetTableDataonSelectedRow('#PayScale', 0);
             $('<div></div>').P2BPartialDeleteModalDialog('@Url.Action("DeleteContactDetails", "Company")', selectedRows, 0, 'Are you sure want to delete record???', 'Message : ', 'Request failed', '#PayScale', $('#PayScale').val(), 200, 200, '#FormCompany', '#PayScale', '#Remove_Payscale_Company');
@@ -612,11 +522,9 @@
         @*$('#Autho').makeDisable('#Create,#Edit,#Delete');
         $('#Autho').onClickGrid('#JqGrid', '@Url.Action("P2BGrid")', '@Url.Action("P2BGrid")');*@
         $('#Category').selectmenu().selectmenu("menuWidget").addClass("overflow");
-        if (UserGroup.toUpperCase() === "CHECKER") {
-            $('#Create,#Edit,#Delete').button().button('disable');
-            $('#Autho').makeDisable('#Edit');
-            $('#Autho').onClickGrid('#JqGrid', APIURL + '/GetCompanyP2BGridRequest', APIURL + '/GetCompanyP2BGridRequest');
-        }
+        //$('#Autho').makeDisable('#Create,#Edit,#Delete');
+        $('#Autho').makeDisable('#Create,#Edit,#Delete', '#JqGrid', APIURL + '/GetCompanyP2BGridRequest');
+            //$('#Autho').onClickGrid('#JqGrid', APIURL + '/GetCompanyP2BGridRequest', APIURL + '/GetCompanyP2BGridRequest');
         
     });
 </script>

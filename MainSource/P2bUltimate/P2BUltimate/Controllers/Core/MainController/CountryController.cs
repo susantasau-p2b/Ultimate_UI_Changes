@@ -35,8 +35,7 @@ namespace P2BUltimate.Controllers.Core.MainController
                  if (data2 != "" && data != "0" && data2 != "0")
                  {
                      selected = Convert.ToInt32(data2);
-                 }
-             
+                 }             
                  SelectList s = new SelectList(qurey, "Id", "FullDetails",selected);
                  return Json(s, JsonRequestBehavior.AllowGet);
          }

@@ -11,6 +11,37 @@
 }
     (function ($) {
         "use strict";
+        function createObjectDataFromFormId(formId) {
+            const formData = $(formId);
+            const allData = new FormData(formData[0]);
+            const allFormData = formDataToObject(allData);
+            //formData.find('table').each(function () {
+            //    let name = this.id;
+            //    let value = this.value || null;
+            //    allData.append(name, value);
+            //});
+            return allFormData;
+        }
+        function compareDataAndSetFlag(formIdForCompareData, orgDataForCompare, DtDataForCompare) {
+            let APIDataForCompare;
+            const formDataForCompare = createObjectDataFromFormId(formIdForCompareData);
+            if (formDataForCompare) {
+                if (orgDataForCompare && orgDataForCompare.Id) {
+                    APIDataForCompare = orgDataForCompare;
+                } else {
+                    APIDataForCompare = DtDataForCompare;
+                }
+                if (APIDataForCompare && APIDataForCompare.Id) {
+                    formDataForCompare.forEach((value, key) => {
+                        if (APIDataForCompare[key] !== value) {
+                            return 'E';
+                        }
+                    });
+                }
+                
+            }
+            return 'O';
+        }
         function formDataToObject(formData) {
             const obj = {};
             if (formData instanceof FormData) {
@@ -40,59 +71,293 @@
             return mergedObject;
         }
 
-        function P2bBindAllDataForCreate(formId, allTableIds) {
+        function P2bBindAllDataForCreate(createFormId, allTableIds) {
             var arrayOfObjects = {};
-            const allFormDataForCreate = new P2bFormDataHandlingClass();
-            const formData = $(formId);
-            let allData = new FormData(formData[0]);
-            allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
-            allFormDataForCreate.addData(allData);
-            var getAllObjectData = P2bObjectFormattedData(allFormDataForCreate);
-            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
-            arrayOfObjects["EntityData"] = getAllObjectData;
+            const formDataHandlingClass = new P2bFormDataHandlingClass();
+            const onlyFormDataForCreate = createObjectDataFromFormId(createFormId);
+            var tableData = formDataHandlingClass.P2bCreateListOfTableDataWithAction(onlyFormDataForCreate, allTableIds);
+            var formEntityData = formDataHandlingClass.P2bCreateListOfTableData(onlyFormDataForCreate, allTableIds);
+            formDataHandlingClass.addData(formEntityData);
+            var getAllObjectData = P2bObjectFormattedData(formDataHandlingClass);
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'C', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = { FormData: getAllObjectData, TableData: tableData };
             return arrayOfObjects;
-
-            //return P2bObjectFormattedData(allFormDataForCreate);
         }
         function P2bBindAllDataForEdit(id) {
             var arrayOfObjects = {};
-            const allDataForEdit = new P2bFormDataHandlingClass();
-            allDataForEdit.addData(id);
-            var getAllObjectData = P2bObjectFormattedData(allDataForEdit);
-            //arrayOfObjects.push(getAllObjectData);
-            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
-            arrayOfObjects["EntityData"] = getAllObjectData;
+            const formDataHandlingClass = new P2bFormDataHandlingClass();
+            formDataHandlingClass.addData({Id:id});
+            var getAllObjectData = P2bObjectFormattedData(formDataHandlingClass);
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'E', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = getAllObjectData;
             return arrayOfObjects;
-            //return P2bObjectFormattedData(allDataForEdit);
         }
-        function P2bBindAllDataForEditSave(formId, idForEdit, allTableIds, originalDataObject) {
+        function P2bBindAllDataForEditSave(EditFormId, idForEdit, allTableIds, originalObjectData, DTObjectData) {
             var arrayOfObjects = {};
-            const allDataForEditSave = new P2bFormDataHandlingClass();
-            const formData = $(formId);
-            let allData = new FormData(formData[0]);
-            formData.find('table').each(function () {
-                let name = this.id;
-                let value = this.value || null;
-                allData.append(name, value);
-            });
-            allData = P2bCreateListOfTableData(formDataToObject(allData), allTableIds);
-            allDataForEditSave.addData(allData, idForEdit);
-            var getAllObjectData = P2bObjectFormattedData(allDataForEditSave);
-            arrayOfObjects["UserData"] = { UserGroup, Action, UserName, IsAuthorized };
-            arrayOfObjects["EntityData"] = getAllObjectData;
-            //arrayOfObjects.push(getAllObjectData);
-            //arrayOfObjects.push(originalDataObject);
+            const formDataHandlingClass = new P2bFormDataHandlingClass();
+            const onlyFormDataForEditSave = createObjectDataFromFormId(EditFormId);
+            var tableData = formDataHandlingClass.P2bCreateListOfTableDataWithAction(onlyFormDataForEditSave, allTableIds);
+            var formEntityData = formDataHandlingClass.P2bCreateListOfTableData(onlyFormDataForEditSave, allTableIds);
+            formDataHandlingClass.addData(formEntityData);
+            var getAllObjectData = P2bObjectFormattedData(formDataHandlingClass);
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'E', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = { Id: idForEdit, FormData: getAllObjectData, TableData: tableData };
+            //arrayOfObjects["EntityClass"] = { OriginalData: originalObjectData, DtData: DTObjectData, idForEdit, FormData: getAllObjectData };
             return arrayOfObjects;
-            //allDataForEditSave.addData(originalDataObject, allData);
-            //allDataForEditSave.addData(allData, idForEdit, originalDataObject);
-            //return P2bObjectFormattedData(allDataForEditSave);
         }
-        function P2bGetAllFilteredNames(obj) {
+        function P2bBindAllDataForDelete(id) {
+            var arrayOfObjects = {};
+            const formDataHandlingClass = new P2bFormDataHandlingClass();
+            formDataHandlingClass.addData({ Id: id });
+            var getAllObjectData = P2bObjectFormattedData(formDataHandlingClass);
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'D', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = getAllObjectData;
+            return arrayOfObjects;
+        }
+
+        function P2bBindAllDataForApproveReject(approveRejectFormId, idForEdit, IsAuthorized, DTObjectData) {
+            var arrayOfObjects = {};
+            const allDataForApproveReject = new P2bFormDataHandlingClass();
+            const onlyFormDataForApproveReject = createObjectDataFromFormId(approveRejectFormId);
+            allData = formDataToObject(allData);
+            allDataForApproveReject.addData(DTObjectData, allData, { IsAuthorized: IsAuthorized });
+            var getAllObjectData = P2bObjectFormattedData(allDataForApproveReject);
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'E', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = { DtData: getAllObjectData, Id: idForEdit, FormData: allData, IsAuthorized };
+            return arrayOfObjects;
+        }
+
+        function P2bBindAllDataForLookUp(Ids) {
+            var arrayOfObjects = {};
+            arrayOfObjects["UserClass"] = { GroupId: singleData['GroupId'], Action: 'A', UserId: singleData['EmpCode'], AuthorizeStatus, AutoAuthorization: singleData['AutoAuthorization'] };
+            arrayOfObjects["EntityClass"] = { SkipIds: Ids };
+            return arrayOfObjects;
+        }
+        function ApproveRejectBtnClickFunc(formId, init, maindialog, titleText, approveRejectValue, rowId, approveRejectUrl, gridreloadname, allModifiedData) {
+            var x = PerformValidations(formId);
+            var y = true;
+            //if (fn != undefined) {
+            //    if (fn.validurl != null && x == true) {
+            //        var allDataForAPI = $.param(P2bBindAllDataForCreate(forwardserializedata, nameofthelookuptable));
+            //        var chkajx = $.ajax({
+            //            url: fn.validurl,
+            //            method: "POST",
+            //            async: false,
+            //            data: allDataForAPI,
+            //            beforeSend: function () {
+            //                $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
+            //                ajaxloaderv2('body');
+            //            },
+            //        });
+            //        chkajx.done(function (msg) {
+            //            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('enable').removeClass('submitbtndisable');
+            //            // $('.ajax_loder').parents('div').remove();
+            //            ajaxLoderRemove();
+            //            if (msg.success == true) {
+            //                //success event
+            //                y = msg.success;
+            //            } else {
+            //                y = msg.success;
+            //                var newDiv = $(document.createElement('div'));
+            //                var htmltag = "";
+            //                for (var i = 0; i < msg.responseText.length; i++) {
+            //                    htmltag += '<span style="float:left;display:block;margin:2px;"><span class="ui-icon ui-icon-alert" style="float:left;display:block"></span><span style="width:80%;"> ' + msg.responseText[i] + '</span></span>';
+            //                }
+            //                newDiv.html(htmltag);
+            //                newDiv.dialog({
+            //                    autoOpen: false,
+            //                    title: "Validation",
+            //                    height: 250, width: 400, modal: true,
+            //                    buttons: {
+            //                        Ok: function (e) {
+            //                            newDiv.dialog("close");
+            //                            newDiv.remove();
+            //                        }
+            //                    }
+            //                });
+            //                newDiv.dialog('open');
+            //                $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+            //            }
+
+            //        });
+            //        chkajx.fail(function (xhr, status, error) {
+            //            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('enable').removeClass('submitbtndisable');
+            //            // $('.ajax_loder').parents('div').remove();
+            //            ajaxLoderRemove();
+            //            y = false;
+            //            var newDiv = $(document.createElement('div'));
+            //            var htmltag = '<p><span class="ui-icon ui-icon-alert" style="float:left;margin-right:10px"></span> ' + xhr.status + '"-"' + xhr.statusText + '';
+            //            htmltag += '</p>';
+            //            newDiv.html(htmltag);
+            //            newDiv.dialog({
+            //                autoOpen: false,
+            //                title: "Information",
+            //                height: 130,
+            //                width: 250,
+            //                modal: true,
+            //                buttons: {
+            //                    Ok: function () {
+            //                        newDiv.remove();
+            //                        newDiv.dialog("close");
+            //                        $(init).dialog("close");
+            //                    }
+            //                }
+            //            });
+            //            newDiv.dialog('open');
+            //            $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+            //        });
+            //    }
+            //}
+            if (x == false || y == false) {
+                return false;
+            }
+            var newDiv2 = $(document.createElement('div'));
+            var htmltag = `<p><span class="ui-icon ui-icon-alert" style="float:left;margin-right:10px"></span> Are You Sure Want To ${titleText} Record???`;
+            htmltag += '</p>';
+            htmltag += `<form id='ApproveRejectCommentForm'>
+                <label for='AuthorizedComment'>Comment:</label>
+                <textarea id='AuthorizedComment' class='must' name='AuthorizedComment'></textarea>
+            </form>`;
+            newDiv2.html(htmltag);            
+            newDiv2.dialog({
+                autoOpen: false,
+                title: `${titleText} Confirmation !`,
+                height: 170,
+                width: 305,
+                closeOnEscape: false,
+                beforeClose: function (e) {
+                    $(newDiv2).remove(); RemoveErrTag();
+                },
+                open: function () {
+                    //$('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('disable').addClass('submitbtndisable');
+                    
+                },
+                modal: true,
+                buttons: {
+                    Confirm: function () {
+                        var commentFieldValidation = PerformValidations('#ApproveRejectCommentForm');
+                        if (!commentFieldValidation) {
+                            return false;
+                        }
+                        var allDataForAPI = JSON.stringify(P2bBindAllDataForApproveReject('#ApproveRejectCommentForm', rowId, approveRejectValue, allModifiedData));
+                        var approveRejectAjaxData = $.ajax({
+                            url: approveRejectUrl,
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: allDataForAPI,
+                            beforeSend: function () {
+                                $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('disable').addClass('submitbtndisable');
+                                ajaxloaderv2('body');
+
+                            },
+                        });
+                        approveRejectAjaxData.done(function (msg) {
+                            var htmltag = "";
+                            $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('enable').removeClass('submitbtndisable');
+                            ajaxLoderRemove();
+                            if (msg.MessageCode == 200) {
+                                var newDiv = $(document.createElement('div'));
+                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-check-circle-o ajax-success-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+
+                                newDiv.html(htmltag);
+                                newDiv.dialog({
+                                    autoOpen: false,
+                                    title: "Information",
+                                    closeOnEscape: false,
+                                    height: 150, width: 250, modal: true,
+                                    buttons: {
+                                        Ok: function (e) {
+                                            if (gridreloadname != '' || gridreloadname == null) {
+                                                jQuery(gridreloadname).trigger('reloadGrid');
+                                            }
+                                            //if (fn != undefined) {
+                                            //    if (fn.datatablename != null) {
+                                            //        var table = $(fn.datatablename).DataTable();
+                                            //        table.ajax.reload();
+                                            //    }
+                                            //}
+                                            //NewIds = [];
+                                            //olddata = [];
+                                            //OldIds = [];
+                                            RemoveLookupTableElement(formId);
+                                            jQuery(init).find('select').empty().append("<option value=0 selected=true>-Select-</option>").selectmenu().selectmenu().selectmenu("refresh");
+                                            jQuery(init).find('input').empty();
+                                            jQuery(init).find('textarea').empty();
+                                            //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                                            //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
+                                            //jQuery(init).find(nameofthelookuptable).find('tr td').parent().remove();
+                                            newDiv.dialog("close");
+                                            jQuery(maindialog).dialog("close");
+                                            jQuery(newDiv2).dialog("close");
+
+                                        }
+                                    }
+                                });
+                                newDiv.dialog('open');
+                            } else {
+                                var newDiv = $(document.createElement('div'));
+                                htmltag += '<span class="ajax-action-class-container"><span style="float:left;display:block"><i class="fa fa-fw fa-3x fa-exclamation-circle ajax-error-icon" aria-hidden="true"></i></span><span class="ajax-action-text"> ' + msg.Message + '</span></span>';
+
+                                newDiv.html(htmltag);
+                                newDiv.dialog({
+                                    autoOpen: false,
+                                    title: "Error",
+                                    height: 250, width: 400, modal: true,
+                                    buttons: {
+                                        Ok: function (e) {
+                                            newDiv.dialog("close");
+                                            newDiv.remove();
+                                            newDiv2.dialog('close');
+                                            $(newDiv).remove();
+
+                                        }
+                                    }
+                                });
+                                newDiv.dialog('open');
+                            }
+                            $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+                        });
+                        approveRejectAjaxData.fail(function (jqXHR, textStatus) {
+                            $('.ui-dialog-buttonpane').find('button:contains("Confirm")').button().button('enable').removeClass('submitbtndisable');
+                            ajaxLoderRemove();
+                            var newDiv = $(document.createElement('div'));
+                            var htmltag = '<p><span class="ui-icon ui-icon-alert" style="float:left;margin-right:10px"></span> ' + editerrormessage + '' + jqXHR.status + '"-"' + jqXHR.statusText + '';
+                            htmltag += '</p>';
+                            newDiv.html(htmltag);
+                            newDiv.dialog({
+                                autoOpen: false,
+                                title: "Information", closeOnEscape: false,
+                                height: 130, width: 250, modal: true,
+                                buttons: {
+                                    Ok: function () {
+                                        if (gridreloadname != '' || gridreloadname == null) {
+                                            jQuery(gridreloadname).trigger('reloadGrid');
+                                        }
+                                        newDiv.dialog("close");
+                                    }
+                                }
+                            });
+                            newDiv.dialog('open');
+                            $('.ui-dialog-buttonpane').find('button:contains("Ok")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+                        });
+                    },
+                    Cancel: function () {
+                        jQuery(newDiv2).dialog("close");
+
+                    }
+                }
+            });
+            jQuery(newDiv2).dialog('open');
+            $('.ui-dialog-buttonpane').find('button:contains("Confirm")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-closethick"></span>');
+
+        }
+        function P2bGetAllFilteredNames(objForFilterData) {
             var arrayOfUncommonKeys = [];
-            if (obj && obj.FieldNames.length > 0 && obj.OriginalData && obj.ModifiedData) {
-                obj.FieldNames.forEach((item) => {
-                    if (obj.OriginalData[item] !== obj.ModifiedData[item]) {
-                        arrayOfUncommonKeys.push(item);
+            if (objForFilterData && objForFilterData['FieldNames'].length > 0 && objForFilterData.OriginalData && objForFilterData.ModifiedData) {
+                $.each(objForFilterData['FieldNames'],(itemValue,itemKey) => {
+                    if (objForFilterData.OriginalData[itemKey] !== objForFilterData.ModifiedData[itemKey]) {
+                        arrayOfUncommonKeys.push(itemKey);
                     }
                 });
                 
@@ -106,26 +371,23 @@
             if (authDialogDiv.length === 0) {
                 authDialogDiv = $(document.createElement('div')).attr('id', 'Autho-Dialog');
             }
-            //var originalDataDiv = $("#Original-Data");
-            //if (originalDataDiv.length === 0) {
-            //    originalDataDiv = $(document.createElement('div')).attr('id', 'Original-Data');
-            //}
-            //var newDataDiv = $("#New-Data");
-            //if (newDataDiv.length === 0) {
-            //    newDataDiv = $(document.createElement('div')).attr('id', 'New-Data');
-            //}
-            //$(authDialogDiv).append(originalDataDiv).append(newDataDiv);
+            var tableDataDiv = $("#Auth-Table-Data");
+            if (tableDataDiv.length === 0) {
+                tableDataDiv = $(document.createElement('div')).attr('id', 'Auth-Table-Data');
+            }
+            var commentDataDiv = $("#Comment-Data");
+            if (commentDataDiv.length === 0) {
+                commentDataDiv = $(document.createElement('div')).attr('id', 'Comment-Data');
+            }
 
             var newDataTable = $('#New-Data-Table');
             if (newDataTable.length === 0) {
                 newDataTable = $(document.createElement('table')).attr({ 'id':'New-Data-Table','class': 'fiter-data-table'});
-                $(newDataTable).append('<caption>New Data</caption>');
+                $(newDataTable).append('<caption>Compared Data</caption>');
+                $(newDataTable).append('<tr><th>Label</th><th>Old Data</th><th>New Data</th></tr>');
             }
-            var oldDataTable = $('#Old-Data-Table');
-            if (oldDataTable.length === 0) {
-                oldDataTable = $(document.createElement('table')).attr({ 'id': 'Old-Data-Table', 'class': 'fiter-data-table' });
-                $(oldDataTable).append('<caption>Old Data</caption>');
-            }
+
+            var commentField = `<form id='FormApproveReaject'><label>Comment</label><textarea id='Comment' name='Comment'></textarea></form>`
 
             var labelAndFieldNameObject = {};
             if (obj && obj.FormName) {
@@ -134,59 +396,84 @@
                     var labelText = $(this).text().trim();
                     var field = $('#' + fieldId);
                     if (field.length > 0) {
-                        labelAndFieldNameObject[labelText] = field.attr('name');
+                        if (labelText === 'Yes' || labelText === 'No') {
+                            const allKeys = Object.keys(labelAndFieldNameObject);
+                            const lastItem = allKeys[allKeys.length - 1];
+                            labelAndFieldNameObject[lastItem] = field.attr('name');
+                        } else if (fieldId.includes('_DDL')) {
+                            var onlyId = fieldId.replace('-button', '');
+                            labelAndFieldNameObject[labelText] = $('#' + onlyId).attr('name');
+                        } else {
+                            labelAndFieldNameObject[labelText] = field.attr('name');
+                        }                        
+                    }else {
+                        labelAndFieldNameObject[labelText] = null;
                     }
                 });
             }
             var arrayOfFieldNames = labelAndFieldNameObject ? Object.values(labelAndFieldNameObject) : [];
-            var uncommonKeys = P2bGetAllFilteredNames({ FieldNames: arrayOfFieldNames, OriginalData: obj.OriginalData, ModifiedData: obj.ModifiedData })
-            if (uncommonKeys.length > 0) {
-                let newObj = {};
-                $.each(labelAndFieldNameObject, function (key, value) {
-                    if (uncommonKeys.includes(value)) {
-                        newObj[key] = value;
+            var uncommonKeys = P2bGetAllFilteredNames({ FieldNames: arrayOfFieldNames, OriginalData: obj['OriginalData'], ModifiedData: obj['ModifiedData'] })
+
+            function addDataIntoTable(labelAndFieldName, OrgData, ModData) {
+                tableWithAllNewData = '';
+                $.each(labelAndFieldName, (label, name) => {
+                    if (OrgData[name] !== ModData[name]) {
+                        tableWithAllNewData += `<tr><td class='td-label'>${label}</td><td class='td-org-data td-data'>${OrgData[name]}</td><td class='td-mod-data td-data'>${ModData[name]}</td></tr>`;
+                    } else {
+                        tableWithAllNewData += `<tr><td class='td-label'>${label}</td><td class='td-org-data'>-</td><td class='td-mod-data'>${ModData[name]}</td></tr>`;
                     }
                 });
-                function addDataIntoTable(variableName, labelAndFieldName, Data) {
-                    $.each(labelAndFieldName, (name, label) => {
-                        variableName += `<tr><td class='td-label'>${label}</td><td class='td-data'>${Data[name]}</td></tr>`;
-                    });
-                }
-
-                addDataIntoTable(tableWithAllNewData, newObj, obj.ModifiedData);
-                addDataIntoTable(tableWithAllOldData, newObj, obj.OriginalData);
             }
 
+            if (uncommonKeys.length > 0) {
+                let filteredLabelAndName = {};
+                $.each(labelAndFieldNameObject, function (key, value) {
+                    if (uncommonKeys.includes(value)) {
+                        filteredLabelAndName[key] = value;
+                    }
+                });
+
+                addDataIntoTable( filteredLabelAndName, obj.OriginalData, obj.ModifiedData);
+            } else {
+                addDataIntoTable( labelAndFieldNameObject, obj.OriginalData, obj.ModifiedData);
+            }
 
             $(newDataTable).append(tableWithAllNewData);
-            $(oldDataTable).append(tableWithAllOldData);
-            $(authDialogDiv).append(newDataTable).append(oldDataTable);
+            $(authDialogDiv).append(tableDataDiv).append(commentDataDiv);
+            $(tableDataDiv).append(newDataTable);
+
             $(authDialogDiv).dialog({
-                width: 700,
+                width: 500,
                 height: 400,
                 modal: false,
                 closeOnEscape: false,
                 position: { my: "right center", at: "right center", of: window },
                 title: 'Company Authorization',
                 open: function () {
-                    jQuery(this).find("select").selectmenu('disable').addClass("ui-selectmenu-text");
-                    jQuery(this).find('input').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
-                    jQuery(this).find('textarea').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
-                    //jQuery(this).contains('Reject').css("background-color", "rgba(241, 0, 0, 0.66)");
+                    $(this).find("select").selectmenu('disable').addClass("ui-selectmenu-text");
+                    $(this).find('input').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
+                    $(this).find('textarea').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
                 },
 
-                buttons: {
-                    Approve: function () {
-                        alert("Hi this is Approve button");
-                    },
-                    Reject: function () {
-                        alert("Hi this is Reject button");
-                    },
-                    Cancel: function () {
-                        $(this).dialog('close');
-                    }
-                }                
+                //buttons: {
+                //    Approve: function () {
+                //        approveRejectAjaxCall();
+                //    },
+                //    Reject: function () {
+                //        alert("Hi this is Reject button");
+                //    },
+                //    Cancel: function () {
+                //        $(this).dialog('close');
+                //    }
+                //}                
             });
+            //$('.ui-dialog-buttonpane .ui-dialog-buttonset .ui-button:contains("Reject")').hover(
+            //    function () {
+            //        $(this).css("background-color", "rgba(241, 0, 0, 0.66)");
+            //},
+            //    function () {
+            //        $(this).css("background-color", "");
+            //    })
         }
 
         function P2bCreateHelpDialog(obj) {
@@ -806,6 +1093,7 @@
                         P2bCreateHelpDialog({ FormName: submitnameformforserilize });
                         //helpfun("create", "" + submitnameformforserilize.slice("4") + "");
                     });
+                    //jQuery(init).find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                     createajaxdata = $.ajax({
                         url: creaturl,
                         method: 'POST',
@@ -907,15 +1195,12 @@
                         if (x == false || y == false) {
                             return false;
                         }
-                        Action = 'C';
                         var allDataForAPI = JSON.stringify(P2bBindAllDataForCreate(submitnameformforserilize, nameofthelookuptable));
-                        //var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize, nameofthelookuptable));
                         ajaxdata = $.ajax({
                             url: submiturl,
                             method: "POST",
                             contentType: 'application/json',
                             data: allDataForAPI,
-                            //data: $(submitnameformforserilize).serialize(),
                             beforeSend: function () {
                                 $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                 ajaxloaderv2('body');
@@ -1316,10 +1601,11 @@
                 modal: true,
                 buttons: {
                     Confirm: function () {
-                        var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: deletedata }));
+                        var allDataForAPI = JSON.stringify(P2bBindAllDataForDelete(deletedata));
                         deleteajaxdata = $.ajax({
                             url: deleteurl,
                             method: 'POST',
+                            contentType: 'application/json',
                             data: allDataForAPI,
                             beforeSend: function () {
                                 // alert('hiihihihihi');
@@ -1446,7 +1732,7 @@
         };
         $.fn.P2BEditModalDialog = function (openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returndatafunction, fn) {
             var originalObjectData;
-            var modifiedObjectData;
+            var DTObjectData;
             var editajaxdata, editajaxopenloaddata, init;
             //$('select').removeAttr('style');
             var OldIds = [];
@@ -1484,6 +1770,7 @@
                 title: maindialogtitle,
                 beforeClose: function (e) {
                     RemoveLookupTableElement(forwardserializedata); RemoveErrTag();
+                    
                     //if (nameofthelookuptable != null && nameofthelookuptable != "") {
                     // NewIds = CountTableIdsVal(nameofthelookuptable);
                     //}
@@ -1535,22 +1822,20 @@
                 open: function (event, ui) {
                     $.CheckSessionExitance();
                     $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
-                    var helpButton = $('<button>', {
-                        title:'Authorization',
-                        html: '<span class="ui-icon ui-icon-person"></span>',
-                        //html: '<span class="ui-icon ui-icon-document"></span>',
-                        class: 'ui-button ui-corner-all ui-widget ui-dialog-titlebar-close ui-dialog-titlebar-person',
-                        click: function () {
-                            P2bCreateAuthorizationDialog({ FormName: forwardserializedata, OriginalData: originalObjectData, ModifiedData: modifiedObjectData });
-                        }
-                    });
-                    $(this).closest('.ui-dialog').find('.ui-dialog-titlebar').append(helpButton);
+                    //var helpButton = $('<button>', {
+                    //    title:'Authorization',
+                    //    html: '<span class="ui-icon ui-icon-person"></span>',
+                    //    //html: '<span class="ui-icon ui-icon-document"></span>',
+                    //    class: 'ui-button ui-corner-all ui-widget ui-dialog-titlebar-close ui-dialog-titlebar-person',
+                    //    click: function () {
+                    //        P2bCreateAuthorizationDialog({ FormName: forwardserializedata, OriginalData: originalObjectData, ModifiedData: DTObjectData });
+                    //    }
+                    //});
+                    //$(this).closest('.ui-dialog').find('.ui-dialog-titlebar').append(helpButton);
                     NewIds = [];
                     olddata = [];
                     OldIds = [];
                     var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit(opendataforward));
-                    //var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit({ Id: opendataforward }));
-                    //var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
                     editajaxopenloaddata = $.ajax({
                         url: openurl,
                         method: 'POST',
@@ -1577,10 +1862,14 @@
                         //}
                         if (typeof returndatafunction === 'function') {
                             if (value && value.Data) {
-                                if (UserGroup.toUpperCase() === "CHECKER") {
-                                    originalObjectData = value.Data.DT_Company;
-                                } else {
+                                if (!singleData['AutoAuthorization'] && !singleData['Action'].includes('C')) {
+                                    DTObjectData = value.Data.DTData;
                                     originalObjectData = value.Data.OriginalData;
+                                    //if (DTObjectData['Action'] === 'C') {
+                                    //    P2bCreateAuthorizationDialog({ FormName: forwardserializedata, OriginalData: originalObjectData, ModifiedData: DTObjectData, Forwarddata: forwarddata });
+                                    //}
+                                } else {
+                                    DTObjectData = value.Data.OriginalData;
                                 }
                             } 
                             returndatafunction(value);
@@ -1688,8 +1977,7 @@
                             modal: true,
                             buttons: {
                                 Confirm: function () {
-                                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }, nameofthelookuptable, originalObjectData));
-                                    //var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }, nameofthelookuptable, originalObjectData));
+                                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEditSave(forwardserializedata, forwarddata, nameofthelookuptable, originalObjectData, DTObjectData));
                                     editajaxdata = $.ajax({
                                         url: editurl,
                                         method: 'POST',
@@ -1812,7 +2100,12 @@
                 }
             });
             jQuery(init).dialog('open');
-            $('.ui-dialog-buttonpane').find('button:contains("Submit")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-disk"></span>');
+            var submitIcon = $('.ui-icon-disk');
+            if (submitIcon.length === 0) {
+                submitIcon = '<span class="ui-icon ui-icon-disk"></span>';
+            }
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend(submitIcon);
+            //$('.ui-dialog-buttonpane').find('button:contains("Submit")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-disk"></span>');
             $('.ui-dialog-buttonpane').find('button:contains("Cancel")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-closethick"></span>');
         };
         $.fn.P2BViewModalDialog = function (openurl, opendataforward, maindialogtitle, nameofthelookuptable, nameidclassofbuttontodisable, height, width, idorclassofautobtn, authoriseurl, autho_id, autho_action, autho_data, editmessage, editerrormessage, gridreloadname, returndatafunction) {
@@ -1844,8 +2137,7 @@
                 open: function (event, ui) {
                     $.CheckSessionExitance();
                     $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
-                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit({ Id: opendataforward }));
-                    //var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
+                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit(opendataforward));
                     viewajaxopenloaddata = $.ajax({
                         url: openurl,
                         method: 'POST',
@@ -1860,16 +2152,6 @@
                         }
                     });
                     viewajaxopenloaddata.done(function (value) {
-                        //$(init).find('').remove();
-                        if (!$(idorclassofautobtn).hasClass("auto_active")) {
-                            value[2] = null;
-                            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable');
-                        } else {
-                            autho_data = true;
-                            $('.ui-dialog-buttonpane button:contains("Submit")').button().button("enable");
-                        }
-                        $.each(value, function (i, k) {
-                        });
                         returndatafunction(value);
                     });
                     jQuery(this).find("select").selectmenu('disable').addClass("ui-selectmenu-text");
@@ -1878,6 +2160,7 @@
                     jQuery(this).find('' + nameofthelookuptable + ' tr td').attr('disabled', 'disabled');
                     //jQuery(this).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                     jQuery(this).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
+                    //jQuery(this).find(nameidclassofbuttontodisable).button().button('disable');
                 },
                 buttons: {
                     Submit: function () {
@@ -1961,6 +2244,7 @@
                 }
             });
             jQuery(init).dialog('open');
+            $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
             $('.ui-dialog-buttonpane').find('button:contains("Submit")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-disk"></span>');
             $('.ui-dialog-buttonpane').find('button:contains("Cancel")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-closethick"></span>');
         };
@@ -1993,31 +2277,105 @@
         function responseXmlDataManipulation(xml) {
             return xml;
         };
-        $.fn.onClickGrid = function (gridname, url1, url2) {
-            $(this).on("click", function () {
-                if ($(this).hasClass('auto_active')) {
-                    $(gridname).P2BGrid.onclickChangeUrl(gridname, url2, true);
-                } else {
-                    $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
-                }
-            });
-        };
-        $.fn.makeDisable = function (buttonsmakedisble) {
-            var note_html = '<span class="parent_span" style="display:inline-block;position:relative"><span style="color:red">*</span><span>Note:The Text Which Are In<span class="child_span_color"></span>&nbsp;&nbsp;&nbsp;&nbsp; Color Is Old Data </span></span>';
-            if ($(this).hasClass('auto_active')) {
-                $('authorization-fields').css('display', 'block');
-            } else {
-                $('authorization-fields').css('display', 'none');
-            }
+        //$.fn.onClickGrid = function (gridname, url1, url2) {
+        //    $(this).on("click", function () {
+        //        if ($(this).hasClass('auto_active')) {
+        //            $(gridname).P2BGrid.onclickChangeUrl(gridname, url2, true);
+        //        } else {
+        //            $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
+        //        }
+        //    });
+        //};
+        $.fn.makeDisable = function (buttonsmakedisble, gridname, url1) {
+            var authoBtn = $(this);
             $(this).on("click", function (e) {
-                $(this).toggleClass('auto_active');
-                if ($(this).hasClass('auto_active')) {
-                    $('<div class="old_data_div">' + note_html + '</div>').appendTo('.ui-dialog-content');
-                    $(buttonsmakedisble).button("enable");
+                if (!$(this).hasClass('auto_active')) {
+                    var yesNoDialog = $(document.createElement('div'));
+                    var smallDialogMsg = `<div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                        <span class="ui-icon ui-icon-person" style="display:block; margin-right:10px;"></span>
+                        <b>You Are In Authorized Mode.</b>
+                        <p> Do You Want To Continue?</p>
+                    </div>`;
+
+                    yesNoDialog.html(smallDialogMsg);
+                    yesNoDialog.dialog({
+                        autoOpen: false,
+                        title: `Authorization Mode!`,
+                        height: 170,
+                        width: 305,
+                        closeOnEscape: false,
+                        beforeClose: function (e) {
+                            $(yesNoDialog).remove(); RemoveErrTag();
+                        },
+                        modal: true,
+                        buttons: {
+                            Yes: function () {
+                                $(buttonsmakedisble).button('disable');
+                                $(authoBtn).toggleClass('auto_active');
+                                if ($(authoBtn).hasClass('auto_active')) {
+                                    AuthorizeStatus = IsAuthorisedObject['Yes'];
+                                    if (AuthorizeStatus && !singleData['Action'].includes('C')) {
+                                        $('#Edit').button("enable");
+                                    }
+                                    $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, true);
+                                    $('.Form_Bg,.page_content').css('background-color', 'lightyellow');
+                                    //$('.Form_Bg,.page_content').css('background-color', '#003366');
+                                    //$('.Form_Bg,.page_content').css('background-color', '#003366');
+                                    //$('.Form_Bg,.page_content').css('background-color', ' #c3eabf ');
+                                    //$('.Form_Bg,.page_content').css('background-color', '  #cde793 ');
+                                    //$('.Form_Bg,.page_content').css('background-color', '#eb96c0');
+                                } else {
+                                    $('.ui-dialog-content').find('.old_data_div').remove();
+                                    if (AuthorizeStatus && !singleData['Action'].includes('C')) {
+                                        $('#Edit').button("disable");
+                                    } else {
+                                        $(buttonsmakedisble).button('enable');
+                                    }
+                                    $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
+                                    AuthorizeStatus = IsAuthorisedObject['No'];
+                                }
+                                $(this).dialog('close');
+                            },
+                            No: function () {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+
+                    $(yesNoDialog).dialog('open');
+                    $('.ui-dialog-buttonpane').find('button:contains("Yes")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-circle-check"></span>');
+                    $('.ui-dialog-buttonpane').find('button:contains("No")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-closethick"></span>');
+
                 } else {
-                    $('.ui-dialog-content').find('.old_data_div').remove();
-                    $(buttonsmakedisble).button("disable");
-                }                
+                    $(authoBtn).toggleClass('auto_active');
+                    if (AuthorizeStatus && !singleData['Action'].includes('C')) {
+                        $(buttonsmakedisble).button('disable');
+                    } else {
+                        $(buttonsmakedisble).button('enable');
+                    }
+                    $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
+                    AuthorizeStatus = IsAuthorisedObject['No'];
+                    $('.Form_Bg,.page_content').css('background-color', '');
+                }
+
+                //$(buttonsmakedisble).button('disable');
+                //$(this).toggleClass('auto_active');
+                //if ($(this).hasClass('auto_active')) {
+                //    AuthorizeStatus = IsAuthorisedObject['Yes'];
+                //    if (AuthorizeStatus && !singleData['Action'].includes('C')) {
+                //        $('#Edit').button("enable");
+                //    }
+                //    $(gridname).P2BGrid.onclickChangeUrl(gridname, url2, true);
+                //} else {
+                //    $('.ui-dialog-content').find('.old_data_div').remove();
+                //    if (AuthorizeStatus && !singleData['Action'].includes('C')) {
+                //        $('#Edit').button("disable");
+                //    } else {
+                //        $(buttonsmakedisble).button('enable');
+                //    }
+                //    $(gridname).P2BGrid.onclickChangeUrl(gridname, url1, false);
+                //    AuthorizeStatus = IsAuthorisedObject['No'];
+                //}
             });
         };
         //$.fn.makeDisable = function (buttonsmakedisble) {
@@ -2406,7 +2764,7 @@
 
             }
         }
-        $.fn.P2BPartialCreateModalDialog = function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, forwarddata, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata, fn) {
+        $.fn.P2BPartialCreateModalDialog = function (url, maindialogtitle, state, submiturl, submitnameformforserilize, savemessage, errormessage, gridreloadname, height, width, tableName, ControlName, event, classoridoftheonwhichpopupderived, nameidclassofbuttontodisable, returnfunctiondata, fn) {
             jQuery(this).trigger('reset');
             var ajaxdata, loadpartialajax, init;
             init = jQuery(this);
@@ -2538,8 +2896,7 @@
                         if (x == false || y == false) {
                             return false;
                         }
-                        var allDataForAPI = JSON.stringify(P2bBindAllDataForCreate(submitnameformforserilize,''));
-                        //var allDataForAPI = $.param(P2bBindAllDataForCreate(submitnameformforserilize));
+                        var allDataForAPI = JSON.stringify(P2bBindAllDataForCreate(submitnameformforserilize, tableName));
                         ajaxdata = $.ajax({
                             url: submiturl,
                             method: "POST",
@@ -2566,7 +2923,8 @@
                                     autoOpen: false,
                                     title: "Information",
                                     closeOnEscape: false,
-                                    height: 150, width: 250, modal: true,
+                                    height: 150, width: 250,
+                                    modal: true,
                                     buttons: {
                                         Ok: function () {
                                             var data = [];
@@ -2645,6 +3003,8 @@
                 $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Row..!");
                 return false;
             };
+            var originalObjectDataForPartialEdit;
+            var DTObjectDataForPartialEdit;
             var editajaxdata, editajaxopenloaddata, init;
             init = jQuery(this);
             var maindialog = jQuery(this).dialog({
@@ -2662,13 +3022,16 @@
                 open: function (event, ui) {
                     $.CheckSessionExitance();
                     function assigndata() {
-                        var allDataForAPI = $.param(P2bBindAllDataForEdit({ Id: opendataforward }));
+                        var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit(opendataforward));
                         editajaxopenloaddata = $.ajax({
                             url: openurl,
                             method: 'POST',
+                            contentType: 'application/json',
                             data: allDataForAPI,
                         });
                         editajaxopenloaddata.done(function (value) {
+                            DTObjectDataForPartialEdit = value.Data.DTData;
+                            originalObjectDataForPartialEdit = value.Data.OriginalData;
                             returndatafunction(value);
                         });
                     };
@@ -2712,6 +3075,7 @@
                                 var chkajx = $.ajax({
                                     url: fn.validurl,
                                     method: "POST",
+                                    contentType: 'application/json',
                                     async: false,
                                     data: allDataForAPI,
                                     //data: $(forwardserializedata).serialize(),
@@ -2780,13 +3144,16 @@
                                 });
                             }
                         }
+
+
                         if (x == false || y == false) {
                             return false;
                         }
-                        var allDataForAPI = $.param(P2bBindAllDataForEditSave(forwardserializedata, { Id: forwarddata }));
+                        var allDataForAPI = JSON.stringify(P2bBindAllDataForEditSave(forwardserializedata, forwarddata, classoridoftheonwhichpopupderived, originalObjectDataForPartialEdit, DTObjectDataForPartialEdit));
                         editajaxdata = $.ajax({
                             url: editurl,
                             method: "POST",
+                            contentType: 'application/json',
                             beforeSend: function () {
                                 $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
                                 ajaxloaderv2('body');
@@ -2821,9 +3188,10 @@
                                                 alert("Parameter is Not Passed Properly");
                                             }
                                             if (nameclassidofinlinelookup != '' || nameclassidofinlinelookup == null && classoridoftheonwhichpopupderived != '' || classoridoftheonwhichpopupderived == null) {
-
                                                 jQuery(classoridoftheonwhichpopupderived).find('' + nameclassidofinlinelookup + ' tr td:contains(' + data[0] + ')').parent('tr.selectedtr').remove();
-                                                $(nameclassidofinlinelookup).P2BLookUpEncapsulate(nameclassidofinlinelookup, nameofthelist_inlinelookuptable, data[0], data[1], nameoftable_inlinelookuptable, nameidclassofbuttontodisable, multiple_allowed_or_not);
+                                                var flagForOriginalOrEdit = compareDataAndSetFlag(forwardserializedata, originalObjectDataForPartialEdit, DTObjectDataForPartialEdit);
+                                                $(nameclassidofinlinelookup).P2BLookUpEncapsulate(nameclassidofinlinelookup, nameofthelist_inlinelookuptable, data[0], data[1], nameoftable_inlinelookuptable, 'Edit', multiple_allowed_or_not, flagForOriginalOrEdit);
+                                                //$(nameclassidofinlinelookup).P2BLookUpEncapsulate(nameclassidofinlinelookup, nameofthelist_inlinelookuptable, data[0], data[1], nameoftable_inlinelookuptable, nameidclassofbuttontodisable, multiple_allowed_or_not,'E');
                                             }
                                             else {
                                                 alert("Parameter is Not Passed Properly.");
@@ -2851,8 +3219,6 @@
                                         Ok: function (e) {
                                             newDiv.dialog("close");
                                             newDiv.remove();
-                                            newDiv2.dialog('close');
-                                            $(newDiv).remove();
 
                                         }
                                     }
@@ -2902,7 +3268,7 @@
             if (typeof deletedata == 'undefined' || deletedata == null) {
                 $('<div></div>').P2BMessageModalDialog('ui-icon-alert', "Please Select Row..!");
                 return false;
-            };
+            };            
             var deleteajaxdata;
             deletedata, forwarddata = 0;
             var newDiv = $(document.createElement('div'));
@@ -2920,6 +3286,24 @@
                 },
                 buttons: {
                     Confirm: function () {
+                        if (deleteurl && deleteurl !== '') {
+                            var allDataForAPI = JSON.stringify(P2bBindAllDataForDelete(deletedata));
+                            $.ajax({
+                                url: deleteurl,
+                                method: "POST",
+                                beforeSend: function () {
+                                    $('.ui-dialog-buttonpane').find('button:contains("Submit")').button().button('disable').addClass('submitbtndisable');
+                                    ajaxloaderv2('body');
+                                },
+                                data: allDataForAPI,
+                                success: function () {
+                                    ajaxLoderRemove();
+                                },
+                                error: function () {
+                                    ajaxLoderRemove();
+                                }
+                            });
+                        }
                         var newDivdelete = $(document.createElement('div'));
                         var htmltag = '<p><span class="ui-icon ui-icon-check" style="float:left;margin-right:10px"></span> ' + deletesuccessmessage + '' + "Record Removed" + '';
                         htmltag += '</p>';
@@ -2930,7 +3314,7 @@
                             autoOpen: false,
                             title: "Information",
                             height: "auto",
-                            width: 425,
+                            width: 200,
                             modal: true,
                             buttons: {
                                 Ok: function (e) {
@@ -3084,7 +3468,9 @@
                         if (multipleallowedornot == 'A') {
                             if (target.className != "selectedtr") {
                                 target.className = "selectedtr";
-                                jQuery(tablename).append('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').insertAfter($(this).closest('tr')).TableOnRowsClick(nameoftable);
+                                
+                                jQuery(tablename).append('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>A</td><td>' + data[1] + '</td></tr>').insertAfter($(this).closest('tr')).TableOnRowsClick(nameoftable);
+                                //jQuery(tablename).append('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').insertAfter($(this).closest('tr')).TableOnRowsClick(nameoftable);
                                 //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                                 jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                 jQuery(tablename + ' tr td').addClass("selectedtr");
@@ -3139,7 +3525,8 @@
                                     target.className = "selectedtr";
 
                                     //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
-                                    jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
+                                    jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>A</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
+                                    //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
                                     //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                                     jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
                                     jQuery(tablename + ' tr td').addClass("selectedtr");
@@ -3196,7 +3583,8 @@
                             for (var j = 0; j < 2; j++) {
                                 data.push(td_arry[j].innerHTML);
                             }
-                            jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
+                            jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>A</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
+                            //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + data[0] + '"/>' + data[0] + '</td><td>' + data[1] + '</td></tr>').TableOnRowsClick(nameoftable);
                             data = [];
                             //jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
                             jQuery(classoridoftheonwhichpopupderived).find('#' + nameofthelist + '').parents('div').next('.icon-row').find(nameidclassofbuttontodisable).button().button('enable').removeClass('ButtonHover');
@@ -3223,18 +3611,20 @@
                     jQuery('#' + pagename + '').empty();
                     $.CheckSessionExitance();
                     var ids = CountTableIds(tablename);
+                    var allDataForAPI = JSON.stringify(P2bBindAllDataForLookUp(ids));
                     lookupajaxdata = $.ajax({
                         url: lookupurl,
                         type: 'POST',
                         cache: false,
                         contentType: 'application/json',
                         datatype: 'json',
-                        data: JSON.stringify([null, null, ids]),
+                        data: allDataForAPI,
+                        //data: JSON.stringify([null, null, ids]),
                         //data: JSON.stringify([{ Id: ids }]),
-                        //beforeSend: function () {
-                        //    ajaxloader(init);
-                        //    $(init).find("div .ajax_loder").show();
-                        //}, 
+                        beforeSend: function () {
+                            ajaxloader(init);
+                            $(init).find("div .ajax_loder").show();
+                        }, 
 
                     });
                     lookupajaxdata.done(function (successdata) {
@@ -3255,7 +3645,7 @@
                             clickon();
                             pageon();
                             searchon();
-                            //$(init).find("div .ajax_loder").hide();
+                            $(init).find("div .ajax_loder").hide();
                         }
                     });
                 },
@@ -3319,13 +3709,14 @@
             var data = [];
             $.each($("" + tableidorclass + " tr.selectedtr"), function () { //tr which has selected class which is delcared in standard css as standardtr.
                 if (jQuery(this).find('td').eq(indexvalueoftable).text() != "") {
-                    data.push(jQuery(this).find('td').eq(indexvalueoftable).text());
+                    data.push(jQuery(this).find('input').val());
+                    //data.push(jQuery(this).find('td').eq(indexvalueoftable).text());
                 }
             });
             return data;
         };
         $.fn.P2BLookUpEncapsulate = function (tablename, nameofthelist, firstdataparameter, seconddataparameter, nameoftable,
-            nameofthebtndisable, multiple_allowed_or_not) {
+            nameofthebtndisable, multiple_allowed_or_not,createOrEditActionFlag) {
             if (firstdataparameter == undefined || firstdataparameter == '' || firstdataparameter == null || seconddataparameter == undefined || seconddataparameter == '' || seconddataparameter == null) {
                 return null;
             }
@@ -3333,7 +3724,7 @@
                 //Value For Para multiple_allowed_or_not
                 //A = Allowed;
                 //N= Not Allowed;
-                if (nameofthebtndisable.toUpperCase() != 'View'.toUpperCase()) {
+                if (nameofthebtndisable && nameofthebtndisable.toUpperCase() != 'View'.toUpperCase()) {
                     nameofthebtndisable = ".popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-view";
                 } else {
                     nameofthebtndisable = "";
@@ -3347,18 +3738,21 @@
                         if (firstdataparameter.length && seconddataparameter.length > 1) {
                         }
                         $(tablename).parents('div').next('.icon-row').find(nameofthebtndisable).button().button('enable');
-                        jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
+                        jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + createOrEditActionFlag + '</td><td>' + seconddataparameter + '</td></tr>');
+                        //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
                     }
                 } else if (multiple_allowed_or_not == 'A') {
                     if (typeof seconddataparameter == 'string') {
                         $(tablename).parents('div').next('.icon-row').find(nameofthebtndisable).button().button('enable');
-                        jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
+                        jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + createOrEditActionFlag + '</td><td>' + seconddataparameter + '</td></tr>');
+                        //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter + '"/>' + firstdataparameter + '</td><td>' + seconddataparameter + '</td></tr>');
                         LookupTableSelectedRowOnClick(nameofthelist);
                     }
                     if (typeof firstdataparameter == 'object' && typeof seconddataparameter == 'object') {
                         $(tablename).parents('div').next('.icon-row').find(nameofthebtndisable).button().button('enable');
                         for (var i = 0; i < firstdataparameter.length && seconddataparameter.length; i++) {
-                            jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter[i] + '"/>' + firstdataparameter[i] + '</td><td>' + seconddataparameter[i] + '</td></tr>');
+                            jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td class="' + nameofthelist + '"><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter[i] + '"/>' + createOrEditActionFlag + '</td><td>' + seconddataparameter[i] + '</td></tr>');
+                            //jQuery('' + tablename + ' tr:last').after('<tr tabindex="-1"><td><input type="text" name="' + nameofthelist + '" value="' + firstdataparameter[i] + '"/>' + firstdataparameter[i] + '</td><td>' + seconddataparameter[i] + '</td></tr>');
                             if (i == 0) {
                                 LookupTableSelectedRowOnClick(nameofthelist);
                             }
@@ -3375,7 +3769,7 @@
             var init = jQuery(this);
             var w = $(init).css('width');
             var htm = '<option style=' + w + ' value=0 selected=true>-Select-</option>';
-            jQuery(init).empty().append(htm).selectmenu().selectmenu().selectmenu("refresh");
+            jQuery(init).empty().append(htm).selectmenu().selectmenu("refresh");
             $.post(url, { data: forwardata, data2: forwardata2 }, function (data) {
                 $.each(data, function (i, k) {
                     jQuery(init).append($('<option>', {
@@ -6866,19 +7260,197 @@
                 }
             });
         };
+        $.fn.P2BAuthorizeModalDialog = function (openurl, opendataforward, editurl, maindialogtitle, forwardserializedata, forwarddata, editmessage, editerrormessage, gridreloadname, height, width, nameofthelookuptable, nameidclassofbuttontodisable, returndatafunction, fn) {
+            var originalObjectData;
+            var DTObjectData;
+            var editajaxdata, editajaxopenloaddata, init;
+            var OldIds = [];
+            var NewIds = [];
+            var olddata = [];
+            //nameidclassofbuttontodisable = '.popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-view';
+            nameidclassofbuttontodisable = ".popup-content-icon-create,.popup-content-icon-edit,.popup-content-icon-remove,.popup-content-icon-lookup,.popup-content-icon-view";
+            var confrm, flag;
+            init = jQuery(this);            
+            var maindialog = jQuery(init).dialog({
+                autoOpen: false,
+                height: height,
+                width: width,
+                modal: true,
+                closeOnEscape: false,
+                title: maindialogtitle,
+                beforeClose: function (e) {
+                    RemoveLookupTableElement(forwardserializedata); RemoveErrTag();
+
+                    
+                },
+                open: function (event, ui) {
+                    $.CheckSessionExitance();
+                    $('.ui-dialog-titlebar-help').html('<span class="ui-button-icon ui-icon ui-icon-help"></span>');
+                    NewIds = [];
+                    olddata = [];
+                    OldIds = [];
+                    var allDataForAPI = JSON.stringify(P2bBindAllDataForEdit(opendataforward));
+                    editajaxopenloaddata = $.ajax({
+                        url: openurl,
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: allDataForAPI,
+                        //data: { data: opendataforward },
+                        beforeSend: function () {
+                            ajaxloaderv2('body');
+                        },
+                        complete: function () {
+                            // $('.ajax_loder').parents('div').remove();
+                            ajaxLoderRemove();
+                        }
+                    });
+                    editajaxopenloaddata.done(function (value) {
+                        if (typeof returndatafunction === 'function') {
+                            if (value && value.Data) {
+                                if (!singleData['AutoAuthorization'] && !singleData['Action'].includes('C')) {
+                                    DTObjectData = value.Data.DTData;
+                                    originalObjectData = value.Data.OriginalData;
+                                } else {
+                                    DTObjectData = value.Data.OriginalData;
+                                }
+                            }
+                            returndatafunction(value);
+                        } else {
+                            console.log('returnfun is not define');
+                        }
+                        if (DTObjectData && DTObjectData['Action'] !== 'E') {
+                            $('.ui-dialog-buttonpane').find('button:contains("Compare")').button('disable');
+                        }
+                    });
+                    OnpageAlter();
+                    jQuery(this).find("select").selectmenu('disable').addClass("ui-selectmenu-text");
+                    jQuery(this).find('input').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
+                    jQuery(this).find('textarea').prop('disabled', true).css("background-color", "rgba(241, 241, 241, 0.66)");
+                    //jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover').css("background-color", "rgba(241, 241, 241, 0.66)");
+                    jQuery(init).find(nameidclassofbuttontodisable).button().button('disable').addClass('ButtonHover');
+                },
+                buttons: {
+                    Approve: function (e) {
+                        ApproveRejectBtnClickFunc(forwardserializedata, init, maindialog, 'Approve', 1, forwarddata, editurl, gridreloadname, DTObjectData);
+                    },
+                    Reject: function () {
+                        ApproveRejectBtnClickFunc(forwardserializedata, init, maindialog, 'Reject', 2, forwarddata, editurl, gridreloadname, DTObjectData);
+                    },
+                    Compare: function () {
+                        if (DTObjectData['Action'] === 'E') {
+                            P2bCreateAuthorizationDialog({ FormName: forwardserializedata, OriginalData: originalObjectData, ModifiedData: DTObjectData, Forwarddata: forwarddata });
+                        }
+                    },
+                    Cancel: function () {
+                        jQuery(init).dialog('close');
+                    }
+                }
+            });
+            jQuery(init).dialog('open');
+            var submitIcon = $('.ui-icon-check');
+            if (submitIcon.length === 0) {
+                submitIcon = '<span class="ui-icon ui-icon-check"></span>';
+            }
+            var rejectIcon = $('.ui-icon-check');
+            if (rejectIcon.length === 0) {
+                rejectIcon = '<span class="ui-icon ui-icon-cancel"></span>';
+            }
+            var compareIcon = $('.ui-icon-check');
+            if (compareIcon.length === 0) {
+                compareIcon = '<span class="ui-icon ui-icon-transferthick-e-w"></span>';
+            }
+            var cancelIcon = $('.ui-icon-check');
+            if (cancelIcon.length === 0) {
+                cancelIcon = '<span class="ui-icon ui-icon-closethick"></span>';
+            }
+            $('.ui-dialog-buttonpane').find('button:contains("Approve")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend(submitIcon);
+            $('.ui-dialog-buttonpane').find('button:contains("Reject")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend(rejectIcon);
+            $('.ui-dialog-buttonpane').find('button:contains("Compare")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend(compareIcon);
+            //$('.ui-dialog-buttonpane').find('button:contains("Submit")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend('<span class="ui-icon ui-icon-disk"></span>');
+            $('.ui-dialog-buttonpane').find('button:contains("Cancel")').removeClass('ui-button-text-only').addClass('ui-button-text-icon-primary').prepend(cancelIcon);
+        };
     }));
 
 class P2bFormDataHandlingClass {
     constructor() {
-        this.data = [{ UserGroup: UserGroup }];
-        this.listOfIds = {};
+        this.data = [];
     }
 
     addData(...args) {
         this.data = [...this.data, ...args];
     }
+
     getData() {
         return this.data;
+    }
+
+    P2bCreateListOfTableData(formData, allTableIds) {
+        const arrayOfTableName = [];
+        if (allTableIds && typeof allTableIds === 'string') {
+            const arrayOfTableIds = allTableIds.split(',');
+            arrayOfTableIds.map(id => {
+                const tableName = id.replace(/#/g, '');
+                arrayOfTableName.push(tableName);
+            })
+
+            if (arrayOfTableName.length > 0) {
+                arrayOfTableName.map(name => {
+                    if (Array.isArray(formData[name]) && !name.includes("_Id")) {
+                        formData[name] = formData[name].map((value, index) => (
+                            { Id: value }
+                        ))
+                    } else if (!name.includes("_Id")) {
+                        formData[name] = [{ Id: formData[name] }];
+                    }
+                    else {
+                        if (Array.isArray(formData[name])) {
+                            formData[name] = formData[name][0];
+                        } else {
+                            formData[name] = formData[name];
+                        }
+                    }
+                })
+            }
+        }
+        return formData;
+    }
+
+    P2bCreateListOfTableDataWithAction(formData, allTableIds) {
+        const arrayOfTableName = [];
+        const listOfTableObject = {};
+        if (allTableIds && typeof allTableIds === 'string') {
+            const arrayOfTableIds = allTableIds.split(',');
+            arrayOfTableIds.map(id => {
+                const tableName = id.replace(/#/g, '');
+                arrayOfTableName.push(tableName);
+            })
+            if (arrayOfTableName.length > 0) {
+                arrayOfTableName.map(name => {
+                    var objData = document.getElementsByClassName(name);
+                    if (Array.isArray(formData[name]) && !name.includes("_Id")) {
+                        listOfTableObject[name] = formData[name].map((value, index) => (
+                            { Id: value, Action: objData[index] && objData[index].innerText }
+
+                        ))
+                    } else if (!name.includes("_Id")) {
+                        listOfTableObject[name] = [{ Id: formData[name], Action: objData[0] && objData[0].innerText }];
+                    } else {
+                        if (Array.isArray(formData[name])) {
+                            listOfTableObject[name] = formData[name].map((value, index) => (
+                                { Id: value, Action: objData[index] && objData[index].innerText }
+                            ))
+                            //listOfTableObject[name] = [{ Id: formData[name], Action: objData[0] && objData[0].innerText }];
+                            //formData[name] = formData[name][0];
+                        } else {
+                            if (formData[name]) {
+                                listOfTableObject[name] = [{ Id: formData[name], Action: objData[0] && objData[0].innerText }];
+                            }
+                        }
+                    }
+                })
+            }
+        }
+        return listOfTableObject;
     }
 }
 
@@ -6914,48 +7486,70 @@ function P2bGetFullDetails(obj) {
 
     }
 }
-
-
-function P2bCreateListOfTableData(formData, allTableIds) {
-    const arrayOfTableName = [];
-    if (allTableIds && typeof allTableIds === 'string') {
-        const arrayOfTableIds = allTableIds.split(',');
-        arrayOfTableIds.map(id => {
-            const tableName = id.replace(/#/g, '');
-            arrayOfTableName.push(tableName);
-        })
-
-        if (arrayOfTableName.length > 0) {
-            arrayOfTableName.map(name => {
-                if (Array.isArray(formData[name])) {
-                    formData[name] = formData[name].map(value => (
-                        { Id: value }
-                    ))
-                } else if (!name.includes("_Id")) {
-                    formData[name] = [{ Id: formData[name] }];
-                }
-            })
-        }
-    }
-    return formData;
-}
-
 function DateConvert(dateString) {
-    var date = dateString.substr(0, 10);
-    const splitDateArray = date.split('-');
-    date = splitDateArray[0] + "-" + splitDateArray[2] + "-" + splitDateArray[1];
-    date = new Date(date);
-    var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+    var date = new Date(dateString);
+    //var date = dateString.substr(0, 10);
+    //const splitDateArray = date.split('-');
+    //date = splitDateArray[0] + "-" + splitDateArray[1] + "-" + splitDateArray[2];
+    //date = new Date(date);
+    //var displayDate = $.datepicker.formatDate("dd/mm/yy", date);
+    var displayDate = $.datepicker.formatDate("yy-mm-dd", date);
     return displayDate;
 }
-//const APIURL = "http://192.168.1.11/P2BUltimate2.0Api";
-//const APIURL = "http://192.168.1.218/P2B.Api_2.0";
-//const APIURL = "http://192.168.1.36/P2B.API_2.0";
+
+function CreateDisableButtonsString(activeButtonsArray) {
+    var disabledButtonsIds = [];
+    var disableButtonIdString = '';
+    if (!activeButtonsArray.includes('A')) {
+        disabledButtonsIds.push('#Autho')
+    }
+    if (!activeButtonsArray.includes('C')) {
+        disabledButtonsIds.push('#Create')
+    }
+    if (!activeButtonsArray.includes('D')) {
+        disabledButtonsIds.push('#Delete')
+    }
+    if (!activeButtonsArray.includes('E')) {
+        disabledButtonsIds.push('#Edit')
+    }
+    if (!activeButtonsArray.includes('L')) {
+        disabledButtonsIds.push('#Lock')
+    }
+    if (!activeButtonsArray.includes('P')) {
+        disabledButtonsIds.push('#Process')
+    }
+    if (!activeButtonsArray.includes('R')) {
+        disabledButtonsIds.push('#Release')
+    }
+    if (!activeButtonsArray.includes('V')) {
+        disabledButtonsIds.push('#View')
+    }
+    if (disabledButtonsIds.length > 0) {
+        disableButtonIdString = disabledButtonsIds.join(',');
+    }
+
+    return disableButtonIdString;
+}
+//const APIURL = "http://192.168.1.11/P2B.API_2.0";
 const APIURL = "http://192.168.1.12/P2B.API_2.0";
-const UserGroup = "ADMIN";
-//const UserGroup = "MAKER";
-//const UserGroup = "CHECKER";
+//const UserGroup = "ADMIN";
+let lookUpActions = {};
 let Action;
 let NavListAction;
-let IsAuthorized;
-let UserName;
+const IsAuthorisedObject = { Yes: true, No: false };
+//let UserName = '00001886'; //Checker
+ //let UserName = '00000357'; //Maker
+ let UserName = '00000228'; //Admin
+let AuthorizeStatus = IsAuthorisedObject['No'];
+const User = [
+    {
+        EmpCode: '00001886', GroupId: 3, Action: ['A', 'L', 'R', 'V'], AutoAuthorization: false  //Checker
+    },
+    {
+        EmpCode: '00000357', GroupId: 2, Action: ['A', 'C', 'D', 'E', 'P', 'V'], AutoAuthorization: false  //Maker
+    },
+    {
+        EmpCode: '00000228', GroupId: 1, Action: ['C', 'E', 'V', 'D', 'P', 'A', 'R', 'L'], AutoAuthorization: true  //Admin
+    }
+];
+var singleData = User.find((e) => e.EmpCode === UserName);
